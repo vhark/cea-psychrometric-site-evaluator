@@ -80,7 +80,7 @@ Throughout these documents, "control window" means only this: the count of hours
 
 **Where it appears.** The DLI target input, the daily light chart, the DLI-deficit day count, the lighting energy line.
 
-**How it is computed here.** Solar photons come from measured GHI at 2.02 µmol/J, after PAR transmission and shade fraction, and are shared across stacked canopy by footprint rather than multiplied by tier area, so stacking cannot create photons. Supplemental light is scheduled causally: the controller sees current sunlight and the photons already accumulated in the local day, never future weather. Days are accumulated on the local calendar, including fractional UTC offsets and daylight-saving transitions, so a DST day keeps its actual elapsed hours.
+**How it is computed here.** Solar photons come from measured GHI at 2.02 µmol/J, after PAR transmission and shade fraction, and are shared across stacked canopy by footprint rather than multiplied by tier area, so stacking cannot create photons. Supplemental light is scheduled causally: the controller sees current sunlight and the photons already accumulated in the local day, never future weather. Each step asks for the outstanding deficit spread over the lit time actually left in the civil day, floored at one step, so the final step requests exactly what is missing and a fixture with the capacity to meet the target lands on it rather than finishing fractionally short. A deficit day is therefore a real shortfall of photons, not an artefact of the request window: `src/metrics.js` counts one only on a complete local day, when `max(0, dliTarget - dli)` exceeds 1e-6 mol/m²/day. Days are accumulated on the local calendar, including fractional UTC offsets and daylight-saving transitions, so a DST day keeps its actual elapsed hours.
 
 ## SHR (sensible heat ratio)
 
@@ -162,6 +162,18 @@ Throughout these documents, "control window" means only this: the count of hours
 
 **How it is computed here.** From the weather classification only: `PAD_EFFECTIVE` when pad leaving air clears both the temperature margin and the moisture ceiling, `PAD_MARGINAL` when it clears the ceiling but not the margin, `PAD_INEFFECTIVE_DEHU_NEEDED` otherwise, with the failing limit recorded. The coupled controller still runs the pad in hours the screen calls ineffective, because partial cooling beats none under the violation-first rule. Reading the two tables side by side is intended: 2,772 h of pad runtime against 244 h of weather-side viability is the honest picture of a moisture-limited climate.
 
+## Insect screen and its ventilation factor
+
+**What it is.** A mesh over the vents that keeps pests out and, by the same restriction, takes away part of the outside-air exchange the house depends on. In a humid climate that exchange is the cheapest moisture sink available, so the screen is a control decision and not only a pest decision. The ventilation factor is the share of a reference house's achievable maximum outside-air exchange that the screened house can still reach.
+
+**Unit.** Dimensionless, 0 to 1. Catalogued grades: `mesh40` 1.000, `mesh52` 0.641, `mesh78` 0.502.
+
+**Where it appears.** The `insectScreen` object of a scenario (`{installed, grade, ventilationFactor}`), which arrives with an imported or hand-edited scenario rather than from a control in the interface; the run warnings in the results panel, which name the factor, its basis and the resulting ACH; the warnings list of the exported report and the reproducible-assumptions appendix of the design-basis brief; and "Does an insect screen cost you, or help?" in [CLASSES.md](CLASSES.md).
+
+**How it is computed here.** `resolveInsectScreen` in `src/screens.js` resolves the factor, preferring a user-declared product measurement over a catalogued grade and reporting which of the two it used. `src/simulate.js` applies it once, at the physics entry point, by multiplying `maxVentACH` by the factor. The declared `minVentACH` is never derated: if the derate would fall below it the maximum clamps to the minimum, the run records `clampedToMinimum` and says so, because a screened house that cannot deliver the ventilation the scenario requires is a finding rather than a rounding. An installed screen that resolves to no factor is a validation error, so a mesh can never quietly cost nothing.
+
+The measured basis is one instrumented rainy-season campaign at the Asian Institute of Technology, Pathum Thani: three 10 x 20 m houses, 300 tomato plants each, fans off, ventilation inferred from a water balance cross-checked against an energy balance, giving 0.0719, 0.0461 and 0.0361 m³ m⁻² s⁻¹ [S24]. The factors above are those rates as ratios. **The reference is the 40-mesh house, not an unscreened one**: the campaign had no unscreened control, so the ventilation cost of adding a first screen to an open house is unsourced and this model cannot supply it, and declaring a factor of 1.0 claims a house like the measured 40-mesh one rather than an unrestricted one. One house per treatment at one site is a measured direction and magnitude, not a validated universal mesh penalty. Only the ventilation restriction is modeled: the same campaign's measured temperature and humidity rises follow from the run rather than being imposed, and no optical effect of the mesh is applied at all (see [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) §3A).
+
 ## Dominance and the operating-cost frontier
 
 **What it is.** A strategy is dominated when another strategy is at least as cheap and holds the band at least as often, and strictly better on one of the two. The frontier is the set of strategies that nothing dominates.
@@ -171,6 +183,16 @@ Throughout these documents, "control window" means only this: the count of hours
 **Where it appears.** The "Operating-cost frontier" and "Operating-dominated" labels in the comparison table, and the site verdict.
 
 **How it is computed here.** Two related computations. `compareScenarios` in `src/metrics.js` marks a row dominated when another comparable row has `cost <= cost` and `compliantHours >= compliantHours` with at least one strict inequality, scored on the common eligible hour set. `strategyFrontier` does the same over median cost and median attainment across weather years, and reports the cheapest frontier member as the verdict. Both are **operating cost only**: capital recovery and maintenance are displayed separately and are not in the dominance test. A scenario with missing prices or numerical-failure hours is not comparable and is excluded rather than assumed. Being the cheapest frontier member is a position on the cost axis, not a recommendation: at Tulsa the pad baseline is the cheapest non-dominated strategy in 100% of screened points while holding the band in a median 28.9% of hours against 66.4% for DX.
+
+## Control class
+
+**What it is.** A step on the ladder of environmental control, defined by the set of indoor states its equipment can reach rather than by its brand or its cost: from C0, fans and a wet pad with no heat, up to C6, an opaque uninsulated box with full mechanical authority. Each class is exhausted by a specific physical condition, which is what promotes a site to the next one.
+
+**Unit.** A label: C0, C1, C2, C3, C4, C5, C5b, C6.
+
+**Where it appears.** Not in the interface. It is the organizing spine of [CLASSES.md](CLASSES.md) and the vocabulary [REGIONS.md](REGIONS.md) uses when a climate needs more than the class it has.
+
+**How it is computed here.** A class is not computed, it is constructed: each one is an ordinary scenario built from the shipped components, and it is run through the same coupled model as any other scenario. The comparison in CLASSES.md reports nine configurations (the ladder plus a heat-pump variant of C1) against calendar year 2025 at six bundled sites, under the ideal per-substep controller, with heating, cooling and dehumidification sized per site by the stated rules. What a class row reports is therefore a capability ceiling for that climate, not an installed-system prediction, not an equipment-sizing certificate and not a manufacturer comparison.
 
 ## Elementary effect and mu\*
 
@@ -201,6 +223,26 @@ Throughout these documents, "control window" means only this: the count of hours
 **Where it appears.** The interface footer, the header of every exported report and design-basis brief (`Evidence tier: Assumption-based component screening`), and [EVALUATION.md](EVALUATION.md), which defines what each tier permits and prohibits.
 
 **How it is computed here.** It is not computed, it is asserted, and it is asserted at the lowest level the evidence supports. `src/simulate.js` writes `evidenceTier: 'Assumption-based component screening'` into the assumptions of every run, and `src/export.js` prints it at the top of every document, so a printed page cannot be separated from its tier. Raising the tier requires the benchmark work in roadmap M5 and the calibration work in M6, not a code change (see [DIGITAL-TWIN.md](DIGITAL-TWIN.md)).
+
+## Evidence grade (A to E)
+
+**What it is.** The strength of a single published claim cited from the outside literature. It is not the same thing as the evidence tier above: the tier describes what this tool's own output may be used for, the grade describes how well somebody else's study was done.
+
+**Unit.** One letter per claim. **A**: peer-reviewed, measured in a real hot-humid facility, with a control or baseline and reported uncertainty. **B**: peer-reviewed and measured, but a short campaign, a single facility, laboratory scale, or warm-humid rather than hot-humid. **C**: peer-reviewed simulation or validated model, including a measured system compared against a modeled baseline. **D**: not peer-reviewed, so technical reports, theses, extension bulletins and conference abstracts. **E**: vendor marketing with no disclosed method.
+
+**Where it appears.** [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md), beside every claim it cites, with a plain-words provenance note; where a paper's capability claim and its efficiency claim deserve different letters, both are given.
+
+**How it is computed here.** It is assigned by review against the definitions above, not computed, and it is never raised because a claim is widely repeated. The review's headline result is the absence it found: **no Grade A evidence in any of the six domains searched**, so the most consequential question in hot-humid CEA, the cheapest way to remove moisture when the outdoor dew point sits above the zone ceiling for thousands of hours, has no measured answer in the literature reviewed. The 52 cited DOIs were machine-checked and all 52 resolve (49 through Crossref, 3 through DataCite), which verifies that the sources exist, not that they are right.
+
+## Learn view
+
+**What it is.** The second of the two views in this single page: a taught curriculum over the tool's own evidence, in reading order, each section giving the concept, the arithmetic behind it, a figure measured in this repository and the caveat that travels with it.
+
+**Unit.** Ten sections: nine curriculum modules plus the regional-findings section.
+
+**Where it appears.** The **Learn** tab in the header, beside **Analyze**. `#learn` opens the view, `#learn/<module-key>` opens one section directly, and `#analyze` returns; every other fragment stays an ordinary in-page anchor.
+
+**How it is computed here.** Nothing on the page is computed by it. `src/learn.js` holds each section's text and a table of figures that are already published elsewhere in this repository, each row naming the file it came from, and the regional section is read from [regional-study.json](regional-study.json) at run time: an absent or unreadable study renders as an absent study, naming the file and the command that regenerates it, rather than falling back to an example. The "show me" button on a section switches to Analyze and highlights the panel it is about, using the guided tour's own spotlight rather than a second implementation; if that panel does not exist yet, the highlight lands on the control that would produce it.
 
 ---
 

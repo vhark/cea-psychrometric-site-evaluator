@@ -12,6 +12,10 @@ control setpoints, and validation data and standards. 52 cited DOIs were machine
 Read this if: you are choosing equipment for a humid site, or you want to know which of this tool's numbers
 rest on measurement and which rest on assumption.
 
+For what this tool itself computes for humid climates, including four hot-humid design questions measured
+rather than asserted, see [CLASSES.md](CLASSES.md). Those are model results held to the screening tier, not
+evidence of the kind graded below.
+
 ## The headline
 
 **No Grade A evidence was found in any of the six domains.** Not one peer-reviewed study was located that

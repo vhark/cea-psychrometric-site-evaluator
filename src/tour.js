@@ -113,7 +113,7 @@ export const TOUR_STEPS = [
     body: 'Run JSON carries inputs, provenance and outputs and is the reproducibility bundle. Hourly CSV is the raw per-hour record, and the printable report is the light-themed narrative. The design-basis brief summarises peak hours, air and water requirements and the strategy verdict for the engineer of record; a report on its own is not the full bundle, so keep the run JSON with it.',
     absent: 'exports become available once there is a run to export'},
   {id: 'sources', target: 'sources', title: 'Know what this screen cannot tell you',
-    body: 'The sources section states the standing limits: weather is evidence, equipment is an assumption, and the desiccant and hybrid entries are technology references rather than brand rankings. There is no independent model benchmark, no site calibration and no equipment performance maps behind these numbers. The 63 regression tests defend physical and data boundaries, which is not the same thing as empirical greenhouse validation.',
+    body: 'The sources section states the standing limits: weather is evidence, equipment is an assumption, and the desiccant and hybrid entries are technology references rather than brand rankings. There is no independent model benchmark, no site calibration and no equipment performance maps behind these numbers. The 91 regression tests defend physical and data boundaries, which is not the same thing as empirical greenhouse validation.',
     why: 'Quoting a figure from this tool without its basis is the one failure mode the whole interface is built to prevent.'}
 ];
 

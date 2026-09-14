@@ -38,6 +38,39 @@ Data flow:
 
 Location + date range -> weather adapters -> immutable raw snapshot -> normalized weather + quality -> scenario configuration -> weather screen OR coupled worker -> hourly results -> aggregation/comparison -> charts and portable exports.
 
+### The seventeen modules, as shipped
+
+Every file in `src/` and the boundary it holds. Concrete per-person ownership is in [IMPLEMENTATION.md](IMPLEMENTATION.md); this table is what each module is allowed to know.
+
+| Module | What it owns | Must not do |
+|---|---|---|
+| `config.js` | Defaults, crop/facility/system catalogs, editable field descriptors, scenario back-fill and `validateScenario` | Simulate anything, or accept a component that resolves to no usable parameter |
+| `physics.js` | Typed SI psychrometrics over pinned PsychroLib, pad state, canopy absorption, Stanghellini transpiration, the outside-air drying screen | Hold state across hours, or decide equipment operation |
+| `screens.js` | Movable shade, thermal curtain, insect screen and heat-pump parameters, their catalogued grades, resolvers and deployment predicates | Ship an unsourced number as a default, or dispatch equipment |
+| `simulate.js` | The coupled single-zone run: substep integration, the staged controller and the ideal-modulation alternative, causal light scheduling, per-hour results and warnings | Aggregate, price or rank; read future weather |
+| `metrics.js` | Summaries, monthly and daily reductions, load decomposition, design hours, multi-year aggregation, comparison and dominance | Recompute physics, or annualize a partial period |
+| `sensitivity.js` | Morris design, elementary effects, mu\*, and the ranking-stability rule | Touch the DOM, or claim a distribution |
+| `weather.js` | Provider adapters, normalization, continuity checks, the bundled site index and year loader | Classify modes or fill a gap |
+| `energy.js` | ZIP lookup, utility, price and grid context, and period-matched costing | Guess a provider, a tariff or a missing price |
+| `vintages.js` | Per-dataset staleness budgets assessed from committed manifests | Read a clock, a file timestamp or the network |
+| `storage.js` | IndexedDB weather snapshots and localStorage scenarios | Persist a secret, or silently drop a quota failure |
+| `worker.js` | The off-thread simulate and parse protocol, progress, cancellation and run identity | Render, or repair invalid physics |
+| `app.js` | The Analyze view: inputs, run lifecycle, panel rendering, weather and energy selection | Embed an equation, or hide a model failure |
+| `charts.js` | SVG charts and their accessible table equivalents, from the same arrays the tables use | Compute a separate approximate series |
+| `report.js` | The standalone printable results document, Archive register, generated from one run | Compute a metric of its own |
+| `export.js` | JSON, CSV and report downloads, scenario export and `parseImport` | Export a claim a run did not produce |
+| `tour.js` | The guided tour steps, the spotlight and the dimmed backdrop | Quote a figure not already committed in this repository |
+| `learn.js` | The Learn view: the curriculum, the regional findings section, the two-view switch and the hash routes | Compute a number, or substitute an example for an absent study |
+
+### Where a new capability belongs
+
+- A new physical process or actuator: `physics.js` for the stateless relation, `simulate.js` for the dispatch that uses it.
+- A new number derived from a completed run: `metrics.js`, then the view. Never in `charts.js`, `report.js` or `export.js`, so a chart, a page and a CSV cannot disagree.
+- A new component with published parameters: `screens.js` for the values and the resolver, `config.js` for back-fill and validation, `docs/COMPONENT-PARAMETERS.md` for the evidence, and the one place in `simulate.js` where the resolved value enters the physics.
+- A new bundled dataset: the snapshot plus its manifest, and a staleness budget in `vintages.js`.
+- A new long computation: through `worker.js` as a new message type with its own progress and cancellation, never on the UI thread.
+- A new taught section: an entry in `MODULES` in `learn.js`, quoting a figure that is already committed with its source.
+
 ## 3. Provider strategy
 
 ### Observed meteorology
@@ -141,6 +174,10 @@ Compare explicit scenario clones. Compute the marginal effect of one upgrade fir
 - Saving handles denied/quota-full storage and offers JSON export. Imports are validated before entering storage or worker state.
 - Names and imported strings render as text, not executable HTML. CSV exports escape delimiters and spreadsheet-formula prefixes in user strings.
 - Charts are derived views of the same result arrays as tables and exports; no separate approximate chart calculations.
+- The page holds two views, Analyze and Learn, in one document. Switching hides a panel rather than unmounting it: no code inside the hidden view runs, nothing re-renders, and a run in flight is not interrupted. `learn.js` owns the switch, remembers the last view in local storage, and keeps a per-view scroll position.
+- `#learn` and `#learn/<module-key>` are routes into the Learn view and `#analyze` is the route back; every other fragment stays an ordinary in-page anchor, so an existing deep link still works. Opening a curriculum section rewrites the hash with `replaceState`, which keeps the back button meaningful.
+- The Learn view's regional section reads `docs/regional-study.json` at run time and renders only what that file contains. An absent or unreadable study renders as an absent study, naming the file and the command that regenerates it, and never falls back to an example.
+- The highlight a Learn section uses to point at a panel is the guided tour's `spotlight()`, exported from `tour.js` and imported by `learn.js`. There is one highlight implementation, and it is a no-op while a tour owns the screen. If the panel a section refers to does not exist yet, the highlight lands on the first visible fallback, which is the control that would produce it.
 - Brand tokens are Grownetics (see PRD §5 Brand): app in Carbon register, exported documents in Archive register. Chart colors resolve through CSS custom properties (`--chart-1..8`, `--ok/--warn/--bad`) so palette changes never touch chart code.
 
 ## 7. Open-source and reproducibility

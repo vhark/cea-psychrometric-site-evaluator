@@ -1,9 +1,9 @@
 <!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CEA Psychrometric Site Evaluator | design-basis brief | Grownetics</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;600&display=swap" rel="stylesheet"><style>:root{color-scheme:light}body{background:#F3F0ED;color:#2B2C2E;font:15px/1.6 'Inter',system-ui,sans-serif;max-width:1000px;margin:auto;padding:40px 32px}.mark{font:700 13px 'DM Sans',sans-serif;letter-spacing:.28em;text-transform:uppercase;margin-bottom:40px}.mark em{font-style:normal;color:#4DB405}.cat{display:block;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#9A8860;margin-bottom:8px}h1,h2{font-family:'DM Sans',sans-serif;font-weight:700;letter-spacing:-.025em;margin:0}h1{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:14px}h2{font-size:1.5rem;margin-bottom:20px}h3{font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:#9A8860;margin:28px 0 8px}p{max-width:68ch;margin:0 0 14px}section{margin:56px 0;padding-top:28px;border-top:1px solid rgba(43,44,46,.15)}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid rgba(43,44,46,.15);vertical-align:top}th{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7);width:34%}td,pre{font-family:'IBM Plex Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}ul{padding-left:18px;font-size:13px;max-width:68ch}summary{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(43,44,46,.7);cursor:pointer;padding:10px 0}.notice{border:1px solid rgba(43,44,46,.3);padding:16px 18px;font-size:13px;max-width:none}.meta{font:11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(43,44,46,.7)}.foot{font:10px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(43,44,46,.55);margin-top:48px}@media print{body{padding:0}details{display:block}section{break-inside:avoid}}.brief table{font-size:12px}.brief th,.brief td{padding:5px 6px}.brief th{width:auto}.brief td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7);white-space:nowrap}.brief section{margin:24px 0;padding-top:16px}.brief h2{font-size:1.15rem;margin-bottom:10px}.brief p{font-size:13px}.verdict{border:1px solid rgba(43,44,46,.3);padding:12px 16px;font-size:13px;max-width:none}.appendix{break-before:page}@media print{.brief section{margin:14px 0;padding-top:10px}.brief table{font-size:10px}.brief p{font-size:11px}}</style><div class="mark">Grownetics<em>.</em></div><span class="cat">Design-basis brief</span><h1>CEA Psychrometric Site Evaluator</h1><div class="brief"><p class="meta">36.15, -95.99 · America/Chicago · 2021-01-01 to 2021-12-31 · weather years 2021, 2022, 2023, 2024, 2025 · NASA POWER (gridded reanalysis + satellite solar)</p><p class="notice"><strong>Evidence tier: Assumption-based component screening.</strong> Assumption-based screening, not a calibrated greenhouse digital twin, guaranteed indoor condition, equipment selection certificate or crop-yield forecast. Hourly source weather does not establish minute-scale or canopy-level precision. Installed costs and component efficiencies are editable assumptions unless separately sourced. Regional grid mix is not utility procurement or marginal emissions. Model 0.2.0-screening, 1 minute dispatch step, staged control, stanghellini transpiration.</p>
-<section><h2><span class="cat">§ 001</span>Climate design conditions</h2><table><thead><tr><th>Condition</th><th>0.4 %</th><th>1 %</th><th>2 %</th></tr></thead><tbody><tr><td class="k">Dry bulb, 0.4 / 1 / 2 percent exceeded</td><td>37.5 C</td><td>36.3 C</td><td>35.3 C</td></tr><tr><td class="k">  coincident wet bulb</td><td>24.1 C</td><td>21.9 C</td><td>22.8 C</td></tr><tr><td class="k">  coincident dew point</td><td>18.7 C</td><td>15.2 C</td><td>17.5 C</td></tr><tr><td class="k">Dew point, 0.4 / 1 / 2 percent exceeded</td><td>25.2 C</td><td>24.6 C</td><td>24.1 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>28.2 C</td><td>27.3 C</td><td>30.3 C</td></tr><tr><td class="k">Wet bulb, 0.4 / 1 / 2 percent exceeded</td><td>26.5 C</td><td>26 C</td><td>25.6 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>30.6 C</td><td>29.6 C</td><td>29.5 C</td></tr></tbody></table><p>8,760 valid weather hours. Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value; coincident values belong to that same hour, not independent percentiles. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single result hours under the assumed strategy; sensible = positive solar, light, envelope, infiltration, fan and crop gains; latent = crop transpiration plus positive infiltration and ventilation moisture import.</p></section>
+<section><h2><span class="cat">§ 001</span>Climate design conditions</h2><table><thead><tr><th>Condition</th><th>0.4 %</th><th>1 %</th><th>2 %</th></tr></thead><tbody><tr><td class="k">Dry bulb, 0.4 / 1 / 2 percent exceeded</td><td>37.5 C</td><td>36.3 C</td><td>35.3 C</td></tr><tr><td class="k">  coincident wet bulb</td><td>24.1 C</td><td>21.9 C</td><td>22.8 C</td></tr><tr><td class="k">  coincident dew point</td><td>18.7 C</td><td>15.2 C</td><td>17.5 C</td></tr><tr><td class="k">Dew point, 0.4 / 1 / 2 percent exceeded</td><td>25.2 C</td><td>24.6 C</td><td>24.1 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>28.2 C</td><td>27.3 C</td><td>30.3 C</td></tr><tr><td class="k">Wet bulb, 0.4 / 1 / 2 percent exceeded</td><td>26.5 C</td><td>26 C</td><td>25.6 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>30.6 C</td><td>29.6 C</td><td>29.5 C</td></tr></tbody></table><p>8,760 valid weather hours. Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record, so a ranked-hour coincidence is a different and noisier statistic computed here from ten reanalysis years (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single result hours under the assumed strategy; sensible = positive solar, light, envelope, infiltration, fan and crop gains; latent = crop transpiration plus positive infiltration and ventilation moisture import.</p></section>
 <section><h2><span class="cat">§ 002</span>Crop band</h2><p>lettuce: 22 C day / 18 C night, tolerance 2 K; VPD 0.6 to 1 kPa; dew-point cap 19 C; DLI target 14 mol/m²/d over 16 h from 6:00</p></section>
-<section><h2><span class="cat">§ 003</span>Strategies</h2><table><thead><tr><th>Quantity</th><th>Pad + vent baseline</th><th>Pads + condensing dehumidifier</th><th>DX / mini-split + dehumidifier</th><th>Integrated HVAC + reheat</th><th>Desiccant + evaporative cooling</th><th>Liquid-desiccant hybrid (generic)</th></tr></thead><tbody><tr><td class="k">Joint attainment</td><td>28.9% median, 27.1% worst (2025) over 5 years; this period 29.8%</td><td>42.7% median, 41.6% worst (2025) over 5 years; this period 43.8%</td><td>71.2% median, 68.9% worst (2022) over 5 years; this period 71.2%</td><td>55.4% median, 55.3% worst (2021) over 5 years; this period 55.3%</td><td>52.5% median, 51.2% worst (2024) over 5 years; this period 53%</td><td>52.6% median, 51.8% worst (2024) over 5 years; this period 53.8%</td></tr><tr><td class="k">Space sensible-heat ratio, period</td><td>0.61</td><td>0.57</td><td>0.6</td><td>0.64</td><td>0.56</td><td>0.6</td></tr><tr><td class="k">Peak sensible hour</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>261.6 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>265.1 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>255.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td></tr><tr><td class="k">Peak latent hour</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>220.8 kg/h at 2021-08-25 13:00; outdoor 38.3 C DB, 24.7 C WB, 19.4 C DP</td><td>172 kg/h at 2021-06-15 14:00; outdoor 32.9 C DB, 24.1 C WB, 20.7 C DP</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>166.7 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td></tr><tr><td class="k">Worst joint-failure hour</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>15.3 K·h, 2.628 kPa·h at 2021-08-25 15:00; outdoor 39.1 C DB, 24.7 C WB, 19 C DP</td><td>14.82 K·h, 3.118 kPa·h at 2021-08-25 15:00; outdoor 39.1 C DB, 24.7 C WB, 19 C DP</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>9.75 K·h, 1.096 kPa·h at 2021-07-24 14:00; outdoor 35.4 C DB, 26.6 C WB, 23.6 C DP</td></tr><tr><td class="k">1 percent joint-failure hour</td><td>13.14 K·h, 2.372 kPa·h at 2021-08-10 12:00; outdoor 35.5 C DB, 25.3 C WB, 21.5 C DP</td><td>13.04 K·h, 2.455 kPa·h at 2021-08-07 15:00; outdoor 35.6 C DB, 24.8 C WB, 20.7 C DP</td><td>11.8 K·h, 2.025 kPa·h at 2021-08-07 13:00; outdoor 35.4 C DB, 24.6 C WB, 20.4 C DP</td><td>10.38 K·h, 2.121 kPa·h at 2021-07-23 16:00; outdoor 34 C DB, 25.2 C WB, 22 C DP</td><td>13.04 K·h, 2.455 kPa·h at 2021-08-07 15:00; outdoor 35.6 C DB, 24.8 C WB, 20.7 C DP</td><td>8.04 K·h, 1.123 kPa·h at 2021-08-07 13:00; outdoor 35.4 C DB, 24.6 C WB, 20.4 C DP</td></tr><tr><td class="k">Ventilation air requirement</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td></tr><tr><td class="k">Condensate peak</td><td>0 kg/h</td><td>40 kg/h</td><td>76.7 kg/h</td><td>51.4 kg/h</td><td>0 kg/h</td><td>0 kg/h</td></tr><tr><td class="k">Pad water peak / runtime</td><td>524 L/h; 691 h on 130 days, 111,737 L</td><td>524 L/h; 759 h on 161 days, 117,169 L</td><td>524 L/h; 633 h on 138 days, 100,259 L</td><td>524 L/h; 602 h on 115 days, 92,396 L</td><td>524 L/h; 736 h on 148 days, 115,837 L</td><td>542.7 L/h; 0 h on 0 days, 446,027 L</td></tr><tr><td class="k">Outside-air drying hours, weather side</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td></tr><tr><td class="k">CO₂ enrichment window</td><td>4,460 equivalent h on 365 days; weather-side 5,477 h</td><td>3,349 equivalent h on 344 days; weather-side 5,477 h</td><td>5,726 equivalent h on 365 days; weather-side 5,477 h</td><td>6,149 equivalent h on 365 days; weather-side 5,477 h</td><td>3,434 equivalent h on 347 days; weather-side 5,477 h</td><td>3,924 equivalent h on 364 days; weather-side 5,477 h</td></tr><tr><td class="k">Reheat after overcooling</td><td>0 kWh</td><td>0 kWh</td><td>0 kWh</td><td>203,635 kWh</td><td>0 kWh</td><td>0 kWh</td></tr><tr><td class="k">Purchased electricity / fuel</td><td>58,640 / 313,297 kWh</td><td>123,495 / 264,086 kWh</td><td>198,739 / 312,325 kWh</td><td>231,768 / 372,861 kWh</td><td>62,849 / 534,226 kWh</td><td>240,233 / 325,965 kWh</td></tr><tr><td class="k">Operating cost, period</td><td>$22,233; median year $22,062</td><td>$27,961; median year $27,176</td><td>$39,068; median year $38,818</td><td>$45,616; median year $45,616</td><td>$32,864; median year $31,588</td><td>$45,329; median year $43,904</td></tr><tr><td class="k">Installed capital assumption</td><td>$15,000</td><td>$35,000</td><td>$85,000</td><td>$110,000</td><td>$90,000</td><td>$125,000</td></tr></tbody></table><p>Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value; coincident values belong to that same hour, not independent percentiles. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single result hours under the assumed strategy; sensible = positive solar, light, envelope, infiltration, fan and crop gains; latent = crop transpiration plus positive infiltration and ventilation moisture import.</p></section>
+<section><h2><span class="cat">§ 003</span>Strategies</h2><table><thead><tr><th>Quantity</th><th>Pad + vent baseline</th><th>Pads + condensing dehumidifier</th><th>DX / mini-split + dehumidifier</th><th>Integrated HVAC + reheat</th><th>Desiccant + evaporative cooling</th><th>Liquid-desiccant hybrid (generic)</th></tr></thead><tbody><tr><td class="k">Joint attainment</td><td>28.9% median, 27.1% worst (2025) over 5 years; this period 29.8%</td><td>42.7% median, 41.6% worst (2025) over 5 years; this period 43.8%</td><td>71.2% median, 68.9% worst (2022) over 5 years; this period 71.2%</td><td>55.4% median, 55.3% worst (2021) over 5 years; this period 55.3%</td><td>52.5% median, 51.2% worst (2024) over 5 years; this period 53%</td><td>52.6% median, 51.8% worst (2024) over 5 years; this period 53.8%</td></tr><tr><td class="k">Space sensible-heat ratio, period</td><td>0.61</td><td>0.57</td><td>0.6</td><td>0.64</td><td>0.56</td><td>0.6</td></tr><tr><td class="k">Peak sensible hour</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>261.6 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>265.1 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>255.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td></tr><tr><td class="k">Peak latent hour</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>220.8 kg/h at 2021-08-25 13:00; outdoor 38.3 C DB, 24.7 C WB, 19.4 C DP</td><td>172 kg/h at 2021-06-15 14:00; outdoor 32.9 C DB, 24.1 C WB, 20.7 C DP</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>166.7 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td></tr><tr><td class="k">Worst joint-failure hour</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>15.3 K·h, 2.628 kPa·h at 2021-08-25 15:00; outdoor 39.1 C DB, 24.7 C WB, 19 C DP</td><td>14.82 K·h, 3.118 kPa·h at 2021-08-25 15:00; outdoor 39.1 C DB, 24.7 C WB, 19 C DP</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>9.75 K·h, 1.096 kPa·h at 2021-07-24 14:00; outdoor 35.4 C DB, 26.6 C WB, 23.6 C DP</td></tr><tr><td class="k">1 percent joint-failure hour</td><td>13.14 K·h, 2.372 kPa·h at 2021-08-10 12:00; outdoor 35.5 C DB, 25.3 C WB, 21.5 C DP</td><td>13.04 K·h, 2.455 kPa·h at 2021-08-07 15:00; outdoor 35.6 C DB, 24.8 C WB, 20.7 C DP</td><td>11.8 K·h, 2.025 kPa·h at 2021-08-07 13:00; outdoor 35.4 C DB, 24.6 C WB, 20.4 C DP</td><td>10.38 K·h, 2.121 kPa·h at 2021-07-23 16:00; outdoor 34 C DB, 25.2 C WB, 22 C DP</td><td>13.04 K·h, 2.455 kPa·h at 2021-08-07 15:00; outdoor 35.6 C DB, 24.8 C WB, 20.7 C DP</td><td>8.04 K·h, 1.123 kPa·h at 2021-08-07 13:00; outdoor 35.4 C DB, 24.6 C WB, 20.4 C DP</td></tr><tr><td class="k">Ventilation air requirement</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td></tr><tr><td class="k">Condensate peak</td><td>0 kg/h</td><td>40 kg/h</td><td>76.7 kg/h</td><td>51.4 kg/h</td><td>0 kg/h</td><td>0 kg/h</td></tr><tr><td class="k">Pad water peak / runtime</td><td>524 L/h; 691 h on 130 days, 111,737 L</td><td>524 L/h; 759 h on 161 days, 117,225 L</td><td>524 L/h; 633 h on 138 days, 100,329 L</td><td>524 L/h; 602 h on 115 days, 92,396 L</td><td>524 L/h; 736 h on 148 days, 115,832 L</td><td>542.7 L/h; 0 h on 0 days, 446,041 L</td></tr><tr><td class="k">Outside-air drying hours, weather side</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td></tr><tr><td class="k">CO₂ enrichment window</td><td>4,460 equivalent h on 365 days; weather-side 5,477 h</td><td>3,349 equivalent h on 344 days; weather-side 5,477 h</td><td>5,723 equivalent h on 365 days; weather-side 5,477 h</td><td>6,149 equivalent h on 365 days; weather-side 5,477 h</td><td>3,434 equivalent h on 347 days; weather-side 5,477 h</td><td>3,924 equivalent h on 364 days; weather-side 5,477 h</td></tr><tr><td class="k">Reheat after overcooling</td><td>0 kWh</td><td>0 kWh</td><td>0 kWh</td><td>203,632 kWh</td><td>0 kWh</td><td>0 kWh</td></tr><tr><td class="k">Purchased electricity / fuel</td><td>58,665 / 313,276 kWh</td><td>123,544 / 264,057 kWh</td><td>198,703 / 312,180 kWh</td><td>231,791 / 372,825 kWh</td><td>62,874 / 534,204 kWh</td><td>240,265 / 325,946 kWh</td></tr><tr><td class="k">Operating cost, period</td><td>$22,235; median year $22,064</td><td>$27,966; median year $27,177</td><td>$39,057; median year $38,817</td><td>$45,617; median year $45,617</td><td>$32,866; median year $31,590</td><td>$45,332; median year $43,907</td></tr><tr><td class="k">Installed capital assumption</td><td>$15,000</td><td>$35,000</td><td>$85,000</td><td>$110,000</td><td>$90,000</td><td>$125,000</td></tr></tbody></table><p>Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record, so a ranked-hour coincidence is a different and noisier statistic computed here from ten reanalysis years (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single result hours under the assumed strategy; sensible = positive solar, light, envelope, infiltration, fan and crop gains; latent = crop transpiration plus positive infiltration and ventilation moisture import.</p></section>
 <section><h2><span class="cat">§ 004</span>Binding constraint</h2><p class="verdict">heating (mean per year: 1,765 h moisture-limited, 1,173 h temperature-limited, 4,570 h heating). Weather-side screen at the target band: moisture = pad moisture-limited, cool-humid and heat-humid hours; temperature = pad temperature-limited and marginal hours; heating = heating hours without a moisture problem. Mean hours per year.</p></section>
-<section><h2><span class="cat">§ 005</span>Strategy verdict</h2><p class="verdict">Cheapest non-dominated strategy by median-year operating cost: Pad + vent baseline at $22,062 holding the band 28.9% of eligible hours. Operating frontier: Pad + vent baseline ($22,062, 28.9%); Pads + condensing dehumidifier ($27,176, 42.7%); Desiccant + evaporative cooling ($31,588, 52.5%); DX / mini-split + dehumidifier ($38,818, 71.2%). Operating-dominated: Integrated HVAC + reheat, Liquid-desiccant hybrid (generic). Capital is separate and not ranked.</p><p>Ranking across years: Operating-cost order of strategies differs between years (2 distinct orders over 5 years); the verdict is year-dependent.</p></section></div><div class="appendix"><h2><span class="cat">Appendix</span>Reproducible assumptions</h2><section><h2><span class="cat">§ A01</span>Pad + vent baseline</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
+<section><h2><span class="cat">§ 005</span>Strategy verdict</h2><p class="verdict">Cheapest non-dominated strategy by median-year operating cost: Pad + vent baseline at $22,064 holding the band 28.9% of eligible hours. Operating frontier: Pad + vent baseline ($22,064, 28.9%); Pads + condensing dehumidifier ($27,177, 42.7%); Desiccant + evaporative cooling ($31,590, 52.5%); DX / mini-split + dehumidifier ($38,817, 71.2%). Operating-dominated: Integrated HVAC + reheat, Liquid-desiccant hybrid (generic). Capital is separate and not ranked.</p><p>Ranking across years: Operating-cost order of strategies differs between years (2 distinct orders over 5 years); the verdict is year-dependent.</p></section></div><div class="appendix"><h2><span class="cat">Appendix</span>Reproducible assumptions</h2><section><h2><span class="cat">§ A01</span>Pad + vent baseline</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
   &quot;schemaVersion&quot;: 1,
   &quot;id&quot;: &quot;2d74ad0b-6724-4d1f-bfdd-faaf2a94996c&quot;,
   &quot;name&quot;: &quot;Pad + vent baseline&quot;,
@@ -79,7 +79,36 @@
   &quot;doasM3s&quot;: 0,
   &quot;doasSupplyDewPointC&quot;: 8,
   &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5
+  &quot;doasKWhPerKg&quot;: 0.5,
+  &quot;heatSource&quot;: &quot;fuel&quot;,
+  &quot;heatPumpCopAt8C&quot;: null,
+  &quot;heatPumpCopAtMinus8C&quot;: null,
+  &quot;heatPumpCopAtMinus15C&quot;: null,
+  &quot;heatPumpCutoffC&quot;: null,
+  &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;shadeScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;shadeFraction&quot;: 0.5,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveWm2&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;maxDeployDliDeficit&quot;: null
+  },
+  &quot;thermalScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;uValueFactor&quot;: null,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;nightDeploy&quot;: true,
+    &quot;closedExchangeACH&quot;: null
+  },
+  &quot;insectScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;grade&quot;: null,
+    &quot;ventilationFactor&quot;: null
+  }
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -89,6 +118,25 @@
   &quot;transpirationModelUsed&quot;: &quot;stanghellini&quot;,
   &quot;canopyTemperature&quot;: &quot;Equal to zone air temperature (declared simplification, no leaf energy balance).&quot;,
   &quot;leafAreaIndex&quot;: 3,
+  &quot;shadeScreen&quot;: null,
+  &quot;thermalScreen&quot;: null,
+  &quot;heatSource&quot;: {
+    &quot;type&quot;: &quot;Fuel-fired heater&quot;,
+    &quot;efficiency&quot;: 0.9,
+    &quot;basis&quot;: &quot;Declared combustion efficiency on delivered heat.&quot;
+  },
+  &quot;envelope&quot;: {
+    &quot;facility&quot;: &quot;greenhouse&quot;,
+    &quot;uValue&quot;: 4,
+    &quot;envelopeRatio&quot;: 1.8,
+    &quot;infiltrationACH&quot;: 0.3,
+    &quot;parTransmission&quot;: 0.65,
+    &quot;solarTransmission&quot;: 0.65,
+    &quot;templateSource&quot;: &quot;Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.&quot;,
+    &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
+    &quot;matchesTemplate&quot;: true
+  },
+  &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
   &quot;psychrolibVersion&quot;: &quot;2.5.0&quot;,
@@ -556,7 +604,36 @@
   &quot;doasM3s&quot;: 0,
   &quot;doasSupplyDewPointC&quot;: 8,
   &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5
+  &quot;doasKWhPerKg&quot;: 0.5,
+  &quot;heatSource&quot;: &quot;fuel&quot;,
+  &quot;heatPumpCopAt8C&quot;: null,
+  &quot;heatPumpCopAtMinus8C&quot;: null,
+  &quot;heatPumpCopAtMinus15C&quot;: null,
+  &quot;heatPumpCutoffC&quot;: null,
+  &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;shadeScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;shadeFraction&quot;: 0.5,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveWm2&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;maxDeployDliDeficit&quot;: null
+  },
+  &quot;thermalScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;uValueFactor&quot;: null,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;nightDeploy&quot;: true,
+    &quot;closedExchangeACH&quot;: null
+  },
+  &quot;insectScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;grade&quot;: null,
+    &quot;ventilationFactor&quot;: null
+  }
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -566,6 +643,25 @@
   &quot;transpirationModelUsed&quot;: &quot;stanghellini&quot;,
   &quot;canopyTemperature&quot;: &quot;Equal to zone air temperature (declared simplification, no leaf energy balance).&quot;,
   &quot;leafAreaIndex&quot;: 3,
+  &quot;shadeScreen&quot;: null,
+  &quot;thermalScreen&quot;: null,
+  &quot;heatSource&quot;: {
+    &quot;type&quot;: &quot;Fuel-fired heater&quot;,
+    &quot;efficiency&quot;: 0.9,
+    &quot;basis&quot;: &quot;Declared combustion efficiency on delivered heat.&quot;
+  },
+  &quot;envelope&quot;: {
+    &quot;facility&quot;: &quot;greenhouse&quot;,
+    &quot;uValue&quot;: 4,
+    &quot;envelopeRatio&quot;: 1.8,
+    &quot;infiltrationACH&quot;: 0.3,
+    &quot;parTransmission&quot;: 0.65,
+    &quot;solarTransmission&quot;: 0.65,
+    &quot;templateSource&quot;: &quot;Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.&quot;,
+    &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
+    &quot;matchesTemplate&quot;: true
+  },
+  &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
   &quot;psychrolibVersion&quot;: &quot;2.5.0&quot;,
@@ -1033,7 +1129,36 @@
   &quot;doasM3s&quot;: 0,
   &quot;doasSupplyDewPointC&quot;: 8,
   &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5
+  &quot;doasKWhPerKg&quot;: 0.5,
+  &quot;heatSource&quot;: &quot;fuel&quot;,
+  &quot;heatPumpCopAt8C&quot;: null,
+  &quot;heatPumpCopAtMinus8C&quot;: null,
+  &quot;heatPumpCopAtMinus15C&quot;: null,
+  &quot;heatPumpCutoffC&quot;: null,
+  &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;shadeScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;shadeFraction&quot;: 0.5,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveWm2&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;maxDeployDliDeficit&quot;: null
+  },
+  &quot;thermalScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;uValueFactor&quot;: null,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;nightDeploy&quot;: true,
+    &quot;closedExchangeACH&quot;: null
+  },
+  &quot;insectScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;grade&quot;: null,
+    &quot;ventilationFactor&quot;: null
+  }
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -1043,6 +1168,25 @@
   &quot;transpirationModelUsed&quot;: &quot;stanghellini&quot;,
   &quot;canopyTemperature&quot;: &quot;Equal to zone air temperature (declared simplification, no leaf energy balance).&quot;,
   &quot;leafAreaIndex&quot;: 3,
+  &quot;shadeScreen&quot;: null,
+  &quot;thermalScreen&quot;: null,
+  &quot;heatSource&quot;: {
+    &quot;type&quot;: &quot;Fuel-fired heater&quot;,
+    &quot;efficiency&quot;: 0.9,
+    &quot;basis&quot;: &quot;Declared combustion efficiency on delivered heat.&quot;
+  },
+  &quot;envelope&quot;: {
+    &quot;facility&quot;: &quot;greenhouse&quot;,
+    &quot;uValue&quot;: 4,
+    &quot;envelopeRatio&quot;: 1.8,
+    &quot;infiltrationACH&quot;: 0.3,
+    &quot;parTransmission&quot;: 0.65,
+    &quot;solarTransmission&quot;: 0.65,
+    &quot;templateSource&quot;: &quot;Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.&quot;,
+    &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
+    &quot;matchesTemplate&quot;: true
+  },
+  &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
   &quot;psychrolibVersion&quot;: &quot;2.5.0&quot;,
@@ -1510,7 +1654,36 @@
   &quot;doasM3s&quot;: 0,
   &quot;doasSupplyDewPointC&quot;: 8,
   &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5
+  &quot;doasKWhPerKg&quot;: 0.5,
+  &quot;heatSource&quot;: &quot;fuel&quot;,
+  &quot;heatPumpCopAt8C&quot;: null,
+  &quot;heatPumpCopAtMinus8C&quot;: null,
+  &quot;heatPumpCopAtMinus15C&quot;: null,
+  &quot;heatPumpCutoffC&quot;: null,
+  &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;shadeScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;shadeFraction&quot;: 0.5,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveWm2&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;maxDeployDliDeficit&quot;: null
+  },
+  &quot;thermalScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;uValueFactor&quot;: null,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;nightDeploy&quot;: true,
+    &quot;closedExchangeACH&quot;: null
+  },
+  &quot;insectScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;grade&quot;: null,
+    &quot;ventilationFactor&quot;: null
+  }
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -1520,6 +1693,25 @@
   &quot;transpirationModelUsed&quot;: &quot;stanghellini&quot;,
   &quot;canopyTemperature&quot;: &quot;Equal to zone air temperature (declared simplification, no leaf energy balance).&quot;,
   &quot;leafAreaIndex&quot;: 3,
+  &quot;shadeScreen&quot;: null,
+  &quot;thermalScreen&quot;: null,
+  &quot;heatSource&quot;: {
+    &quot;type&quot;: &quot;Fuel-fired heater&quot;,
+    &quot;efficiency&quot;: 0.9,
+    &quot;basis&quot;: &quot;Declared combustion efficiency on delivered heat.&quot;
+  },
+  &quot;envelope&quot;: {
+    &quot;facility&quot;: &quot;greenhouse&quot;,
+    &quot;uValue&quot;: 4,
+    &quot;envelopeRatio&quot;: 1.8,
+    &quot;infiltrationACH&quot;: 0.3,
+    &quot;parTransmission&quot;: 0.65,
+    &quot;solarTransmission&quot;: 0.65,
+    &quot;templateSource&quot;: &quot;Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.&quot;,
+    &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
+    &quot;matchesTemplate&quot;: true
+  },
+  &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
   &quot;psychrolibVersion&quot;: &quot;2.5.0&quot;,
@@ -1987,7 +2179,36 @@
   &quot;doasM3s&quot;: 0,
   &quot;doasSupplyDewPointC&quot;: 8,
   &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5
+  &quot;doasKWhPerKg&quot;: 0.5,
+  &quot;heatSource&quot;: &quot;fuel&quot;,
+  &quot;heatPumpCopAt8C&quot;: null,
+  &quot;heatPumpCopAtMinus8C&quot;: null,
+  &quot;heatPumpCopAtMinus15C&quot;: null,
+  &quot;heatPumpCutoffC&quot;: null,
+  &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;shadeScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;shadeFraction&quot;: 0.5,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveWm2&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;maxDeployDliDeficit&quot;: null
+  },
+  &quot;thermalScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;uValueFactor&quot;: null,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;nightDeploy&quot;: true,
+    &quot;closedExchangeACH&quot;: null
+  },
+  &quot;insectScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;grade&quot;: null,
+    &quot;ventilationFactor&quot;: null
+  }
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -1997,6 +2218,25 @@
   &quot;transpirationModelUsed&quot;: &quot;stanghellini&quot;,
   &quot;canopyTemperature&quot;: &quot;Equal to zone air temperature (declared simplification, no leaf energy balance).&quot;,
   &quot;leafAreaIndex&quot;: 3,
+  &quot;shadeScreen&quot;: null,
+  &quot;thermalScreen&quot;: null,
+  &quot;heatSource&quot;: {
+    &quot;type&quot;: &quot;Fuel-fired heater&quot;,
+    &quot;efficiency&quot;: 0.9,
+    &quot;basis&quot;: &quot;Declared combustion efficiency on delivered heat.&quot;
+  },
+  &quot;envelope&quot;: {
+    &quot;facility&quot;: &quot;greenhouse&quot;,
+    &quot;uValue&quot;: 4,
+    &quot;envelopeRatio&quot;: 1.8,
+    &quot;infiltrationACH&quot;: 0.3,
+    &quot;parTransmission&quot;: 0.65,
+    &quot;solarTransmission&quot;: 0.65,
+    &quot;templateSource&quot;: &quot;Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.&quot;,
+    &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
+    &quot;matchesTemplate&quot;: true
+  },
+  &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
   &quot;psychrolibVersion&quot;: &quot;2.5.0&quot;,
@@ -2464,7 +2704,36 @@
   &quot;doasM3s&quot;: 0,
   &quot;doasSupplyDewPointC&quot;: 8,
   &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5
+  &quot;doasKWhPerKg&quot;: 0.5,
+  &quot;heatSource&quot;: &quot;fuel&quot;,
+  &quot;heatPumpCopAt8C&quot;: null,
+  &quot;heatPumpCopAtMinus8C&quot;: null,
+  &quot;heatPumpCopAtMinus15C&quot;: null,
+  &quot;heatPumpCutoffC&quot;: null,
+  &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;shadeScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;shadeFraction&quot;: 0.5,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveWm2&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;maxDeployDliDeficit&quot;: null
+  },
+  &quot;thermalScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;uValueFactor&quot;: null,
+    &quot;parTransmission&quot;: null,
+    &quot;solarTransmission&quot;: null,
+    &quot;deployAboveC&quot;: null,
+    &quot;nightDeploy&quot;: true,
+    &quot;closedExchangeACH&quot;: null
+  },
+  &quot;insectScreen&quot;: {
+    &quot;installed&quot;: false,
+    &quot;grade&quot;: null,
+    &quot;ventilationFactor&quot;: null
+  }
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -2474,6 +2743,25 @@
   &quot;transpirationModelUsed&quot;: &quot;stanghellini&quot;,
   &quot;canopyTemperature&quot;: &quot;Equal to zone air temperature (declared simplification, no leaf energy balance).&quot;,
   &quot;leafAreaIndex&quot;: 3,
+  &quot;shadeScreen&quot;: null,
+  &quot;thermalScreen&quot;: null,
+  &quot;heatSource&quot;: {
+    &quot;type&quot;: &quot;Fuel-fired heater&quot;,
+    &quot;efficiency&quot;: 0.9,
+    &quot;basis&quot;: &quot;Declared combustion efficiency on delivered heat.&quot;
+  },
+  &quot;envelope&quot;: {
+    &quot;facility&quot;: &quot;greenhouse&quot;,
+    &quot;uValue&quot;: 4,
+    &quot;envelopeRatio&quot;: 1.8,
+    &quot;infiltrationACH&quot;: 0.3,
+    &quot;parTransmission&quot;: 0.65,
+    &quot;solarTransmission&quot;: 0.65,
+    &quot;templateSource&quot;: &quot;Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.&quot;,
+    &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
+    &quot;matchesTemplate&quot;: true
+  },
+  &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
   &quot;psychrolibVersion&quot;: &quot;2.5.0&quot;,
@@ -2956,4 +3244,4 @@
   },
   &quot;startUTC&quot;: &quot;2021-01-01T06:00:00.000Z&quot;,
   &quot;endExclusiveUTC&quot;: &quot;2022-01-01T06:00:00.000Z&quot;
-}</pre><p>Export JSON alongside this document to retain raw weather, hourly results and all configuration values. This document alone is not the complete reproducibility bundle.</p></section></div><p class="foot">Grownetics · CEA Psychrometric Site Evaluator · Model 0.2.0-screening · Generated 2026-09-14T05:25:41.675Z</p></html>
+}</pre><p>Export JSON alongside this document to retain raw weather, hourly results and all configuration values. This document alone is not the complete reproducibility bundle.</p></section></div><p class="foot">Grownetics · CEA Psychrometric Site Evaluator · Model 0.2.0-screening · Generated 2026-09-14T19:45:16.532Z</p></html>

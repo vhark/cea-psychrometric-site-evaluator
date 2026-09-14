@@ -12,6 +12,11 @@ predictions, and no figure here is a manufacturer comparison or an equipment-siz
 Read this if: you are deciding whether a site needs pads, a dehumidifier, a curtain, lights, or an opaque box,
 or you are asking whether a greenhouse is worth building at all at a given latitude.
 
+Before acting on any figure here, read [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md). It reviews what the
+measured literature establishes for humid climates and finds no Grade A evidence in six domains, which means
+the numbers below are this model's screening output and not a measured comparison. The hot-humid section of
+this document is where the two meet.
+
 ## The classes
 
 A class is defined by the set of states it can reach, not by its brand or its cost. Each row states what the

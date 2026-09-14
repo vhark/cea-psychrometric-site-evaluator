@@ -6,6 +6,13 @@ Status: executed 2026-09-14 for model `0.2.0-screening`, roadmap milestone **M3*
 Measured run: [morris-screening.json](morris-screening.json), Tulsa 2023 to 2025, 120 sampled days per year,
 8 trajectories over 12 parameters (104 design points), six example strategies, 1,872 full simulations, 290 s.
 
+**Coverage limit, stated because it is easy to miss:** those 12 parameters are the ones that existed when the
+screening ran. Components added since have **never been screened**: movable shade and thermal screens, the
+air-source heat-pump rating points, the envelope ladder entries, and the insect-screen ventilation factor. The
+ranking-stability verdict below therefore says nothing about them. Section 7 of
+[COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) lists what a next screening pass should vary, and the
+control-class results in [CLASSES.md](CLASSES.md) are single-point runs rather than screened ranges.
+
 Read this if: you are deciding what to measure first at a real site, or judging how much weight a cost ranking can carry.
 
 ## What this is, and what it is not

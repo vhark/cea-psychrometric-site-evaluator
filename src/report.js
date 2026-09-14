@@ -30,7 +30,7 @@ export function localStamp(time, timezone) {
 /* Screening evidence that belongs to the repository rather than to this run. Cited, not asserted:
    every figure here is reproducible from the named file with the named command. */
 const REPO_EVIDENCE = {
-  tests: 63,
+  tests: 91,
   cadence: 'Staged controller cadence check on the full Tulsa 2025 year, 1 minute against 0.5 minute dispatch: 0.004, 0.383 and 0.091 percentage points of attainment and at most 0.31 percent of electricity (docs/VERIFICATION.md). The older ideal optimizer does not converge, at 1.5 points and 1.95 percent, and remains selectable only as a labeled upper bound.',
   residuals: 'Hourly conservation identities close between 1e-16 and 5e-13 relative in the bundled checks (test/conservation.test.mjs).',
   morris: 'Morris elementary-effects screening of 12 assumptions, 104 points, 1,872 simulations (docs/SENSITIVITY.md, docs/morris-screening.json): crop leaf area and transpiration lead every metric at 9.10 points of attainment, envelope U-value follows at 5.89 and shade fraction at 3.43. The cost ranking as a whole is not stable, taking 3 distinct orders, while the three cheapest positions are identical in 104 of 104 screened points and the instability is confined to strategies whose median costs sit within 16 percent of each other.',
@@ -375,7 +375,7 @@ export function reportHTML(results, snapshot, {aggregate = null, sites = null} =
       ['Numerical failure hours', int(summary.numericalFailureHours)],
       ['Largest sensible residual', `${num(summary.maxEnergyResidualW, 12)} W`], ['Largest moisture residual', `${num(summary.maxMoistureResidualKgS, 18)} kg/s`],
       ['Electricity price basis', summary.costBasis || primary.energyContext?.appliedPriceMode || scenario.priceMode]])}
-${interp([REPO_EVIDENCE.cadence, REPO_EVIDENCE.residuals, `${int(REPO_EVIDENCE.tests)} regression tests pass on this model version, covering finite capacity, photon conservation, dehumidifier and regeneration energy, cadence-invariant unmet loads, pad runtime, missingness, daylight-saving folds and price provenance.`, REPO_EVIDENCE.notClaimed])}
+${interp([REPO_EVIDENCE.cadence, REPO_EVIDENCE.residuals, `${int(REPO_EVIDENCE.tests)} regression tests pass on this model version, covering finite capacity, photon conservation, dehumidifier and regeneration energy, cadence-invariant unmet loads, exact and step-invariant daily light-target delivery with sufficient fixture capacity, pad runtime, insect-screen ventilation derating in the measured direction for a vent-limited humid house, shade and thermal-screen effects, heat-pump rating limits, missingness, daylight-saving folds, fractional-offset light days, bounded imports, price provenance, conservation, Morris reproducibility, regional verdict consistency, dataset staleness budgets and executable examples.`, REPO_EVIDENCE.notClaimed])}
 <p>To repeat this document: serve the repository, load the weather snapshot named above, import the scenario JSON in the appendix, run all scenarios and export the report. The run JSON carries the hourly results this page summarizes; this page alone is not the reproducibility bundle.</p>
 <p><a href="${escapeHTML(snapshot.sourceUrl || 'https://power.larc.nasa.gov/')}">Weather source endpoint</a></p>`),
     `<div class="appendix">${section('Assumptions and provenance appendix', `${results.map(result => `<h3>${escapeHTML(result.scenario.name)}</h3><ul>${

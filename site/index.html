@@ -88,7 +88,7 @@
       <div class="row-item">
         <span class="step">Q3</span>
         <h3>Which strategy class closes the gap, at what cost and confidence?</h3>
-        <p>Six equipment strategies compared on identical weather, geometry and crop assumptions, across ten weather years, reported as median, worst, spread and trend, with a computed verdict on whether the ranking survives the years and the screened parameter ranges. Class, not brand: there are no performance maps behind this.</p>
+        <p>Six equipment strategies compared on identical weather, geometry and crop assumptions, across ten weather years, reported as median, worst, spread and trend, with a computed verdict on whether the ranking survives the years and the screened parameter ranges. Class, not brand: there are no performance maps behind this. A separate measured ladder of nine control classes, from a pad and vent house with no heat to an insulated indoor box, records what each class reached in six climates and the physical condition that exhausts it: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/CLASSES.md">CLASSES.md</a>.</p>
       </div>
     </div>
   </section>
@@ -99,7 +99,7 @@
       <div class="row-item">
         <span class="step">01</span>
         <h3>Pick a site and the years</h3>
-        <p>Enter a US ZIP, confirm the centroid and time zone, then retrieve NASA POWER hourly weather, use station observations with independent solar, or import a CSV or JSON snapshot. Tulsa 2016 to 2025 is bundled, so you can run ten years offline.</p>
+        <p>Enter a US ZIP, confirm the centroid and time zone, then retrieve NASA POWER hourly weather, use station observations with independent solar, or import a CSV or JSON snapshot. Six sites are bundled, Tulsa, Phoenix, Miami, Denver, Seattle and Fairbanks, each with 2016 to 2025 complete, so you can run sixty site-years offline.</p>
       </div>
       <div class="row-item">
         <span class="step">02</span>
@@ -118,10 +118,11 @@
       </div>
     </div>
     <div class="metrics-grid">
-      <div class="metric"><div class="metric-label">Weather years bundled</div><p class="metric-value">10</p><p class="metric-detail">Tulsa 2016 to 2025, NASA POWER, complete coverage, 8,760 or 8,784 h each</p></div>
-      <div class="metric"><div class="metric-label">Regression tests</div><p class="metric-value">63</p><p class="metric-detail">Passing. Physical and data boundaries, not empirical validation</p></div>
+      <div class="metric"><div class="metric-label">Site-years bundled</div><p class="metric-value">60</p><p class="metric-detail">Six climates x 2016 to 2025, NASA POWER, complete coverage, 87,672 h per site, 526,032 h in all</p></div>
+      <div class="metric"><div class="metric-label">Regression tests</div><p class="metric-value">91</p><p class="metric-detail">Passing, 0 failures. Physical and data boundaries, not empirical validation</p></div>
       <div class="metric"><div class="metric-label">Cadence convergence</div><p class="metric-value">0.38 pp</p><p class="metric-detail">Largest attainment difference, 1 min vs 0.5 min, Tulsa 2025 full year, max 0.31% electricity</p></div>
       <div class="metric"><div class="metric-label">Conservation closure</div><p class="metric-value">1e-16</p><p class="metric-detail">Relative residual, heat and moisture identities, up to 5e-13 worst case</p></div>
+      <div class="metric"><div class="metric-label">Regional study</div><p class="metric-value">360</p><p class="metric-detail">Full-year simulations: 6 climates, 10 years, 6 strategies, 1 min step, 281.7 s on 8 threads</p></div>
       <div class="metric"><div class="metric-label">Sensitivity simulations</div><p class="metric-value">1,872</p><p class="metric-detail">Morris screen: 104 design points, 8 trajectories, 12 parameters, 3 years, seed 1, 290 s</p></div>
       <div class="metric"><div class="metric-label">Dominant assumption</div><p class="metric-value">9.10 pp</p><p class="metric-detail">mu* of leaf area and transpiration on attainment, the leader on all three metrics</p></div>
       <div class="metric"><div class="metric-label">Ranking stability</div><p class="metric-value">Unstable</p><p class="metric-detail">3 orders across the screened ranges, most common in 61.5% of points; 3 cheapest positions identical in 104 of 104</p></div>
@@ -135,12 +136,12 @@
       <article class="card">
         <h3>Multi-year climate risk</h3>
         <p>Attainment and operating cost as a distribution per strategy: median year, worst year, spread, trend, plus a computed stable or unstable verdict on the cost ranking.</p>
-        <p class="basis"><strong>Basis</strong> Ten bundled NASA POWER years. Measured example, six strategies over five years: baseline median 28.9%, worst 27.1% in 2025, spread 2.7 pts, ranking not stable (2 orders).</p>
+        <p class="basis"><strong>Basis</strong> Ten bundled NASA POWER years at each of six bundled sites, 60 site-years in all. Measured example, six strategies over five Tulsa years: baseline median 28.9%, worst 27.1% in 2025, spread 2.7 pts, ranking not stable (2 orders).</p>
       </article>
       <article class="card">
         <h3>Multi-site comparison</h3>
         <p>The same facility, crop and strategies across several ZIPs, ranked by free-cooling hours, binding constraint and operating cost.</p>
-        <p class="basis"><strong>Basis</strong> Measured two-site run, Tulsa 74103 vs Phoenix 85001: 244 vs 2,334 pad-effective hours, 401 vs 2,636 free-cooling hours. Time zone is entered explicitly, the public ZIP catalog has no time-zone column.</p>
+        <p class="basis"><strong>Basis</strong> Measured two-site run, Tulsa 74103 vs Phoenix 85001: 244 vs 2,334 pad-effective hours, 401 vs 2,636 free-cooling hours. The bundled six-climate study runs the same six strategies over ten years at every site, 360 full-year simulations, in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/REGIONS.md">REGIONS.md</a>. Time zone is entered explicitly, the public ZIP catalog has no time-zone column.</p>
       </article>
       <article class="card">
         <h3>Pad viability, not just runtime</h3>
@@ -217,6 +218,9 @@
         <p class="prose" style="margin-top:12px">A Morris elementary-effects screen (<span class="mono">1,872</span> full simulations over <span class="mono">104</span> design points, 8 trajectories, 12 parameters, three weather years, seed 1, reproducible in <span class="mono">290</span> s) ranks which assumptions move the answer. Crop leaf area and transpiration lead on all three metrics (<span class="mono">9.10</span> pp of attainment), then envelope U value (<span class="mono">5.89</span>), then shade fraction (<span class="mono">3.43</span>).</p>
         <p class="prose">The cost ranking is <strong>not stable</strong> across those ranges: three distinct orders appear, the most common in <span class="mono">61.5%</span> of points. The instability is confined to the DX, hybrid-desiccant and integrated positions, whose median costs sit within <span class="mono">16%</span> of each other. The three cheapest positions are identical in <span class="mono">104</span> of <span class="mono">104</span> points. So the screen supports a coarse verdict and refuses a fine one, which is the correct output for this tier.</p>
         <p class="prose">Morris is a screening method. It gives no probability distribution, no confidence interval and no probability that one strategy beats another. Quantified uncertainty needs calibration against measurements, which is milestone M6.</p>
+        <h3 style="margin-top:32px">What the measured literature actually proves</h3>
+        <p class="prose" style="margin-top:12px">A graded review of the published evidence for hot and humid CEA, six parallel searches over evaporative cooling, mechanical cooling and dehumidification, desiccants, enclosed plant factories, crop and control setpoints, and validation data, found <strong>no Grade A evidence in any of the six domains</strong>: not one peer-reviewed study that measured two or more climate-control strategies in a real hot-humid facility against a shared crop and a shared target band, with separated energy metering and reported uncertainty. <span class="mono">52</span> cited DOIs were machine-checked and all <span class="mono">52</span> resolve (<span class="mono">49</span> through Crossref, <span class="mono">3</span> through DataCite).</p>
+        <p class="prose">That absence is the finding, and it changes how the humid-climate output of this tool should be read: those numbers are this model's screening result, not a measured comparison. The review records what each claim is worth, grade by grade, including the two known biases that pull in opposite directions and the closest thing to external corroboration in the repository, the shipped 2.5 L/kWh dehumidifier assumption sitting inside a measured 2.0 to 3.1 kg/kWh band from a Mediterranean winter. It is in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVIDENCE-HOT-HUMID.md">EVIDENCE-HOT-HUMID.md</a>.</p>
       </div>
       <div>
         <h3>What this is not</h3>
@@ -229,45 +233,47 @@
           <li>Not a forecast of any kind. Historical weather years are evidence about a site, not a prediction of the next one.</li>
           <li>Not a site locator. ZIP centroids are not exact facility locations, and utility candidates are not tariffs.</li>
           <li>Not spatial. A well-mixed single zone cannot evaluate canopy-to-canopy precision.</li>
+          <li>Not corroborated by measured hot-humid field data. The graded review found no Grade A evidence in six domains, so the humid-climate verdicts are model output whose direction follows from physics and whose magnitude is unconfirmed.</li>
         </ul>
-        <p class="notice warning" style="margin-top:20px"><strong>Read the caveats with the numbers.</strong> Executed checks are in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/VERIFICATION.md">VERIFICATION.md</a>, the independent reviews and open items in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/AUDIT.md">AUDIT.md</a>, the sensitivity screen in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/SENSITIVITY.md">SENSITIVITY.md</a>.</p>
+        <p class="notice warning" style="margin-top:20px"><strong>Read the caveats with the numbers.</strong> Executed checks are in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/VERIFICATION.md">VERIFICATION.md</a>, the independent reviews and open items in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/AUDIT.md">AUDIT.md</a>, the sensitivity screen in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/SENSITIVITY.md">SENSITIVITY.md</a>, the graded state of the measured evidence in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVIDENCE-HOT-HUMID.md">EVIDENCE-HOT-HUMID.md</a>, and what each class of control reached per climate in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/CLASSES.md">CLASSES.md</a>.</p>
       </div>
     </div>
   </section>
 
   <section class="panel" id="screens" aria-labelledby="screens-title">
     <div class="section-heading"><div><span class="step">&sect; 06</span><h2 id="screens-title">The interface</h2></div><span class="badge">Actual screenshots, bundled Tulsa example</span></div>
+    <p class="prose">The tool has two views. <strong>Analyze</strong> is the calculator: configure a site, a facility, a crop band and the strategies, then run. <strong>Learn</strong> is a ten-part curriculum on the psychrometrics the model applies, in the order it applies them, each part carrying a number measured in this repository and a control that switches to Analyze and highlights the panel where that quantity is read. Views are linkable, so a section can be sent to someone as a URL: <span class="mono">#analyze</span>, <span class="mono">#learn</span>, <span class="mono">#learn/&lt;module&gt;</span>.</p>
     <div class="shots">
       <figure class="shot">
-        <img src="assets/screenshots/app-overview.png" alt="The evaluator workspace: configuration rail on the left, joint band attainment and headline metrics on the right." width="1600" height="1000" loading="lazy" decoding="async">
+        <img src="assets/screenshots/app-overview.png" alt="The evaluator workspace: configuration rail on the left, joint band attainment and headline metrics on the right." width="1875" height="1250" loading="lazy" decoding="async">
         <figcaption><b>Overview</b> Joint temperature and VPD attainment, misses by cause, energy and cost, with the evidence tier beside the result.</figcaption>
       </figure>
       <figure class="shot">
-        <img src="assets/screenshots/across-years.png" alt="Across-years table showing median, worst, best, spread and trend attainment per strategy with a ranking stability verdict." width="1600" height="1000" loading="lazy" decoding="async">
+        <img src="assets/screenshots/across-years.png" alt="Across-years table showing median, worst, best, spread and trend attainment per strategy with a ranking stability verdict." width="1875" height="1250" loading="lazy" decoding="async">
         <figcaption><b>Across years</b> Median, worst, best, spread and trend per strategy, plus the computed ranking-stability verdict.</figcaption>
       </figure>
       <figure class="shot">
-        <img src="assets/screenshots/learn.png" alt="The Learn view: a numbered curriculum of ten sections, the first expanded to explain the outdoor state." width="1600" height="1000" loading="lazy" decoding="async">
-        <figcaption><b>Learn</b> Ten sections in the order the model applies them, each stating its relationship and pointing at the panel where it is read.</figcaption>
+        <img src="assets/screenshots/learn.png" alt="The Learn view: a numbered curriculum of ten sections, the first expanded to explain the outdoor state." width="1875" height="1250" loading="lazy" decoding="async">
+        <figcaption><b>Learn</b> Ten sections in the order the model applies them. Each states the concept, the relationship behind it, a number measured in this repository, and the caveat that travels with it.</figcaption>
       </figure>
       <figure class="shot">
-        <img src="assets/screenshots/learn-regional.png" alt="A regional verdict: the recommended strategy with the attainment, worst year, cost and margin that justify it." width="1600" height="1000" loading="lazy" decoding="async">
-        <figcaption><b>Regional verdict</b> Ten weather years per site, with the recommendation stated only when the evidence separates the candidates.</figcaption>
+        <img src="assets/screenshots/learn-regional.png" alt="The closing Learn section: the recommended strategy for a region with the attainment, worst year, cost, capability tier and caveats that justify it." width="1875" height="1250" loading="lazy" decoding="async">
+        <figcaption><b>Regional verdict</b> The closing section reads the committed six-climate study at load. Here Tulsa resolves to DX at 71.5% of eligible hours, worst year 68.9%; three of the six climates return no recommendation, because inside the capability tier the candidates are not separated by this evidence.</figcaption>
       </figure>
       <figure class="shot">
-        <img src="assets/screenshots/loads.png" alt="Monthly sensible and latent load decomposition chart with losses drawn below the axis." width="1600" height="1000" loading="lazy" decoding="async">
+        <img src="assets/screenshots/loads.png" alt="Monthly sensible and latent load decomposition chart with losses drawn below the axis." width="1875" height="1250" loading="lazy" decoding="async">
         <figcaption><b>Loads</b> Sensible gains by source above the axis, losses below it in the same colours, latent load and space SHR.</figcaption>
       </figure>
       <figure class="shot">
-        <img src="assets/screenshots/pad-viability.png" alt="Equipment runtime table separating hours a pad ran from hours the weather made the pad effective." width="1600" height="1000" loading="lazy" decoding="async">
+        <img src="assets/screenshots/pad-viability.png" alt="Equipment runtime table separating hours a pad ran from hours the weather made the pad effective." width="1875" height="1250" loading="lazy" decoding="async">
         <figcaption><b>Pad viability</b> Hours and days each component ran, next to the weather-side hours that justified running it.</figcaption>
       </figure>
       <figure class="shot">
-        <img src="assets/screenshots/design-basis.png" alt="Exported design-basis brief rendered in the parchment Archive register with numbered sections." width="1600" height="1000" loading="lazy" decoding="async">
+        <img src="assets/screenshots/design-basis.png" alt="Exported design-basis brief rendered in the parchment Archive register with numbered sections." width="1200" height="900" loading="lazy" decoding="async">
         <figcaption><b>Design-basis brief</b> The export a mechanical engineer can argue with, in the Archive register, with the evidence tier on the page.</figcaption>
       </figure>
       <figure class="shot">
-        <img src="assets/screenshots/tour.png" alt="The guided tour overlay explaining a panel of the interface." width="1600" height="1000" loading="lazy" decoding="async">
+        <img src="assets/screenshots/tour.png" alt="The guided tour overlay explaining a panel of the interface." width="1875" height="1250" loading="lazy" decoding="async">
         <figcaption><b>Guided tour</b> A first-run walkthrough of the workflow, so the assumptions are visible before the first run, not after it.</figcaption>
       </figure>
     </div>
@@ -285,8 +291,8 @@
           <tr>
             <td class="row-name">M0 site evaluator</td>
             <td class="mono done">Done, v0.2</td>
-            <td>Multi-year risk, multi-site comparison, sensible and latent split, CO<sub>2</sub> window, cost-of-precision sweeps, design-basis brief</td>
-            <td>Results reported as a distribution over ten weather years, not a single year</td>
+            <td>Multi-year risk, multi-site comparison across six bundled climates, sensible and latent split, CO<sub>2</sub> window, cost-of-precision sweeps, design-basis brief, Learn curriculum</td>
+            <td>Results reported as a distribution over ten weather years per site, not a single year</td>
           </tr>
           <tr>
             <td class="row-name">M1 converged controller</td>
@@ -327,7 +333,7 @@
         </tbody>
       </table>
     </div>
-    <p class="source-line">Tool documentation: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/PRD.md">PRD</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/ARCHITECTURE.md">architecture</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/ENERGY-DATA.md">energy data</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/RESEARCH.md">research</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVALUATION.md">evaluation scheme</a>. Public data sources: NASA POWER, Iowa Environmental Mesonet, US Census and HUD ZIP records, EIA electricity prices, EPA eGRID 2023. PsychroLib 2.5.0 is vendored at a pinned commit.</p>
+    <p class="source-line">Tool documentation: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/PRD.md">PRD</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/ARCHITECTURE.md">architecture</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/ENERGY-DATA.md">energy data</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/RESEARCH.md">research</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVALUATION.md">evaluation scheme</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/CLASSES.md">control classes</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVIDENCE-HOT-HUMID.md">hot-humid evidence review</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/REGIONS.md">regional study</a>. Public data sources: NASA POWER, Iowa Environmental Mesonet, US Census and HUD ZIP records, EIA electricity prices, EPA eGRID 2023. PsychroLib 2.5.0 is vendored at a pinned commit.</p>
     <p class="button-row" style="margin-top:28px">
       <a class="button primary" href="app/">Open the tool</a>
       <a class="button" href="https://github.com/vhark/cea-psychrometric-site-evaluator">Read the source and the docs</a>

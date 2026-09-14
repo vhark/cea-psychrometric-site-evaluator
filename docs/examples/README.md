@@ -20,7 +20,7 @@ Most sets hold the site, crop band and geometry constant so the comparison isola
 | [propagation-nursery.json](propagation-nursery.json) | When the moisture ceiling binds rather than temperature, what closes the gap? | Strategy | Pad and vent, pads with dehumidifier, DOAS |
 | [hybrid-tomato.json](hybrid-tomato.json) | How does a semi-closed house with a tall, high-LAI crop behave? | Strategy | Integrated HVAC with reheat, DOAS, pads with dehumidifier |
 | [crop-bands.json](crop-bands.json) | With the equipment fixed, how much does the crop program alone move the answer? | Crop program | Baby-leaf lettuce, basil, propagation seedlings, illustrative tomato |
-| [climate-archetypes.json](climate-archetypes.json) | Does the same facility face the same constraint at a different site? | Site | Tulsa, Phoenix, Miami, Denver, Seattle |
+| [climate-archetypes.json](climate-archetypes.json) | Does the same facility face the same constraint at a different site? | Site | Tulsa, Phoenix, Miami, Denver, Seattle, Fairbanks |
 | [screens-and-heat-source.json](screens-and-heat-source.json) | Which days do you want a shade screen or a thermal curtain, and what does swapping fuel for a heat pump do? | Screens and heat source | No screens, light-guarded shade screen, thermal curtain with a declared gap, both, both plus heat pump |
 
 The canonical six-strategy comparison used throughout the documentation stays at [../example-scenarios.json](../example-scenarios.json).
@@ -35,7 +35,7 @@ Every measured figure on this page is screening output from this repository unde
 
 **Mechanism.** A cooling coil removes moisture only by driving air below its dew point, so hitting a moisture target with a coil usually means overshooting the temperature target downward and then paying to put sensible heat back. Decoupled equipment attacks the two loads separately: a dry-neutral supply stream or a desiccant removes water without first making the air cold, and a smaller sensible device holds temperature. The trade is that the coupled machine is mostly electric while regeneration and reheat can be fuel, so the comparison is a question about your energy prices as much as about your air.
 
-**What the measured run showed.** The dry-neutral DOAS held the band slightly better than the coupled coil, 56.2% against 55.3%, on 14% less purchased electricity, 211,807 against 246,930 kWh, while shifting load to fuel, 417,992 against 367,321 kWh.
+**What the measured run showed.** The dry-neutral DOAS held the band slightly better than the coupled coil, 56.2% against 55.3%, on 14% less purchased electricity, 211,830 against 246,957 kWh, while shifting load to fuel, 417,969 against 367,295 kWh.
 
 **Counter-case.** The verdict flips with the electricity-to-fuel price ratio, which is an editable input, not a property of the equipment. A 0.9 pp attainment gain bought by moving roughly 50,000 kWh from electricity to fuel is a bargain at some prices and a loss at others, and a site with expensive gas or an electrification constraint should read this set the other way round.
 
@@ -45,7 +45,7 @@ Every measured figure on this page is screening output from this repository unde
 
 **Mechanism.** With zero solar transmission the sensible load is fixture power plus envelope conduction, and fixture power is nearly constant during the photoperiod, so the hourly load is a schedule rather than a weather series. Transpiration then arrives as latent load at the same time. That combination is easy to hold and expensive to run: every joule of light has to be bought first and then removed again.
 
-**What the measured run showed.** The highest attainment anywhere in the library, 93.0% for DX with a dehumidifier, which is what a closed box with no solar gain and generous installed capacity should give. It is also the most electricity-hungry at 344,528 kWh.
+**What the measured run showed.** The highest attainment anywhere in the library, 93.1% for DX with a dehumidifier, which is what a closed box with no solar gain and generous installed capacity should give. It is also the most electricity-hungry facility in the library: 344,731 kWh for that strategy, and the three rows of this set are the three largest electricity totals of any shipped scenario, up to 393,792 kWh for integrated HVAC with reheat.
 
 **Counter-case.** The high attainment is a statement about installed capacity, not about the design being good. Cut the capacity, or price electricity at a site where it is dear, and the same box becomes the worst option in the library on cost per compliant hour. An opaque envelope also removes the free cooling and free light that make a greenhouse cheap in mild weather, which is exactly what the Seattle and Denver rows in the climate lesson below are about.
 
@@ -77,7 +77,7 @@ Every measured figure on this page is screening output from this repository unde
 
 **What the measured run showed.** Attainment sits in a narrow 45.1 to 51.5% band across three very different strategies, so at this crop band the classes are closer than the capital difference between them suggests.
 
-**Counter-case.** A 6 pp spread is not a reason to buy the cheapest machine: the classes differ in what they cost to run, in whether that cost is electricity or fuel, and in what happens in the extreme hours rather than the average ones. The tomato crop program is also the illustrative preset, so treat the absolute level as a placeholder. Leaf area and transpiration are the most influential assumption in the whole model, at 9.10 pp of attainment across the screened range, and this is the set where they are largest.
+**Counter-case.** A 6.5 pp spread is not a reason to buy the cheapest machine: the classes differ in what they cost to run, in whether that cost is electricity or fuel, and in what happens in the extreme hours rather than the average ones. The tomato crop program is also the illustrative preset, so treat the absolute level as a placeholder. Leaf area and transpiration are the most influential assumption in the whole model, at 9.10 pp of attainment across the screened range, and this is the set where they are largest.
 
 ### crop-bands.json: the band changes the bill, not the feasibility
 
@@ -89,16 +89,16 @@ Every measured figure on this page is screening output from this repository unde
 
 | Crop program | Band | Attainment | Electricity (kWh) | Fuel (kWh) | DLI deficit days | Operating cost |
 |---|---|---:|---:|---:|---:|---:|
-| Baby-leaf lettuce | 22 C day, VPD 0.6 to 1.0, DLI 14, LAI 3 | 27.1% | 61,098 | 303,246 | 135 | $22,062 |
-| Basil | 26 C, VPD 0.8 to 1.2, DLI 29, LAI 3 | 21.4% | 123,741 | 373,860 | 341 | $32,737 |
-| Propagation seedlings | 23 C, VPD 0.4 to 0.8, DLI 10, LAI 1 | 24.4% | 42,968 | 231,732 | 69 | $16,208 |
-| Fruiting tomato (illustrative) | 26 C, VPD 0.8 to 1.4, DLI 25, LAI 3.5 | 24.2% | 107,386 | 398,398 | 282 | $31,944 |
+| Baby-leaf lettuce | 22 C day, VPD 0.6 to 1.0, DLI 14, LAI 3 | 27.1% | 61,123 | 303,230 | 74 | $22,064 |
+| Basil | 26 C, VPD 0.8 to 1.2, DLI 29, LAI 3 | 21.4% | 123,791 | 373,841 | 317 | $32,743 |
+| Propagation seedlings | 23 C, VPD 0.4 to 0.8, DLI 10, LAI 1 | 24.4% | 42,987 | 231,719 | 25 | $16,210 |
+| Fruiting tomato (illustrative) | 26 C, VPD 0.8 to 1.4, DLI 25, LAI 3.5 | 24.2% | 107,424 | 398,371 | 259 | $31,947 |
 
-With the equipment held fixed, attainment moves only 5.7 points across four very different crops, 21.4 to 27.1, while operating cost moves by a factor of 2.0, $16,208 to $32,737, and DLI deficit days move by a factor of 4.9, 69 to 341. At this site the crop band barely changes whether the equipment can hold the band, but it dominates what running it costs, and most of that cost difference is light, not HVAC.
+With the equipment held fixed, attainment moves only 5.7 points across four very different crops, 21.4 to 27.1, while operating cost moves by a factor of 2.0, $16,210 to $32,743, and DLI deficit days move by a factor of 12.7, 25 to 317. At this site the crop band barely changes whether the equipment can hold the band, but it dominates what running it costs, and most of that cost difference is light, not HVAC.
 
 **Counter-case.** The tomato entry is the illustrative preset, so treat its absolute figures as a placeholder rather than a tomato result. And this near-indifference of attainment to the band is a Tulsa finding: a site where cooling rather than heating dominates would likely show the band mattering more to attainment than it does here, because a warmer target band buys real relief when the problem is rejecting heat and buys nothing when the problem is supplying it.
 
-### climate-archetypes.json: the same house, five climates
+### climate-archetypes.json: the same house, six climates
 
 **Decision it informs.** Whether a design, or a piece of received wisdom about equipment, transfers from one site to another.
 
@@ -106,7 +106,7 @@ With the equipment held fixed, attainment moves only 5.7 points across four very
 
 **What the measured run showed.** See the climate lesson below, which is the reason this set exists.
 
-**Counter-case.** These are single-year runs at four sites with three bundled years each, and three years is not a climate normal, so the ordering between two similar sites can be a property of the year. The set is also only the facility half of a site comparison: it carries the site fields, and you still have to load each site's weather record before running its scenario. Running a Phoenix scenario against the Tulsa record reports Tulsa under a Phoenix name.
+**Counter-case.** These are single-year runs at six sites with ten bundled years each, and one year is not a climate normal, so the ordering between two similar sites can be a property of the year. The set is also only the facility half of a site comparison: it carries the site fields, and you still have to load each site's weather record before running its scenario. Running a Phoenix scenario against the Tulsa record reports Tulsa under a Phoenix name.
 
 ### screens-and-heat-source.json: a curtain buys fuel and spends humidity
 
@@ -118,13 +118,13 @@ With the equipment held fixed, attainment moves only 5.7 points across four very
 
 | Configuration | Attainment | Electricity kWh | Fuel kWh | Screen hours | Attributed effect |
 |---|---|---|---|---|---|
-| Baseline, no screens, fuel heat | 27.14% | 61,098 | 303,246 | none | reference |
-| Shade screen, light-guarded | 28.89% | 60,932 | 306,519 | 970 h shade | gave up 1,051 mol/m² of crop light |
-| Thermal curtain, 0.1 h⁻¹ declared gap | 22.24% | 60,773 | 236,672 | 1,179 h curtain | saved 59,917 kWh of delivered heat |
-| Both screens | 23.98% | 60,607 | 239,940 | 970 h + 1,179 h | both effects, partly cancelling |
-| Both plus heat pump | 23.75% | 127,231 | 0 | 970 h + 1,179 h | all heat moved to electricity |
+| Baseline, no screens, fuel heat | 27.14% | 61,123 | 303,230 | none | reference |
+| Shade screen, light-guarded | 28.89% | 60,958 | 306,500 | 970 h shade | gave up 1,051 mol/m² of crop light |
+| Thermal curtain, 0.1 h⁻¹ declared gap | 22.24% | 60,798 | 236,653 | 1,179 h curtain | saved 59,919 kWh of delivered heat |
+| Both screens | 23.98% | 60,633 | 239,920 | 970 h + 1,179 h | both effects, partly cancelling |
+| Both plus heat pump | 23.75% | 127,251 | 0 | 970 h + 1,179 h | all heat moved to electricity |
 
-The curtain is the result worth staring at. It cut fuel by 22% and cost 4.9 points of attainment at the same time, because restricting the outside-air path while the crop keeps transpiring traps moisture in the zone. The tool reports both halves of that trade rather than only the saving, which is the entire reason to schedule a curtain by outdoor moisture and not only by outdoor temperature. The shade screen is the mirror image: guarded, it bought 1.75 points of attainment for essentially no energy change, because it removed solar heat in hours the crop could spare the light. Ungated, the same screen closes for 1,867 hours and pushes lighting energy up by 17,817 kWh to replace the photons it just blocked.
+The curtain is the result worth staring at. It cut fuel by 22% and cost 4.9 points of attainment at the same time, because restricting the outside-air path while the crop keeps transpiring traps moisture in the zone. The tool reports both halves of that trade rather than only the saving, which is the entire reason to schedule a curtain by outdoor moisture and not only by outdoor temperature. The shade screen is the mirror image: guarded, it bought 1.75 points of attainment for essentially no energy change, because it removed solar heat in hours the crop could spare the light. Ungated, the same screen closes for 1,867 hours and pushes lighting energy up by 17,834 kWh against the no-screen baseline, to replace the photons it just blocked.
 
 **The counter-case.** Every number here is configuration-dependent in ways that flip the conclusion. The 0.1 h⁻¹ closed-gap exchange is a user input, not a sourced value: screen-gap leakage is UNSOURCED in [COMPONENT-PARAMETERS.md](../COMPONENT-PARAMETERS.md), and leaving it null makes the run warn that the moisture case is optimistic. The heat-pump rating points in this file are a labeled hypothetical, since only the eligibility floors are sourced (COP 1.75 at -15 C, 0.70 capacity derate), so whether the heat pump is cheaper than fuel depends entirely on your electricity-to-fuel price ratio and on rating points from a catalogued unit. In a cooling-dominated climate the shade screen would carry the set and the curtain would be close to irrelevant, which is the point [climate-archetypes.json](climate-archetypes.json) makes.
 
@@ -136,17 +136,18 @@ One pad-and-vent greenhouse, one lettuce band, one set of equipment and one set 
 |---|---:|---:|---:|---:|---:|---:|
 | Tulsa, mixed humid | 27.1% | 244 | 3,851 | 2,952 | 401 | 4,442 |
 | Phoenix, hot-dry | 46.8% | 2,334 | 1,708 | 2,184 | 2,636 | 3,029 |
-| Miami, hot-humid | 7.6% | 33 | 8,176 | not reported | 138 | 213 |
-| Denver, cold-dry at altitude | 44.2% | 1,065 | 84 | not reported | 1,345 | 6,777 |
-| Seattle, cool-marine | 43.1% | 12 | not reported | not reported | 113 | 8,269 |
+| Miami, hot-humid | 7.6% | 33 | 8,176 | 7,381 | 138 | 213 |
+| Denver, cold-dry at altitude | 44.2% | 1,065 | 84 | 0 | 1,345 | 6,777 |
+| Seattle, cool-marine | 43.1% | 12 | 525 | 50 | 113 | 8,269 |
+| Fairbanks, subarctic and light-limited | 26.5% | 40 | 224 | 9 | 89 | 8,420 |
 
-"Not reported" means the figure was not part of the reported run, not that it is zero. Denver also recorded only 4 pad-ineffective hours, and Seattle's 8,269 heating hours are the highest fuel demand of the five.
+The moisture and temperature columns are the weather-side pad-limit counts over the whole year: hours in which pad leaving air would sit above the moisture ceiling, and hours in which it would not clear the temperature margin, whether or not cooling was called for in that hour. They overlap heavily, since most failing hours fail both (2,934 of Tulsa's, and every one of Miami's temperature-limited hours), and they are wider than the single-cause attribution used in [../REGIONS.md](../REGIONS.md), which divides each pad-ineffective hour between the two causes instead. The heating column counts every heating-mode hour. Denver also recorded only 4 pad-ineffective hours, and Fairbanks 15.
 
-Read the pad column against the free-cooling column. In Phoenix the pad is a primary cooling stage: 2,334 hours in which pad leaving air clears both the temperature margin and the moisture ceiling, alongside 2,636 hours when plain outside air is enough. In Denver the same pad works almost whenever it is asked to, 1,065 effective hours against just 4 ineffective ones, and moisture barely binds at all, 84 hours, because the air at 2,095 m of source elevation is dry and the diurnal swing is large. In Miami the identical pad is worth 33 hours in a year, and in Seattle 12. Those two zeros have opposite causes: Miami's mean summer wet bulb is above Phoenix's peak summer wet bulb, so there is no depression left to evaporate into and moisture binds for 8,176 hours, while Seattle is simply never hot enough to need the pad, with 113 free-cooling hours because outside air is already inside the band rather than usefully below it.
+Read the pad column against the free-cooling column. In Phoenix the pad is a primary cooling stage: 2,334 hours in which pad leaving air clears both the temperature margin and the moisture ceiling, alongside 2,636 hours when plain outside air is enough. In Denver the same pad works almost whenever it is asked to, 1,065 effective hours against just 4 ineffective ones, and moisture barely binds at all, 84 hours, because the air at 2,095 m of source elevation is dry and the diurnal swing is large. In Miami the identical pad is worth 33 hours in a year, in Fairbanks 40 and in Seattle 12. Those three small numbers do not have the same cause. Miami's 25.7 C mean summer wet bulb sits within a degree of Phoenix's 26.6 C peak summer wet bulb (ten-year figures, [../CLIMATES.md](../CLIMATES.md)), so there is next to no depression left to evaporate into and pad leaving air breaks the moisture ceiling in 8,176 hours, while Seattle and Fairbanks are almost never hot enough to ask for a pad at all, with 113 and 89 free-cooling hours because outside air is already inside the band rather than usefully below it.
 
-The consequence is the lesson. The binding constraint is a property of the climate, not of the equipment: the same pad that is a primary cooling stage in Phoenix and Denver is close to useless in Miami and Seattle, for opposite reasons, and no change to pad effectiveness would alter that. It also explains why the attainment column is a poor summary on its own. Miami at 7.6% and Seattle at 43.1% both fail this house, but Miami fails on latent load that needs dehumidification, while Seattle's 8,269 heating hours and lowest-of-five irradiance make it a heating and supplemental-lighting problem. Choose the equipment against the constraint the site actually has, then check it against the other four years before treating one year's ordering as the answer.
+The consequence is the lesson. The binding constraint is a property of the climate, not of the equipment: the same pad that is a primary cooling stage in Phoenix and Denver is close to useless in Miami, Seattle and Fairbanks, and not for the same reason in any of the three, and no change to pad effectiveness would alter that. It also explains why the attainment column is a poor summary on its own. Miami at 7.6%, Fairbanks at 26.5% and Seattle at 43.1% all fail this house, and they fail it differently. Miami fails on latent load that needs dehumidification: 8,176 moisture-limited hours against 213 heating hours. Seattle's 8,269 heating hours and 150.9 W/m² mean irradiance in this record, the second lowest of the six, make it a heating and supplemental-lighting problem instead. Fairbanks is the far end of that: 8,420 heating-mode hours, 765,587 kWh of fuel and $46,685 of operating cost, all the highest of the six, on 105.3 W/m² of mean irradiance, with moisture second only to Denver in how rarely it binds, 224 hours. Two constraints bind there at once, and only one of them is a capacity decision in this set: the 120 kW heater leaves 68,983 kWh of sensible load unmet, which a bigger heater would close, while the crop misses its 14 mol/m² daily light target on 208 of 365 days, the most of any site here, because the installed fixtures top out near 9.8 mol/m²/day and a December day inside this house adds about 0.2 mol/m² to that. No choice between the HVAC classes this library compares touches the second one. Choose the equipment against the constraint the site actually has, then check it against the other nine bundled years before treating one year's ordering as the answer.
 
-Site profiles, provenance and the limits of three bundled years are in [../CLIMATES.md](../CLIMATES.md).
+Site profiles, provenance and the limits of ten bundled years of gridded reanalysis are in [../CLIMATES.md](../CLIMATES.md).
 
 ## Adding a set
 

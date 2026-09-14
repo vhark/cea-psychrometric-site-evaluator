@@ -1,9 +1,9 @@
 # CEA Psychrometric Site Evaluator
 ## Product requirements, approved implementation scope
 
-Purpose: state what the product must do, for whom, and what it must never claim, including the approved v0.2 site-evaluator scope in §10.
+Purpose: state what the product must do, for whom, and what it must never claim, including the approved v0.2 site-evaluator scope in §10 and the record of what shipped beyond it in §11.
 
-Status: approved for implementation. Written 2026-09-11, §10 approved 2026-09-13, reviewed 2026-09-14. Execution and measured verification status are recorded separately in [VERIFICATION.md](VERIFICATION.md); this specification is not evidence of validation.
+Status: approved for implementation. Written 2026-09-11, §10 approved 2026-09-13, reviewed 2026-09-14, §11 records scope that landed as of 2026-09-14. Execution and measured verification status are recorded separately in [VERIFICATION.md](VERIFICATION.md); this specification is not evidence of validation.
 
 Read this if: you are deciding whether a proposed capability is in scope, or checking a shipped behaviour against what was approved.
 
@@ -182,3 +182,22 @@ Explicitly not in v0.2: brand performance maps, 3-D or multi-zone spatial modeli
 ### Client-facing deliverable
 
 A site verdict: the climate offers X free hours; the binding constraint is Y; strategy class Z holds the band N% of hours in the median year and M% in the worst of ten, at $C/year operating cost; the ranking is stable/unstable across years and the screened parameter ranges. Plus the design-basis brief for the engineer of record.
+
+## 11. Scope that landed after §10 (recorded 2026-09-14)
+
+This section is a record of shipped work, not a new set of promises. Each entry landed after §10 was approved, so a reader comparing the tool against the approved scope can tell a shipped capability from an undocumented one. Nothing here relaxes the acceptance contract in §7 or the prohibitions in §3, and nothing here raises an evidence tier.
+
+| Capability | What shipped | Where it is documented | Standing |
+|---|---|---|---|
+| **Learn view** | `src/learn.js`: ten curriculum modules that teach the reading of a result, each able to switch to Analyze and spotlight the panel it describes, reusing the guided tour's `spotlight` rather than a second implementation. `#learn` and `#learn/<module-key>` are routes alongside `#analyze`; every other fragment stays an ordinary anchor. | the view itself | Explanatory. It computes no new quantity and makes no claim of its own. |
+| **Six bundled sites, ten years each** | Tulsa, Phoenix, Miami, Denver, Seattle and Fairbanks, 2016 to 2025 per site: 60 complete site-years, 87,672 h per site, 526,032 h in total, discovered from `data/weather/index.json`. §10 item 1 assumed Tulsa alone was bundled, so multi-year and multi-site work now runs offline across six climates. Fairbanks was added because the control-class ladder needed a site whose binding limit is photons rather than heat. | [CLIMATES.md](CLIMATES.md), [REGIONS.md](REGIONS.md) | Same tier as before: more weather evidence, no physics change. Reanalysis, not station observations. |
+| **Control-class ladder** | [CLASSES.md](CLASSES.md): nine configurations from pad-and-vent with no heat to an insulated opaque box, each run against calendar year 2025 at all six sites under the ideal per-substep controller, with capacities sized per site by stated rules, plus four hot-humid design questions measured on Miami 2025 rather than asserted. | [CLASSES.md](CLASSES.md) | Capability ceilings under a declared upper-bound controller. Not installed-system predictions, not equipment sizing, not a manufacturer comparison. |
+| **Graded evidence review** | [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md): six parallel literature searches, 52 machine-checked DOIs, and an A to E grade plus a plain-words provenance note on every external claim. Its headline result is an absence: no Grade A evidence was found in any of the six domains. | [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) | Applies §7 item 12 outward. It grades the literature, it does not promote any output of this tool. External source grades are not the internal evidence tiers; the relationship is stated once in [EVALUATION.md](EVALUATION.md) §1. |
+| **Insect-screen ventilation model** | `insectScreen` in `src/screens.js` derates the achievable maximum outside-air exchange by measured ratios 1.000, 0.641 and 0.502 for nominal 40, 52 and 78 mesh. The reference is the measured 40-mesh house and not an unscreened one, so the cost of the first screen stays unsourced; an installed screen with no declared factor blocks the run rather than costing nothing; minimum ventilation is a requirement rather than a capability and is not derated. | [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) §3A, [CLASSES.md](CLASSES.md) | One instrumented Thai rainy-season campaign, one house per treatment: a measured direction and magnitude, not a validated universal mesh penalty. |
+
+### Still out of scope
+
+The §10 exclusions stand unchanged: no brand performance maps, no 3-D or multi-zone spatial modeling, no crop yield, no GreenLight coupling. Two further exclusions are recorded because the work above invites them:
+
+- **Central chiller and boiler plant is not modeled and is out of scope.** Every class in the ladder is packaged equipment. The scale at which central plant, hydronic distribution and a plant-side part-load curve beat packaged units is not answered here, and no figure in this repository may be read as that answer.
+- **The ideal per-substep controller stays a labeled upper bound**, not a product capability. Results computed under it, the control-class ladder included, are ceilings. The staged deadband controller remains the interface default (§10 item 7), and a capacity comparison is only meaningful with staging or modulation to match.

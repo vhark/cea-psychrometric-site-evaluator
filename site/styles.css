@@ -112,8 +112,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1.02; letter-spacing: -.0
 /* Stat strip, same giant-number treatment as the tool's metrics */
 .metrics-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); margin: 32px 0 0; }
 .metric { padding: 28px 20px 24px; border-left: 1px solid var(--hairline); min-height: 150px; }
-.metric:first-child { border-left: 0; padding-left: 0; }
-.metric:nth-child(5) { border-left: 0; padding-left: 0; }
+.metric:nth-child(4n+1) { border-left: 0; padding-left: 0; }
 .metric:nth-child(n+5) { border-top: 1px solid var(--hairline); }
 .metric-label { font: var(--label); letter-spacing: .16em; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; }
 .metric-value { font: 700 clamp(1.6rem, 2.6vw, 2.4rem)/1 var(--font-display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; white-space: nowrap; margin: 0 0 10px; }

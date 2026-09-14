@@ -37,7 +37,7 @@ Three paths, none of which invents data:
 | NASA POWER retrieval | Gridded hourly meteorology and solar for the chosen dates, with the original payload and provenance retained |
 | Station observations (IEM) | Routine observations matched to the nearest UTC hour within 30 minutes, plus independently sourced solar that may be unavailable |
 | Import | A saved snapshot, an exported run bundle, or a CSV (schema below) |
-| Bundled example | The genuine Tulsa 2025 NASA POWER year, plus nine more Tulsa years (2016 to 2025) for multi-year runs |
+| Bundled example | Ten complete NASA POWER years (2016 to 2025) at each of six sites, Tulsa, Phoenix, Miami, Denver, Seattle and Fairbanks: 60 site-years, 87,672 h per site, listed in `data/weather/index.json`. Tulsa 2025 is the worked example year |
 
 Retrieval failures never generate substitute weather. A partially observed period stays partial, and no partial-period weather-dependent cost is annualized.
 
@@ -46,6 +46,21 @@ Retrieval failures never generate substitute weather. A partially observed perio
 Choose facility (greenhouse, hybrid, indoor), cultivation system (greenhouse benches) and crop, then edit floor and canopy geometry, envelope, moisture, light and DLI, target bands, capacities, efficiencies and costs. Every default is a labeled assumption with a stated source. Inputs are SI, with live °F, ft and ft² equivalents shown on the corresponding fields.
 
 Terms used on these fields are defined in [GLOSSARY.md](GLOSSARY.md). To start from a worked comparison instead of the defaults, import one of the sets in [examples/](examples/README.md).
+
+Screens are configured through an imported scenario rather than a form control, the same as the shade and
+thermal screens: `shadeScreen`, `thermalScreen` and `insectScreen` are scenario fields, so a screened house
+starts from an edited or imported scenario JSON. An installed insect screen multiplies the achievable maximum
+outside-air exchange, which in a humid house restricts its cheapest moisture sink. The catalogued grades
+`mesh40`, `mesh52` and `mesh78` carry the measured ventilation ratios 1.000, 0.641 and 0.502; an explicit
+`ventilationFactor` overrides the grade for a user holding real product data. An installed screen with neither
+a catalogued grade nor a declared factor **blocks the run**, because a screen that costs no ventilation is not
+a defensible default. The factor is relative to a 40-mesh screened house and **not** to an unscreened one: the
+source campaign had no unscreened control, so declaring 1.000 claims a house like the measured 40-mesh one
+rather than an unrestricted one, and the ventilation cost of the first screen is unsourced. The declared
+minimum ventilation is a requirement rather than a capability, so it is never derated; if the derate would
+fall below it, the maximum clamps there and the run says so. No optical or thermal effect of the mesh is
+modeled. Measurement, limits and sources are in
+[COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md#3a-insect-screens-the-ventilation-penalty).
 
 ## 5. Add strategies and sensitivity cases
 

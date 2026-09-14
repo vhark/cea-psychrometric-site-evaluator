@@ -10,7 +10,7 @@ Read this if: you are deciding how far to trust a number, auditing the evidence 
 
 | Check | Result |
 |---|---|
-| Regression suite (`npm test`) | **87 passed, 0 failed**: 30 model, 10 screens, 9 data, 9 analysis, 7 regional, 7 sensitivity, 6 conservation, 5 vintages, 3 examples |
+| Regression suite (`npm test`) | **91 passed, 0 failed**: 30 model, 12 screens, 9 data, 9 analysis, 8 regional, 7 sensitivity, 6 conservation, 5 examples, 5 vintages |
 | Model version | `0.2.0-screening`, staged deadband controller default, one-minute dispatch step |
 | Controller cadence convergence, Tulsa 2025 full year, 1 min vs 0.5 min | 0.004 / 0.383 / 0.091 pp attainment, 0.31% electricity at most (staged); the retained ideal optimizer does not converge: 1.5 pp, 1.95% |
 | Conservation identities | Close between 1e-16 and 5e-13 relative across six independently derived closed-form checks |
@@ -106,7 +106,7 @@ Four independent reviews (model, data, interface, roadmap) are recorded in AUDIT
 
 ### 2026-09-13 v0.2 site-evaluator sprint
 
-Model `0.2.0-screening`. Built in three parallel slices (engine, analysis, interface) against the PRD §10 contract; the engine agent timed out after writing its tests, so Main completed integration. `npm test` **43 passed, 0 failed** (24 model, 10 data, 9 analysis) at the end of the sprint. The six conservation identities (audit item 2) and the seven Morris screening tests (M3) took the suite to its current **56**.
+Model `0.2.0-screening`. Built in three parallel slices (engine, analysis, interface) against the PRD §10 contract; the engine agent timed out after writing its tests, so Main completed integration. `npm test` **43 passed, 0 failed** (24 model, 10 data, 9 analysis) at the end of the sprint. The six conservation identities (audit item 2) and the seven Morris screening tests (M3) took the suite to **56 at that point**. The current suite is recorded in the dated current-state table above.
 
 **M1 gate met.** The staged deadband controller replaced per-substep re-optimization as the default. Measured on the full Tulsa 2025 year, 1 minute versus 0.5 minute dispatch:
 

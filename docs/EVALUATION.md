@@ -17,6 +17,8 @@ Read this if: you are judging how far a result can be pushed, or designing the n
 
 A detailed interface does not raise the evidence tier. Display it beside results and exports.
 
+**Source grades are a different axis from these tiers, and the two must not be traded against each other.** [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) grades *external literature* A to E: A is peer-reviewed and measured in a real hot-humid facility with a baseline and reported uncertainty, E is vendor marketing with no disclosed method. The four rows above grade *this tool's own output*: what a number computed here is licensed to say. A citation does not move a run up the ladder, because a tier is earned by checking this model against data, and a screening run does not inherit the grade of a paper it borrowed a parameter from. They touch in exactly two places. First, provenance: a default taken from a Grade D extension bulletin stays labeled as that inside a tier-2 result, and a shipped assumption that a Grade B measurement happens to bracket is corroborated, not validated. Second, reachability: because the review found no Grade A evidence and no hot-humid benchmark dataset, tier 3 for hot-humid latent performance cannot currently be earned from measurement at all, only by model-to-model verification on matched forcing (§5).
+
 ## 2. Data acceptance
 
 - Record requested and actual dates, source/model/station, location/elevation, units, download time, raw checksum, time basis and interval semantics.
@@ -96,6 +98,8 @@ These are development tolerances, not measured accuracy claims:
 - Halving integration step changes period energy by <1%, target compliance by <0.5 percentage points and maximum temperature by <0.2 K on representative stress cases; tighten or qualify where thresholds produce real classification sensitivity.
 - No invented exact indoor state in weather-only mode; equipment-mode outputs include assumptions, warm-up and model version.
 
+**Controller standing (added 2026-09-14).** Two controllers ship and they are licensed to say different things. The staged deadband controller is causal, is the interface default, and its converged results are the tool's ordinary tier-2 output. The ideal per-substep controller enumerates the best reachable air state in each substep and is a **declared capability ceiling, not a prediction**: a result computed under it states the most a given plant could do, so it may be compared with another ceiling but never presented as what an installed system will hold, and any figure produced under it must name it, as the control-class ladder does ([CLASSES.md](CLASSES.md)). Two measured facts fix the rule. The ideal optimizer does not converge with cadence (1.5 pp attainment and 1.95% electricity between 1 min and 0.5 min, against 0.004 to 0.383 pp and 0.31% for the staged controller; see [VERIFICATION.md](VERIFICATION.md)). And under the staged controller a Miami pad house fell from 9.6% to 0.0% attainment as cooling grew from 100 to 406 kW, because larger single stages overshoot the band harder, while the same sweep under the ideal controller rose from 10.1% to 18.7% and saturated. A capacity or class comparison is therefore only meaningful with staging or modulation matched, which is why cross-class comparisons are run at the ceiling and labeled as ceilings rather than presented as installed performance.
+
 ### Behavioral experiments
 
 | Experiment | Observable result |
@@ -111,6 +115,7 @@ These are development tolerances, not measured accuracy claims:
 | Identical indoor system with canopy area doubled | Crop and fixture loads scale by canopy, not just floor area |
 | Lights off/on in opaque facility | Crop light and heat inputs change; outdoor GHI does not become crop DLI |
 | Increased shade in greenhouse | Solar cooling load falls while natural DLI can fall and lighting demand rises |
+| Finer insect screen in a house whose only moisture sink is the outside-air path | Attainment falls, temperature and VPD violation rise and less crop water is shed, in the order of the measured ventilation ratios; minimum ventilation is never derated below its requirement |
 | Missing forcing hour | Gap and segment reset reported; no hidden continuous trajectory |
 | Identical scenario copied unchanged | Same values, zero incremental investment result |
 | Zero extra compliant hours | Incremental cost per additional hour is undefined/unfavorable, never division by zero |
@@ -120,6 +125,8 @@ These are development tolerances, not measured accuracy claims:
 Use Katzin et al. (2020), DOI 10.1016/j.biosystemseng.2020.03.010, and its actual measured dataset at https://doi.org/10.4121/78968e1b-eaea-4f37-89f9-2b98ba3ed865.v2. It contains Bleiswijk tomato greenhouse outdoor/indoor/control data and LED/HPS simulations, not Tulsa indoor HVAC ground truth. Dataset license CC BY-SA 4.0 differs from GreenLight's BSD-3-Clause-Clear code license.
 
 Benchmark only matched envelope, crop and control cases. Report temperature/RH bias and RMSE, humidity-ratio error, energy bias, day/night and extreme-hour breakdown. Use a time-separated holdout to prevent tuning and evaluation on the same events. Agreement with GreenLight alone is model-to-model verification; agreement with held-out measurements is validation. No universal benchmark accuracy threshold is asserted before dataset applicability and sensor uncertainty are assessed.
+
+The 2026-09-14 evidence review found no independent hot-humid greenhouse benchmark dataset, and no greenhouse model it reviewed carries a published hot-humid latent validation ([EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) §7). This gate is therefore unreachable by measurement for a humid site until such a dataset exists: what remains available is the Dutch-winter reproduction above and model-to-model verification on matched Tulsa or Miami forcing, which is verification and not validation. The consequence for the roadmap is recorded as a named external blocker in [DIGITAL-TWIN.md](DIGITAL-TWIN.md).
 
 Manufacturer curves are an additional validation source, not interchangeable with nominal equipment labels. Outside a published map, report out-of-domain operation or an explicit derating assumption; never extrapolate invisibly.
 
@@ -131,6 +138,7 @@ Manufacturer curves are an additional validation source, not interchangeable wit
 - Verify integration over 23/24/25-hour local days, incomplete days and midnight-crossing photoperiods.
 - Controller must not use later weather unless explicitly running hindsight optimization. Report daily DLI deficits even when temperature/VPD passes.
 - Check dark-period moisture demand and crop/substrate evaporation separately from daytime radiation response. Leaf temperature and crop transpiration uncertainty often dominate precision claims.
+- A fixture with capacity in hand must land on the daily target exactly and be step-invariant across control cadences. The outstanding deficit is spread over the time actually left in the lit window: padding that window under-delivers a little every step and reports a fully lit crop as light-deficient (audit item 8 in [AUDIT.md](AUDIT.md)). An undersized fixture must still report its shortfall at its own delivery ceiling.
 
 ## 7. Investment scheme
 

@@ -11,13 +11,15 @@ const sets = readdirSync('docs/examples').filter(name => name.endsWith('.json'))
 const canonical = JSON.parse(readFileSync('docs/example-scenarios.json', 'utf8'));
 const load = name => JSON.parse(readFileSync(setPath(name), 'utf8'));
 // One representative week keeps the suite fast while still exercising a real record end to end.
-const week = (() => {
-  const snapshot = JSON.parse(readFileSync('data/weather/tulsa-2025.json', 'utf8'));
+const weekOf = (site, year) => {
+  const snapshot = JSON.parse(readFileSync(`data/weather/${site}-${year}.json`, 'utf8'));
   const hours = snapshot.hours.slice(0, 24 * 7);
-  return {...snapshot, raw: undefined, startDate: '2025-01-01', endDate: '2025-01-07',
+  return {...snapshot, raw: undefined, startDate: `${year}-01-01`, endDate: `${year}-01-07`,
     startUTC: new Date(hours[0].time).toISOString(),
     endExclusiveUTC: new Date(hours.at(-1).time + 3600000).toISOString(), hours};
-})();
+};
+const week = weekOf('tulsa', 2025);
+const bundled = JSON.parse(readFileSync('data/weather/index.json', 'utf8')).sites;
 
 test('every shipped example set carries a note and valid scenarios', () => {
   assert.ok(sets.length >= 5, `expected the example library, found ${sets.length} sets`);
@@ -57,5 +59,47 @@ test('every shipped example simulates a real week without numerical failure', ()
       assert.ok(summary.maxMoistureResidualKgS < 1e-6, `${name}: ${scenario.name} moisture residual ${summary.maxMoistureResidualKgS} kg/s`);
       assert.ok(Number.isFinite(summary.compliancePct), `${name}: ${scenario.name} produced no attainment figure`);
     }
+  }
+});
+
+// The point of climate-archetypes.json is that one unchanged facility meets every bundled climate. A site
+// added to the bundle without a scenario, or a scenario that quietly differs in the house it describes,
+// destroys the comparison without breaking anything the tests above would notice.
+test('the climate set carries one unchanged facility at every bundled site', () => {
+  const set = load('climate-archetypes.json');
+  assert.equal(set.scenarios.length, bundled.length,
+    `climate-archetypes.json has ${set.scenarios.length} scenarios for ${bundled.length} bundled sites`);
+  const byLocation = new Map(set.scenarios.map(s => [`${s.latitude},${s.longitude}`, s]));
+  for (const site of bundled) {
+    const scenario = byLocation.get(`${site.latitude},${site.longitude}`);
+    assert.ok(scenario, `climate-archetypes.json has no scenario at ${site.key}`);
+    assert.equal(scenario.timezone, site.timezone, `${site.key} scenario carries the wrong time zone`);
+    assert.equal(scenario.zip, site.zip, `${site.key} scenario carries the wrong ZIP`);
+  }
+  const siteFields = new Set(['id', 'name', 'latitude', 'longitude', 'timezone', 'zip']);
+  const [reference, ...rest] = set.scenarios;
+  for (const scenario of rest) {
+    for (const key of new Set([...Object.keys(reference), ...Object.keys(scenario)])) {
+      if (siteFields.has(key)) continue;
+      assert.deepEqual(scenario[key], reference[key],
+        `${scenario.name} differs from ${reference.name} in "${key}"; only the site may change`);
+    }
+  }
+});
+
+// Each climate scenario is only ever meaningful against its own site record, and the Tulsa week above never
+// reaches the states that a subarctic or a hot-humid record does.
+test('every climate-archetype scenario simulates its own site record', () => {
+  const set = load('climate-archetypes.json');
+  const byLocation = new Map(set.scenarios.map(s => [`${s.latitude},${s.longitude}`, s]));
+  for (const site of bundled) {
+    const scenario = byLocation.get(`${site.latitude},${site.longitude}`);
+    const record = weekOf(site.key, 2025);
+    const summary = simulateScenario(scenario, record).summary;
+    assert.equal(summary.numericalFailureHours, 0, `${site.key} produced numerical failures`);
+    assert.equal(summary.validHours, record.hours.length, `${site.key} lost hours`);
+    assert.ok(summary.maxEnergyResidualW < 1, `${site.key} energy residual ${summary.maxEnergyResidualW} W`);
+    assert.ok(summary.maxMoistureResidualKgS < 1e-6, `${site.key} moisture residual ${summary.maxMoistureResidualKgS} kg/s`);
+    assert.ok(Number.isFinite(summary.compliancePct), `${site.key} produced no attainment figure`);
   }
 });
