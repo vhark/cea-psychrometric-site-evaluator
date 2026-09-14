@@ -215,4 +215,4 @@ Throughout these documents, "control window" means only this: the count of hours
 | Unmet load | The steady capacity shortfall in an hour: the extra W or kg/s that would have been needed to hold a violated bound under that hour's forcing, integrated over time. Cadence-invariant to first order, and not a sum of re-counted inventory deficits. |
 | Common eligible set | The intersection of eligible hours across all compared scenarios. Comparison dollars and hours use it, so they differ slightly from single-scenario totals. |
 | Capital recovery | Annualized capital plus maintenance, shown separately from historical-period operating cost, and never added into the dominance test. |
-| Assumption label | Every default input carries its source string, including "Client assumption (OSF …)" where the value came from a client planning document rather than a public source. |
+| Assumption label | Every default input carries a source string saying where the number came from and what it is not: a planning assumption with its arithmetic, an illustrative placeholder, or a user-defined value. |

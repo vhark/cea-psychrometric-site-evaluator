@@ -31,10 +31,10 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
  a{color:inherit;text-decoration:none}
  a[href^="http"]::after{content:" (" attr(href) ")";font:8pt 'IBM Plex Mono',monospace;overflow-wrap:anywhere}
  .appendix{break-before:page}
-}</style><div class="mark">Grownetics<em>.</em></div><span class="cat">Site evaluation results</span><h1>CEA Psychrometric Site Evaluator</h1><div class="report"><p class="lede">Site evaluation for ZIP 74103, 36.15, -95.99: what the climate gives free, what binds, which strategy class sits on the operating-cost frontier, and how far that verdict survives weather years and screened assumptions.</p><dl class="facts"><div><dt>Site</dt><dd>ZIP 74103, 36.15, -95.99</dd></div><div><dt>Period</dt><dd>2025-01-01 to 2025-12-31</dd></div><div><dt>Time zone</dt><dd>America/Chicago</dd></div><div><dt>Weather years</dt><dd>1, this period only</dd></div><div><dt>Weather source</dt><dd>NASA POWER (gridded reanalysis + satellite solar)</dd></div><div><dt>Model version</dt><dd>0.2.0-screening</dd></div><div><dt>Evidence tier</dt><dd>Assumption-based component screening</dd></div><div><dt>Facility / crop</dt><dd>greenhouse / lettuce</dd></div><div><dt>Strategies screened</dt><dd>6</dd></div><div><dt>Valid / missing hours</dt><dd>8,760 / 0</dd></div><div><dt>Generated</dt><dd>2026-09-14T02:57:52.429Z</dd></div></dl><p><button type="button" class="pdf" onclick="window.print()">Save as PDF</button></p><section><h2><span class="cat">§ 001</span>Executive summary</h2><p class="interp">At ZIP 74103, 36.15, -95.99, over 8,760 classified weather hours from 2025-01-01 to 2025-12-31, the climate gives 401 hours (4.6%) in which outside air or an evaporative pad can do the cooling, of which the pad screens as effective in only 244 h. What binds is heating: in this period the weather screen counts 1,963 h moisture-limited against 1,181 h temperature-limited and 4,142 h of heating, so this is a heating problem before it is a cooling problem. On operating cost the frontier is held by Pad + vent baseline at $22,062 per observed period while holding the joint band 27.1% of 8,759 eligible hours, with 2 strategies dominated on both cost and attainment. Crop moisture is 37.9% of the load the equipment sees (282,959 kWh latent against 462,966 kWh sensible, a sensible-heat ratio of 0.62), which is the term that decides between a coupled coil and a decoupled latent stage, and it is also the least certain input in the screening. This is 1 weather year only, so year risk is unmeasured here; the bundled ten-year Tulsa set moves baseline attainment by 2.7 points between its median and worst years, which is the order of variation a single year hides. Morris elementary-effects screening of 12 assumptions, 104 points, 1,872 simulations (docs/SENSITIVITY.md, docs/morris-screening.json): crop leaf area and transpiration lead every metric at 9.10 points of attainment, envelope U-value follows at 5.89 and shade fraction at 3.43. The cost ranking as a whole is not stable, taking 3 distinct orders, while the three cheapest positions are identical in 104 of 104 screened points and the instability is confined to strategies whose median costs sit within 16 percent of each other. What the reader must not conclude: these are 6 sets of assumed component performance run against 8,760 hours of reanalysis weather at evidence tier &quot;Assumption-based component screening&quot; on model 0.2.0-screening, so the figures cannot size equipment, cannot rank one manufacturer against another and cannot forecast a single kilogram of yield. Five things are absent from the evidence behind this document, and none of them can be inferred from it: measured-site calibration, a benchmark against an independent greenhouse model, manufacturer performance maps, equipment sizing, and any yield or revenue forecast. Hourly conservation identities close between 1e-16 and 5e-13 relative in the bundled checks (test/conservation.test.mjs). 56 regression tests pass in this repository, which bounds arithmetic and bookkeeping, not physical accuracy: no figure in this document is evidence that a built facility will behave this way.</p><p class="notice">Assumption-based screening, not a calibrated greenhouse digital twin, guaranteed indoor condition, equipment selection certificate or crop-yield forecast. Hourly source weather does not establish minute-scale or canopy-level precision. Installed costs and component efficiencies are editable assumptions unless separately sourced. Regional grid mix is not utility procurement or marginal emissions.</p></section><section><h2><span class="cat">§ 002</span>Climate design conditions</h2><table class="data"><thead><tr><th>Condition</th><th>0.4 percent</th><th>1 percent</th><th>2 percent</th></tr></thead><tbody><tr><td class="k">Dry bulb exceeded</td><td>36 C</td><td>35 C</td><td>33.4 C</td></tr><tr><td class="k">  coincident wet bulb</td><td>25.2 C</td><td>21.4 C</td><td>20.5 C</td></tr><tr><td class="k">  coincident dew point</td><td>21.2 C</td><td>14.7 C</td><td>14 C</td></tr><tr><td class="k">Dew point exceeded</td><td>25.6 C</td><td>25 C</td><td>24.6 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>28.4 C</td><td>27 C</td><td>30.2 C</td></tr><tr><td class="k">Wet bulb exceeded</td><td>26.7 C</td><td>26.2 C</td><td>25.9 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>31 C</td><td>34.5 C</td><td>28.7 C</td></tr></tbody></table><p class="interp">The 0.4 percent design dry bulb is 36 C with a coincident wet bulb of 25.2 C and dew point of 21.2 C, a state exceeded in about 35 of the 8,760 valid weather hours in this record. At the declared 80% pad effectiveness, ideal wet-bulb approach and no other gain, that hour leaves the pad near 27.4 C, 3.4 K above the 24 C band ceiling (day target 22 C plus 2 K), so the pad alone does not hold the design hour. The 1 percent design dew point of 25 C sits 6 K above the 19 C dew-point guardrail, so moisture removal, not sensible cooling, sets the equipment at the design hour. Coincident values belong to the same single hour rather than to independent percentiles, and all three exceedance levels come from the 8,760 valid hours of this one weather period (2025-01-01 to 2025-12-31), so they are a screening basis, not the stamped design conditions an engineer of record signs.</p><p class="meta">Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value; coincident values belong to that same hour, not independent percentiles. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single result hours under the assumed strategy; sensible = positive solar, light, envelope, infiltration, fan and crop gains; latent = crop transpiration plus positive infiltration and ventilation moisture import.</p></section><section><h2><span class="cat">§ 003</span>Strategy comparison</h2><table class="data wide"><thead><tr><th>Strategy</th><th>Joint attainment</th><th>Operating cost</th><th>Electric / fuel kWh</th><th>Installed capital assumption</th><th>Operating frontier</th></tr></thead><tbody><tr><td class="k">Pad + vent baseline</td><td>27.1%</td><td>$22,062.03</td><td>61,098 / 303,246</td><td>$15,000</td><td>On operating frontier</td></tr><tr><td class="k">Pads + condensing dehumidifier</td><td>41.6%</td><td>$28,490.96</td><td>132,941 / 250,653</td><td>$35,000</td><td>On operating frontier</td></tr><tr><td class="k">DX / mini-split + dehumidifier</td><td>73.1%</td><td>$39,910.28</td><td>210,033 / 300,566</td><td>$85,000</td><td>On operating frontier</td></tr><tr><td class="k">Integrated HVAC + reheat</td><td>55.3%</td><td>$47,199.09</td><td>246,930 / 367,321</td><td>$110,000</td><td>Operating-dominated</td></tr><tr><td class="k">Desiccant + evaporative cooling</td><td>51.9%</td><td>$33,824.65</td><td>65,584 / 548,276</td><td>$90,000</td><td>On operating frontier</td></tr><tr><td class="k">Liquid-desiccant hybrid (generic)</td><td>52.6%</td><td>$47,330.49</td><td>261,221 / 316,116</td><td>$125,000</td><td>Operating-dominated</td></tr></tbody></table><p class="interp">Pad + vent baseline is the cheapest non-dominated strategy at $22,062 of observed period operating cost while holding the joint band 27.1% of eligible hours, out of 6 screened strategies. The operating-cost frontier holds 4 strategies (Pad + vent baseline at $22,062 and 27.1%; Pads + condensing dehumidifier at $28,491 and 41.6%; Desiccant + evaporative cooling at $33,825 and 51.9%; DX / mini-split + dehumidifier at $39,910 and 73.1%), so more attainment is available, at a price. 2 strategies are operating-dominated, beaten on both cost and attainment: Integrated HVAC + reheat ($47,199, 55.3%); Liquid-desiccant hybrid (generic) ($47,330, 52.6%). Attainment spans 45.9 points across the strategies (27.1% to 73.1%), so the classes are genuinely different at this band, not price variants of one answer. Pad + vent baseline undercuts Pads + condensing dehumidifier by 29.1% of operating cost, wider than the 16 percent band in which the screened assumption ranges reorder strategies, so that gap survives the screened uncertainty. Capital is reported but never ranked: the installed assumptions span $15,000 to $125,000 and are editable inputs, so a strategy on the operating frontier can still be the wrong purchase.</p></section><section><h2><span class="cat">§ 004</span>Operating modes through the year</h2><figure><svg viewBox="0 0 800 225" width="100%" role="img" aria-label="Operating-mode hours by local calendar month. 12 months. See mode table below." font-family="'IBM Plex Mono', monospace" font-size="10" fill="rgba(43,44,46,.72)"><title>Operating-mode hours by local calendar month. 12 months. See mode table below.</title><desc>Stacked bars, one column per local month, 4 operating modes ordered by total hours. Tallest column 744 hours. The table below carries every value.</desc><line x1="48" x2="788" y1="184" y2="184" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="187" text-anchor="end" fill="rgba(43,44,46,.72)">0</text><line x1="48" x2="788" y1="143.75" y2="143.75" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="146.75" text-anchor="end" fill="rgba(43,44,46,.72)">186</text><line x1="48" x2="788" y1="103.5" y2="103.5" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="106.5" text-anchor="end" fill="rgba(43,44,46,.72)">372</text><line x1="48" x2="788" y1="63.25" y2="63.25" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="66.25" text-anchor="end" fill="rgba(43,44,46,.72)">558</text><line x1="48" x2="788" y1="23" y2="23" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="26" text-anchor="end" fill="rgba(43,44,46,.72)">744</text><text x="48" y="13" fill="rgba(43,44,46,.72)">hours</text><rect x="59.1" y="30.573924731182785" width="39.46666666666667" height="153.42607526881721" fill="#4DB405"><title>2025-01: Heating, 709 hours</title></rect><rect x="59.1" y="29.92473118279569" width="39.46666666666667" height="0.6491935483870968" fill="#A8730D"><title>2025-01: Ventilation, 3 hours</title></rect><rect x="59.1" y="22.99999999999999" width="39.46666666666667" height="6.9247311827957" fill="#6E8A74"><title>2025-01: Minimum air, 32 hours</title></rect><text x="78.83333333333333" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">01</text><rect x="120.76666666666665" y="53.0793010752688" width="39.46666666666667" height="130.9206989247312" fill="#4DB405"><title>2025-02: Heating, 605 hours</title></rect><rect x="120.76666666666665" y="42.90860215053762" width="39.46666666666667" height="10.170698924731182" fill="#A8730D"><title>2025-02: Ventilation, 47 hours</title></rect><rect x="120.76666666666665" y="39.44623655913977" width="39.46666666666667" height="3.46236559139785" fill="#6E8A74"><title>2025-02: Minimum air, 16 hours</title></rect><rect x="120.76666666666665" y="38.580645161290306" width="39.46666666666667" height="0.8655913978494625" fill="#8A9B2E"><title>2025-02: Pad cooling, 4 hours</title></rect><text x="140.5" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">02</text><rect x="182.4333333333333" y="71.90591397849461" width="39.46666666666667" height="112.09408602150539" fill="#4DB405"><title>2025-03: Heating, 518 hours</title></rect><rect x="182.4333333333333" y="39.44623655913977" width="39.46666666666667" height="32.45967741935484" fill="#A8730D"><title>2025-03: Ventilation, 150 hours</title></rect><rect x="182.4333333333333" y="32.08870967741934" width="39.46666666666667" height="7.35752688172043" fill="#6E8A74"><title>2025-03: Minimum air, 34 hours</title></rect><rect x="182.4333333333333" y="23.216397849462346" width="39.46666666666667" height="8.87231182795699" fill="#8A9B2E"><title>2025-03: Pad cooling, 41 hours</title></rect><text x="202.16666666666666" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">03</text><rect x="244.1" y="108.04435483870968" width="39.46666666666667" height="75.95564516129032" fill="#4DB405"><title>2025-04: Heating, 351 hours</title></rect><rect x="244.1" y="62.600806451612904" width="39.46666666666667" height="45.443548387096776" fill="#A8730D"><title>2025-04: Ventilation, 210 hours</title></rect><rect x="244.1" y="40.96102150537635" width="39.46666666666667" height="21.639784946236556" fill="#6E8A74"><title>2025-04: Minimum air, 100 hours</title></rect><rect x="244.1" y="28.193548387096783" width="39.46666666666667" height="12.76747311827957" fill="#8A9B2E"><title>2025-04: Pad cooling, 59 hours</title></rect><text x="263.8333333333333" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">04</text><rect x="305.76666666666665" y="124.2741935483871" width="39.46666666666667" height="59.725806451612904" fill="#4DB405"><title>2025-05: Heating, 276 hours</title></rect><rect x="305.76666666666665" y="63.8991935483871" width="39.46666666666667" height="60.375" fill="#A8730D"><title>2025-05: Ventilation, 279 hours</title></rect><rect x="305.76666666666665" y="44.63978494623656" width="39.46666666666667" height="19.25940860215054" fill="#6E8A74"><title>2025-05: Minimum air, 89 hours</title></rect><rect x="305.76666666666665" y="23.000000000000004" width="39.46666666666667" height="21.639784946236556" fill="#8A9B2E"><title>2025-05: Pad cooling, 100 hours</title></rect><text x="325.49999999999994" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">05</text><rect x="367.43333333333334" y="181.18682795698925" width="39.46666666666667" height="2.8131720430107525" fill="#4DB405"><title>2025-06: Heating, 13 hours</title></rect><rect x="367.43333333333334" y="81.86021505376344" width="39.46666666666667" height="99.32661290322581" fill="#A8730D"><title>2025-06: Ventilation, 459 hours</title></rect><rect x="367.43333333333334" y="28.626344086021504" width="39.46666666666667" height="53.233870967741936" fill="#6E8A74"><title>2025-06: Minimum air, 246 hours</title></rect><rect x="367.43333333333334" y="28.193548387096772" width="39.46666666666667" height="0.43279569892473124" fill="#8A9B2E"><title>2025-06: Pad cooling, 2 hours</title></rect><text x="387.16666666666663" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">06</text><rect x="429.1" y="80.34543010752688" width="39.46666666666667" height="103.65456989247312" fill="#A8730D"><title>2025-07: Ventilation, 479 hours</title></rect><rect x="429.1" y="22.999999999999993" width="39.46666666666667" height="57.34543010752689" fill="#6E8A74"><title>2025-07: Minimum air, 265 hours</title></rect><text x="448.8333333333333" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">07</text><rect x="490.76666666666665" y="179.45564516129033" width="39.46666666666667" height="4.544354838709677" fill="#4DB405"><title>2025-08: Heating, 21 hours</title></rect><rect x="490.76666666666665" y="100.25403225806453" width="39.46666666666667" height="79.20161290322581" fill="#A8730D"><title>2025-08: Ventilation, 366 hours</title></rect><rect x="490.76666666666665" y="25.5967741935484" width="39.46666666666667" height="74.65725806451613" fill="#6E8A74"><title>2025-08: Minimum air, 345 hours</title></rect><rect x="490.76666666666665" y="23.00000000000001" width="39.46666666666667" height="2.596774193548387" fill="#8A9B2E"><title>2025-08: Pad cooling, 12 hours</title></rect><text x="510.49999999999994" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">08</text><rect x="552.4333333333333" y="165.82258064516128" width="39.46666666666667" height="18.177419354838708" fill="#4DB405"><title>2025-09: Heating, 84 hours</title></rect><rect x="552.4333333333333" y="98.30645161290322" width="39.46666666666667" height="67.51612903225806" fill="#A8730D"><title>2025-09: Ventilation, 312 hours</title></rect><rect x="552.4333333333333" y="49.184139784946225" width="39.46666666666667" height="49.12231182795699" fill="#6E8A74"><title>2025-09: Minimum air, 227 hours</title></rect><rect x="552.4333333333333" y="28.193548387096765" width="39.46666666666667" height="20.99059139784946" fill="#8A9B2E"><title>2025-09: Pad cooling, 97 hours</title></rect><text x="572.1666666666666" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">09</text><rect x="614.1" y="114.96908602150538" width="39.46666666666667" height="69.03091397849462" fill="#4DB405"><title>2025-10: Heating, 319 hours</title></rect><rect x="614.1" y="77.31586021505376" width="39.46666666666667" height="37.65322580645161" fill="#A8730D"><title>2025-10: Ventilation, 174 hours</title></rect><rect x="614.1" y="49.61693548387096" width="39.46666666666667" height="27.6989247311828" fill="#6E8A74"><title>2025-10: Minimum air, 128 hours</title></rect><rect x="614.1" y="22.999999999999993" width="39.46666666666667" height="26.616935483870968" fill="#8A9B2E"><title>2025-10: Pad cooling, 123 hours</title></rect><text x="633.8333333333334" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">10</text><rect x="675.7666666666667" y="63.46639784946237" width="39.46666666666667" height="120.53360215053763" fill="#4DB405"><title>2025-11: Heating, 557 hours</title></rect><rect x="675.7666666666667" y="42.69220430107527" width="39.46666666666667" height="20.774193548387096" fill="#A8730D"><title>2025-11: Ventilation, 96 hours</title></rect><rect x="675.7666666666667" y="33.81989247311828" width="39.46666666666667" height="8.87231182795699" fill="#6E8A74"><title>2025-11: Minimum air, 41 hours</title></rect><rect x="675.7666666666667" y="27.977150537634408" width="39.46666666666667" height="5.842741935483871" fill="#8A9B2E"><title>2025-11: Pad cooling, 27 hours</title></rect><text x="695.5" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">11</text><rect x="737.4333333333333" y="40.09543010752688" width="39.46666666666667" height="143.90456989247312" fill="#4DB405"><title>2025-12: Heating, 665 hours</title></rect><rect x="737.4333333333333" y="32.08870967741935" width="39.46666666666667" height="8.006720430107526" fill="#A8730D"><title>2025-12: Ventilation, 37 hours</title></rect><rect x="737.4333333333333" y="24.73118279569892" width="39.46666666666667" height="7.35752688172043" fill="#6E8A74"><title>2025-12: Minimum air, 34 hours</title></rect><rect x="737.4333333333333" y="22.999999999999996" width="39.46666666666667" height="1.731182795698925" fill="#8A9B2E"><title>2025-12: Pad cooling, 8 hours</title></rect><text x="757.1666666666666" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">12</text></svg><figcaption>Equipment operating modes by local month for Pad + vent baseline. Stacked bars, one column per local month, 4 operating modes ordered by total hours. Tallest column 744 hours. The table below carries every value.</figcaption><ul class="legend"><li><i style="background:#4DB405;opacity:1"></i>Heating</li><li><i style="background:#A8730D;opacity:1"></i>Ventilation</li><li><i style="background:#6E8A74;opacity:1"></i>Minimum air</li><li><i style="background:#8A9B2E;opacity:1"></i>Pad cooling</li></ul><table class="data"><thead><tr><th>Month</th><th>Heating · h</th><th>Ventilation · h</th><th>Minimum air · h</th><th>Pad cooling · h</th><th>Total · h</th></tr></thead><tbody><tr><td class="k">2025-01</td><td>709</td><td>3</td><td>32</td><td>0</td><td>744</td></tr><tr><td class="k">2025-02</td><td>605</td><td>47</td><td>16</td><td>4</td><td>672</td></tr><tr><td class="k">2025-03</td><td>518</td><td>150</td><td>34</td><td>41</td><td>743</td></tr><tr><td class="k">2025-04</td><td>351</td><td>210</td><td>100</td><td>59</td><td>720</td></tr><tr><td class="k">2025-05</td><td>276</td><td>279</td><td>89</td><td>100</td><td>744</td></tr><tr><td class="k">2025-06</td><td>13</td><td>459</td><td>246</td><td>2</td><td>720</td></tr><tr><td class="k">2025-07</td><td>0</td><td>479</td><td>265</td><td>0</td><td>744</td></tr><tr><td class="k">2025-08</td><td>21</td><td>366</td><td>345</td><td>12</td><td>744</td></tr><tr><td class="k">2025-09</td><td>84</td><td>312</td><td>227</td><td>97</td><td>720</td></tr><tr><td class="k">2025-10</td><td>319</td><td>174</td><td>128</td><td>123</td><td>744</td></tr><tr><td class="k">2025-11</td><td>557</td><td>96</td><td>41</td><td>27</td><td>721</td></tr><tr><td class="k">2025-12</td><td>665</td><td>37</td><td>34</td><td>8</td><td>744</td></tr><tr><td class="k">Record</td><td>4,118</td><td>2,612</td><td>1,557</td><td>473</td><td>8,760</td></tr></tbody></table></figure><p class="interp">The dispatch splits into 4 distinct equipment modes over 8,759 eligible hours, with the joint band held in 2,376.8 equivalent hours (27.1%). Mode counts are the most frequent mode per hour under these assumptions, not a measured schedule, and 1 segment warm-up hours are excluded from the comparison set.</p></section><section><h2><span class="cat">§ 005</span>Pad and outside-air opportunity</h2><p class="interp">Pad-effective weather covers 244 h of the 2,942 h that show a cooling demand, 8.3%, so at this site the pad is a marginal device rather than a primary cooling stage. It is effective on 65 days, of which 30 give four hours or more, and it is ineffective in 2,680 h on 171 days. The limit that binds more often is the moisture ceiling: counted over every classified hour, 3,851 h carry the moisture-ceiling flag against 2,952 h that run out of temperature margin, so adding pad area cannot help those hours, while removing moisture can. The controller still ran the pad 843 h on 145 days for 126,314 L of water, 3.5 times the 244 h the weather screen calls effective, because staging it partially helps the zone even where it cannot hold the band alone. Outside air can carry moisture out of the zone in 5,266 h (cool-dry 536, cold-dry 4,142, hot-dry 588) at up to 40 ACH. Against the declared 0.4 kWh/kg condensing dehumidifier, outside air is cheaper per kilogram in 4,970 h and lower in energy per kilogram in 1,752 h, so a ventilation-first moisture sequence is worth wiring. Those are weather-side opportunity hours, not equipment runtime: the 4,142 cold-dry hours carry a heating penalty that is priced here, while the sensible import of the 588 hot-dry hours is not.</p><p class="meta">Maximum ventilation rate, fan power and heating of ventilation air to the target at scenario prices; sensible import in hot-dry hours is not costed here.</p></section><section><h2><span class="cat">§ 006</span>Sensible against latent load</h2><figure><svg viewBox="0 0 800 300" width="100%" role="img" aria-label="Monthly space loads in kWh. Sensible gains above the axis; sensible losses and latent gains below. 12 months. Signed values in the load table." font-family="'IBM Plex Mono', monospace" font-size="10" fill="rgba(43,44,46,.72)"><title>Monthly space loads in kWh. Sensible gains above the axis; sensible losses and latent gains below. 12 months. Signed values in the load table.</title><desc>Column per local month. Sensible gains rise above the zero line to at most 54,835 kWh; sensible losses and latent gains fall below it to at most 79,804 kWh. The table carries the same totals, so colour is not needed.</desc><line x1="56" x2="788" y1="23" y2="23" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="26" text-anchor="end" fill="rgba(43,44,46,.72)">54,835</text><line x1="56" x2="788" y1="71.05877086389927" y2="71.05877086389927" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="74.05877086389927" text-anchor="end" fill="rgba(43,44,46,.72)">27,418</text><line x1="56" x2="788" y1="119.11754172779854" y2="119.11754172779854" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="122.11754172779854" text-anchor="end" fill="rgba(43,44,46,.72)">0</text><line x1="56" x2="788" y1="189.05877086389927" y2="189.05877086389927" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="192.05877086389927" text-anchor="end" fill="rgba(43,44,46,.72)">-39,902</text><line x1="56" x2="788" y1="259" y2="259" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="262" text-anchor="end" fill="rgba(43,44,46,.72)">-79,804</text><text x="56" y="13" fill="rgba(43,44,46,.72)">kWh, gains up, losses and latent down</text><rect x="66.98" y="82.59375434144715" width="39.04" height="36.52378738635139" fill="#4DB405"><title>2025-01: Solar 20,837 kWh sensible gain</title></rect><rect x="66.98" y="72.70274178799225" width="39.04" height="9.891012553454898" fill="#A8730D"><title>2025-01: Lighting 5,643 kWh sensible gain</title></rect><rect x="66.98" y="72.51873131517404" width="39.04" height="0.18401047281822158" fill="#71806B"><title>2025-01: Fans 105 kWh sensible gain</title></rect><rect x="66.98" y="119.11754172779854" width="39.04" height="90.93707999450417" fill="#6E8A74" opacity="0.45"><title>2025-01: Envelope 51,880 kWh sensible loss</title></rect><rect x="66.98" y="210.05462172230273" width="39.04" height="5.374963256674031" fill="#8A9B2E" opacity="0.45"><title>2025-01: Infiltration 3,066 kWh sensible loss</title></rect><rect x="66.98" y="215.42958497897675" width="39.04" height="18.72951058792694" fill="#9A8860" opacity="0.45"><title>2025-01: Ventilation 10,685 kWh sensible loss</title></rect><rect x="66.98" y="234.1590955669037" width="39.04" height="24.840904433096348" fill="#5A5B5D" opacity="0.9"><title>2025-01: Crop transpiration 20,824 kg, 14,172 kWh latent</title></rect><text x="86.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">01</text><rect x="127.98" y="83.29418141440539" width="39.04" height="35.82336031339316" fill="#4DB405"><title>2025-02: Solar 20,437 kWh sensible gain</title></rect><rect x="127.98" y="73.76689719386539" width="39.04" height="9.527284220539991" fill="#A8730D"><title>2025-02: Lighting 5,435 kWh sensible gain</title></rect><rect x="127.98" y="73.357700666845" width="39.04" height="0.40919652702038795" fill="#71806B"><title>2025-02: Fans 233 kWh sensible gain</title></rect><rect x="127.98" y="119.11754172779854" width="39.04" height="69.73170321239387" fill="#6E8A74" opacity="0.45"><title>2025-02: Envelope 39,782 kWh sensible loss</title></rect><rect x="127.98" y="188.84924494019242" width="39.04" height="4.103079156304791" fill="#8A9B2E" opacity="0.45"><title>2025-02: Infiltration 2,341 kWh sensible loss</title></rect><rect x="127.98" y="192.95232409649722" width="39.04" height="23.77467037400068" fill="#9A8860" opacity="0.45"><title>2025-02: Ventilation 13,564 kWh sensible loss</title></rect><rect x="127.98" y="216.7269944704979" width="39.04" height="26.605907774509415" fill="#5A5B5D" opacity="0.9"><title>2025-02: Crop transpiration 22,304 kg, 15,179 kWh latent</title></rect><text x="147.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">02</text><rect x="188.98" y="57.26013722396918" width="39.04" height="61.85740450382936" fill="#4DB405"><title>2025-03: Solar 35,290 kWh sensible gain</title></rect><rect x="188.98" y="51.72434511559697" width="39.04" height="5.535792108372214" fill="#A8730D"><title>2025-03: Lighting 3,158 kWh sensible gain</title></rect><rect x="188.98" y="50.456705420016824" width="39.04" height="1.2676396955801439" fill="#71806B"><title>2025-03: Fans 723 kWh sensible gain</title></rect><rect x="188.98" y="119.11754172779854" width="39.04" height="34.7031272521529" fill="#6E8A74" opacity="0.45"><title>2025-03: Envelope 19,798 kWh sensible loss</title></rect><rect x="188.98" y="153.82066897995145" width="39.04" height="1.9529099907132657" fill="#8A9B2E" opacity="0.45"><title>2025-03: Infiltration 1,114 kWh sensible loss</title></rect><rect x="188.98" y="155.77357897066472" width="39.04" height="42.16148027285682" fill="#9A8860" opacity="0.45"><title>2025-03: Ventilation 24,053 kWh sensible loss</title></rect><rect x="188.98" y="197.93505924352155" width="39.04" height="42.819650273966595" fill="#5A5B5D" opacity="0.9"><title>2025-03: Crop transpiration 35,895 kg, 24,429 kWh latent</title></rect><text x="208.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">03</text><rect x="249.98" y="60.03009628543213" width="39.04" height="59.08744544236641" fill="#4DB405"><title>2025-04: Solar 33,710 kWh sensible gain</title></rect><rect x="249.98" y="52.01642012352356" width="39.04" height="8.013676161908567" fill="#A8730D"><title>2025-04: Lighting 4,572 kWh sensible gain</title></rect><rect x="249.98" y="50.1194392955693" width="39.04" height="1.8969808279542624" fill="#71806B"><title>2025-04: Fans 1,082 kWh sensible gain</title></rect><rect x="249.98" y="119.11754172779854" width="39.04" height="19.469004831997875" fill="#6E8A74" opacity="0.45"><title>2025-04: Envelope 11,107 kWh sensible loss</title></rect><rect x="249.98" y="138.5865465597964" width="39.04" height="1.0856832056888295" fill="#8A9B2E" opacity="0.45"><title>2025-04: Infiltration 619 kWh sensible loss</title></rect><rect x="249.98" y="139.67222976548524" width="39.04" height="48.086566384111315" fill="#9A8860" opacity="0.45"><title>2025-04: Ventilation 27,434 kWh sensible loss</title></rect><rect x="249.98" y="187.75879614959655" width="39.04" height="39.02125341841064" fill="#5A5B5D" opacity="0.9"><title>2025-04: Crop transpiration 32,711 kg, 22,262 kWh latent</title></rect><text x="269.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">04</text><rect x="310.98" y="42.75444323542193" width="39.04" height="76.36309849237661" fill="#4DB405"><title>2025-05: Solar 43,565 kWh sensible gain</title></rect><rect x="310.98" y="37.512091859674555" width="39.04" height="5.242351375747377" fill="#A8730D"><title>2025-05: Lighting 2,991 kWh sensible gain</title></rect><rect x="310.98" y="34.64266712606018" width="39.04" height="2.86942473361437" fill="#71806B"><title>2025-05: Fans 1,637 kWh sensible gain</title></rect><rect x="310.98" y="119.11754172779854" width="39.04" height="9.94486328670518" fill="#6E8A74" opacity="0.45"><title>2025-05: Envelope 5,674 kWh sensible loss</title></rect><rect x="310.98" y="129.06240501450372" width="39.04" height="0.5401975881582556" fill="#8A9B2E" opacity="0.45"><title>2025-05: Infiltration 308 kWh sensible loss</title></rect><rect x="310.98" y="129.602602602662" width="39.04" height="58.14937389245683" fill="#9A8860" opacity="0.45"><title>2025-05: Ventilation 33,174 kWh sensible loss</title></rect><rect x="310.98" y="187.7519764951188" width="39.04" height="41.420937561019194" fill="#5A5B5D" opacity="0.9"><title>2025-05: Crop transpiration 34,723 kg, 23,631 kWh latent</title></rect><text x="330.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">05</text><rect x="371.98" y="39.38290226916219" width="39.04" height="79.73463945863635" fill="#4DB405"><title>2025-06: Solar 45,489 kWh sensible gain</title></rect><rect x="371.98" y="35.54302133276442" width="39.04" height="3.839880936397771" fill="#A8730D"><title>2025-06: Lighting 2,191 kWh sensible gain</title></rect><rect x="371.98" y="32.49016156782625" width="39.04" height="3.052859764938169" fill="#71806B"><title>2025-06: Fans 1,742 kWh sensible gain</title></rect><rect x="371.98" y="119.11754172779854" width="39.04" height="5.9053368986235695" fill="#6E8A74" opacity="0.45"><title>2025-06: Envelope 3,369 kWh sensible loss</title></rect><rect x="371.98" y="125.02287862642211" width="39.04" height="0.30545005837862826" fill="#8A9B2E" opacity="0.45"><title>2025-06: Infiltration 174 kWh sensible loss</title></rect><rect x="371.98" y="125.32832868480074" width="39.04" height="36.46539602367876" fill="#9A8860" opacity="0.45"><title>2025-06: Ventilation 20,804 kWh sensible loss</title></rect><rect x="371.98" y="161.7937247084795" width="39.04" height="45.069441736696916" fill="#5A5B5D" opacity="0.9"><title>2025-06: Crop transpiration 37,781 kg, 25,712 kWh latent</title></rect><text x="391.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">06</text><rect x="432.98" y="29.118680722533355" width="39.04" height="89.99886100526518" fill="#4DB405"><title>2025-07: Solar 51,345 kWh sensible gain</title></rect><rect x="432.98" y="26.15096454242196" width="39.04" height="2.967716180111397" fill="#A8730D"><title>2025-07: Lighting 1,693 kWh sensible gain</title></rect><rect x="432.98" y="23.00000000000002" width="39.04" height="3.150964542421939" fill="#71806B"><title>2025-07: Fans 1,798 kWh sensible gain</title></rect><rect x="432.98" y="119.11754172779854" width="39.04" height="5.622193954876714" fill="#6E8A74" opacity="0.45"><title>2025-07: Envelope 3,207 kWh sensible loss</title></rect><rect x="432.98" y="124.73973568267525" width="39.04" height="0.28859732115793196" fill="#8A9B2E" opacity="0.45"><title>2025-07: Infiltration 165 kWh sensible loss</title></rect><rect x="432.98" y="125.02833300383318" width="39.04" height="36.2483568789435" fill="#9A8860" opacity="0.45"><title>2025-07: Ventilation 20,680 kWh sensible loss</title></rect><rect x="432.98" y="161.27668988277668" width="39.04" height="54.034498927828984" fill="#5A5B5D" opacity="0.9"><title>2025-07: Crop transpiration 45,297 kg, 30,827 kWh latent</title></rect><text x="452.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">07</text><rect x="493.98" y="45.285469150608975" width="39.04" height="73.83207257718956" fill="#4DB405"><title>2025-08: Solar 42,121 kWh sensible gain</title></rect><rect x="493.98" y="40.17923807615217" width="39.04" height="5.106231074456806" fill="#A8730D"><title>2025-08: Lighting 2,913 kWh sensible gain</title></rect><rect x="493.98" y="37.59912376604778" width="39.04" height="2.5801143101043875" fill="#71806B"><title>2025-08: Fans 1,472 kWh sensible gain</title></rect><rect x="493.98" y="119.11754172779854" width="39.04" height="2.5916517827045324" fill="#6E8A74" opacity="0.45"><title>2025-08: Envelope 1,479 kWh sensible loss</title></rect><rect x="493.98" y="121.70919351050307" width="39.04" height="0.13510174520227394" fill="#8A9B2E" opacity="0.45"><title>2025-08: Infiltration 77 kWh sensible loss</title></rect><rect x="493.98" y="121.84429525570535" width="39.04" height="18.14700650300945" fill="#9A8860" opacity="0.45"><title>2025-08: Ventilation 10,353 kWh sensible loss</title></rect><rect x="493.98" y="139.9913017587148" width="39.04" height="62.395486343830015" fill="#5A5B5D" opacity="0.9"><title>2025-08: Crop transpiration 52,306 kg, 35,597 kWh latent</title></rect><text x="513.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">08</text><rect x="554.98" y="57.121138743061536" width="39.04" height="61.996402984737" fill="#4DB405"><title>2025-09: Solar 35,369 kWh sensible gain</title></rect><rect x="554.98" y="52.06058720149113" width="39.04" height="5.060551541570408" fill="#A8730D"><title>2025-09: Lighting 2,887 kWh sensible gain</title></rect><rect x="554.98" y="51.994946778835256" width="39.04" height="0.06564042265587543" fill="#6E8A74"><title>2025-09: Envelope 37 kWh sensible gain</title></rect><rect x="554.98" y="49.554718797655596" width="39.04" height="2.440227981179662" fill="#71806B"><title>2025-09: Fans 1,392 kWh sensible gain</title></rect><rect x="554.98" y="119.11754172779854" width="39.04" height="0.001324539237805551" fill="#8A9B2E" opacity="0.45"><title>2025-09: Infiltration 1 kWh sensible loss</title></rect><rect x="554.98" y="119.11886626703634" width="39.04" height="28.79674403812446" fill="#9A8860" opacity="0.45"><title>2025-09: Ventilation 16,429 kWh sensible loss</title></rect><rect x="554.98" y="147.91561030516078" width="39.04" height="48.7924529908877" fill="#5A5B5D" opacity="0.9"><title>2025-09: Crop transpiration 40,902 kg, 27,836 kWh latent</title></rect><text x="574.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">09</text><rect x="615.98" y="69.97638545694123" width="39.04" height="49.14115627085731" fill="#4DB405"><title>2025-10: Solar 28,035 kWh sensible gain</title></rect><rect x="615.98" y="61.1894045859518" width="39.04" height="8.78698087098943" fill="#A8730D"><title>2025-10: Lighting 5,013 kWh sensible gain</title></rect><rect x="615.98" y="58.92429011960492" width="39.04" height="2.2651144663468763" fill="#71806B"><title>2025-10: Fans 1,292 kWh sensible gain</title></rect><rect x="615.98" y="119.11754172779854" width="39.04" height="6.998142181528376" fill="#6E8A74" opacity="0.45"><title>2025-10: Envelope 3,992 kWh sensible loss</title></rect><rect x="615.98" y="126.11568390932692" width="39.04" height="0.40541608498751647" fill="#8A9B2E" opacity="0.45"><title>2025-10: Infiltration 231 kWh sensible loss</title></rect><rect x="615.98" y="126.52109999431444" width="39.04" height="42.87358327307031" fill="#9A8860" opacity="0.45"><title>2025-10: Ventilation 24,460 kWh sensible loss</title></rect><rect x="615.98" y="169.39468326738475" width="39.04" height="43.12152358888241" fill="#5A5B5D" opacity="0.9"><title>2025-10: Crop transpiration 36,148 kg, 24,601 kWh latent</title></rect><text x="635.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">10</text><rect x="676.98" y="80.98164882338561" width="39.04" height="38.13589290441293" fill="#4DB405"><title>2025-11: Solar 21,757 kWh sensible gain</title></rect><rect x="676.98" y="72.57343138130157" width="39.04" height="8.40821744208404" fill="#A8730D"><title>2025-11: Lighting 4,797 kWh sensible gain</title></rect><rect x="676.98" y="71.32504133209804" width="39.04" height="1.2483900492035396" fill="#71806B"><title>2025-11: Fans 712 kWh sensible gain</title></rect><rect x="676.98" y="119.11754172779854" width="39.04" height="35.65667035264779" fill="#6E8A74" opacity="0.45"><title>2025-11: Envelope 20,342 kWh sensible loss</title></rect><rect x="676.98" y="154.77421208044632" width="39.04" height="2.03313823434271" fill="#8A9B2E" opacity="0.45"><title>2025-11: Infiltration 1,160 kWh sensible loss</title></rect><rect x="676.98" y="156.80735031478903" width="39.04" height="40.44445056072645" fill="#9A8860" opacity="0.45"><title>2025-11: Ventilation 23,074 kWh sensible loss</title></rect><rect x="676.98" y="197.25180087551547" width="39.04" height="37.24923088550613" fill="#5A5B5D" opacity="0.9"><title>2025-11: Crop transpiration 31,226 kg, 21,251 kWh latent</title></rect><text x="696.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">11</text><rect x="737.98" y="87.67587428311812" width="39.04" height="31.441667444680416" fill="#4DB405"><title>2025-12: Solar 17,938 kWh sensible gain</title></rect><rect x="737.98" y="75.09664743915037" width="39.04" height="12.579226843967747" fill="#A8730D"><title>2025-12: Lighting 7,176 kWh sensible gain</title></rect><rect x="737.98" y="74.53947349163046" width="39.04" height="0.5571739475199083" fill="#71806B"><title>2025-12: Fans 318 kWh sensible gain</title></rect><rect x="737.98" y="119.11754172779854" width="39.04" height="64.23934258606735" fill="#6E8A74" opacity="0.45"><title>2025-12: Envelope 36,649 kWh sensible loss</title></rect><rect x="737.98" y="183.3568843138659" width="39.04" height="3.730396772567902" fill="#8A9B2E" opacity="0.45"><title>2025-12: Infiltration 2,128 kWh sensible loss</title></rect><rect x="737.98" y="187.0872810864338" width="39.04" height="23.682448166092122" fill="#9A8860" opacity="0.45"><title>2025-12: Ventilation 13,511 kWh sensible loss</title></rect><rect x="737.98" y="210.7697292525259" width="39.04" height="30.608854601555713" fill="#5A5B5D" opacity="0.9"><title>2025-12: Crop transpiration 25,659 kg, 17,462 kWh latent</title></rect><text x="757.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">12</text></svg><figcaption>Monthly space loads for Pad + vent baseline, sensible gains above the axis, sensible losses and latent gains below. Column per local month. Sensible gains rise above the zero line to at most 54,835 kWh; sensible losses and latent gains fall below it to at most 79,804 kWh. The table carries the same totals, so colour is not needed.</figcaption><ul class="legend"><li><i style="background:#4DB405;opacity:1"></i>Solar</li><li><i style="background:#A8730D;opacity:1"></i>Lighting</li><li><i style="background:#6E8A74;opacity:1"></i>Envelope</li><li><i style="background:#8A9B2E;opacity:1"></i>Infiltration</li><li><i style="background:#9A8860;opacity:1"></i>Ventilation</li><li><i style="background:#71806B;opacity:1"></i>Fans</li><li><i style="background:#C4654A;opacity:1"></i>Crop sensible</li><li><i style="background:rgba(43,44,46,.72);opacity:0.45"></i>Same colours at 45% opacity below the axis are sensible losses</li><li><i style="background:#5A5B5D;opacity:0.9"></i>Crop transpiration (latent)</li><li><i style="background:#C4654A;opacity:0.55"></i>Infiltration moisture (latent)</li><li><i style="background:#71806B;opacity:0.55"></i>Ventilation moisture (latent)</li></ul><table class="data"><thead><tr><th>Month</th><th>Sensible gains · kWh</th><th>Sensible losses · kWh</th><th>Latent gains · kWh</th><th>Crop latent · kg</th><th>Sensible-heat ratio</th></tr></thead><tbody><tr><td class="k">2025-01</td><td>26,585</td><td>65,632</td><td>14,172</td><td>20,824</td><td>0.65</td></tr><tr><td class="k">2025-02</td><td>26,106</td><td>55,687</td><td>15,179</td><td>22,304</td><td>0.63</td></tr><tr><td class="k">2025-03</td><td>39,171</td><td>44,966</td><td>24,429</td><td>35,895</td><td>0.62</td></tr><tr><td class="k">2025-04</td><td>39,364</td><td>39,160</td><td>22,262</td><td>32,711</td><td>0.64</td></tr><tr><td class="k">2025-05</td><td>48,193</td><td>39,156</td><td>23,631</td><td>34,723</td><td>0.67</td></tr><tr><td class="k">2025-06</td><td>49,421</td><td>24,347</td><td>25,712</td><td>37,781</td><td>0.66</td></tr><tr><td class="k">2025-07</td><td>54,835</td><td>24,052</td><td>30,827</td><td>45,297</td><td>0.64</td></tr><tr><td class="k">2025-08</td><td>46,507</td><td>11,909</td><td>35,597</td><td>52,306</td><td>0.57</td></tr><tr><td class="k">2025-09</td><td>39,686</td><td>16,429</td><td>27,836</td><td>40,902</td><td>0.6</td></tr><tr><td class="k">2025-10</td><td>34,340</td><td>28,683</td><td>24,601</td><td>36,148</td><td>0.6</td></tr><tr><td class="k">2025-11</td><td>27,266</td><td>44,576</td><td>21,251</td><td>31,226</td><td>0.56</td></tr><tr><td class="k">2025-12</td><td>25,432</td><td>52,288</td><td>17,462</td><td>25,659</td><td>0.59</td></tr><tr><td class="k">Period total</td><td>456,869</td><td>446,847</td><td>282,959</td><td>415,776</td><td>0.62</td></tr></tbody></table></figure><p class="interp">Across 8,760 valid hours the space sensible-heat ratio is 0.62: 462,966 kWh of positive sensible gain against 282,959 kWh of crop transpiration (415,776 kg of water). A ratio of 0.62 is latent-dominated, so a coupled cooling coil has to overcool to reach the moisture target, and a decoupled latent stage (dry-neutral DOAS or desiccant) deserves screening against the 282,959 kWh of latent load. The ratio moves through the year from 0.56 in 2025-11 to 0.67 in 2025-05, so a single design-day ratio matches at most 1 of the 12 months in this record. The ratio is defined here as positive sensible gains over those gains plus the latent heat of crop transpiration at 0.681 kWh/kg, with transpiration itself the single most influential assumption in the screening at 9.10 points of attainment, so treat 0.62 as a range, not a constant.</p><p class="meta">Signed balance terms per local month, positive = gain into zone air. Sensible-heat ratio = positive sensible gains / (positive sensible gains + latent heat of crop transpiration); null in hours without gains. Latent kg listed by source; ventilation and infiltration are negative when outside air is drier than the zone.</p></section><section><h2><span class="cat">§ 007</span>Equipment runtime and design peaks</h2><table class="data wide"><thead><tr><th>Component</th><th>Hours</th><th>Days</th><th>Equivalent full-load h</th><th>Duty</th></tr></thead><tbody><tr><td class="k">Evaporative pad</td><td>843</td><td>145</td><td>487.9</td><td>57.9% mean duty while on</td></tr><tr><td class="k">Heating</td><td>4,419</td><td>297</td><td>2,274.3</td><td>51.5% mean duty while on</td></tr><tr><td class="k">Supplemental light</td><td>2,226</td><td>365</td><td>2,226</td><td>100% mean duty while on</td></tr></tbody></table><table class="data"><thead><tr><th>Design quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Peak sensible hour</td><td>248 kWh/h at 2025-05-04 13:00</td></tr><tr><td class="k">Peak latent hour</td><td>288 kg/h at 2025-08-18 14:00</td></tr><tr><td class="k">Ventilation air requirement</td><td>40 ACH, 22.22 m³/s</td></tr><tr><td class="k">Condensate peak</td><td>0.2 kg/h</td></tr><tr><td class="k">Pad water peak</td><td>437.7 L/h</td></tr></tbody></table><p class="interp">The busiest component is heating at 4,419 h on 297 days, 2,274.3 equivalent full-load hours, a mean duty of 51.5% while it is on. No reheat energy appears in this strategy (0 kWh), so it does not overcool to control moisture at this band. Installed capacity runs out somewhere: 283,634 kWh of sensible demand and 724,060 kg of moisture are reported unmet rather than absorbed silently, and the longest continuous band miss is 2,049 h. Runtime follows the declared capacities, not measured equipment: 120 kW of heat at 90% efficiency, 0 kW of cooling at COP 3 and SHR 0.75, and 0 kg/h of dehumidification at 2.5 L/kWh, all editable inputs with no manufacturer curve behind them.</p></section><section><h2><span class="cat">§ 008</span>CO2 enrichment window</h2><table class="data"><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Equivalent enrichment hours</td><td>4,357</td></tr><tr><td class="k">Hours with any window</td><td>6,315</td></tr><tr><td class="k">Days touched</td><td>365</td></tr><tr><td class="k">Weather-side counterpart</td><td>5,215 h</td></tr><tr><td class="k">Valid hours</td><td>8,760</td></tr></tbody></table><p class="interp">Enrichment is not immediately flushed in 4,357 duty-weighted equivalent hours spread over 365 days, 49.7% of the 8,760 valid hours, against a weather-side counterpart of 5,215 h with no primary ventilation demand. At 49.7% of hours the window is wide enough to plan enrichment around, subject to injection hardware this screen does not model. No CO2 mass balance, injection rate, leakage or crop uptake is modeled, so the 4,357 equivalent hours are an upper bound on opportunity and not a yield claim.</p></section><section><h2><span class="cat">§ 009</span>Reproducibility and evidence</h2><table class="data"><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody><tr><td class="k">Model version</td><td>0.2.0-screening</td></tr><tr><td class="k">Evidence tier</td><td>Assumption-based component screening</td></tr><tr><td class="k">Controller</td><td>staged</td></tr><tr><td class="k">Transpiration model</td><td>stanghellini</td></tr><tr><td class="k">Dispatch step</td><td>1 minute</td></tr><tr><td class="k">Warm-up hours per segment</td><td>1</td></tr><tr><td class="k">Leaf area index</td><td>3</td></tr><tr><td class="k">PsychroLib</td><td>2.5.0 at commit a42717d24ed08534642d6caf7dcbbf72b9510bea</td></tr><tr><td class="k">Expected / valid / missing hours</td><td>8,760 / 8,760 / 0</td></tr><tr><td class="k">Numerical failure hours</td><td>0</td></tr><tr><td class="k">Largest sensible residual</td><td>0.000000007929 W</td></tr><tr><td class="k">Largest moisture residual</td><td>0.000000000000000451 kg/s</td></tr><tr><td class="k">Electricity price basis</td><td>Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.</td></tr></tbody></table>
+}</style><div class="mark">Grownetics<em>.</em></div><span class="cat">Site evaluation results</span><h1>CEA Psychrometric Site Evaluator</h1><div class="report"><p class="lede">Site evaluation for ZIP 74103, 36.15, -95.99: what the climate gives free, what binds, which strategy class sits on the operating-cost frontier, and how far that verdict survives weather years and screened assumptions.</p><dl class="facts"><div><dt>Site</dt><dd>ZIP 74103, 36.15, -95.99</dd></div><div><dt>Period</dt><dd>2021-01-01 to 2021-12-31</dd></div><div><dt>Time zone</dt><dd>America/Chicago</dd></div><div><dt>Weather years</dt><dd>2021, 2022, 2023, 2024, 2025</dd></div><div><dt>Weather source</dt><dd>NASA POWER (gridded reanalysis + satellite solar)</dd></div><div><dt>Model version</dt><dd>0.2.0-screening</dd></div><div><dt>Evidence tier</dt><dd>Assumption-based component screening</dd></div><div><dt>Facility / crop</dt><dd>greenhouse / lettuce</dd></div><div><dt>Strategies screened</dt><dd>6</dd></div><div><dt>Valid / missing hours</dt><dd>8,760 / 0</dd></div><div><dt>Generated</dt><dd>2026-09-14T05:14:08.223Z</dd></div></dl><p><button type="button" class="pdf" onclick="window.print()">Save as PDF</button></p><section><h2><span class="cat">§ 001</span>Executive summary</h2><p class="interp">At ZIP 74103, 36.15, -95.99, over 8,760 classified weather hours from 2021-01-01 to 2021-12-31, the climate gives 345 hours (3.9%) in which outside air or an evaporative pad can do the cooling, of which the pad screens as effective in only 208 h. What binds is heating: in this period the weather screen counts 1,765 h moisture-limited against 1,173 h temperature-limited and 4,570 h of heating, so this is a heating problem before it is a cooling problem. On operating cost the frontier is held by Pad + vent baseline at $22,062 per median weather year while holding the joint band 28.9% of 8,759 eligible hours, with 2 strategies dominated on both cost and attainment. Crop moisture is 39.3% of the load the equipment sees (297,603 kWh latent against 459,829 kWh sensible, a sensible-heat ratio of 0.61), which is the term that decides between a coupled coil and a decoupled latent stage, and it is also the least certain input in the screening. Across 5 weather years that verdict moves from 28.9% in the median year to 27.1% in the worst (2025), a 2.7 point spread, and the cost order changes between years, 2 distinct orders. Morris elementary-effects screening of 12 assumptions, 104 points, 1,872 simulations (docs/SENSITIVITY.md, docs/morris-screening.json): crop leaf area and transpiration lead every metric at 9.10 points of attainment, envelope U-value follows at 5.89 and shade fraction at 3.43. The cost ranking as a whole is not stable, taking 3 distinct orders, while the three cheapest positions are identical in 104 of 104 screened points and the instability is confined to strategies whose median costs sit within 16 percent of each other. What the reader must not conclude: these are 6 sets of assumed component performance run against 8,760 hours of reanalysis weather at evidence tier &quot;Assumption-based component screening&quot; on model 0.2.0-screening, so the figures cannot size equipment, cannot rank one manufacturer against another and cannot forecast a single kilogram of yield. Five things are absent from the evidence behind this document, and none of them can be inferred from it: measured-site calibration, a benchmark against an independent greenhouse model, manufacturer performance maps, equipment sizing, and any yield or revenue forecast. Hourly conservation identities close between 1e-16 and 5e-13 relative in the bundled checks (test/conservation.test.mjs). 56 regression tests pass in this repository, which bounds arithmetic and bookkeeping, not physical accuracy: no figure in this document is evidence that a built facility will behave this way.</p><p class="notice">Assumption-based screening, not a calibrated greenhouse digital twin, guaranteed indoor condition, equipment selection certificate or crop-yield forecast. Hourly source weather does not establish minute-scale or canopy-level precision. Installed costs and component efficiencies are editable assumptions unless separately sourced. Regional grid mix is not utility procurement or marginal emissions.</p></section><section><h2><span class="cat">§ 002</span>Climate design conditions</h2><table class="data"><thead><tr><th>Condition</th><th>0.4 percent</th><th>1 percent</th><th>2 percent</th></tr></thead><tbody><tr><td class="k">Dry bulb exceeded</td><td>37.5 C</td><td>36.3 C</td><td>35.3 C</td></tr><tr><td class="k">  coincident wet bulb</td><td>24.1 C</td><td>21.9 C</td><td>22.8 C</td></tr><tr><td class="k">  coincident dew point</td><td>18.7 C</td><td>15.2 C</td><td>17.5 C</td></tr><tr><td class="k">Dew point exceeded</td><td>25.2 C</td><td>24.6 C</td><td>24.1 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>28.2 C</td><td>27.3 C</td><td>30.3 C</td></tr><tr><td class="k">Wet bulb exceeded</td><td>26.5 C</td><td>26 C</td><td>25.6 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>30.6 C</td><td>29.6 C</td><td>29.5 C</td></tr></tbody></table><p class="interp">The 0.4 percent design dry bulb is 37.5 C with a coincident wet bulb of 24.1 C and dew point of 18.7 C, a state exceeded in about 35 of the 8,760 valid weather hours in this record. At the declared 80% pad effectiveness, ideal wet-bulb approach and no other gain, that hour leaves the pad near 26.8 C, 2.8 K above the 24 C band ceiling (day target 22 C plus 2 K), so the pad alone does not hold the design hour. The 1 percent design dew point of 24.6 C sits 5.6 K above the 19 C dew-point guardrail, so moisture removal, not sensible cooling, sets the equipment at the design hour. Coincident values belong to the same single hour rather than to independent percentiles, and all three exceedance levels come from the 8,760 valid hours of this one weather period (2021-01-01 to 2021-12-31), so they are a screening basis, not the stamped design conditions an engineer of record signs.</p><p class="meta">Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value; coincident values belong to that same hour, not independent percentiles. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single result hours under the assumed strategy; sensible = positive solar, light, envelope, infiltration, fan and crop gains; latent = crop transpiration plus positive infiltration and ventilation moisture import.</p></section><section><h2><span class="cat">§ 003</span>Strategy comparison</h2><table class="data wide"><thead><tr><th>Strategy</th><th>Joint attainment, years</th><th>Operating cost</th><th>Electric / fuel kWh</th><th>Installed capital assumption</th><th>Operating frontier</th></tr></thead><tbody><tr><td class="k">Pad + vent baseline</td><td>28.9% median, 27.1% worst</td><td>$22,062 median year</td><td>58,640 / 313,297</td><td>$15,000</td><td>On operating frontier</td></tr><tr><td class="k">Pads + condensing dehumidifier</td><td>42.7% median, 41.6% worst</td><td>$27,176 median year</td><td>123,495 / 264,086</td><td>$35,000</td><td>On operating frontier</td></tr><tr><td class="k">DX / mini-split + dehumidifier</td><td>71.2% median, 68.9% worst</td><td>$38,818 median year</td><td>198,739 / 312,325</td><td>$85,000</td><td>On operating frontier</td></tr><tr><td class="k">Integrated HVAC + reheat</td><td>55.4% median, 55.3% worst</td><td>$45,616 median year</td><td>231,768 / 372,861</td><td>$110,000</td><td>Operating-dominated</td></tr><tr><td class="k">Desiccant + evaporative cooling</td><td>52.5% median, 51.2% worst</td><td>$31,588 median year</td><td>62,849 / 534,226</td><td>$90,000</td><td>On operating frontier</td></tr><tr><td class="k">Liquid-desiccant hybrid (generic)</td><td>52.6% median, 51.8% worst</td><td>$43,904 median year</td><td>240,233 / 325,965</td><td>$125,000</td><td>Operating-dominated</td></tr></tbody></table><p class="interp">Pad + vent baseline is the cheapest non-dominated strategy at $22,062 of median weather year operating cost while holding the joint band 28.9% of eligible hours, out of 6 screened strategies. The operating-cost frontier holds 4 strategies (Pad + vent baseline at $22,062 and 28.9%; Pads + condensing dehumidifier at $27,176 and 42.7%; Desiccant + evaporative cooling at $31,588 and 52.5%; DX / mini-split + dehumidifier at $38,818 and 71.2%), so more attainment is available, at a price. 2 strategies are operating-dominated, beaten on both cost and attainment: Integrated HVAC + reheat ($45,616, 55.4%); Liquid-desiccant hybrid (generic) ($43,904, 52.6%). Attainment spans 42.3 points across the strategies (28.9% to 71.2%), so the classes are genuinely different at this band, not price variants of one answer. Pad + vent baseline undercuts Pads + condensing dehumidifier by 23.2% of operating cost, wider than the 16 percent band in which the screened assumption ranges reorder strategies, so that gap survives the screened uncertainty. Capital is reported but never ranked: the installed assumptions span $15,000 to $125,000 and are editable inputs, so a strategy on the operating frontier can still be the wrong purchase.</p></section><section><h2><span class="cat">§ 004</span>Operating modes through the year</h2><figure><svg viewBox="0 0 800 225" width="100%" role="img" aria-label="Operating-mode hours by local calendar month. 12 months. See mode table below." font-family="'IBM Plex Mono', monospace" font-size="10" fill="rgba(43,44,46,.72)"><title>Operating-mode hours by local calendar month. 12 months. See mode table below.</title><desc>Stacked bars, one column per local month, 4 operating modes ordered by total hours. Tallest column 744 hours. The table below carries every value.</desc><line x1="48" x2="788" y1="184" y2="184" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="187" text-anchor="end" fill="rgba(43,44,46,.72)">0</text><line x1="48" x2="788" y1="143.75" y2="143.75" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="146.75" text-anchor="end" fill="rgba(43,44,46,.72)">186</text><line x1="48" x2="788" y1="103.5" y2="103.5" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="106.5" text-anchor="end" fill="rgba(43,44,46,.72)">372</text><line x1="48" x2="788" y1="63.25" y2="63.25" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="66.25" text-anchor="end" fill="rgba(43,44,46,.72)">558</text><line x1="48" x2="788" y1="23" y2="23" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="40" y="26" text-anchor="end" fill="rgba(43,44,46,.72)">744</text><text x="48" y="13" fill="rgba(43,44,46,.72)">hours</text><rect x="59.1" y="26.462365591397855" width="39.46666666666667" height="157.53763440860214" fill="#4DB405"><title>2021-01: Heating, 728 hours</title></rect><rect x="59.1" y="26.24596774193549" width="39.46666666666667" height="0.21639784946236562" fill="#A8730D"><title>2021-01: Ventilation, 1 hours</title></rect><rect x="59.1" y="23.000000000000007" width="39.46666666666667" height="3.245967741935484" fill="#6E8A74"><title>2021-01: Minimum air, 15 hours</title></rect><text x="78.83333333333333" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">01</text><rect x="120.76666666666665" y="52.64650537634407" width="39.46666666666667" height="131.35349462365593" fill="#4DB405"><title>2021-02: Heating, 607 hours</title></rect><rect x="120.76666666666665" y="45.505376344086" width="39.46666666666667" height="7.141129032258065" fill="#A8730D"><title>2021-02: Ventilation, 33 hours</title></rect><rect x="120.76666666666665" y="38.580645161290306" width="39.46666666666667" height="6.9247311827957" fill="#6E8A74"><title>2021-02: Minimum air, 32 hours</title></rect><text x="140.5" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">02</text><rect x="182.4333333333333" y="63.03360215053763" width="39.46666666666667" height="120.96639784946237" fill="#4DB405"><title>2021-03: Heating, 559 hours</title></rect><rect x="182.4333333333333" y="30.357526881720432" width="39.46666666666667" height="32.6760752688172" fill="#A8730D"><title>2021-03: Ventilation, 151 hours</title></rect><rect x="182.4333333333333" y="27.327956989247312" width="39.46666666666667" height="3.0295698924731185" fill="#6E8A74"><title>2021-03: Minimum air, 14 hours</title></rect><rect x="182.4333333333333" y="23.216397849462364" width="39.46666666666667" height="4.111559139784947" fill="#8A9B2E"><title>2021-03: Pad cooling, 19 hours</title></rect><text x="202.16666666666666" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">03</text><rect x="244.1" y="87.70295698924731" width="39.46666666666667" height="96.29704301075269" fill="#4DB405"><title>2021-04: Heating, 445 hours</title></rect><rect x="244.1" y="51.99731182795699" width="39.46666666666667" height="35.70564516129032" fill="#A8730D"><title>2021-04: Ventilation, 165 hours</title></rect><rect x="244.1" y="43.557795698924735" width="39.46666666666667" height="8.439516129032258" fill="#6E8A74"><title>2021-04: Minimum air, 39 hours</title></rect><rect x="244.1" y="28.19354838709678" width="39.46666666666667" height="15.364247311827956" fill="#8A9B2E"><title>2021-04: Pad cooling, 71 hours</title></rect><text x="263.8333333333333" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">04</text><rect x="305.76666666666665" y="125.57258064516128" width="39.46666666666667" height="58.42741935483871" fill="#4DB405"><title>2021-05: Heating, 270 hours</title></rect><rect x="305.76666666666665" y="58.05645161290322" width="39.46666666666667" height="67.51612903225806" fill="#A8730D"><title>2021-05: Ventilation, 312 hours</title></rect><rect x="305.76666666666665" y="32.088709677419345" width="39.46666666666667" height="25.967741935483872" fill="#6E8A74"><title>2021-05: Minimum air, 120 hours</title></rect><rect x="305.76666666666665" y="22.999999999999993" width="39.46666666666667" height="9.088709677419354" fill="#8A9B2E"><title>2021-05: Pad cooling, 42 hours</title></rect><text x="325.49999999999994" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">05</text><rect x="367.43333333333334" y="173.3965053763441" width="39.46666666666667" height="10.603494623655914" fill="#4DB405"><title>2021-06: Heating, 49 hours</title></rect><rect x="367.43333333333334" y="82.7258064516129" width="39.46666666666667" height="90.6706989247312" fill="#A8730D"><title>2021-06: Ventilation, 419 hours</title></rect><rect x="367.43333333333334" y="33.17069892473118" width="39.46666666666667" height="49.55510752688172" fill="#6E8A74"><title>2021-06: Minimum air, 229 hours</title></rect><rect x="367.43333333333334" y="28.19354838709677" width="39.46666666666667" height="4.977150537634409" fill="#8A9B2E"><title>2021-06: Pad cooling, 23 hours</title></rect><text x="387.16666666666663" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">06</text><rect x="429.1" y="183.56720430107526" width="39.46666666666667" height="0.43279569892473124" fill="#4DB405"><title>2021-07: Heating, 2 hours</title></rect><rect x="429.1" y="88.78494623655914" width="39.46666666666667" height="94.78225806451613" fill="#A8730D"><title>2021-07: Ventilation, 438 hours</title></rect><rect x="429.1" y="22.999999999999986" width="39.46666666666667" height="65.78494623655915" fill="#6E8A74"><title>2021-07: Minimum air, 304 hours</title></rect><text x="448.8333333333333" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">07</text><rect x="490.76666666666665" y="183.56720430107526" width="39.46666666666667" height="0.43279569892473124" fill="#4DB405"><title>2021-08: Heating, 2 hours</title></rect><rect x="490.76666666666665" y="106.96236559139784" width="39.46666666666667" height="76.60483870967742" fill="#A8730D"><title>2021-08: Ventilation, 354 hours</title></rect><rect x="490.76666666666665" y="25.596774193548384" width="39.46666666666667" height="81.36559139784946" fill="#6E8A74"><title>2021-08: Minimum air, 376 hours</title></rect><rect x="490.76666666666665" y="22.999999999999996" width="39.46666666666667" height="2.596774193548387" fill="#8A9B2E"><title>2021-08: Pad cooling, 12 hours</title></rect><text x="510.49999999999994" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">08</text><rect x="552.4333333333333" y="169.06854838709677" width="39.46666666666667" height="14.931451612903226" fill="#4DB405"><title>2021-09: Heating, 69 hours</title></rect><rect x="552.4333333333333" y="117.34946236559139" width="39.46666666666667" height="51.719086021505376" fill="#A8730D"><title>2021-09: Ventilation, 239 hours</title></rect><rect x="552.4333333333333" y="59.35483870967741" width="39.46666666666667" height="57.99462365591398" fill="#6E8A74"><title>2021-09: Minimum air, 268 hours</title></rect><rect x="552.4333333333333" y="28.193548387096765" width="39.46666666666667" height="31.161290322580644" fill="#8A9B2E"><title>2021-09: Pad cooling, 144 hours</title></rect><text x="572.1666666666666" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">09</text><rect x="614.1" y="103.93279569892474" width="39.46666666666667" height="80.06720430107526" fill="#4DB405"><title>2021-10: Heating, 370 hours</title></rect><rect x="614.1" y="59.78763440860216" width="39.46666666666667" height="44.14516129032258" fill="#A8730D"><title>2021-10: Ventilation, 204 hours</title></rect><rect x="614.1" y="39.01344086021506" width="39.46666666666667" height="20.774193548387096" fill="#6E8A74"><title>2021-10: Minimum air, 96 hours</title></rect><rect x="614.1" y="23.00000000000001" width="39.46666666666667" height="16.013440860215052" fill="#8A9B2E"><title>2021-10: Pad cooling, 74 hours</title></rect><text x="633.8333333333334" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">10</text><rect x="675.7666666666667" y="53.512096774193566" width="39.46666666666667" height="130.48790322580643" fill="#4DB405"><title>2021-11: Heating, 603 hours</title></rect><rect x="675.7666666666667" y="36.20026881720432" width="39.46666666666667" height="17.311827956989248" fill="#A8730D"><title>2021-11: Ventilation, 80 hours</title></rect><rect x="675.7666666666667" y="29.70833333333335" width="39.46666666666667" height="6.491935483870968" fill="#6E8A74"><title>2021-11: Minimum air, 30 hours</title></rect><rect x="675.7666666666667" y="27.977150537634426" width="39.46666666666667" height="1.731182795698925" fill="#8A9B2E"><title>2021-11: Pad cooling, 8 hours</title></rect><text x="695.5" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">11</text><rect x="737.4333333333333" y="48.534946236559136" width="39.46666666666667" height="135.46505376344086" fill="#4DB405"><title>2021-12: Heating, 626 hours</title></rect><rect x="737.4333333333333" y="31.439516129032253" width="39.46666666666667" height="17.095430107526884" fill="#A8730D"><title>2021-12: Ventilation, 79 hours</title></rect><rect x="737.4333333333333" y="23.649193548387093" width="39.46666666666667" height="7.790322580645161" fill="#6E8A74"><title>2021-12: Minimum air, 36 hours</title></rect><rect x="737.4333333333333" y="22.999999999999996" width="39.46666666666667" height="0.6491935483870968" fill="#8A9B2E"><title>2021-12: Pad cooling, 3 hours</title></rect><text x="757.1666666666666" y="204" text-anchor="middle" fill="rgba(43,44,46,.72)">12</text></svg><figcaption>Equipment operating modes by local month for Pad + vent baseline. Stacked bars, one column per local month, 4 operating modes ordered by total hours. Tallest column 744 hours. The table below carries every value.</figcaption><ul class="legend"><li><i style="background:#4DB405;opacity:1"></i>Heating</li><li><i style="background:#A8730D;opacity:1"></i>Ventilation</li><li><i style="background:#6E8A74;opacity:1"></i>Minimum air</li><li><i style="background:#8A9B2E;opacity:1"></i>Pad cooling</li></ul><table class="data"><thead><tr><th>Month</th><th>Heating · h</th><th>Ventilation · h</th><th>Minimum air · h</th><th>Pad cooling · h</th><th>Total · h</th></tr></thead><tbody><tr><td class="k">2021-01</td><td>728</td><td>1</td><td>15</td><td>0</td><td>744</td></tr><tr><td class="k">2021-02</td><td>607</td><td>33</td><td>32</td><td>0</td><td>672</td></tr><tr><td class="k">2021-03</td><td>559</td><td>151</td><td>14</td><td>19</td><td>743</td></tr><tr><td class="k">2021-04</td><td>445</td><td>165</td><td>39</td><td>71</td><td>720</td></tr><tr><td class="k">2021-05</td><td>270</td><td>312</td><td>120</td><td>42</td><td>744</td></tr><tr><td class="k">2021-06</td><td>49</td><td>419</td><td>229</td><td>23</td><td>720</td></tr><tr><td class="k">2021-07</td><td>2</td><td>438</td><td>304</td><td>0</td><td>744</td></tr><tr><td class="k">2021-08</td><td>2</td><td>354</td><td>376</td><td>12</td><td>744</td></tr><tr><td class="k">2021-09</td><td>69</td><td>239</td><td>268</td><td>144</td><td>720</td></tr><tr><td class="k">2021-10</td><td>370</td><td>204</td><td>96</td><td>74</td><td>744</td></tr><tr><td class="k">2021-11</td><td>603</td><td>80</td><td>30</td><td>8</td><td>721</td></tr><tr><td class="k">2021-12</td><td>626</td><td>79</td><td>36</td><td>3</td><td>744</td></tr><tr><td class="k">Record</td><td>4,330</td><td>2,475</td><td>1,559</td><td>396</td><td>8,760</td></tr></tbody></table></figure><p class="interp">The dispatch splits into 4 distinct equipment modes over 8,759 eligible hours, with the joint band held in 2,605.9 equivalent hours (29.8%). Mode counts are the most frequent mode per hour under these assumptions, not a measured schedule, and 1 segment warm-up hours are excluded from the comparison set.</p></section><section><h2><span class="cat">§ 005</span>Pad and outside-air opportunity</h2><p class="interp">Pad-effective weather covers 208 h of the 2,813 h that show a cooling demand, 7.4%, so at this site the pad is a marginal device rather than a primary cooling stage. It is effective on 37 days, of which 27 give four hours or more, and it is ineffective in 2,580 h on 153 days. The limit that binds more often is the moisture ceiling: counted over every classified hour, 3,519 h carry the moisture-ceiling flag against 2,823 h that run out of temperature margin, so adding pad area cannot help those hours, while removing moisture can. The controller still ran the pad 691 h on 130 days for 111,737 L of water, 3.3 times the 208 h the weather screen calls effective, because staging it partially helps the zone even where it cannot hold the band alone. Outside air can carry moisture out of the zone in 5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at up to 40 ACH. Against the declared 0.4 kWh/kg condensing dehumidifier, outside air is cheaper per kilogram in 5,153 h and lower in energy per kilogram in 1,914 h, so a ventilation-first moisture sequence is worth wiring. Those are weather-side opportunity hours, not equipment runtime: the 4,570 cold-dry hours carry a heating penalty that is priced here, while the sensible import of the 477 hot-dry hours is not.</p><p class="meta">Maximum ventilation rate, fan power and heating of ventilation air to the target at scenario prices; sensible import in hot-dry hours is not costed here.</p></section><section><h2><span class="cat">§ 006</span>Sensible against latent load</h2><figure><svg viewBox="0 0 800 300" width="100%" role="img" aria-label="Monthly space loads in kWh. Sensible gains above the axis; sensible losses and latent gains below. 12 months. Signed values in the load table." font-family="'IBM Plex Mono', monospace" font-size="10" fill="rgba(43,44,46,.72)"><title>Monthly space loads in kWh. Sensible gains above the axis; sensible losses and latent gains below. 12 months. Signed values in the load table.</title><desc>Column per local month. Sensible gains rise above the zero line to at most 53,584 kWh; sensible losses and latent gains fall below it to at most 74,403 kWh. The table carries the same totals, so colour is not needed.</desc><line x1="56" x2="788" y1="23" y2="23" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="26" text-anchor="end" fill="rgba(43,44,46,.72)">53,584</text><line x1="56" x2="788" y1="72.40272872402032" y2="72.40272872402032" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="75.40272872402032" text-anchor="end" fill="rgba(43,44,46,.72)">26,792</text><line x1="56" x2="788" y1="121.80545744804064" y2="121.80545744804064" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="124.80545744804064" text-anchor="end" fill="rgba(43,44,46,.72)">0</text><line x1="56" x2="788" y1="190.40272872402033" y2="190.40272872402033" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="193.40272872402033" text-anchor="end" fill="rgba(43,44,46,.72)">-37,201</text><line x1="56" x2="788" y1="259" y2="259" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="48" y="262" text-anchor="end" fill="rgba(43,44,46,.72)">-74,403</text><text x="56" y="13" fill="rgba(43,44,46,.72)">kWh, gains up, losses and latent down</text><rect x="66.98" y="92.82204675456427" width="39.04" height="28.983410693476365" fill="#4DB405"><title>2021-01: Solar 15,718 kWh sensible gain</title></rect><rect x="66.98" y="77.7708760704909" width="39.04" height="15.051170684073368" fill="#A8730D"><title>2021-01: Lighting 8,162 kWh sensible gain</title></rect><rect x="66.98" y="77.53337781100163" width="39.04" height="0.23749825948926928" fill="#71806B"><title>2021-01: Fans 129 kWh sensible gain</title></rect><rect x="66.98" y="121.80545744804064" width="39.04" height="81.79223616123275" fill="#6E8A74" opacity="0.45"><title>2021-01: Envelope 44,357 kWh sensible loss</title></rect><rect x="66.98" y="203.5976936092734" width="39.04" height="4.750732979699987" fill="#8A9B2E" opacity="0.45"><title>2021-01: Infiltration 2,576 kWh sensible loss</title></rect><rect x="66.98" y="208.34842658897338" width="39.04" height="20.85962880841562" fill="#9A8860" opacity="0.45"><title>2021-01: Ventilation 11,312 kWh sensible loss</title></rect><rect x="66.98" y="229.208055397389" width="39.04" height="28.06561891953695" fill="#5A5B5D" opacity="0.9"><title>2021-01: Crop transpiration 22,365 kg, 15,220 kWh latent</title></rect><text x="86.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">01</text><rect x="127.98" y="83.42765391691856" width="39.04" height="38.37780353112208" fill="#4DB405"><title>2021-02: Solar 20,813 kWh sensible gain</title></rect><rect x="127.98" y="73.73636739691858" width="39.04" height="9.691286519999975" fill="#A8730D"><title>2021-02: Lighting 5,256 kWh sensible gain</title></rect><rect x="127.98" y="73.48516091265802" width="39.04" height="0.25120648426056946" fill="#71806B"><title>2021-02: Fans 136 kWh sensible gain</title></rect><rect x="127.98" y="121.80545744804064" width="39.04" height="87.60617373121588" fill="#6E8A74" opacity="0.45"><title>2021-02: Envelope 47,510 kWh sensible loss</title></rect><rect x="127.98" y="209.41163117925652" width="39.04" height="5.216168598581999" fill="#8A9B2E" opacity="0.45"><title>2021-02: Infiltration 2,829 kWh sensible loss</title></rect><rect x="127.98" y="214.6277997778385" width="39.04" height="19.429397519998123" fill="#9A8860" opacity="0.45"><title>2021-02: Ventilation 10,537 kWh sensible loss</title></rect><rect x="127.98" y="234.05719729783664" width="39.04" height="24.942802702163394" fill="#5A5B5D" opacity="0.9"><title>2021-02: Crop transpiration 19,876 kg, 13,527 kWh latent</title></rect><text x="147.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">02</text><rect x="188.98" y="60.54284825977946" width="39.04" height="61.26260918826118" fill="#4DB405"><title>2021-03: Solar 33,224 kWh sensible gain</title></rect><rect x="188.98" y="52.87665699269024" width="39.04" height="7.666191267089214" fill="#A8730D"><title>2021-03: Lighting 4,157 kWh sensible gain</title></rect><rect x="188.98" y="51.54898138736309" width="39.04" height="1.3276756053271532" fill="#71806B"><title>2021-03: Fans 720 kWh sensible gain</title></rect><rect x="188.98" y="121.80545744804064" width="39.04" height="39.72834614863126" fill="#6E8A74" opacity="0.45"><title>2021-03: Envelope 21,545 kWh sensible loss</title></rect><rect x="188.98" y="161.5338035966719" width="39.04" height="2.2425847969990906" fill="#8A9B2E" opacity="0.45"><title>2021-03: Infiltration 1,216 kWh sensible loss</title></rect><rect x="188.98" y="163.776388393671" width="39.04" height="46.95645580597579" fill="#9A8860" opacity="0.45"><title>2021-03: Ventilation 25,465 kWh sensible loss</title></rect><rect x="188.98" y="210.7328441996468" width="39.04" height="44.356170005135226" fill="#5A5B5D" opacity="0.9"><title>2021-03: Crop transpiration 35,346 kg, 24,055 kWh latent</title></rect><text x="208.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">03</text><rect x="249.98" y="51.31185305129614" width="39.04" height="70.4936043967445" fill="#4DB405"><title>2021-04: Solar 38,230 kWh sensible gain</title></rect><rect x="249.98" y="46.16295389869739" width="39.04" height="5.148899152598749" fill="#A8730D"><title>2021-04: Lighting 2,792 kWh sensible gain</title></rect><rect x="249.98" y="44.41074282387519" width="39.04" height="1.7522110748221973" fill="#71806B"><title>2021-04: Fans 950 kWh sensible gain</title></rect><rect x="249.98" y="121.80545744804064" width="39.04" height="28.748014961116123" fill="#6E8A74" opacity="0.45"><title>2021-04: Envelope 15,590 kWh sensible loss</title></rect><rect x="249.98" y="150.55347240915677" width="39.04" height="1.6157745392580298" fill="#8A9B2E" opacity="0.45"><title>2021-04: Infiltration 876 kWh sensible loss</title></rect><rect x="249.98" y="152.1692469484148" width="39.04" height="54.27050931189618" fill="#9A8860" opacity="0.45"><title>2021-04: Ventilation 29,432 kWh sensible loss</title></rect><rect x="249.98" y="206.439756260311" width="39.04" height="43.989503755593475" fill="#5A5B5D" opacity="0.9"><title>2021-04: Crop transpiration 35,054 kg, 23,856 kWh latent</title></rect><text x="269.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">04</text><rect x="310.98" y="58.29621400937578" width="39.04" height="63.50924343866486" fill="#4DB405"><title>2021-05: Solar 34,442 kWh sensible gain</title></rect><rect x="310.98" y="52.085778866845196" width="39.04" height="6.210435142530586" fill="#A8730D"><title>2021-05: Lighting 3,368 kWh sensible gain</title></rect><rect x="310.98" y="49.564535537209736" width="39.04" height="2.5212433296354635" fill="#71806B"><title>2021-05: Fans 1,367 kWh sensible gain</title></rect><rect x="310.98" y="121.80545744804064" width="39.04" height="13.637166648840111" fill="#6E8A74" opacity="0.45"><title>2021-05: Envelope 7,396 kWh sensible loss</title></rect><rect x="310.98" y="135.44262409688076" width="39.04" height="0.7477552953861779" fill="#8A9B2E" opacity="0.45"><title>2021-05: Infiltration 406 kWh sensible loss</title></rect><rect x="310.98" y="136.19037939226695" width="39.04" height="46.616425727600856" fill="#9A8860" opacity="0.45"><title>2021-05: Ventilation 25,281 kWh sensible loss</title></rect><rect x="310.98" y="182.80680511986782" width="39.04" height="40.534165070007695" fill="#5A5B5D" opacity="0.9"><title>2021-05: Crop transpiration 32,300 kg, 21,982 kWh latent</title></rect><text x="330.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">05</text><rect x="371.98" y="32.88468250100496" width="39.04" height="88.92077494703568" fill="#4DB405"><title>2021-06: Solar 48,223 kWh sensible gain</title></rect><rect x="371.98" y="29.669308676415163" width="39.04" height="3.2153738245897983" fill="#A8730D"><title>2021-06: Lighting 1,744 kWh sensible gain</title></rect><rect x="371.98" y="26.45034836037969" width="39.04" height="3.2189603160354747" fill="#71806B"><title>2021-06: Fans 1,746 kWh sensible gain</title></rect><rect x="371.98" y="121.80545744804064" width="39.04" height="5.995645541599343" fill="#6E8A74" opacity="0.45"><title>2021-06: Envelope 3,252 kWh sensible loss</title></rect><rect x="371.98" y="127.80110298963999" width="39.04" height="0.311588084239578" fill="#8A9B2E" opacity="0.45"><title>2021-06: Infiltration 169 kWh sensible loss</title></rect><rect x="371.98" y="128.11269107387957" width="39.04" height="40.81938291655501" fill="#9A8860" opacity="0.45"><title>2021-06: Ventilation 22,137 kWh sensible loss</title></rect><rect x="371.98" y="168.9320739904346" width="39.04" height="51.899033192671475" fill="#5A5B5D" opacity="0.9"><title>2021-06: Crop transpiration 41,357 kg, 28,146 kWh latent</title></rect><text x="391.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">06</text><rect x="432.98" y="29.375579755534986" width="39.04" height="92.42987769250566" fill="#4DB405"><title>2021-07: Solar 50,126 kWh sensible gain</title></rect><rect x="432.98" y="26.123871165820944" width="39.04" height="3.2517085897140436" fill="#A8730D"><title>2021-07: Lighting 1,763 kWh sensible gain</title></rect><rect x="432.98" y="23.000000000000007" width="39.04" height="3.1238711658209355" fill="#71806B"><title>2021-07: Fans 1,694 kWh sensible gain</title></rect><rect x="432.98" y="121.80545744804064" width="39.04" height="5.044556297267115" fill="#6E8A74" opacity="0.45"><title>2021-07: Envelope 2,736 kWh sensible loss</title></rect><rect x="432.98" y="126.85001374530776" width="39.04" height="0.26057780001694386" fill="#8A9B2E" opacity="0.45"><title>2021-07: Infiltration 141 kWh sensible loss</title></rect><rect x="432.98" y="127.11059154532471" width="39.04" height="31.39617832397289" fill="#9A8860" opacity="0.45"><title>2021-07: Ventilation 17,027 kWh sensible loss</title></rect><rect x="432.98" y="158.5067698692976" width="39.04" height="62.46594301830285" fill="#5A5B5D" opacity="0.9"><title>2021-07: Crop transpiration 49,777 kg, 33,876 kWh latent</title></rect><text x="452.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">07</text><rect x="493.98" y="37.592632312240426" width="39.04" height="84.21282513580022" fill="#4DB405"><title>2021-08: Solar 45,670 kWh sensible gain</title></rect><rect x="493.98" y="34.06020308478714" width="39.04" height="3.5324292274532842" fill="#A8730D"><title>2021-08: Lighting 1,916 kWh sensible gain</title></rect><rect x="493.98" y="31.434337926021943" width="39.04" height="2.6258651587651967" fill="#71806B"><title>2021-08: Fans 1,424 kWh sensible gain</title></rect><rect x="493.98" y="121.80545744804064" width="39.04" height="2.098748355432891" fill="#6E8A74" opacity="0.45"><title>2021-08: Envelope 1,138 kWh sensible loss</title></rect><rect x="493.98" y="123.90420580347353" width="39.04" height="0.10790367823588817" fill="#8A9B2E" opacity="0.45"><title>2021-08: Infiltration 59 kWh sensible loss</title></rect><rect x="493.98" y="124.01210948170942" width="39.04" height="17.55365265453879" fill="#9A8860" opacity="0.45"><title>2021-08: Ventilation 9,520 kWh sensible loss</title></rect><rect x="493.98" y="141.5657621362482" width="39.04" height="70.86593313853314" fill="#5A5B5D" opacity="0.9"><title>2021-08: Crop transpiration 56,471 kg, 38,432 kWh latent</title></rect><text x="513.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">08</text><rect x="554.98" y="48.64433304444145" width="39.04" height="73.16112440359919" fill="#4DB405"><title>2021-09: Solar 39,676 kWh sensible gain</title></rect><rect x="554.98" y="44.54171225799019" width="39.04" height="4.10262078645126" fill="#A8730D"><title>2021-09: Lighting 2,225 kWh sensible gain</title></rect><rect x="554.98" y="38.275172768622056" width="39.04" height="6.266539489368132" fill="#6E8A74"><title>2021-09: Envelope 3,398 kWh sensible gain</title></rect><rect x="554.98" y="37.95225252754776" width="39.04" height="0.32292024107428974" fill="#8A9B2E"><title>2021-09: Infiltration 175 kWh sensible gain</title></rect><rect x="554.98" y="35.54479768206523" width="39.04" height="2.4074548454825337" fill="#71806B"><title>2021-09: Fans 1,306 kWh sensible gain</title></rect><rect x="554.98" y="121.80545744804064" width="39.04" height="33.27490229555468" fill="#9A8860" opacity="0.45"><title>2021-09: Ventilation 18,045 kWh sensible loss</title></rect><rect x="554.98" y="155.08035974359532" width="39.04" height="58.338410982777184" fill="#5A5B5D" opacity="0.9"><title>2021-09: Crop transpiration 46,488 kg, 31,638 kWh latent</title></rect><text x="574.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">09</text><rect x="615.98" y="69.96855515591592" width="39.04" height="51.83690229212472" fill="#4DB405"><title>2021-10: Solar 28,112 kWh sensible gain</title></rect><rect x="615.98" y="62.443590010001074" width="39.04" height="7.524965145914847" fill="#A8730D"><title>2021-10: Lighting 4,081 kWh sensible gain</title></rect><rect x="615.98" y="60.286601456886686" width="39.04" height="2.156988553114391" fill="#71806B"><title>2021-10: Fans 1,170 kWh sensible gain</title></rect><rect x="615.98" y="121.80545744804064" width="39.04" height="12.74674883848712" fill="#6E8A74" opacity="0.45"><title>2021-10: Envelope 6,913 kWh sensible loss</title></rect><rect x="615.98" y="134.55220628652776" width="39.04" height="0.7123644557017716" fill="#8A9B2E" opacity="0.45"><title>2021-10: Infiltration 386 kWh sensible loss</title></rect><rect x="615.98" y="135.26457074222952" width="39.04" height="42.47875746639943" fill="#9A8860" opacity="0.45"><title>2021-10: Ventilation 23,037 kWh sensible loss</title></rect><rect x="615.98" y="177.74332820862895" width="39.04" height="44.2255903874869" fill="#5A5B5D" opacity="0.9"><title>2021-10: Crop transpiration 35,242 kg, 23,984 kWh latent</title></rect><text x="635.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">10</text><rect x="676.98" y="81.4807662663069" width="39.04" height="40.32469118173374" fill="#4DB405"><title>2021-11: Solar 21,869 kWh sensible gain</title></rect><rect x="676.98" y="73.00147572753083" width="39.04" height="8.479290538776066" fill="#A8730D"><title>2021-11: Lighting 4,598 kWh sensible gain</title></rect><rect x="676.98" y="72.1895857167639" width="39.04" height="0.8118900107669238" fill="#71806B"><title>2021-11: Fans 440 kWh sensible gain</title></rect><rect x="676.98" y="121.80545744804064" width="39.04" height="46.80148251381193" fill="#6E8A74" opacity="0.45"><title>2021-11: Envelope 25,381 kWh sensible loss</title></rect><rect x="676.98" y="168.60693996185256" width="39.04" height="2.6665340697989546" fill="#8A9B2E" opacity="0.45"><title>2021-11: Infiltration 1,446 kWh sensible loss</title></rect><rect x="676.98" y="171.27347403165152" width="39.04" height="32.025410282101724" fill="#9A8860" opacity="0.45"><title>2021-11: Ventilation 17,368 kWh sensible loss</title></rect><rect x="676.98" y="203.29888431375323" width="39.04" height="38.606093954888856" fill="#5A5B5D" opacity="0.9"><title>2021-11: Crop transpiration 30,764 kg, 20,937 kWh latent</title></rect><text x="696.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">11</text><rect x="737.98" y="87.7821373598704" width="39.04" height="34.02332008817023" fill="#4DB405"><title>2021-12: Solar 18,451 kWh sensible gain</title></rect><rect x="737.98" y="75.00810836263099" width="39.04" height="12.774028997239407" fill="#A8730D"><title>2021-12: Lighting 6,928 kWh sensible gain</title></rect><rect x="737.98" y="74.14278762239033" width="39.04" height="0.8653207402406663" fill="#71806B"><title>2021-12: Fans 469 kWh sensible gain</title></rect><rect x="737.98" y="121.80545744804064" width="39.04" height="49.28897680497955" fill="#6E8A74" opacity="0.45"><title>2021-12: Envelope 26,730 kWh sensible loss</title></rect><rect x="737.98" y="171.09443425302018" width="39.04" height="2.8102117643314815" fill="#8A9B2E" opacity="0.45"><title>2021-12: Infiltration 1,524 kWh sensible loss</title></rect><rect x="737.98" y="173.90464601735167" width="39.04" height="32.65127180552071" fill="#9A8860" opacity="0.45"><title>2021-12: Ventilation 17,707 kWh sensible loss</title></rect><rect x="737.98" y="206.55591782287237" width="39.04" height="40.4749391456386" fill="#5A5B5D" opacity="0.9"><title>2021-12: Crop transpiration 32,253 kg, 21,950 kWh latent</title></rect><text x="757.5" y="279" text-anchor="middle" fill="rgba(43,44,46,.72)">12</text></svg><figcaption>Monthly space loads for Pad + vent baseline, sensible gains above the axis, sensible losses and latent gains below. Column per local month. Sensible gains rise above the zero line to at most 53,584 kWh; sensible losses and latent gains fall below it to at most 74,403 kWh. The table carries the same totals, so colour is not needed.</figcaption><ul class="legend"><li><i style="background:#4DB405;opacity:1"></i>Solar</li><li><i style="background:#A8730D;opacity:1"></i>Lighting</li><li><i style="background:#6E8A74;opacity:1"></i>Envelope</li><li><i style="background:#8A9B2E;opacity:1"></i>Infiltration</li><li><i style="background:#9A8860;opacity:1"></i>Ventilation</li><li><i style="background:#71806B;opacity:1"></i>Fans</li><li><i style="background:#C4654A;opacity:1"></i>Crop sensible</li><li><i style="background:rgba(43,44,46,.72);opacity:0.45"></i>Same colours at 45% opacity below the axis are sensible losses</li><li><i style="background:#5A5B5D;opacity:0.9"></i>Crop transpiration (latent)</li><li><i style="background:#C4654A;opacity:0.55"></i>Infiltration moisture (latent)</li><li><i style="background:#71806B;opacity:0.55"></i>Ventilation moisture (latent)</li></ul><table class="data"><thead><tr><th>Month</th><th>Sensible gains · kWh</th><th>Sensible losses · kWh</th><th>Latent gains · kWh</th><th>Crop latent · kg</th><th>Sensible-heat ratio</th></tr></thead><tbody><tr><td class="k">2021-01</td><td>24,009</td><td>58,246</td><td>15,220</td><td>22,365</td><td>0.61</td></tr><tr><td class="k">2021-02</td><td>26,205</td><td>60,876</td><td>13,527</td><td>19,876</td><td>0.66</td></tr><tr><td class="k">2021-03</td><td>38,101</td><td>48,227</td><td>24,055</td><td>35,346</td><td>0.61</td></tr><tr><td class="k">2021-04</td><td>41,972</td><td>45,898</td><td>23,856</td><td>35,054</td><td>0.64</td></tr><tr><td class="k">2021-05</td><td>39,177</td><td>33,082</td><td>21,982</td><td>32,300</td><td>0.64</td></tr><tr><td class="k">2021-06</td><td>51,712</td><td>25,557</td><td>28,146</td><td>41,357</td><td>0.65</td></tr><tr><td class="k">2021-07</td><td>53,584</td><td>19,904</td><td>33,876</td><td>49,777</td><td>0.61</td></tr><tr><td class="k">2021-08</td><td>49,010</td><td>10,716</td><td>38,432</td><td>56,471</td><td>0.56</td></tr><tr><td class="k">2021-09</td><td>46,780</td><td>18,045</td><td>31,638</td><td>46,488</td><td>0.6</td></tr><tr><td class="k">2021-10</td><td>33,363</td><td>30,336</td><td>23,984</td><td>35,242</td><td>0.59</td></tr><tr><td class="k">2021-11</td><td>26,907</td><td>44,195</td><td>20,937</td><td>30,764</td><td>0.56</td></tr><tr><td class="k">2021-12</td><td>25,848</td><td>45,961</td><td>21,950</td><td>32,253</td><td>0.54</td></tr><tr><td class="k">Period total</td><td>453,095</td><td>437,470</td><td>297,603</td><td>437,294</td><td>0.61</td></tr></tbody></table></figure><p class="interp">Across 8,760 valid hours the space sensible-heat ratio is 0.61: 459,829 kWh of positive sensible gain against 297,603 kWh of crop transpiration (437,294 kg of water). A ratio of 0.61 is latent-dominated, so a coupled cooling coil has to overcool to reach the moisture target, and a decoupled latent stage (dry-neutral DOAS or desiccant) deserves screening against the 297,603 kWh of latent load. The ratio moves through the year from 0.54 in 2021-12 to 0.66 in 2021-02, so a single design-day ratio matches at most 1 of the 12 months in this record. The ratio is defined here as positive sensible gains over those gains plus the latent heat of crop transpiration at 0.681 kWh/kg, with transpiration itself the single most influential assumption in the screening at 9.10 points of attainment, so treat 0.61 as a range, not a constant.</p><p class="meta">Signed balance terms per local month, positive = gain into zone air. Sensible-heat ratio = positive sensible gains / (positive sensible gains + latent heat of crop transpiration); null in hours without gains. Latent kg listed by source; ventilation and infiltration are negative when outside air is drier than the zone.</p></section><section><h2><span class="cat">§ 007</span>Equipment runtime and design peaks</h2><table class="data wide"><thead><tr><th>Component</th><th>Hours</th><th>Days</th><th>Equivalent full-load h</th><th>Duty</th></tr></thead><tbody><tr><td class="k">Evaporative pad</td><td>691</td><td>130</td><td>392.4</td><td>56.8% mean duty while on</td></tr><tr><td class="k">Heating</td><td>4,604</td><td>288</td><td>2,349.7</td><td>51% mean duty while on</td></tr><tr><td class="k">Supplemental light</td><td>2,220</td><td>365</td><td>2,220</td><td>100% mean duty while on</td></tr></tbody></table><table class="data"><thead><tr><th>Design quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Peak sensible hour</td><td>253.9 kWh/h at 2021-06-22 13:00</td></tr><tr><td class="k">Peak latent hour</td><td>294.3 kg/h at 2021-08-25 14:00</td></tr><tr><td class="k">Ventilation air requirement</td><td>40 ACH, 22.22 m³/s</td></tr><tr><td class="k">Condensate peak</td><td>0 kg/h</td></tr><tr><td class="k">Pad water peak</td><td>524 L/h</td></tr></tbody></table><p class="interp">The busiest component is heating at 4,604 h on 288 days, 2,349.7 equivalent full-load hours, a mean duty of 51% while it is on. No reheat energy appears in this strategy (0 kWh), so it does not overcool to control moisture at this band. Installed capacity runs out somewhere: 283,400 kWh of sensible demand and 673,294 kg of moisture are reported unmet rather than absorbed silently, and the longest continuous band miss is 972 h. Runtime follows the declared capacities, not measured equipment: 120 kW of heat at 90% efficiency, 0 kW of cooling at COP 3 and SHR 0.75, and 0 kg/h of dehumidification at 2.5 L/kWh, all editable inputs with no manufacturer curve behind them.</p></section><section><h2><span class="cat">§ 008</span>CO2 enrichment window</h2><table class="data"><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Equivalent enrichment hours</td><td>4,460</td></tr><tr><td class="k">Hours with any window</td><td>6,525</td></tr><tr><td class="k">Days touched</td><td>365</td></tr><tr><td class="k">Weather-side counterpart</td><td>5,477 h</td></tr><tr><td class="k">Valid hours</td><td>8,760</td></tr></tbody></table><p class="interp">Enrichment is not immediately flushed in 4,460 duty-weighted equivalent hours spread over 365 days, 50.9% of the 8,760 valid hours, against a weather-side counterpart of 5,477 h with no primary ventilation demand. At 50.9% of hours the window is wide enough to plan enrichment around, subject to injection hardware this screen does not model. No CO2 mass balance, injection rate, leakage or crop uptake is modeled, so the 4,460 equivalent hours are an upper bound on opportunity and not a yield claim.</p></section><section><h2><span class="cat">§ 009</span>Multi-year risk</h2><figure><svg viewBox="0 0 420 240" width="100%" role="img" aria-label="Joint climate-band attainment by weather year for Pad + vent baseline. Median 28.9 percent; worst year 2025 at 27.1 percent. Values in the year table." font-family="'IBM Plex Mono', monospace" font-size="10" fill="rgba(43,44,46,.72)"><title>Joint climate-band attainment by weather year for Pad + vent baseline. Median 28.9 percent; worst year 2025 at 27.1 percent. Values in the year table.</title><desc>One bar per weather year for Pad + vent baseline, 5 years, scaled 0 to 100 percent of eligible hours. The dashed line is the median at 28.9 percent; the worst year is drawn in the warning colour and named in the table.</desc><line x1="42" x2="403" y1="200" y2="200" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="34" y="203" text-anchor="end" fill="rgba(43,44,46,.72)">0</text><line x1="42" x2="403" y1="156" y2="156" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="34" y="159" text-anchor="end" fill="rgba(43,44,46,.72)">25</text><line x1="42" x2="403" y1="112" y2="112" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="34" y="115" text-anchor="end" fill="rgba(43,44,46,.72)">50</text><line x1="42" x2="403" y1="68" y2="68" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="34" y="71" text-anchor="end" fill="rgba(43,44,46,.72)">75</text><line x1="42" x2="403" y1="24" y2="24" stroke="rgba(43,44,46,.20)" stroke-width="1"></line><text x="34" y="27" text-anchor="end" fill="rgba(43,44,46,.72)">100</text><text x="42" y="14" fill="rgba(43,44,46,.72)">% of eligible hours</text><rect x="54.996" y="147.63737108497918" width="46.208000000000006" height="52.36262891502081" fill="#4DB405"><title>2021: 29.8 percent joint attainment; operating cost $22,233</title></rect><text x="78.1" y="220" text-anchor="middle" fill="rgba(43,44,46,.72)">2021</text><rect x="127.196" y="150.7411652776193" width="46.208000000000006" height="49.258834722380705" fill="#4DB405"><title>2022: 28 percent joint attainment; operating cost $22,247</title></rect><text x="150.3" y="220" text-anchor="middle" fill="rgba(43,44,46,.72)">2022</text><rect x="199.39600000000002" y="149.12329413555568" width="46.208000000000006" height="50.876705864444304" fill="#4DB405"><title>2023: 28.9 percent joint attainment; operating cost $21,931</title></rect><text x="222.5" y="220" text-anchor="middle" fill="rgba(43,44,46,.72)">2023</text><rect x="271.596" y="147.4257694789176" width="46.208000000000006" height="52.57423052108239" fill="#4DB405"><title>2024: 29.9 percent joint attainment; operating cost $20,588</title></rect><text x="294.70000000000005" y="220" text-anchor="middle" fill="rgba(43,44,46,.72)">2024</text><rect x="343.796" y="152.24148875442398" width="46.208000000000006" height="47.758511245576" fill="#A8730D"><title>2025: 27.1 percent joint attainment, worst year; operating cost $22,062</title></rect><text x="366.90000000000003" y="220" text-anchor="middle" fill="rgba(43,44,46,.72)">2025</text><line x1="42" x2="403" y1="149.12329413555568" y2="149.12329413555568" stroke="rgba(43,44,46,.72)" stroke-width="1" stroke-dasharray="5 4"><title>Median 28.9 percent</title></line></svg><figcaption>Joint attainment by weather year for Pad + vent baseline. One bar per weather year for Pad + vent baseline, 5 years, scaled 0 to 100 percent of eligible hours. The dashed line is the median at 28.9 percent; the worst year is drawn in the warning colour and named in the table.</figcaption><ul class="legend"><li><i style="background:#4DB405;opacity:1"></i>Weather year attainment, 5 years</li><li><i style="background:#A8730D;opacity:1"></i>Worst year: 2025</li><li><i style="background:rgba(43,44,46,.72);opacity:1"></i>Median 28.9 percent, dashed</li></ul><table class="data"><thead><tr><th>Weather year</th><th>Joint attainment · %</th><th>Operating cost · $</th><th>Eligible hours</th></tr></thead><tbody><tr><td class="k">2021</td><td>29.8</td><td>22,233</td><td>8,759</td></tr><tr><td class="k">2022</td><td>28</td><td>22,247</td><td>8,759</td></tr><tr><td class="k">2023</td><td>28.9</td><td>21,931</td><td>8,759</td></tr><tr><td class="k">2024</td><td>29.9</td><td>20,588</td><td>8,783</td></tr><tr><td class="k">2025 (worst)</td><td>27.1</td><td>22,062</td><td>8,759</td></tr></tbody></table></figure><table class="data wide"><thead><tr><th>Strategy</th><th>Median attainment</th><th>Worst year</th><th>Best year</th><th>Median cost</th><th>Attainment / cost spread</th></tr></thead><tbody><tr><td class="k">Pad + vent baseline</td><td>28.9%</td><td>2025 at 27.1%</td><td>2024 at 29.9%</td><td>$22,062</td><td>2.7 pts / $1,659</td></tr><tr><td class="k">Pads + condensing dehumidifier</td><td>42.7%</td><td>2025 at 41.6%</td><td>2021 at 43.8%</td><td>$27,176</td><td>2.1 pts / $2,822</td></tr><tr><td class="k">DX / mini-split + dehumidifier</td><td>71.2%</td><td>2022 at 68.9%</td><td>2025 at 73.1%</td><td>$38,818</td><td>4.1 pts / $2,632</td></tr><tr><td class="k">Integrated HVAC + reheat</td><td>55.4%</td><td>2021 at 55.3%</td><td>2023 at 57.6%</td><td>$45,616</td><td>2.3 pts / $3,323</td></tr><tr><td class="k">Desiccant + evaporative cooling</td><td>52.5%</td><td>2024 at 51.2%</td><td>2021 at 53%</td><td>$31,588</td><td>1.8 pts / $3,796</td></tr><tr><td class="k">Liquid-desiccant hybrid (generic)</td><td>52.6%</td><td>2024 at 51.8%</td><td>2021 at 53.8%</td><td>$43,904</td><td>1.9 pts / $5,544</td></tr></tbody></table><p class="interp">Over 5 weather years Pad + vent baseline holds the band 28.9% in the median year and 27.1% in its worst year (2025), a spread of 2.7 points, with median operating cost $22,062 and a cost spread of $1,659. 4 positions are firm in every one of the 5 years (1: Pad + vent baseline; 2: Pads + condensing dehumidifier; 3: Desiccant + evaporative cooling; 4: DX / mini-split + dehumidifier), while 2 positions (5, 6) are interchangeable across 2 distinct cost orders. The least-squares trend over 5 numeric years is -0.33 points of attainment per year, which describes these observed years and is not a climate projection.</p><p class="meta">Median over weather years of each metric; worst year is the lowest joint attainment; operating cost only, capital separate. Operating-cost order of strategies differs between years (2 distinct orders over 5 years); the verdict is year-dependent.</p></section><section><h2><span class="cat">§ 010</span>Reproducibility and evidence</h2><table class="data"><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody><tr><td class="k">Model version</td><td>0.2.0-screening</td></tr><tr><td class="k">Evidence tier</td><td>Assumption-based component screening</td></tr><tr><td class="k">Controller</td><td>staged</td></tr><tr><td class="k">Transpiration model</td><td>stanghellini</td></tr><tr><td class="k">Dispatch step</td><td>1 minute</td></tr><tr><td class="k">Warm-up hours per segment</td><td>1</td></tr><tr><td class="k">Leaf area index</td><td>3</td></tr><tr><td class="k">PsychroLib</td><td>2.5.0 at commit a42717d24ed08534642d6caf7dcbbf72b9510bea</td></tr><tr><td class="k">Expected / valid / missing hours</td><td>8,760 / 8,760 / 0</td></tr><tr><td class="k">Numerical failure hours</td><td>0</td></tr><tr><td class="k">Largest sensible residual</td><td>0.000000008258 W</td></tr><tr><td class="k">Largest moisture residual</td><td>0.000000000000000533 kg/s</td></tr><tr><td class="k">Electricity price basis</td><td>Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.</td></tr></tbody></table>
 <p class="interp">Staged controller cadence check on the full Tulsa 2025 year, 1 minute against 0.5 minute dispatch: 0.004, 0.383 and 0.091 percentage points of attainment and at most 0.31 percent of electricity (docs/VERIFICATION.md). The older ideal optimizer does not converge, at 1.5 points and 1.95 percent, and remains selectable only as a labeled upper bound. Hourly conservation identities close between 1e-16 and 5e-13 relative in the bundled checks (test/conservation.test.mjs). 56 regression tests pass on this model version, covering finite capacity, photon conservation, dehumidifier and regeneration energy, cadence-invariant unmet loads, pad runtime, missingness, daylight-saving folds and price provenance. Five things are absent from the evidence behind this document, and none of them can be inferred from it: measured-site calibration, a benchmark against an independent greenhouse model, manufacturer performance maps, equipment sizing, and any yield or revenue forecast.</p>
 <p>To repeat this document: serve the repository, load the weather snapshot named above, import the scenario JSON in the appendix, run all scenarios and export the report. The run JSON carries the hourly results this page summarizes; this page alone is not the reproducibility bundle.</p>
-<p><a href="https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20241231&amp;end=20241231&amp;format=JSON&amp;time-standard=UTC">Weather source endpoint</a></p></section><div class="appendix"><section><h2><span class="cat">§ 010</span>Assumptions and provenance appendix</h2><h3>Pad + vent baseline</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Reproducible scenario JSON</summary><pre>{
+<p><a href="https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20201231&amp;end=20201231&amp;format=JSON&amp;time-standard=UTC">Weather source endpoint</a></p></section><div class="appendix"><section><h2><span class="cat">§ 011</span>Assumptions and provenance appendix</h2><h3>Pad + vent baseline</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Reproducible scenario JSON</summary><pre>{
   &quot;schemaVersion&quot;: 1,
   &quot;id&quot;: &quot;2d74ad0b-6724-4d1f-bfdd-faaf2a94996c&quot;,
   &quot;name&quot;: &quot;Pad + vent baseline&quot;,
@@ -115,8 +115,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2025-01-01&quot;,
-  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;startDate&quot;: &quot;2021-01-01&quot;,
+  &quot;endDate&quot;: &quot;2021-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -130,8 +130,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2024-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;period&quot;: &quot;2020-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0731,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -139,117 +139,117 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-01&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0773,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0842,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0848,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0643,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0793,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0846,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0799,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0978,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0915,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0992,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0934,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-08&quot;,
-      &quot;usdPerKWh&quot;: 0.1,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-08&quot;,
+      &quot;usdPerKWh&quot;: 0.0936,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-09&quot;,
-      &quot;usdPerKWh&quot;: 0.1018,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-09&quot;,
+      &quot;usdPerKWh&quot;: 0.0964,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0917,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0985,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-11&quot;,
-      &quot;usdPerKWh&quot;: 0.0865,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-11&quot;,
+      &quot;usdPerKWh&quot;: 0.088,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-12&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0862,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2026-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0988,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2022-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0875,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -579,8 +579,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2025-01-01&quot;,
-  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;startDate&quot;: &quot;2021-01-01&quot;,
+  &quot;endDate&quot;: &quot;2021-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -594,8 +594,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2024-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;period&quot;: &quot;2020-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0731,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -603,117 +603,117 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-01&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0773,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0842,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0848,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0643,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0793,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0846,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0799,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0978,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0915,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0992,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0934,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-08&quot;,
-      &quot;usdPerKWh&quot;: 0.1,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-08&quot;,
+      &quot;usdPerKWh&quot;: 0.0936,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-09&quot;,
-      &quot;usdPerKWh&quot;: 0.1018,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-09&quot;,
+      &quot;usdPerKWh&quot;: 0.0964,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0917,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0985,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-11&quot;,
-      &quot;usdPerKWh&quot;: 0.0865,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-11&quot;,
+      &quot;usdPerKWh&quot;: 0.088,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-12&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0862,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2026-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0988,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2022-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0875,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -1043,8 +1043,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2025-01-01&quot;,
-  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;startDate&quot;: &quot;2021-01-01&quot;,
+  &quot;endDate&quot;: &quot;2021-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -1058,8 +1058,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2024-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;period&quot;: &quot;2020-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0731,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -1067,117 +1067,117 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-01&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0773,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0842,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0848,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0643,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0793,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0846,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0799,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0978,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0915,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0992,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0934,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-08&quot;,
-      &quot;usdPerKWh&quot;: 0.1,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-08&quot;,
+      &quot;usdPerKWh&quot;: 0.0936,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-09&quot;,
-      &quot;usdPerKWh&quot;: 0.1018,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-09&quot;,
+      &quot;usdPerKWh&quot;: 0.0964,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0917,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0985,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-11&quot;,
-      &quot;usdPerKWh&quot;: 0.0865,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-11&quot;,
+      &quot;usdPerKWh&quot;: 0.088,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-12&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0862,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2026-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0988,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2022-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0875,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -1507,8 +1507,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2025-01-01&quot;,
-  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;startDate&quot;: &quot;2021-01-01&quot;,
+  &quot;endDate&quot;: &quot;2021-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -1522,8 +1522,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2024-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;period&quot;: &quot;2020-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0731,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -1531,117 +1531,117 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-01&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0773,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0842,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0848,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0643,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0793,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0846,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0799,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0978,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0915,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0992,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0934,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-08&quot;,
-      &quot;usdPerKWh&quot;: 0.1,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-08&quot;,
+      &quot;usdPerKWh&quot;: 0.0936,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-09&quot;,
-      &quot;usdPerKWh&quot;: 0.1018,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-09&quot;,
+      &quot;usdPerKWh&quot;: 0.0964,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0917,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0985,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-11&quot;,
-      &quot;usdPerKWh&quot;: 0.0865,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-11&quot;,
+      &quot;usdPerKWh&quot;: 0.088,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-12&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0862,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2026-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0988,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2022-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0875,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -1971,8 +1971,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2025-01-01&quot;,
-  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;startDate&quot;: &quot;2021-01-01&quot;,
+  &quot;endDate&quot;: &quot;2021-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -1986,8 +1986,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2024-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;period&quot;: &quot;2020-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0731,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -1995,117 +1995,117 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-01&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0773,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0842,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0848,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0643,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0793,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0846,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0799,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0978,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0915,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0992,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0934,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-08&quot;,
-      &quot;usdPerKWh&quot;: 0.1,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-08&quot;,
+      &quot;usdPerKWh&quot;: 0.0936,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-09&quot;,
-      &quot;usdPerKWh&quot;: 0.1018,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-09&quot;,
+      &quot;usdPerKWh&quot;: 0.0964,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0917,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0985,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-11&quot;,
-      &quot;usdPerKWh&quot;: 0.0865,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-11&quot;,
+      &quot;usdPerKWh&quot;: 0.088,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-12&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0862,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2026-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0988,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2022-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0875,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -2435,8 +2435,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2025-01-01&quot;,
-  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;startDate&quot;: &quot;2021-01-01&quot;,
+  &quot;endDate&quot;: &quot;2021-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -2450,8 +2450,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2024-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;period&quot;: &quot;2020-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0731,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -2459,117 +2459,117 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-01&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0773,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0842,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0848,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0643,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0812,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0793,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0846,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0799,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0978,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0915,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0992,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0934,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-08&quot;,
-      &quot;usdPerKWh&quot;: 0.1,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-08&quot;,
+      &quot;usdPerKWh&quot;: 0.0936,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-09&quot;,
-      &quot;usdPerKWh&quot;: 0.1018,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-09&quot;,
+      &quot;usdPerKWh&quot;: 0.0964,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0917,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0985,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-11&quot;,
-      &quot;usdPerKWh&quot;: 0.0865,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-11&quot;,
+      &quot;usdPerKWh&quot;: 0.088,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2025-12&quot;,
-      &quot;usdPerKWh&quot;: 0.086,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2021-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0862,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2026-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0988,
-      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;period&quot;: &quot;2022-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0875,
+      &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -2827,14 +2827,14 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   &quot;longitude&quot;: -95.99,
   &quot;timezone&quot;: &quot;America/Chicago&quot;,
   &quot;zip&quot;: &quot;74103&quot;,
-  &quot;startDate&quot;: &quot;2025-01-01&quot;,
-  &quot;endDate&quot;: &quot;2025-12-31&quot;,
-  &quot;retrievedAt&quot;: &quot;2026-09-11T21:12:17.231016+00:00&quot;,
-  &quot;sourceUrl&quot;: &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20241231&amp;end=20241231&amp;format=JSON&amp;time-standard=UTC&quot;,
+  &quot;startDate&quot;: &quot;2021-01-01&quot;,
+  &quot;endDate&quot;: &quot;2021-12-31&quot;,
+  &quot;retrievedAt&quot;: &quot;2026-09-13T23:37:37.177251+00:00&quot;,
+  &quot;sourceUrl&quot;: &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20201231&amp;end=20201231&amp;format=JSON&amp;time-standard=UTC&quot;,
   &quot;sourceUrls&quot;: [
-    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20241231&amp;end=20241231&amp;format=JSON&amp;time-standard=UTC&quot;,
-    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20250101&amp;end=20251231&amp;format=JSON&amp;time-standard=UTC&quot;,
-    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20260101&amp;end=20260101&amp;format=JSON&amp;time-standard=UTC&quot;
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20201231&amp;end=20201231&amp;format=JSON&amp;time-standard=UTC&quot;,
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20210101&amp;end=20211231&amp;format=JSON&amp;time-standard=UTC&quot;,
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20220101&amp;end=20220101&amp;format=JSON&amp;time-standard=UTC&quot;
   ],
   &quot;units&quot;: {
     &quot;time&quot;: &quot;UTC epoch milliseconds&quot;,
@@ -2860,8 +2860,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       ],
       &quot;fill_value&quot;: -999,
       &quot;time_standard&quot;: &quot;UTC&quot;,
-      &quot;start&quot;: &quot;20241231&quot;,
-      &quot;end&quot;: &quot;20241231&quot;
+      &quot;start&quot;: &quot;20201231&quot;,
+      &quot;end&quot;: &quot;20201231&quot;
     },
     {
       &quot;title&quot;: &quot;NASA/POWER Source Native Resolution Hourly Data&quot;,
@@ -2876,8 +2876,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       ],
       &quot;fill_value&quot;: -999,
       &quot;time_standard&quot;: &quot;UTC&quot;,
-      &quot;start&quot;: &quot;20250101&quot;,
-      &quot;end&quot;: &quot;20251231&quot;
+      &quot;start&quot;: &quot;20210101&quot;,
+      &quot;end&quot;: &quot;20211231&quot;
     },
     {
       &quot;title&quot;: &quot;NASA/POWER Source Native Resolution Hourly Data&quot;,
@@ -2892,8 +2892,8 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
       ],
       &quot;fill_value&quot;: -999,
       &quot;time_standard&quot;: &quot;UTC&quot;,
-      &quot;start&quot;: &quot;20260101&quot;,
-      &quot;end&quot;: &quot;20260101&quot;
+      &quot;start&quot;: &quot;20220101&quot;,
+      &quot;end&quot;: &quot;20220101&quot;
     }
   ],
   &quot;coordinateNotes&quot;: &quot;Requested 36.15,-95.99 is not an airport station. POWER returns source-native grids: MERRA-2 meteorology 0.5° latitude × 0.625° longitude; SYN1deg solar 1° × 1°. Returned point coordinates do not identify grid-cell centers. Elevation from source geometry, not measured site elevation.&quot;,
@@ -2901,15 +2901,15 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
     &quot;expectedHours&quot;: 8760,
     &quot;weatherHours&quot;: 8760,
     &quot;solarHours&quot;: 8760,
-    &quot;startUTC&quot;: &quot;2025-01-01T06:00:00.000Z&quot;,
-    &quot;endExclusiveUTC&quot;: &quot;2026-01-01T06:00:00.000Z&quot;,
+    &quot;startUTC&quot;: &quot;2021-01-01T06:00:00.000Z&quot;,
+    &quot;endExclusiveUTC&quot;: &quot;2022-01-01T06:00:00.000Z&quot;,
     &quot;sourceQueryPadding&quot;: &quot;One UTC day before first local day, through UTC date of exclusive local end&quot;,
-    &quot;actualWeatherCutoffUTC&quot;: &quot;2026-01-01T05:00:00.000Z&quot;,
-    &quot;actualSolarCutoffUTC&quot;: &quot;2026-01-01T05:00:00.000Z&quot;,
+    &quot;actualWeatherCutoffUTC&quot;: &quot;2022-01-01T05:00:00.000Z&quot;,
+    &quot;actualSolarCutoffUTC&quot;: &quot;2022-01-01T05:00:00.000Z&quot;,
     &quot;incompleteTrailingHours&quot;: 0
   },
-  &quot;startUTC&quot;: &quot;2025-01-01T06:00:00.000Z&quot;,
-  &quot;endExclusiveUTC&quot;: &quot;2026-01-01T06:00:00.000Z&quot;
+  &quot;startUTC&quot;: &quot;2021-01-01T06:00:00.000Z&quot;,
+  &quot;endExclusiveUTC&quot;: &quot;2022-01-01T06:00:00.000Z&quot;
 }</pre></details>
 <details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
@@ -2924,4 +2924,4 @@ td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7)}.data td,.data th{
   &quot;latentHeatJkg&quot;: 2450000,
   &quot;psychrolibVersion&quot;: &quot;2.5.0&quot;,
   &quot;psychrolibCommit&quot;: &quot;a42717d24ed08534642d6caf7dcbbf72b9510bea&quot;
-}</pre></details></section></div><p class="page-foot">Grownetics · CEA Psychrometric Site Evaluator · Model 0.2.0-screening · ZIP 74103, 36.15, -95.99 · Generated 2026-09-14T02:57:52.429Z</p></div><p class="foot">Grownetics · CEA Psychrometric Site Evaluator · Model 0.2.0-screening · Generated 2026-09-14T02:57:52.448Z</p></html>
+}</pre></details></section></div><p class="page-foot">Grownetics · CEA Psychrometric Site Evaluator · Model 0.2.0-screening · ZIP 74103, 36.15, -95.99 · Generated 2026-09-14T05:14:08.223Z</p></div><p class="foot">Grownetics · CEA Psychrometric Site Evaluator · Model 0.2.0-screening · Generated 2026-09-14T05:14:08.243Z</p></html>

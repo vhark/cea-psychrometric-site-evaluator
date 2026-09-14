@@ -191,7 +191,7 @@ test('per-hour load decomposition closes the zone heat and moisture balances',()
  assert.ok(removals>0&&result.summary.dehuKWh>0&&result.summary.heatingKWh>0,'fixture must exercise DX, dehumidifier and heater paths');
 });
 test('older scenario JSON without v0.2 keys validates with crop-specific defaults',()=>{
- const legacy={...makeScenario('greenhouse','mushroom','mushroom')};
+ const legacy={...makeScenario('greenhouse','bench','mushroom')};
  for(const key of ['controlMode','transpirationModel','lai','doasM3s','doasSupplyDewPointC','doasSupplyTempC','doasKWhPerKg'])delete legacy[key];
  assert.deepEqual(validateScenario(legacy),[]);
  assert.equal(legacy.transpirationModel,'schedule');assert.equal(legacy.lai,0);
@@ -200,6 +200,15 @@ test('older scenario JSON without v0.2 keys validates with crop-specific default
  assert.deepEqual(validateScenario(lettuce),[]);
  assert.equal(lettuce.transpirationModel,'stanghellini');assert.equal(lettuce.lai,3);
  assert.ok(validateScenario({...makeScenario(),controlMode:'optimal'}).length>0);
+});
+test('a scenario carrying a retired cultivation system fails with a message that names it',()=>{
+ for(const system of ['wall','microgreens','propagation','mushroom']){
+  const errors=validateScenario({...makeScenario(),system});
+  assert.equal(errors.length,1,`expected exactly one error for ${system}, got ${errors.join(' | ')}`);
+  assert.match(errors[0],new RegExp(`"${system}" was retired`));
+  assert.match(errors[0],/greenhouse benches/);
+ }
+ assert.deepEqual(validateScenario({...makeScenario(),system:'bench'}),[]);
 });
 test('a schemaVersion 1 scenario simulates without a prior validate call',()=>{
  const legacy={...makeScenario('greenhouse')};

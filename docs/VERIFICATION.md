@@ -93,7 +93,7 @@ This was functional and visual verification, not a comprehensive accessibility a
 
 ### 2026-09-12 rebrand
 
-The interface was moved from the One Season Farmers system to Grownetics (Carbon register; Archive register for documents). No calculation code changed. Verified after the change: `npm test` 22/22; the six-strategy example was re-imported from `example-scenarios.json`, re-run in the browser and re-exported, producing identical comparison figures (baseline $19,283 period cost, 2,937.9 joint hours, 8,759 matched hours); DM Sans, Inter and IBM Plex Mono confirmed loaded in app and reports; no "One Season" text remains in the rendered app; 390 px mobile document width equals viewport width. `example-comparison.html` was regenerated from that re-run, so its hash differs from the 09-11 record while its numbers do not.
+The interface was moved onto the Grownetics brand system (Carbon register for the tool, Archive register for documents). No calculation code changed. Verified after the change: `npm test` 22/22; the six-strategy example was re-imported from `example-scenarios.json`, re-run in the browser and re-exported, producing identical comparison figures (baseline $19,283 period cost, 2,937.9 joint hours, 8,759 matched hours); DM Sans, Inter and IBM Plex Mono confirmed loaded in app and reports; no prior-brand text remains in the rendered app; 390 px mobile document width equals viewport width. `example-comparison.html` was regenerated from that re-run, so its hash differs from the 09-11 record while its numbers do not.
 
 ### 2026-09-12 audit
 

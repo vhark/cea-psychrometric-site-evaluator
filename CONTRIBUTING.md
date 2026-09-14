@@ -30,7 +30,7 @@ Why this holds: the tool must be openable from a static host, a USB stick or a c
 Every number in the interface, in an export or in a document carries its basis. Specifically:
 
 - **Never invent data.** No synthetic weather when a fetch fails, no nearest-provider guess when a ZIP has no mapped utility, no reuse of a 2023 emissions factor for a 2019 run. Missing stays missing and stays visible.
-- **Label assumptions as assumptions.** Every crop and equipment default carries a `source` string, and defaults that came from a client planning document say so ("Client assumption (OSF …)").
+- **Label assumptions as assumptions.** Every crop and equipment default carries a `source` string that states where the number came from and what it is not ("Planning assumption: …", "Illustrative …", "User-defined …").
 - **Do not upgrade a claim without upgrading the evidence.** The evidence tier is asserted at the lowest level the evidence supports (see [docs/EVALUATION.md](docs/EVALUATION.md)). Raising it requires the benchmark and calibration work in [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md), not a rewording.
 - **State what is not claimed.** Every document does this. Keep doing it in yours.
 - **Cite the file.** A figure quoted in a document names where it was measured: `docs/VERIFICATION.md`, `docs/morris-screening.json`, `docs/browser-run-metrics.json`, `docs/AUDIT.md`.
@@ -78,8 +78,8 @@ Keep changes inside one boundary where you can. Concurrent work is divided along
 ## How to add a crop
 
 1. Add an entry to `CROPS` in `src/config.js`. Required fields: `label`, `dayTargetC`, `nightTargetC`, `vpdMin`, `vpdMax`, `dliTarget`, `photoperiod`, `lai`, `transpirationLDayM2`, and `source`.
-2. The `source` string is mandatory and must be honest about provenance. Compare the existing entries: a measured value says so, a client planning figure says "Client assumption (…)", and an illustrative value says it is illustrative and must be replaced.
-3. Set `transpirationModel: 'schedule'` only if the Stanghellini path is inappropriate for that crop (the mushroom preset does this, because there is no meaningful leaf area).
+2. The `source` string is mandatory and must be honest about provenance. Compare the existing entries: a measured value says so, a planning figure says "Planning assumption: …" with the arithmetic behind it, and an illustrative value says it is illustrative and must be replaced.
+3. Set `transpirationModel: 'schedule'` only if the Stanghellini path is inappropriate for that crop (the mushroom preset does this, because there is no meaningful leaf area to drive it).
 4. Check the defaults survive `validateScenario`, then run the crop in the browser for a full year and look at the DLI, moisture and attainment rows before proposing it.
 
 Do not add a crop whose numbers you cannot source. An unsourced preset is worse than no preset, because it will be believed.

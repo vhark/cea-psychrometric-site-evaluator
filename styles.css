@@ -95,11 +95,11 @@ label > select { font-family: var(--font-body); }
 input[type="range"] { border: 0; padding: 0; min-height: 24px; accent-color: var(--green); }
 
 /* Top bar */
-.topbar { position: relative; z-index: 2; max-width: 1440px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 20px 32px; border-bottom: 1px solid var(--hairline); }
+.topbar { position: relative; z-index: 2; max-width: 1440px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; padding: 20px 32px; border-bottom: 1px solid var(--hairline); }
 .wordmark { display: inline-flex; align-items: center; text-decoration: none; color: var(--text); font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: .28em; text-transform: uppercase; }
 .wordmark em { font-style: normal; color: var(--green); }
 .wordmark small { display: none; }
-.header-actions { display: flex; align-items: center; gap: 24px; }
+.header-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 12px 24px; min-width: 0; }
 .header-actions a { font: 500 11px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-2); text-decoration: none; }
 .header-actions a:hover { color: var(--text); }
 .version { font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); font-variant-numeric: tabular-nums; }
@@ -378,7 +378,9 @@ footer { position: relative; z-index: 1; max-width: 1440px; margin: auto; paddin
 }
 @media (max-width: 640px) {
   main { padding: 0 20px; } .topbar { padding: 16px 20px; } footer { padding: 20px 20px 40px; flex-direction: column; gap: 6px; }
-  .wordmark { font-size: 13px; letter-spacing: .22em; } .header-actions { gap: 14px; } .version { display: none; }
+  .wordmark { font-size: 13px; letter-spacing: .22em; } .header-actions { gap: 10px 14px; } .version { display: none; }
+  /* The resume label carries a step count, so it is the widest control in the bar. Let it take its own row. */
+  .tour-button { order: 1; flex-basis: 100%; text-align: center; white-space: normal; }
   .intro { padding: 36px 0 32px; }
   .section-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
   .weather-grid { grid-template-columns: 1fr 1fr; gap: 20px; } .weather-grid > label:first-child { grid-column: span 2; } .weather-grid > label:nth-child(4) { grid-column: span 2; } .weather-grid > button { grid-column: span 2; }

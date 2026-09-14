@@ -187,7 +187,7 @@ This public repository holds the tool, its public data catalogs and its document
 - `private/`: material belonging to a client engagement, including an audit of a client's own separate internal calculator. It stays with that engagement.
 - `data/energy/raw/`: 36 MB of public-domain government workbooks and CSVs that `scripts/build-energy.py --refresh` re-downloads and verifies against the SHA-256 values already recorded in the committed manifests. The derived catalogs the application actually loads are committed.
 
-First client: One Season Farmers (Tulsa, OK). The bundled Tulsa 2025 example, the ZIP 74103 default and the crop presets marked "Client assumption (OSF …)" are that engagement's inputs. The model, data catalogs and interface are client-independent.
+Tulsa, Oklahoma is the bundled worked example: ten complete NASA POWER weather years and the ZIP 74103 default give a full run with no network access. Nothing in the tool is specific to that site. Every crop, envelope, equipment and price input is an editable, labeled assumption.
 
 ## Contributing
 

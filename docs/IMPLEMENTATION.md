@@ -16,7 +16,7 @@ Read this if: you are changing a module signature, adding a worker message, or d
 
 ## Approved scope extension
 
-User approved implementation on 2026-09-11 and requested audit/reuse of the client's (OSF) existing load calculator plus US ZIP/utility/pricing/grid context. The client calculator remains unchanged and outside this repository. Reuse geometry, light equations and labeled crop assumptions; do not import its empirical total-electricity multipliers into explicit HVAC energy accounting. Add greenhouse benches.
+Scope approved 2026-09-11: a coupled hourly screen plus US ZIP, utility, pricing and grid context. Geometry, light equations and labeled crop assumptions were reused from an earlier internal load calculator; its empirical total-facility electricity multipliers were deliberately not imported, because this model calculates HVAC electricity explicitly and multiplying on top would double count.
 
 National catalog means enumerate the public ZIP inventory with explicit mapping/price/grid coverage per entry. A ZIP can have several providers or none mapped. Unknown service territories remain unknown, not nearest-provider assertions. Historical state/sector average prices are proxies, never utility tariffs. Regional generation mix is not supplier-specific clean electricity or hourly marginal emissions. Every dataset is dated and attributed. USPS-authoritative completeness cannot be claimed from GeoNames or ZCTA sources.
 

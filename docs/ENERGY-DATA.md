@@ -2,7 +2,7 @@
 
 Purpose: state exactly what the ZIP, utility, price and grid catalogs contain, when each was retrieved, what it cannot be used for, and how to rebuild it.
 
-Status: catalogs retrieved 2026-09-11, reviewed 2026-09-14. Utility mapping is vintage 2021 and eGRID is vintage 2023; neither refreshes automatically (open audit item 6 in [AUDIT.md](AUDIT.md)).
+Status: catalogs retrieved 2026-09-11, reviewed 2026-09-14. Utility mapping is vintage 2021 and eGRID is vintage 2023; neither refreshes automatically (open audit item 6 in [AUDIT.md](AUDIT.md)). Run `node scripts/check-vintages.mjs` for the current age of every bundled snapshot against its budget; see [Vintage and refresh](#vintage-and-refresh).
 
 Read this if: you are quoting a price, an emissions factor or a service territory from this tool, or rebuilding the catalogs.
 
@@ -114,6 +114,36 @@ To intentionally acquire new mutable upstream snapshots:
 ```
 
 This replaces acquisition timestamps and source checksums, then regenerates data and provenance. Mapping and grid filenames are pinned to their dated datasets; a newly published mapping/grid year needs an explicit URL/schema update rather than relabeling old observations. The manifest has parser/schema version `1.0` / `1` and checksums for generated artifacts. Update the written coverage figures above when adopting a different snapshot.
+
+## Vintage and refresh
+
+Every dataset here is a committed snapshot. **Nothing refreshes automatically**: no build step, no page load and no scheduled job re-downloads anything, so age accumulates silently until someone looks. `scripts/check-vintages.mjs` is what looks.
+
+```sh
+node scripts/check-vintages.mjs                 # aligned table; exit 1 if anything is stale
+node scripts/check-vintages.mjs --json          # same assessment, machine readable
+node scripts/check-vintages.mjs --check-remote  # also probe each recorded source URL (HEAD, 10 s each)
+```
+
+It reads only the committed manifests, writes nothing, and makes no network request unless `--check-remote` is given. Exit code is 0 when nothing is stale and 1 when at least one dataset is past its budget, so it can gate a workflow. `--check-remote` findings are informational and never change the exit code: an upstream file that moved is not evidence that the local snapshot went bad, and an unreachable host is reported as unknown rather than as a pass. `--now YYYY-MM-DD` assesses against a fixed UTC clock.
+
+Age is whole months since the covered period ended, and a partial month never rounds up: a price series through 2026-06 is 2 months old on 2026-09-14 and 3 on 2026-09-30. Budgets are per dataset because the publishers differ; a monthly price series goes stale long before an annual grid vintage does. `aging` is a prompt, `stale` is a gate, and `unknown` is its own status: a dataset whose manifest carries no machine-readable date is never reported as current, and no date is ever inferred from a file timestamp, a clock, or a publication month written in prose.
+
+| Dataset | Vintage read from | Aging / stale | Why that budget | Refresh |
+| --- | --- | ---: | --- | --- |
+| EIA-861M monthly prices | `data/energy/coverage.json` newest `lastPeriod` | 5 / 9 mo | EIA publishes each month about two months in arrears (the retained workbook, last modified 2026-08-26, ends at 2026-06), so three months of lag is normal, not a defect. At five months two releases are missing; at nine the newest priced month predates a full cooling season. | `build-energy.py --refresh` |
+| OpenEI ZIP utility mapping | `manifest.json` `sources.oedi2021.vintage` | 30 / 48 mo | Association snapshot for calendar 2021, published 2022-11. Ownership changes and territory transfers accumulate slowly, so two to three years is still defensible under the "possible provider" caveat; past four years the candidate list cannot support naming a provider. | new mapping year URL in `build-energy.py`, then `--refresh` |
+| eGRID generation mix and CO2 | `manifest.json` `sources.egrid2023.vintage` | 24 / 36 mo | eGRID is annual and lands about 18 months after its data year (eGRID2023 published 2025-06), so one missing data year is always expected. At 24 months a newer eGRID should exist; at 36 two do. | new eGRID year URL in `build-energy.py`, then `--refresh` |
+| EPA Power Profiler ZIP subregions | `manifest.json` `sources.epaZip2023.published` | 24 / 36 mo | Subregion boundaries move only when EPA redraws them, so this follows the eGRID cadence. | new ZIP tool version in `build-energy.py`, then `--refresh` |
+| GeoNames ZIP inventory | `manifest.json` newest `acquisition[].retrievedAt` for `geonames-*` | 12 / 18 mo | GeoNames rewrites its country files continuously, so this is a retrieval date, not a data year. A missing ZIP fails closed (lookup returns null), so a year is tolerable; beyond 18 months recently activated ZIPs are absent often enough to look like a bug. | `build-energy.py --refresh` |
+| Bundled Tulsa NASA POWER years | `data/weather/index.json` newest `sites[].years` | 15 / 24 mo | POWER hourly data lag real time by two to three months, so a completed year becomes fetchable around March. Fifteen months after a bundled year ends, a newer complete year exists and is not bundled. | `python3 scripts/fetch-weather.py <year>`, then add the year to `index.json` |
+| NOAA Tulsa daily cross-check | `data/reference/noaa-provenance.json` `lastDate` | 6 / 12 mo | A year-to-date observation series checking the station snapshot beside it. Past twelve months it no longer overlaps the year anyone is running. | `node scripts/fetch-observed.mjs` |
+
+Status on 2026-09-14, from the committed manifests: prices `2026-06` (2 mo, current), utility mapping `2021` (56 mo, **stale**), eGRID `2023` (32 mo, aging), Power Profiler ZIP tool **unknown**, GeoNames `2026-09-11` (0 mo, current), weather `2025` (8 mo, current), NOAA cross-check `2026-09-08` (0 mo, current). The check therefore exits 1 today, which is the honest state of open audit item 6 rather than a broken script. The Power Profiler entry is unknown because its manifest records only the prose `"eGRID2023_rev1 associations, published 2025-06"`; adding `"published": "2025-06"` to the `epaZip2023` entry in `SOURCES` in `scripts/build-energy.py` makes it checkable. A `--check-remote` run on 2026-09-14 found every recorded URL still present, all upstream files unchanged since their recorded `Last-Modified`, except the GeoNames archives, which are rewritten daily.
+
+What a stale dataset does and does not change: **a stale price series moves cost figures, not the physics.** Psychrometrics, capacity, attainment, runtime and water are computed from weather and equipment alone; price enters only as `electricKWh × periodPrice` afterwards, so an old price series changes USD and `effectiveElectricityPrice` while leaving every hour's state, load and failure identical. A stale eGRID narrows emissions coverage instead of misdating it, because hourly CO2 is only computed when the hour's local calendar year equals the grid record's year. A stale utility mapping degrades a candidate provider list that was never a service guarantee. A stale GeoNames snapshot makes an unlisted ZIP return null, not a wrong location.
+
+`assessVintages(manifests, now)` in `src/vintages.js` is the shared, DOM-free assessment behind the script, so a surface that already holds `catalog.manifest` and `catalog.coverage` can report the same status without re-reading anything. Regression coverage is `test/vintages.test.mjs`.
 
 ## Static adapter contract
 

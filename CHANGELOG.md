@@ -6,6 +6,19 @@ Versions are model versions: the string the engine stamps into every result and 
 
 ## [Unreleased]
 
+### Changed
+
+- Cultivation system is greenhouse benches only. Harvest walls, microgreen racks, propagation racks and mushroom racks are retired: their canopy-area and tier-interception factors were unevidenced assumptions. Canopy area stays an explicit editable input. A scenario carrying a retired system now fails validation with a message naming it rather than a generic unknown-value error.
+- All content is generic. Crop presets state their own arithmetic as planning assumptions, and no customer name, site label or engagement material appears anywhere in the repository. Tulsa remains the bundled worked example because ten complete public weather years there let the tool run offline.
+
+### Added
+
+- `scripts/check-vintages.mjs` and `src/vintages.js`: per-dataset staleness budgets with rationale, an offline age report that exits non-zero past budget, and a CI step that reports without failing.
+
+### Fixed
+
+- The header overflowed horizontally at 390 px once the tour button was added; the bar now wraps and the tour control takes its own row on narrow screens.
+
 ### Added
 
 - `docs/GLOSSARY.md`: every domain term the interface uses, with unit, location in the tool and how it is computed here.

@@ -9,7 +9,7 @@ Read this if: you are deciding whether a proposed capability is in scope, or che
 
 **Working name: CEA Psychrometric Site Evaluator.** Descriptor: CEA climate & equipment explorer. Promise: See when your climate strategy works, what closes the gap, and what that control costs. Alternatives: Canopy Atlas (broader siting emphasis), Climate Ledger (stronger economic emphasis). Name and trademark availability have not been checked.
 
-**Ownership and positioning (2026-09-12).** CEA Psychrometric Site Evaluator is a standalone Grownetics tool, not a One Season Farmers deliverable. OSF is the first client it is applied to. Anything OSF-specific is client data, not product identity: the bundled Tulsa 2025 example and ZIP 74103 are the OSF site; crop-program presets whose `source` says "Client assumption (OSF …)" came from OSF planning documents; the audit of the client's own separate load calculator is held privately with that engagement and is not published here. Future clients replace or add those inputs without touching the model. The repository must not depend on files outside its own folder.
+**Ownership and positioning.** CEA Psychrometric Site Evaluator is a standalone Grownetics product with no customer-specific content. Tulsa is a worked example, not a client configuration: it is bundled because ten complete public weather years there let the tool run offline end to end. Every crop, envelope, equipment and price default is a labeled, editable assumption sourced from public references or stated as a planning figure. Any engagement-specific material stays with that engagement and outside this repository.
 
 ## 1. Product decision
 
@@ -123,7 +123,7 @@ Accessibility: keyboard-operable forms/tabs, associated units and help, text/tab
 
 ### Brand
 
-Grownetics, per `brand.grownetics.com` and the user's V4 "minimal aerospace" concept (2026-09-12 decision, superseding the enclosing project's One Season Farmers rule for this tool). Locked tokens: Brand Green `#4DB405` as the single accent, Carbon `#1C1C1A` canvas, Flash White `#F5F5F0` text, hairline dividers at 10%/20% white. Type: DM Sans display, Inter body, IBM Plex Mono for labels, data and buttons. The app runs in the dark Carbon register only; there is no light toggle. Exported documents (analysis report, observed-weather study) use Archive mode: Parchment `#F3F0ED`, Charleston `#2B2C2E`, Gold `#9A8860` catalog labels with § numbering. Chart categoricals are drawn from the brand palette (green, amber, nitrogen, electric lime, gold, sage, terracotta); attainment uses green/amber/red. Rules kept: max-width 68ch on paragraphs, left-anchored text, no gradients, no shadows, dark text on green buttons.
+Grownetics, per `brand.grownetics.com` and the V4 "minimal aerospace" concept (2026-09-12 decision). Locked tokens: Brand Green `#4DB405` as the single accent, Carbon `#1C1C1A` canvas, Flash White `#F5F5F0` text, hairline dividers at 10%/20% white. Type: DM Sans display, Inter body, IBM Plex Mono for labels, data and buttons. The app runs in the dark Carbon register only; there is no light toggle. Exported documents (analysis report, observed-weather study) use Archive mode: Parchment `#F3F0ED`, Charleston `#2B2C2E`, Gold `#9A8860` catalog labels with § numbering. Chart categoricals are drawn from the brand palette (green, amber, nitrogen, electric lime, gold, sage, terracotta); attainment uses green/amber/red. Rules kept: max-width 68ch on paragraphs, left-anchored text, no gradients, no shadows, dark text on green buttons.
 
 ## 6. Definition of value and precision
 

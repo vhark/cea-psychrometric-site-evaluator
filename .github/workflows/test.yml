@@ -24,3 +24,8 @@ jobs:
 
       - name: Run the regression suite
         run: npm test
+
+      # Reports bundled dataset ages. It exits 1 when a dataset is past its staleness budget,
+      # which is a maintenance signal, not a broken build, so it never fails the run.
+      - name: data vintages
+        run: node scripts/check-vintages.mjs || true

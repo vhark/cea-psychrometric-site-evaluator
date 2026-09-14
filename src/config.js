@@ -1,12 +1,12 @@
 export const MODEL_VERSION = '0.2.0-screening';
 // lai: leaf area index (m² leaf / m² canopy) for the Stanghellini transpiration model; screening assumptions, not measured canopies.
 export const CROPS = {
-  lettuce: {label:'Baby-leaf lettuce',dayTargetC:22,nightTargetC:18,vpdMin:.6,vpdMax:1,dliTarget:14,photoperiod:16,lai:3,transpirationLDayM2:1.3*9/7,source:'Client assumption (OSF LightHouse): 1.3 kg/m²/week × 9 L/kg. Not measured transpiration.'},
-  headLettuce: {label:'Head lettuce',dayTargetC:24,nightTargetC:18,vpdMin:.8,vpdMax:1.2,dliTarget:17,photoperiod:16,lai:3,transpirationLDayM2:2*10/7,source:'Client assumption (OSF reference): 2 kg/m²/week × 10 L/kg.'},
-  basil: {label:'Basil',dayTargetC:26,nightTargetC:22,vpdMin:.8,vpdMax:1.2,dliTarget:29,photoperiod:16,lai:3,transpirationLDayM2:.9*13/7,source:'Client assumption (OSF design); cultivar, flowering and harvest schedule need verification.'},
-  arugula: {label:'Arugula',dayTargetC:22,nightTargetC:18,vpdMin:.6,vpdMax:1,dliTarget:14,photoperiod:16,lai:2.5,transpirationLDayM2:.85*8/7,source:'Client assumption (OSF design estimate), not wall-format validated.'},
+  lettuce: {label:'Baby-leaf lettuce',dayTargetC:22,nightTargetC:18,vpdMin:.6,vpdMax:1,dliTarget:14,photoperiod:16,lai:3,transpirationLDayM2:1.3*9/7,source:'Planning assumption: 1.3 kg/m²/week at 9 L/kg of fresh weight. Not measured transpiration; replace with site data.'},
+  headLettuce: {label:'Head lettuce',dayTargetC:24,nightTargetC:18,vpdMin:.8,vpdMax:1.2,dliTarget:17,photoperiod:16,lai:3,transpirationLDayM2:2*10/7,source:'Planning assumption: 2 kg/m²/week at 10 L/kg of fresh weight. Not measured transpiration; replace with site data.'},
+  basil: {label:'Basil',dayTargetC:26,nightTargetC:22,vpdMin:.8,vpdMax:1.2,dliTarget:29,photoperiod:16,lai:3,transpirationLDayM2:.9*13/7,source:'Planning assumption: 0.9 kg/m²/week at 13 L/kg. Cultivar, flowering and harvest schedule need verification.'},
+  arugula: {label:'Arugula',dayTargetC:22,nightTargetC:18,vpdMin:.6,vpdMax:1,dliTarget:14,photoperiod:16,lai:2.5,transpirationLDayM2:.85*8/7,source:'Planning assumption: 0.85 kg/m²/week at 8 L/kg. Not validated against measured transpiration.'},
   microgreens: {label:'Mixed microgreens',dayTargetC:22,nightTargetC:19,vpdMin:.5,vpdMax:.9,dliTarget:8,photoperiod:15,lai:1.5,transpirationLDayM2:2,source:'Editable screening moisture schedule. Tray/cycle yield is not hourly evapotranspiration.'},
-  propagation: {label:'Propagation seedlings',dayTargetC:23,nightTargetC:20,vpdMin:.4,vpdMax:.8,dliTarget:10,photoperiod:16,lai:1,transpirationLDayM2:1,source:'Client assumption (OSF propagation): 1 L/m²/day.'},
+  propagation: {label:'Propagation seedlings',dayTargetC:23,nightTargetC:20,vpdMin:.4,vpdMax:.8,dliTarget:10,photoperiod:16,lai:1,transpirationLDayM2:1,source:'Planning assumption: 1 L/m²/day under mist or fog propagation. Replace with measured irrigation data.'},
   tomato: {label:'Fruiting tomato (illustrative)',dayTargetC:26,nightTargetC:20,vpdMin:.8,vpdMax:1.4,dliTarget:25,photoperiod:16,lai:3.5,transpirationLDayM2:4,source:'Illustrative warm fruiting-crop screen, not a calibrated tomato water or yield model. Replace with measured stage-specific loads.'},
   custom: {label:'Custom crop program',dayTargetC:22,nightTargetC:18,vpdMin:.6,vpdMax:1,dliTarget:14,photoperiod:16,lai:3,transpirationLDayM2:2,source:'User-defined program. The initial values are assumptions until replaced by measured inputs.'},
   mushroom: {label:'Mushroom fruiting',dayTargetC:18,nightTargetC:18,vpdMin:.1,vpdMax:.3,dliTarget:0,photoperiod:12,lai:0,transpirationModel:'schedule',transpirationLDayM2:.3,source:'Provisional moisture input. Set respiration heat and mandatory fresh air from block/CO₂ loading.'}
@@ -14,7 +14,10 @@ export const CROPS = {
 export const CONTROL_MODES = {staged:'Staged causal controller (deadband, minimum on/off, ordered stages)',ideal:'Ideal modulation upper bound (enumerating dispatcher)'};
 export const TRANSPIRATION_MODELS = {stanghellini:'Stanghellini (Vanthoor 2011 §8.9), state-coupled',schedule:'Declared L/m²/day schedule'};
 export const FACILITIES = {greenhouse:'Vented greenhouse',hybrid:'Hybrid greenhouse',indoor:'Indoor farm'};
-export const SYSTEMS = {bench:'Greenhouse benches',wall:'Harvest walls',microgreens:'Microgreen racks',propagation:'Propagation racks',mushroom:'Mushroom racks'};
+// One cultivation system for now. Rack and wall formats need canopy-area and tier-interception
+// evidence this screen does not have, so they are not offered rather than guessed.
+export const SYSTEMS = {bench:'Greenhouse benches'};
+const RETIRED_SYSTEMS = new Set(['wall', 'microgreens', 'propagation', 'mushroom']);
 export const TECHNOLOGIES = {pad:'Pads + ventilation + heat',dehu:'Pads + condensing dehumidifier',dx:'DX / mini-split + dehumidifier',integrated:'Integrated HVAC + reheat',desiccant:'Desiccant + evaporative cooling',hybridDesiccant:'Liquid-desiccant hybrid (generic)',doas:'Dry-neutral DOAS + DX sensible'};
 export const DEFAULT_SCENARIO = {
  schemaVersion:1,id:'baseline',name:'Pad + vent baseline',facility:'greenhouse',system:'bench',crop:'lettuce',technology:'pad',
@@ -45,9 +48,7 @@ export function makeScenario(facility='greenhouse',system='bench',crop='lettuce'
  delete s.label;delete s.source;
  if(facility==='indoor')Object.assign(s,{solarTransmission:0,parTransmission:0,uValue:.3,maxVentACH:2,padEnabled:false,coolingKW:90,dehuKgH:40,technology:'dx',installedCost:80000,name:'Indoor DX + dehu'});
  if(facility==='hybrid')Object.assign(s,{maxVentACH:15,coolingKW:80,dehuKgH:30,integratedHVAC:true,technology:'integrated',installedCost:90000,name:'Hybrid controlled greenhouse'});
- if(system==='wall')s.canopyM2=s.areaM2*(28*5.853/92.903);
- if(system==='microgreens'||system==='propagation')s.canopyM2=s.areaM2*.35/.7432*2.4;
- if(system==='mushroom')Object.assign(s,{canopyM2:s.areaM2*.35/.7432*2.4,lightWm2:8,cropSensibleWm2:20,minVentACH:6,maxVentACH:15,humidifierKgH:20});
+ // Canopy area stays an explicit editable input; no per-system geometry is inferred.
  s.canopyM2=Math.round(s.canopyM2);
  return s;
 }
@@ -75,7 +76,11 @@ export function validateScenario(s){
  if(!s||s.schemaVersion!==1)return ['Unsupported scenario schema.'];
  backfillScenario(s);
  for(const group of FIELDS)for(const field of group.fields){const value=s[field.key];if(typeof value!=='number'||!Number.isFinite(value)||value<field.min||value>field.max)errors.push(`${field.label}: enter ${field.min}–${field.max} ${field.unit}.`);}
- if(!Object.hasOwn(FACILITIES,s.facility)||!Object.hasOwn(SYSTEMS,s.system)||!Object.hasOwn(CROPS,s.crop)||!Object.hasOwn(TECHNOLOGIES,s.technology))errors.push('Unknown facility, cultivation system, crop or technology.');
+ // Rack and wall formats shipped before 0.2.1. Name them so an older export fails legibly
+ // rather than reporting a generic unknown value.
+ if(RETIRED_SYSTEMS.has(s.system))errors.push(`Cultivation system "${s.system}" was retired: its canopy-area and tier-interception assumptions were not evidenced. Set the system to greenhouse benches and enter the active canopy area directly.`);
+ else if(!Object.hasOwn(SYSTEMS,s.system))errors.push('Unknown cultivation system.');
+ if(!Object.hasOwn(FACILITIES,s.facility)||!Object.hasOwn(CROPS,s.crop)||!Object.hasOwn(TECHNOLOGIES,s.technology))errors.push('Unknown facility, crop or technology.');
  if(!Object.hasOwn(CONTROL_MODES,s.controlMode))errors.push('Control mode must be staged or ideal.');
  if(!Object.hasOwn(TRANSPIRATION_MODELS,s.transpirationModel))errors.push('Transpiration model must be stanghellini or schedule.');
  for(const key of ['padEnabled','integratedHVAC'])if(typeof s[key]!=='boolean')errors.push(`${key} must be true or false.`);
