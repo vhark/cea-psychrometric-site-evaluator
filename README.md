@@ -138,6 +138,7 @@ region and what measurement would. Three of the six regions currently return no 
 | [docs/SENSITIVITY.md](docs/SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives |
 | [docs/REGIONS.md](docs/REGIONS.md) | The ten-year regional study: method, recommendation rule, and the verdict for each bundled climate |
 | [docs/CLASSES.md](docs/CLASSES.md) | Classes of environmental control, the condition that exhausts each, and what each achieved in six climates |
+| [docs/EVIDENCE-HOT-HUMID.md](docs/EVIDENCE-HOT-HUMID.md) | What measured research proves for hot-humid CEA, graded by evidence tier, with the gaps named |
 | [docs/ENERGY-DATA.md](docs/ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage, vintages and limits |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Landscape review and source register behind the build decision |
 | [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md) | Roadmap M1 to M6 to a calibrated twin, with the claim each milestone earns |

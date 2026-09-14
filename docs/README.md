@@ -17,6 +17,7 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | Know which assumption to measure first | [SENSITIVITY.md](SENSITIVITY.md) |
 | Learn the psychrometrics the tool applies | the **Learn** tab in the interface, then [REGIONS.md](REGIONS.md) |
 | Choose between pads, a dehumidifier, a curtain, lights or an opaque box | [CLASSES.md](CLASSES.md) |
+| Know what published research actually proves for a humid site | [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) |
 | Change the code | [ARCHITECTURE.md](ARCHITECTURE.md), then [IMPLEMENTATION.md](IMPLEMENTATION.md), then [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 | Know where the data came from | [ENERGY-DATA.md](ENERGY-DATA.md) and [RESEARCH.md](RESEARCH.md) |
 | Know what happens next | [DIGITAL-TWIN.md](DIGITAL-TWIN.md) |
@@ -37,6 +38,7 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | [SENSITIVITY.md](SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives them | Engineer choosing what to measure, reviewer |
 | [REGIONS.md](REGIONS.md) | The ten-year, six-climate study: method, recommendation rule, per-region verdict and what each unresolved region needs measured | Anyone choosing equipment for a climate, reviewer |
 | [CLASSES.md](CLASSES.md) | The classes of environmental control, what exhausts each one, and what each achieved in six climates including a subarctic site | Anyone choosing a facility type, or asking whether a greenhouse is worth building at a latitude |
+| [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) | Graded literature review of what measurement actually establishes for hot-humid CEA, the named gaps, and which of this tool's numbers the evidence can and cannot carry | Anyone acting on a humid-climate result, reviewer, anyone quoting a technology claim |
 | [ENERGY-DATA.md](ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage counts, vintages, join limits, rebuild procedure | Data maintainer, anyone quoting a price or an emissions factor |
 | [RESEARCH.md](RESEARCH.md) | Landscape review, literature anchors and public source register behind the build decision | Reviewer, anyone asking why this exists |
 | [DIGITAL-TWIN.md](DIGITAL-TWIN.md) | Roadmap M1 to M6, with the claim each milestone earns and the gate it must pass | Product owner, reviewer |
