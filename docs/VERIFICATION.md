@@ -1,12 +1,37 @@
 # CEA Psychrometric Site Evaluator: executed verification
 
-Date: 2026-09-11. Release model: `0.1.0-screening`. This records executed checks, not completion of every future gate in EVALUATION.md.
+Purpose: record the checks that were actually executed, with the commands, the measured values and the date, so no claim in this repository rests on an unexecuted intention.
+
+Status: current for model `0.2.0-screening`, last updated 2026-09-14. Sections are dated and cumulative: the 0.1.0 sections are kept as the historical record, and the material precision limit they state was superseded by the staged controller in v0.2. This records executed checks, not completion of every future gate in [EVALUATION.md](EVALUATION.md).
+
+Read this if: you are deciding how far to trust a number, auditing the evidence behind a claim, or repeating a check.
+
+## Current state, 2026-09-14
+
+| Check | Result |
+|---|---|
+| Regression suite (`npm test`) | **56 passed, 0 failed**: 25 model, 9 data, 9 analysis, 6 conservation, 7 sensitivity |
+| Model version | `0.2.0-screening`, staged deadband controller default, one-minute dispatch step |
+| Controller cadence convergence, Tulsa 2025 full year, 1 min vs 0.5 min | 0.004 / 0.383 / 0.091 pp attainment, 0.31% electricity at most (staged); the retained ideal optimizer does not converge: 1.5 pp, 1.95% |
+| Conservation identities | Close between 1e-16 and 5e-13 relative across six independently derived closed-form checks |
+| Bundled weather | Ten Tulsa NASA POWER years, 2016 to 2025, complete coverage each (8,760 or 8,784 h) |
+| Multi-year example, six strategies over five years | Baseline median attainment 28.9%, worst year 2025 at 27.1%, spread 2.7 pts; cost ranking **not stable** (2 distinct orders over 5 years) |
+| Multi-site example | Tulsa vs Phoenix: 244 vs 2,334 pad-effective hours, 401 vs 2,636 free-cooling hours |
+| Tulsa pad, runtime vs weather-side viability | Pad ran 2,772 h on 296 days; the weather screen clears both pad limits in only 244 h on 65 days; moisture ceiling binds 3,851 h against 2,952 h for the temperature margin |
+| Outside air as the dehumidifier, Tulsa, against a 2.5 L/kWh unit | Outside air is cheaper per kg in 4,970 h and lower energy per kg in 1,752 h |
+| Morris screening | 1,872 simulations, 104 design points, 8 trajectories, 12 parameters, 3 years x 120 days, seed 1, 290 s, reproducible. mu\* leader on all three metrics is leaf area and transpiration (9.10 pp attainment), then envelope U (5.89), then shade fraction (3.43). Ranking unstable: 3 orders, most common 61.5%; the three cheapest positions identical in 104/104 points; instability confined to DX, hybrid-desiccant and integrated, whose median costs sit within 16% |
+
+Still not claimed, at this or any earlier date: no independent greenhouse-model benchmark, no site calibration, no equipment performance maps.
+
+## 0.1.0-screening record (2026-09-11)
+
+Release model at the time: `0.1.0-screening`.
 
 ## Result and evidence tier
 
 The static application runs end to end with actual historical data, finite-capacity component calculations, national ZIP energy context, comparisons, sensitivities and portable exports. It is an **assumption-based coarse component screen**, not an independently benchmarked or calibrated greenhouse digital twin.
 
-**Material precision limit:** changing the ideal controller cadence from one minute to half a minute in the seasonal samples changed joint climate attainment by as much as 4.1 percentage points and electricity by 23.5%. These are observed sample differences, not universal error bounds or statistical confidence intervals. Close cost rankings are exploratory and must not determine equipment selection. A tighter hot-period sample alone was not sufficient evidence of broad convergence. The default remains an explicit one-minute control assumption; changing it changes dispatch as well as state sampling.
+**Material precision limit (superseded 2026-09-13, retained for the record):** changing the ideal controller cadence from one minute to half a minute in the seasonal samples changed joint climate attainment by as much as 4.1 percentage points and electricity by 23.5%. These are observed sample differences, not universal error bounds or statistical confidence intervals. A tighter hot-period sample alone was not sufficient evidence of broad convergence. This limit was a property of the ideal per-substep optimizer, which is now a selectable labeled upper bound rather than the default; the staged deadband controller that replaced it converges, as measured in the v0.2 section below. Close cost rankings remain exploratory for the separate reason recorded in [SENSITIVITY.md](SENSITIVITY.md): the ranking is unstable under the screened parameter ranges.
 
 Final seasonal evidence is in [seasonal-step-check.json](seasonal-step-check.json). Earlier tuning experiments are retained in step-sensitivity.json and step-refinement.json as historical development evidence, not final accuracy claims. Conservation residuals below do not remove this control-model uncertainty.
 
@@ -76,7 +101,7 @@ Four independent reviews (model, data, interface, roadmap) are recorded in AUDIT
 
 ### 2026-09-13 v0.2 site-evaluator sprint
 
-Model `0.2.0-screening`. Built in three parallel slices (engine, analysis, interface) against the PRD §10 contract; the engine agent timed out after writing its tests, so Main completed integration. `npm test` **43 passed, 0 failed** (24 model, 10 data, 9 analysis).
+Model `0.2.0-screening`. Built in three parallel slices (engine, analysis, interface) against the PRD §10 contract; the engine agent timed out after writing its tests, so Main completed integration. `npm test` **43 passed, 0 failed** (24 model, 10 data, 9 analysis) at the end of the sprint. The six conservation identities (audit item 2) and the seven Morris screening tests (M3) took the suite to its current **56**.
 
 **M1 gate met.** The staged deadband controller replaced per-substep re-optimization as the default. Measured on the full Tulsa 2025 year, 1 minute versus 0.5 minute dispatch:
 

@@ -1,0 +1,80 @@
+name: pages
+
+# Publishes two things from one artifact:
+#   /      the explainer site (site/)
+#   /app/  the tool itself (the repository, minus git metadata, CI, the site, private
+#          engagement material and the 36 MB of retained raw energy downloads)
+# Every path inside the tool is relative, so it runs unchanged from the /app/ subpath.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Assemble _site
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site/app
+
+          # Explainer site at the root. site/assets/screenshots holds real committed files,
+          # so the local preview and the deployed site show the same images.
+          cp -R site/. _site/
+
+          # The tool at /app/. tar keeps the copy under control: no .git, no workflows,
+          # no site/, no client-private material, no raw government workbooks.
+          tar -cf - \
+            --exclude=./.git \
+            --exclude=./.github \
+            --exclude=./site \
+            --exclude=./private \
+            --exclude=./data/energy/raw \
+            --exclude=.DS_Store \
+            --exclude=./_site \
+            . | tar -xf - -C _site/app
+
+          # Keep the deployed copies in step with the canonical docs/screenshots set.
+          if [ -d docs/screenshots ]; then
+            mkdir -p _site/assets/screenshots
+            cp -R docs/screenshots/. _site/assets/screenshots/
+          fi
+
+          # Serve paths containing underscores verbatim.
+          touch _site/.nojekyll
+
+          echo "artifact size: $(du -sh _site | cut -f1), $(find _site -type f | wc -l) files"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

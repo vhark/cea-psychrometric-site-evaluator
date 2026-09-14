@@ -14,17 +14,47 @@ function svgNode(tag, attributes = {}, text) {
 function blank(container, message) {
   const p = document.createElement('p'); p.className = 'empty-chart'; p.textContent = message; container.replaceChildren(p);
 }
-function makeSvg(container, width, height, label) {
+function makeSvg(container, width, height, label, desc) {
   const svg = svgNode('svg', {viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-label': label});
-  svg.append(svgNode('title', {}, label)); container.replaceChildren(svg); return svg;
+  svg.append(svgNode('title', {}, label));
+  if (desc) svg.append(svgNode('desc', {}, desc));
+  container.replaceChildren(svg); return svg;
 }
-function ticks(svg, {left, top, width, height, max, count = 4, unit = ''}) {
+/* One chart is computed once as a spec: geometry primitives plus a legend and a text table. The browser
+   renderer appends the primitives as DOM nodes with brand CSS variables; the exporter serializes the same
+   primitives as a static SVG string with explicit Archive-register colours. Colour lives in a role name
+   (chart-1, warn, text-2), never in the maths. */
+const roleVar = role => `var(--${role})`;
+function tickPrims({left, top, width, height, max, count = 4, unit = ''}) {
+  const prims = [];
   for (let i = 0; i <= count; i++) {
     const y = top + height - height * i / count;
-    svg.append(svgNode('line', {x1: left, x2: left + width, y1: y, y2: y, class: 'grid-line'}));
-    svg.append(svgNode('text', {x: left - 8, y: y + 3, 'text-anchor': 'end'}, number(max * i / count, max < 10 ? 1 : 0)));
+    prims.push({tag: 'line', attrs: {x1: left, x2: left + width, y1: y, y2: y}, cls: 'grid-line'});
+    prims.push({tag: 'text', attrs: {x: left - 8, y: y + 3, 'text-anchor': 'end'}, text: number(max * i / count, max < 10 ? 1 : 0)});
   }
-  if (unit) svg.append(svgNode('text', {x: left, y: top - 10, class: 'axis-label'}, unit));
+  if (unit) prims.push({tag: 'text', attrs: {x: left, y: top - 10}, cls: 'axis-label', text: unit});
+  return prims;
+}
+function appendPrims(svg, prims) {
+  for (const p of prims) {
+    const attrs = {...p.attrs};
+    if (p.fill) attrs.fill = roleVar(p.fill);
+    if (p.stroke) attrs.stroke = roleVar(p.stroke);
+    if (p.opacity !== undefined) attrs.opacity = p.opacity;
+    if (p.dash) attrs['stroke-dasharray'] = p.dash;
+    if (p.cls) attrs.class = p.cls;
+    const node = svgNode(p.tag, attrs, p.text);
+    if (p.title) node.append(svgNode('title', {}, p.title));
+    svg.append(node);
+  }
+}
+function ticks(svg, options) {appendPrims(svg, tickPrims(options));}
+function renderSpec(container, legend, spec) {
+  if (spec.empty) {blank(container, spec.message); if (legend) legend.replaceChildren(); return;}
+  appendPrims(makeSvg(container, spec.width, spec.height, spec.label, spec.desc), spec.prims);
+  if (!legend) return;
+  legend.replaceChildren();
+  for (const entry of spec.legend || []) legendEntry(legend, entry.label, roleVar(entry.role), entry.opacity ?? 1);
 }
 export function modeEntries(hours, weatherOnly = false) {
   const counts = new Map();
@@ -35,9 +65,10 @@ export function modeEntries(hours, weatherOnly = false) {
   }
   return [...counts].sort((a, b) => b[1] - a[1]);
 }
-export function renderMonthly(container, legend, hours, timezone, weatherOnly = false) {
+/** Operating-mode hours per local calendar month, as a spec: stacked bars, legend and the hour table. */
+export function monthlyChartSpec(hours, timezone, weatherOnly = false) {
   const entries = modeEntries(hours, weatherOnly);
-  if (!entries.length) {blank(container, 'No valid operating modes in this record.'); legend.replaceChildren(); return;}
+  if (!entries.length) return {empty: true, message: 'No valid operating modes in this record.'};
   const monthFormat = new Intl.DateTimeFormat('en-CA', {timeZone: timezone, year: 'numeric', month: '2-digit'});
   const months = new Map();
   for (const hour of hours) {
@@ -52,8 +83,8 @@ export function renderMonthly(container, legend, hours, timezone, weatherOnly = 
   const data = [...months].sort((a, b) => a[0].localeCompare(b[0]));
   const width = 800, height = 225, left = 48, top = 23, plotHeight = 161, plotWidth = width - left - 12;
   const max = Math.max(1, ...data.map(([, row]) => [...row.values()].reduce((a, b) => a + b, 0)));
-  const svg = makeSvg(container, width, height, `Operating-mode hours by local calendar month. ${data.length} months. See mode table below.`);
-  ticks(svg, {left, top, width: plotWidth, height: plotHeight, max, unit: 'hours'});
+  const label = `Operating-mode hours by local calendar month. ${data.length} months. See mode table below.`;
+  const prims = tickPrims({left, top, width: plotWidth, height: plotHeight, max, unit: 'hours'});
   const step = plotWidth / data.length;
   data.forEach(([month, row], index) => {
     let y = top + plotHeight;
@@ -61,16 +92,22 @@ export function renderMonthly(container, legend, hours, timezone, weatherOnly = 
       const count = row.get(mode) || 0;
       if (!count) return;
       const h = count / max * plotHeight; y -= h;
-      const rect = svgNode('rect', {x: left + index * step + step * .18, y, width: step * .64, height: h, fill: `var(--${colors[mi % colors.length]})`});
-      rect.append(svgNode('title', {}, `${month}: ${modeLabel(mode)}, ${number(count)} hours`)); svg.append(rect);
+      prims.push({tag: 'rect', attrs: {x: left + index * step + step * .18, y, width: step * .64, height: h},
+        fill: colors[mi % colors.length], title: `${month}: ${modeLabel(mode)}, ${number(count)} hours`});
     });
-    if (data.length <= 18 || index % Math.ceil(data.length / 12) === 0) svg.append(svgNode('text', {x: left + index * step + step / 2, y: top + plotHeight + 20, 'text-anchor': 'middle'}, data.length <= 12 ? month.slice(5) : month));
+    if (data.length <= 18 || index % Math.ceil(data.length / 12) === 0)
+      prims.push({tag: 'text', attrs: {x: left + index * step + step / 2, y: top + plotHeight + 20, 'text-anchor': 'middle'}, text: data.length <= 12 ? month.slice(5) : month});
   });
-  legend.replaceChildren();
-  entries.forEach(([mode], index) => {
-    const span = document.createElement('span'), swatch = document.createElement('i'); swatch.className = 'swatch'; swatch.style.background = `var(--${colors[index % colors.length]})`;
-    span.append(swatch, document.createTextNode(modeLabel(mode))); legend.append(span);
-  });
+  const total = mode => data.reduce((sum, [, row]) => sum + (row.get(mode) || 0), 0);
+  return {empty: false, width, height, label, prims,
+    desc: `Stacked bars, one column per local month, ${entries.length} operating modes ordered by total hours. Tallest column ${number(max)} hours. The table below carries every value.`,
+    legend: entries.map(([mode], index) => ({label: modeLabel(mode), role: colors[index % colors.length]})),
+    table: {head: ['Month', ...entries.map(([mode]) => `${modeLabel(mode)} · h`), 'Total · h'],
+      rows: [...data.map(([month, row]) => [month, ...entries.map(([mode]) => number(row.get(mode) || 0)), number([...row.values()].reduce((a, b) => a + b, 0))]),
+        ['Record', ...entries.map(([mode]) => number(total(mode))), number(entries.reduce((sum, [mode]) => sum + total(mode), 0))]]}};
+}
+export function renderMonthly(container, legend, hours, timezone, weatherOnly = false) {
+  renderSpec(container, legend, monthlyChartSpec(hours, timezone, weatherOnly));
 }
 /* Timeline cells carry a shape as well as a colour, so the calendar is readable without colour vision.
    Cells are batched into one Path2D per colour+shape class, so 8,760 cells cost a handful of draw calls. */
@@ -253,9 +290,9 @@ function legendEntry(legend, label, color, opacity = 1) {
 }
 // Monthly space loads: sensible gains stacked above the axis; sensible losses (envelope, ventilation,
 // infiltration in cold months) and latent gains stacked below. Hiding the losses would hide the heating story.
-export function renderLoads(container, legend, decomposition) {
+export function loadsChartSpec(decomposition) {
   const data = decomposition?.monthly || [];
-  if (!data.length) {blank(container, 'Load decomposition is not available for this run.'); legend.replaceChildren(); return;}
+  if (!data.length) return {empty: true, message: 'Load decomposition is not available for this run.'};
   const lPerKg = decomposition.latentKWhPerKg;
   const up = row => SENSIBLE_SERIES.reduce((a, [k]) => a + Math.max(0, row[k] || 0), 0);
   const lossOf = row => SENSIBLE_SERIES.reduce((a, [k]) => a + Math.max(0, -(row[k] || 0)), 0);
@@ -264,12 +301,13 @@ export function renderLoads(container, legend, decomposition) {
   const width = 800, height = 300, left = 56, top = 23, plotHeight = 236, plotWidth = width - left - 12;
   const maxUp = Math.max(1, ...data.map(up)), maxDown = Math.max(1, ...data.map(down)), span = maxUp + maxDown;
   const axisY = top + plotHeight * maxUp / span, scale = plotHeight / span;
-  const svg = makeSvg(container, width, height, `Monthly space loads in kWh. Sensible gains above the axis; sensible losses and latent gains below. ${data.length} months. Signed values in the load table.`);
+  const label = `Monthly space loads in kWh. Sensible gains above the axis; sensible losses and latent gains below. ${data.length} months. Signed values in the load table.`;
+  const prims = [];
   for (const [value, y] of [[maxUp, top], [maxUp / 2, axisY - maxUp / 2 * scale], [0, axisY], [-maxDown / 2, axisY + maxDown / 2 * scale], [-maxDown, top + plotHeight]]) {
-    svg.append(svgNode('line', {x1: left, x2: left + plotWidth, y1: y, y2: y, class: 'grid-line'}));
-    svg.append(svgNode('text', {x: left - 8, y: y + 3, 'text-anchor': 'end'}, number(value, span < 10 ? 1 : 0)));
+    prims.push({tag: 'line', attrs: {x1: left, x2: left + plotWidth, y1: y, y2: y}, cls: 'grid-line'});
+    prims.push({tag: 'text', attrs: {x: left - 8, y: y + 3, 'text-anchor': 'end'}, text: number(value, span < 10 ? 1 : 0)});
   }
-  svg.append(svgNode('text', {x: left, y: top - 10, class: 'axis-label'}, 'kWh, gains up, losses and latent down'));
+  prims.push({tag: 'text', attrs: {x: left, y: top - 10}, cls: 'axis-label', text: 'kWh, gains up, losses and latent down'});
   const step = plotWidth / data.length;
   data.forEach((row, index) => {
     const x = left + index * step + step * .18, w = step * .64;
@@ -277,47 +315,91 @@ export function renderLoads(container, legend, decomposition) {
     SENSIBLE_SERIES.forEach(([key, label], si) => {
       const value = Math.max(0, row[key] || 0); if (!value) return;
       const h = value * scale; y -= h;
-      const rect = svgNode('rect', {x, y, width: w, height: h, fill: `var(--${colors[si % colors.length]})`});
-      rect.append(svgNode('title', {}, `${row.month}: ${label} ${number(value)} kWh sensible gain`)); svg.append(rect);
+      prims.push({tag: 'rect', attrs: {x, y, width: w, height: h}, fill: colors[si % colors.length],
+        title: `${row.month}: ${label} ${number(value)} kWh sensible gain`});
     });
     y = axisY;
     SENSIBLE_SERIES.forEach(([key, label], si) => {
       const loss = Math.max(0, -(row[key] || 0)); if (!loss) return;
       const h = loss * scale;
-      const rect = svgNode('rect', {x, y, width: w, height: h, fill: `var(--${colors[si % colors.length]})`, opacity: .45});
-      rect.append(svgNode('title', {}, `${row.month}: ${label} ${number(loss)} kWh sensible loss`)); svg.append(rect); y += h;
+      prims.push({tag: 'rect', attrs: {x, y, width: w, height: h}, fill: colors[si % colors.length], opacity: .45,
+        title: `${row.month}: ${label} ${number(loss)} kWh sensible loss`});
+      y += h;
     });
     LATENT_SERIES.forEach(([key, label], li) => {
       const kg = Math.max(0, row.latentKg?.[key] || 0); if (!kg) return;
       const h = kg * lPerKg * scale;
-      const rect = svgNode('rect', {x, y, width: w, height: h, fill: `var(--${colors[(7 - li) % colors.length]})`, opacity: li ? .55 : .9});
-      rect.append(svgNode('title', {}, `${row.month}: ${label} ${number(kg)} kg, ${number(kg * lPerKg)} kWh latent`)); svg.append(rect); y += h;
+      prims.push({tag: 'rect', attrs: {x, y, width: w, height: h}, fill: colors[(7 - li) % colors.length], opacity: li ? .55 : .9,
+        title: `${row.month}: ${label} ${number(kg)} kg, ${number(kg * lPerKg)} kWh latent`});
+      y += h;
     });
-    if (data.length <= 18 || index % Math.ceil(data.length / 12) === 0) svg.append(svgNode('text', {x: left + index * step + step / 2, y: top + plotHeight + 20, 'text-anchor': 'middle'}, data.length <= 12 ? row.month.slice(5) : row.month));
+    if (data.length <= 18 || index % Math.ceil(data.length / 12) === 0)
+      prims.push({tag: 'text', attrs: {x: left + index * step + step / 2, y: top + plotHeight + 20, 'text-anchor': 'middle'}, text: data.length <= 12 ? row.month.slice(5) : row.month});
   });
-  legend.replaceChildren();
-  SENSIBLE_SERIES.forEach(([, label], i) => legendEntry(legend, label, `var(--${colors[i % colors.length]})`));
-  legendEntry(legend, 'Same colours at 45% opacity below the axis are sensible losses', 'var(--text-2)', .45);
-  LATENT_SERIES.forEach(([, label], i) => legendEntry(legend, `${label} (latent)`, `var(--${colors[(7 - i) % colors.length]})`, i ? .55 : .9));
+  const legend = [
+    ...SENSIBLE_SERIES.map(([, label], i) => ({label, role: colors[i % colors.length]})),
+    {label: 'Same colours at 45% opacity below the axis are sensible losses', role: 'text-2', opacity: .45},
+    ...LATENT_SERIES.map(([, label], i) => ({label: `${label} (latent)`, role: colors[(7 - i) % colors.length], opacity: i ? .55 : .9}))];
+  const rowOf = row => [row.month, number(up(row)), number(lossOf(row)), number(latentOf(row)), number(row.cropLatentKg), Number.isFinite(row.shr) ? number(row.shr, 2) : 'No gains'];
+  return {empty: false, width, height, label, prims,
+    desc: `Column per local month. Sensible gains rise above the zero line to at most ${number(maxUp)} kWh; sensible losses and latent gains fall below it to at most ${number(maxDown)} kWh. The table carries the same totals, so colour is not needed.`,
+    legend, table: {head: ['Month', 'Sensible gains · kWh', 'Sensible losses · kWh', 'Latent gains · kWh', 'Crop latent · kg', 'Sensible-heat ratio'],
+      rows: [...data.map(rowOf), ...(decomposition.total ? [rowOf({...decomposition.total, month: 'Period total'})] : [])]}};
+}
+export function renderLoads(container, legend, decomposition) {
+  renderSpec(container, legend, loadsChartSpec(decomposition));
 }
 // Joint attainment per weather year for one scenario, with the median as a dashed line and the worst year in the warning colour.
-export function renderYears(container, aggregate, scenarioId) {
+export function yearsChartSpec(aggregate, scenarioId) {
   const entry = aggregate?.byScenario?.[scenarioId];
   const years = (entry?.years || []).filter(y => Number.isFinite(y.compliancePct));
-  if (!years.length) {blank(container, 'No multi-year results for this scenario.'); return;}
+  if (!years.length) return {empty: true, message: 'No multi-year results for this scenario.'};
   const width = 420, height = 240, left = 42, top = 24, ph = 176, pw = 361, max = 100;
-  const svg = makeSvg(container, width, height, `Joint climate-band attainment by weather year for ${entry.name}. Median ${number(entry.median.compliancePct, 1)} percent; worst year ${entry.worst?.label ?? 'not available'} at ${number(entry.worst?.compliancePct, 1)} percent. Values in the year table.`);
-  ticks(svg, {left, top, width: pw, height: ph, max, unit: '% of eligible hours'});
+  const label = `Joint climate-band attainment by weather year for ${entry.name}. Median ${number(entry.median.compliancePct, 1)} percent; worst year ${entry.worst?.label ?? 'not available'} at ${number(entry.worst?.compliancePct, 1)} percent. Values in the year table.`;
+  const prims = tickPrims({left, top, width: pw, height: ph, max, unit: '% of eligible hours'});
   const step = pw / years.length;
   years.forEach((year, i) => {
     const h = year.compliancePct / max * ph, worst = entry.worst && year.label === entry.worst.label;
-    const rect = svgNode('rect', {x: left + i * step + step * .18, y: top + ph - h, width: step * .64, height: h, fill: worst ? 'var(--warn)' : 'var(--chart-1)'});
-    rect.append(svgNode('title', {}, `${year.label}: ${number(year.compliancePct, 1)} percent joint attainment${worst ? ', worst year' : ''}; operating cost ${Number.isFinite(year.cost) ? `$${number(year.cost)}` : 'unpriced'}`)); svg.append(rect);
-    if (years.length <= 12 || i % Math.ceil(years.length / 12) === 0) svg.append(svgNode('text', {x: left + i * step + step / 2, y: top + ph + 20, 'text-anchor': 'middle'}, year.label));
+    prims.push({tag: 'rect', attrs: {x: left + i * step + step * .18, y: top + ph - h, width: step * .64, height: h}, fill: worst ? 'warn' : 'chart-1',
+      title: `${year.label}: ${number(year.compliancePct, 1)} percent joint attainment${worst ? ', worst year' : ''}; operating cost ${Number.isFinite(year.cost) ? `$${number(year.cost)}` : 'unpriced'}`});
+    if (years.length <= 12 || i % Math.ceil(years.length / 12) === 0)
+      prims.push({tag: 'text', attrs: {x: left + i * step + step / 2, y: top + ph + 20, 'text-anchor': 'middle'}, text: year.label});
   });
-  if (Number.isFinite(entry.median.compliancePct)) {
-    const y = top + ph - entry.median.compliancePct / max * ph;
-    const line = svgNode('line', {x1: left, x2: left + pw, y1: y, y2: y, stroke: 'var(--text-2)', 'stroke-dasharray': '5 4'});
-    line.append(svgNode('title', {}, `Median ${number(entry.median.compliancePct, 1)} percent`)); svg.append(line);
-  }
+  if (Number.isFinite(entry.median.compliancePct))
+    prims.push({tag: 'line', attrs: {x1: left, x2: left + pw, y1: top + ph - entry.median.compliancePct / max * ph, y2: top + ph - entry.median.compliancePct / max * ph},
+      stroke: 'text-2', dash: '5 4', title: `Median ${number(entry.median.compliancePct, 1)} percent`});
+  return {empty: false, width, height, label, prims,
+    desc: `One bar per weather year for ${entry.name}, ${years.length} years, scaled 0 to 100 percent of eligible hours. The dashed line is the median at ${number(entry.median.compliancePct, 1)} percent; the worst year is drawn in the warning colour and named in the table.`,
+    legend: [{label: `Weather year attainment, ${years.length} years`, role: 'chart-1'}, {label: `Worst year: ${entry.worst?.label ?? 'not available'}`, role: 'warn'},
+      {label: `Median ${number(entry.median.compliancePct, 1)} percent, dashed`, role: 'text-2'}],
+    table: {head: ['Weather year', 'Joint attainment · %', 'Operating cost · $', 'Eligible hours'],
+      rows: years.map(year => [`${year.label}${entry.worst && year.label === entry.worst.label ? ' (worst)' : ''}`, number(year.compliancePct, 1),
+        Number.isFinite(year.cost) ? number(year.cost) : 'Unpriced', number(year.eligibleHours)])}};
+}
+export function renderYears(container, aggregate, scenarioId) {
+  renderSpec(container, null, yearsChartSpec(aggregate, scenarioId));
+}
+export const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+/* Archive-register chart colours: the same brand categoricals, darkened where the Carbon-register tone would
+   disappear on parchment or in a grayscale print. Exported documents never carry the app's CSS variables. */
+export const ARCHIVE_PALETTE = {
+  'chart-1': '#4DB405', 'chart-2': '#A8730D', 'chart-3': '#6E8A74', 'chart-4': '#8A9B2E',
+  'chart-5': '#9A8860', 'chart-6': '#71806B', 'chart-7': '#C4654A', 'chart-8': '#5A5B5D',
+  warn: '#A8730D', green: '#4DB405', 'text-2': 'rgba(43,44,46,.72)', grid: 'rgba(43,44,46,.20)', ink: '#2B2C2E'};
+/** The same spec as a static SVG string: explicit colours, no CSS variables, no script, every text escaped. */
+export function chartSVG(spec, palette = ARCHIVE_PALETTE) {
+  if (!spec || spec.empty) return `<p class="empty-chart">${escapeHTML(spec?.message || 'Chart data is not available.')}</p>`;
+  const color = role => palette[role] || palette['chart-8'];
+  const body = spec.prims.map(p => {
+    const attrs = {...p.attrs};
+    if (p.tag === 'line') {attrs.stroke = p.stroke ? color(p.stroke) : palette.grid; attrs['stroke-width'] = 1;}
+    if (p.tag === 'rect') attrs.fill = color(p.fill);
+    if (p.tag === 'text') attrs.fill = palette['text-2'];
+    if (p.dash) attrs['stroke-dasharray'] = p.dash;
+    if (p.opacity !== undefined) attrs.opacity = p.opacity;
+    const open = `<${p.tag} ${Object.entries(attrs).map(([k, v]) => `${k}="${escapeHTML(v)}"`).join(' ')}>`;
+    return `${open}${p.title ? `<title>${escapeHTML(p.title)}</title>` : ''}${p.text !== undefined ? escapeHTML(p.text) : ''}</${p.tag}>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${spec.width} ${spec.height}" width="100%" role="img" aria-label="${escapeHTML(spec.label)}" font-family="'IBM Plex Mono', monospace" font-size="10" fill="${palette['text-2']}">`
+    + `<title>${escapeHTML(spec.label)}</title><desc>${escapeHTML(spec.desc || spec.label)}</desc>${body}</svg>`;
 }

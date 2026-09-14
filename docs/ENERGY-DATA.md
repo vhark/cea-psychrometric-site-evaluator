@@ -1,5 +1,11 @@
 # Energy catalog: evidence and limits
 
+Purpose: state exactly what the ZIP, utility, price and grid catalogs contain, when each was retrieved, what it cannot be used for, and how to rebuild it.
+
+Status: catalogs retrieved 2026-09-11, reviewed 2026-09-14. Utility mapping is vintage 2021 and eGRID is vintage 2023; neither refreshes automatically (open audit item 6 in [AUDIT.md](AUDIT.md)).
+
+Read this if: you are quoting a price, an emissions factor or a service territory from this tool, or rebuilding the catalogs.
+
 ## Retained snapshot
 
 The checked-in acquisition is dated **2026-09-11**. This is the retrieval date, not the utility mapping year, price observation period, or grid generation year. `data/energy/manifest.json` contains publisher, source URL, license, evidence kind, artifact SHA-256, upstream Last-Modified header when provided, and per-file retrieval timestamps. `data/energy/raw/acquisition.json` records hashes of the original downloaded bytes. Original GeoNames ZIP archives, OpenEI CSVs and EIA/EPA workbooks are retained under `data/energy/raw/`.

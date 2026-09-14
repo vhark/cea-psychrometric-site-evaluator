@@ -1,6 +1,10 @@
 # CEA Psychrometric Site Evaluator: architecture
 
-Date: 2026-09-11. Status: static coarse-screen implementation exists. This document also preserves design constraints for the next calibrated-model iteration. Runtime evidence and limits are in VERIFICATION.md; no public production deployment or site calibration is claimed.
+Purpose: record the deployment decision, the module boundaries, the canonical data contracts and the controller design, so an implementer can change one part without breaking the others.
+
+Status: current for model `0.2.0-screening`. Written 2026-09-11, reviewed 2026-09-14. The static coarse-screen implementation exists; this document also preserves the design constraints for the next calibrated-model iteration. Runtime evidence and limits are in [VERIFICATION.md](VERIFICATION.md). No public production deployment or site calibration is claimed.
+
+Read this if: you are implementing or reviewing code in `src/`, or deciding where a new capability belongs.
 
 ## 1. Deployment decision
 
@@ -118,6 +122,8 @@ Opaque indoor surfaces may gain solar heat through an envelope model; direct cro
 At each substep, construct only physically admissible strategies: minimum ventilation/heating, outside-air cooling/drying, pad cooling, closed-loop DX, standalone dehu, integrated dehu/reheat, and permitted combinations. Respect topology; a scenario without equipment cannot dispatch it.
 
 Find feasible actuator levels subject to sensible/moisture coupling, installed capacity, minimum outdoor air and operating envelopes. Prefer target-feasible actions according to a declared policy. For a cost-aware policy, minimize modeled instantaneous purchased cost among feasible actions, including ventilation's downstream heating/cooling penalty. This is a causal local dispatch policy, not a proof of annual global optimality. If infeasible, report the limiting constraints and use a declared priority (temperature safety, moisture band, then cost), not an unexplained blended score.
+
+As shipped in `0.2.0-screening`, the default realization of that policy is a staged deadband controller (per-device hysteresis, minimum on and off times, ordered stages) dispatched on a one-minute step, because the enumerating per-substep dispatcher described above does not converge with cadence. The enumerating dispatcher is retained and selectable as a labeled "ideal modulation upper bound". Measured convergence for both is in [VERIFICATION.md](VERIFICATION.md).
 
 A DX/dehu/reheat loop must converge as a coupled calculation. Adding latent removal can change sensible demand and runtime, which changes latent capability again. Use bounded iteration/convergence reporting or a simultaneous solution, never a one-pass subtraction that grants full capacity twice. Performance maps are interpolated within their documented domain; assumed curves and out-of-domain operation remain visible.
 

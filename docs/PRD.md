@@ -1,7 +1,11 @@
 # CEA Psychrometric Site Evaluator
 ## Product requirements, approved implementation scope
 
-Date: 2026-09-11. Status: approved for implementation. Execution and measured verification status are recorded separately; this specification is not evidence of validation.
+Purpose: state what the product must do, for whom, and what it must never claim, including the approved v0.2 site-evaluator scope in §10.
+
+Status: approved for implementation. Written 2026-09-11, §10 approved 2026-09-13, reviewed 2026-09-14. Execution and measured verification status are recorded separately in [VERIFICATION.md](VERIFICATION.md); this specification is not evidence of validation.
+
+Read this if: you are deciding whether a proposed capability is in scope, or checking a shipped behaviour against what was approved.
 
 **Working name: CEA Psychrometric Site Evaluator.** Descriptor: CEA climate & equipment explorer. Promise: See when your climate strategy works, what closes the gap, and what that control costs. Alternatives: Canopy Atlas (broader siting emphasis), Climate Ledger (stronger economic emphasis). Name and trademark availability have not been checked.
 

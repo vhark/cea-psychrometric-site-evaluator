@@ -5,6 +5,7 @@ import {loadScenarios, saveScenarios, loadWeather, saveWeather, listWeather, loa
 import {downloadRun, downloadScenario} from './export.js';
 import {compareScenarios, aggregateYears, compareSites, loadDecomposition, co2Window} from './metrics.js';
 import {modeLabel, modeEntries, attainmentClass, attainmentText, renderMonthly, renderTimeline, renderTimelineTable, renderScatter, renderDLI, renderLoads, renderYears} from './charts.js';
+import {initTour} from './tour.js';
 
 const $ = id => document.getElementById(id);
 const state = {scenarios: [], selected: null, snapshot: null, results: [], resultSnapshot: null, resultId: null, revision: 0, resultRevision: -1, pool: null, runId: null, runController: null, catalog: null, zipInfo: null, energyContext: null, energyEpoch: 0, weatherEpoch: 0, weatherController: null, parseWorker: null, weatherOnly: false, hour: 0,
@@ -684,9 +685,12 @@ function bindEvents() {
   on('timeline-month', 'change', renderCalendar); on('hour-slider', 'input', () => {state.hour = Number($('hour-slider').value); renderInspector();});
   on('hour-prev', 'click', () => {state.hour--; renderInspector();}); on('hour-next', 'click', () => {state.hour++; renderInspector();});
   on('export-scenario', 'click', () => {const errors = validateScenario(current()); if (errors.length) throw new Error(errors.join('\n')); downloadScenario(current());});
-  for (const type of ['json', 'csv', 'report']) on(`export-${type}`, 'click', () => downloadRun(state.results, state.resultSnapshot, type));
+  for (const type of ['json', 'csv']) on(`export-${type}`, 'click', () => downloadRun(state.results, state.resultSnapshot, type));
+  // The results document carries the multi-year and multi-site sections when those runs exist.
+  on('export-report', 'click', () => downloadRun(state.results, state.resultSnapshot, 'report', {aggregate: state.aggregate, sites: state.siteComparison}));
   on('export-design-basis', 'click', () => downloadRun(state.results, state.resultSnapshot, 'design-basis', {aggregate: state.aggregate, sites: state.siteComparison}));
   on('import-button', 'click', () => $('import-file').click()); on('import-file', 'change', importFile);
+  initTour();
 }
 async function initialize() {
   buildFields(); bindEvents();

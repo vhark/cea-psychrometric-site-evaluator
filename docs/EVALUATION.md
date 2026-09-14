@@ -1,6 +1,10 @@
 # CEA Psychrometric Site Evaluator: evaluation scheme
 
-Date: 2026-09-11. Status: evaluation plan and evidence-tier boundaries, not a claim that all higher-tier gates pass. The approved current iteration is coarse screening; executed checks and material control-cadence sensitivity are recorded in VERIFICATION.md. Benchmarked/site-calibrated gates remain the next iteration.
+Purpose: define the evidence ladder, the gate each tier must pass, and the checks that would move this tool up a rung.
+
+Status: evaluation plan. Written 2026-09-11, reviewed 2026-09-14. The tool currently sits at tier 2, the assumption-based equipment screen; tiers 3 and 4 are unmet. This document specifies gates, it does not record that they passed. The record of executed checks is [VERIFICATION.md](VERIFICATION.md).
+
+Read this if: you are judging how far a result can be pushed, or designing the next round of checks.
 
 ## 1. Evidence ladder
 
@@ -156,6 +160,8 @@ For partial-year or selected historical windows, show observed-period operating 
 ### Sensitivity and robustness
 
 Run low/base/high cases for crop moisture, envelope U/leakage, shade/transmission, pad effectiveness, equipment performance and tariffs. Report whether the preferred alternative changes. Scenario ranges are not statistical confidence intervals unless a probability model supports them. Several actual years plus hot/humid/cold event analysis are preferable to treating one TMY or year-to-date record as climate resilience proof.
+
+**Executed 2026-09-14 (roadmap M3).** This gate is now met by measurement rather than by prose: a Morris elementary-effects screening over twelve parameters and six strategies ranks the assumptions and produces a computed ranking-stability label on every comparison. The result is in [SENSITIVITY.md](SENSITIVITY.md). It remains a screening method, so the sentence above still holds: those ranges are not confidence intervals.
 
 ## 8. Release proof
 

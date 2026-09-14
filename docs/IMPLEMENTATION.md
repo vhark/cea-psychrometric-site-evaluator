@@ -1,5 +1,11 @@
 # CEA Psychrometric Site Evaluator Implementation Plan
 
+Purpose: hold the cross-module interface contract and the file-ownership map, so parallel work on `src/` composes instead of colliding.
+
+Status: current for model `0.2.0-screening`, reviewed 2026-09-14. The ordered work list at the end is complete for v0.1; the v0.2 scope it does not cover is specified in [PRD.md](PRD.md) §10.
+
+Read this if: you are changing a module signature, adding a worker message, or dividing work between several implementers.
+
 > For agentic workers: use subagent-driven-development. Concurrent file ownership is explicit below. Skip validation while sibling edits are in flight; Main integrates and runs scientific and browser checks once the implementation is assembled.
 
 **Goal:** Deliver a usable static CEA historical-climate comparison tool with portable facility scenarios, audited crop/light assumptions, national ZIP/utility data availability, energy pricing and grid-source context.
@@ -23,6 +29,7 @@ The user's latest scope distinction is binding: coarse component efficacy and in
 - UI implementer: `index.html`, `styles.css`, `src/app.js`, `src/charts.js`. No edits to calculation/data modules.
 - Energy implementer: `src/energy.js`, `scripts/build-energy.py`, `data/energy/*`, `data/us-zips.json`, `docs/ENERGY-DATA.md`. Own the reproducible national data ingestion and coverage report, not weather files.
 - Weather implementer: `src/weather.js`, `scripts/fetch-weather.py`, `data/weather/*` real snapshots with original payload/provenance, not synthetic demo weather.
+- Added in v0.2, same boundaries: `src/sensitivity.js` and `scripts/morris-screening.mjs` belong with the climate implementer (pure calculation, importable without a DOM); `test/conservation.test.mjs`, `test/analysis.test.mjs`, `test/data.test.mjs` and `test/sensitivity.test.mjs` sit beside the module they defend.
 
 ## Cross-module contract
 

@@ -1,6 +1,12 @@
 # Audit: 2026-09-12
 
-Four independent read-only reviews (model, data, interface, roadmap) plus a metric gap the client raised. Findings are cited to file:line at audit time; line numbers drift after fixes. Regression tests: 26 passing after fixes (22 before).
+Purpose: record what four independent reviews found, what was changed in response, and the honest status of every item that was not closed.
+
+Status: reviews executed 2026-09-12, item status updated 2026-09-14 for model `0.2.0-screening`. Items 1 to 5 are closed; items 6 (data vintages) and 7 (benchmark gap) remain open.
+
+Read this if: you are judging how much scrutiny this model has survived, or picking up an open item.
+
+Four independent read-only reviews (model, data, interface, roadmap) plus a metric gap the client raised. Findings are cited to file:line at audit time; line numbers drift after fixes. The regression suite was 22 tests before the audit and 26 after it; it stands at 56 today (see [VERIFICATION.md](VERIFICATION.md)).
 
 ## Fixed in this audit
 
@@ -42,7 +48,9 @@ Structural sensitivity (roadmap M3) is now quantified rather than asserted: see 
 
 ## Suggested improvements beyond defects
 
+Raised 2026-09-12. The last item was delivered in v0.2.
+
 - Show the pad-viability numbers in the headline strip when the scenario has a pad (currently one weather-only metric plus the new table).
 - Expose `runtime` in the comparison table as "pad h / DX h / dehu h" columns so strategies can be compared on utilization, not only cost.
 - Add a per-month runtime breakdown (the monthly structure already exists in `summary.monthly`).
-- Add two more NASA POWER years for Tulsa to the bundled examples so multi-year stability (roadmap M3) can be exercised without network access.
+- ~~Add two more NASA POWER years for Tulsa to the bundled examples so multi-year stability (roadmap M3) can be exercised without network access.~~ **Done in v0.2:** ten Tulsa years, 2016 to 2025, are bundled and discovered from `data/weather/index.json`.

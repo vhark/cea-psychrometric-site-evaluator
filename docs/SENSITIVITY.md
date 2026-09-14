@@ -1,8 +1,12 @@
 # Structural sensitivity: Morris screening
 
-Roadmap milestone **M3** ([DIGITAL-TWIN.md](DIGITAL-TWIN.md)). Model `0.2.0-screening`.
+Purpose: report which assumptions actually move the answer, and whether the strategy ranking survives them.
+
+Status: executed 2026-09-14 for model `0.2.0-screening`, roadmap milestone **M3** ([DIGITAL-TWIN.md](DIGITAL-TWIN.md)) complete.
 Measured run: [morris-screening.json](morris-screening.json), Tulsa 2023 to 2025, 120 sampled days per year,
 8 trajectories over 12 parameters (104 design points), six example strategies, 1,872 full simulations, 290 s.
+
+Read this if: you are deciding what to measure first at a real site, or judging how much weight a cost ranking can carry.
 
 ## What this is, and what it is not
 

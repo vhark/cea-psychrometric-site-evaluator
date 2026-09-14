@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="og-title">
+  <title id="og-title">CEA Psychrometric Site Evaluator, a Grownetics tool</title>
+  <rect width="1200" height="630" fill="#1C1C1A"/>
+  <g opacity="0.06" fill="none" stroke="#F5F5F0">
+    <circle cx="1090" cy="-40" r="380" stroke-width="1.5"/>
+    <circle cx="1090" cy="-40" r="280" stroke-width="1"/>
+  </g>
+  <rect x="1078" y="212" width="8" height="8" fill="#4DB405" opacity="0.5"/>
+
+  <g font-family="'IBM Plex Mono', 'Courier New', monospace" font-size="17" letter-spacing="3.4" fill="#F5F5F0" fill-opacity="0.55">
+    <rect x="80" y="78" width="9" height="9" fill="#4DB405" fill-opacity="1"/>
+    <text x="102" y="88">GROWNETICS  /  OPEN SOURCE  /  MIT</text>
+  </g>
+
+  <g font-family="'DM Sans', system-ui, sans-serif" font-weight="700" fill="#F5F5F0">
+    <text x="80" y="240" font-size="84" letter-spacing="-2.6">CEA Psychrometric</text>
+    <text x="80" y="330" font-size="84" letter-spacing="-2.6">Site Evaluator<tspan fill="#4DB405">.</tspan></text>
+  </g>
+
+  <g font-family="'Inter', system-ui, sans-serif" font-size="26" fill="#F5F5F0" fill-opacity="0.72">
+    <text x="80" y="398">What the climate gives free. What binds. What closing the gap costs.</text>
+  </g>
+  <g font-family="'Inter', system-ui, sans-serif" font-size="21" fill="#F5F5F0" fill-opacity="0.55">
+    <text x="80" y="436">An assumption-based screen over hourly historical weather, not a calibrated twin.</text>
+  </g>
+
+  <line x1="80" y1="492" x2="1120" y2="492" stroke="#F5F5F0" stroke-opacity="0.2"/>
+  <g font-family="'IBM Plex Mono', 'Courier New', monospace">
+    <g font-size="40" fill="#F5F5F0">
+      <text x="80" y="562">10</text>
+      <text x="340" y="562">6</text>
+      <text x="600" y="562">1,872</text>
+      <text x="880" y="562">56</text>
+    </g>
+    <g font-size="15" letter-spacing="1.8" fill="#F5F5F0" fill-opacity="0.55">
+      <text x="80" y="590">WEATHER YEARS</text>
+      <text x="340" y="590">STRATEGY CLASSES</text>
+      <text x="600" y="590">SENSITIVITY RUNS</text>
+      <text x="880" y="590">TESTS PASSING</text>
+    </g>
+  </g>
+</svg>

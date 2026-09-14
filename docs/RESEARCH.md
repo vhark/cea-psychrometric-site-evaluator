@@ -1,6 +1,10 @@
 # Existing tools, literature & public data
 
-Research date: 2026-09-11. Purpose: decide what to reuse before building CEA Psychrometric Site Evaluator. This is a targeted landscape review, not an exhaustive systematic review. Source documentation and selected source code were inspected; existing simulators were not installed or benchmarked during this research.
+Purpose: record the landscape review, the literature anchors and the public data sources that decided what to reuse and what to build.
+
+Status: research executed 2026-09-11, reviewed 2026-09-14. A targeted landscape review, not an exhaustive systematic review. Source documentation and selected source code were inspected; existing simulators were not installed or benchmarked during this research.
+
+Read this if: you are asking why this tool exists rather than an existing one, or you need the original URL and licence for a source.
 
 ## Executive finding
 

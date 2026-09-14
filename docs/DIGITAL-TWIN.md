@@ -1,5 +1,11 @@
 # Next iteration: a calibrated greenhouse digital twin
 
+Purpose: define the ordered route from the current assumption-based screen to a calibrated twin, and state exactly which claim each milestone earns.
+
+Status: roadmap, reviewed 2026-09-14. M0, M1 and M2 shipped in v0.2; M3 is done (see [SENSITIVITY.md](SENSITIVITY.md)); M4, M5 and M6 are open. Nothing here is evidence that a later milestone has been reached.
+
+Read this if: you are planning the next iteration, or you want to know what would have to be true before this tool could be called a digital twin.
+
 The user explicitly separates this from the current coarse component screen. The current browser tool makes conditional comparisons under declared assumptions. It does not become a digital twin by adding more decimal places or equipment brands.
 
 ## Ordered milestones (2026-09-12 audit)

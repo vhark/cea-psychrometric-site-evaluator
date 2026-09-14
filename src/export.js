@@ -1,6 +1,7 @@
 import {validateScenario,MODEL_VERSION} from './config.js';
 import {designHours,loadDecomposition,co2Window,aggregateYears,strategyFrontier,bindingConstraint} from './metrics.js';
-const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+import {escapeHTML,reportHTML,shell,NOTICE,provenanceSection,localStamp} from './report.js';
+export {reportHTML};
 function csvValue(value){let text=String(value??'');if(typeof value==='string'&&/^[=+@\-\t\r]/.test(text))text=`'${text}`;return `"${text.replaceAll('"','""')}"`;}
 function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
 export function downloadScenario(scenario){download('cea-psychrometric-site-evaluator-scenario.json',JSON.stringify({schemaVersion:1,scenarios:[scenario]},null,2),'application/json');}
@@ -13,41 +14,7 @@ export function parseImport(input){
  const ids=new Set();for(const s of scenarios){if(typeof s.id!=='string'||ids.has(s.id))s.id=crypto.randomUUID();ids.add(s.id);}
  return {scenarios,snapshot:data.snapshot||null};
 }
-function runtimeRows(r){
- const f=(v,d=0)=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('en-US',{maximumFractionDigits:d}):'Not available';
- const s=r.summary||{},rt=s.runtime||{},pv=r.weatherSummary?.padViability,use=k=>rt[k]?`${f(rt[k].hours)} h on ${f(rt[k].days)} days (${f(rt[k].equivalentHours,1)} equivalent full-load h)`:'Not available';
- const rows=[];
- if(r.scenario.padEnabled)rows.push(['Evaporative pad runtime',`${use('pad')}; ${f(s.padWaterL)} L water`]);
- if(pv)rows.push(['Pad viability, weather only',`${f(pv.effectiveHours)} h effective on ${f(pv.effectiveDays?.atLeast1)} days (${f(pv.effectiveDays?.atLeast4)} days with 4 h or more); ${f(pv.marginalHours)} h marginal; ${f(pv.ineffectiveHours)} h too warm or humid for pad alone on ${f(pv.ineffectiveDays?.atLeast1)} days`]);
- if(rt.indirect?.hours)rows.push(['Indirect evaporative runtime',use('indirect')]);
- if(rt.dx?.hours)rows.push(['DX cooling runtime',use('dx')]);
- if(rt.dehu?.hours)rows.push(['Condensing dehumidifier runtime',use('dehu')]);
- if(rt.desiccant?.hours)rows.push(['Desiccant runtime',use('desiccant')]);
- if(rt.heating?.hours)rows.push(['Heating runtime',use('heating')]);
- if(rt.light?.hours)rows.push(['Supplemental light runtime',use('light')]);
- if(s.reheatKWh>0)rows.push(['Reheat after overcooling for latent control',`${f(s.reheatKWh)} kWh; a decoupled latent strategy avoids this penalty`]);
- const d=r.weatherSummary?.outdoorDrying;
- if(d){const b=k=>`${f(d[k].hours)} h on ${f(d[k].days.atLeast1)} days, ${f(d[k].meanPotentialKgH,1)} kg/h mean at ${f(d.maxVentACH,1)} ACH${Number.isFinite(d[k].kWhPerKg)?`, ${f(d[k].kWhPerKg,2)} kWh/kg`:''}`;
-  rows.push(['Outside air as dehumidifier',`Cool-dry ${b('coolDry')}; cold-dry (heating penalty) ${b('coldDry')}; hot-dry ${b('hotDry')}. Cheaper per kg than the condensing dehumidifier${Number.isFinite(d.dehuKWhPerKg)?` (${f(d.dehuKWhPerKg,2)} kWh/kg)`:''} on cost in ${f(d.cheaperThanDehuHours)} h and on energy in ${f(d.lowerEnergyThanDehuHours)} h.`]);}
- return rows;
-}
-const STYLE=`:root{color-scheme:light}body{background:#F3F0ED;color:#2B2C2E;font:15px/1.6 'Inter',system-ui,sans-serif;max-width:1000px;margin:auto;padding:40px 32px}.mark{font:700 13px 'DM Sans',sans-serif;letter-spacing:.28em;text-transform:uppercase;margin-bottom:40px}.mark em{font-style:normal;color:#4DB405}.cat{display:block;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#9A8860;margin-bottom:8px}h1,h2{font-family:'DM Sans',sans-serif;font-weight:700;letter-spacing:-.025em;margin:0}h1{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:14px}h2{font-size:1.5rem;margin-bottom:20px}h3{font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:#9A8860;margin:28px 0 8px}p{max-width:68ch;margin:0 0 14px}section{margin:56px 0;padding-top:28px;border-top:1px solid rgba(43,44,46,.15)}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid rgba(43,44,46,.15);vertical-align:top}th{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7);width:34%}td,pre{font-family:'IBM Plex Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}ul{padding-left:18px;font-size:13px;max-width:68ch}summary{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(43,44,46,.7);cursor:pointer;padding:10px 0}.notice{border:1px solid rgba(43,44,46,.3);padding:16px 18px;font-size:13px;max-width:none}.meta{font:11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(43,44,46,.7)}.foot{font:10px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(43,44,46,.55);margin-top:48px}@media print{body{padding:0}details{display:block}section{break-inside:avoid}}`;
-const shell=(title,cat,body,extraStyle='')=>`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CEA Psychrometric Site Evaluator | ${escapeHTML(title)} | Grownetics</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;600&display=swap" rel="stylesheet"><style>${STYLE}${extraStyle}</style><div class="mark">Grownetics<em>.</em></div><span class="cat">${escapeHTML(cat)}</span><h1>CEA Psychrometric Site Evaluator</h1>${body}<p class="foot">Grownetics · CEA Psychrometric Site Evaluator · Model ${escapeHTML(MODEL_VERSION)} · Generated ${escapeHTML(new Date().toISOString())}</p></html>`;
-const NOTICE='Assumption-based screening, not a calibrated greenhouse digital twin, guaranteed indoor condition, equipment selection certificate or crop-yield forecast. Hourly source weather does not establish minute-scale or canopy-level precision. Installed costs and component efficiencies are editable assumptions unless separately sourced. Regional grid mix is not utility procurement or marginal emissions.';
-const provenanceSection=(label,snapshot)=>`<section><h2><span class="cat">§ ${escapeHTML(label)}</span>Weather provenance</h2><pre>${escapeHTML(JSON.stringify({...snapshot,hours:undefined,raw:undefined},null,2))}</pre><p>Export JSON alongside this document to retain raw weather, hourly results and all configuration values. This document alone is not the complete reproducibility bundle.</p></section>`;
-export function reportHTML(results,snapshot){
- const f=(value,digits=1)=>typeof value==='number'&&Number.isFinite(value)?value.toLocaleString('en-US',{maximumFractionDigits:digits}):'Not available';
- const body=results.map((r,i)=>{const s=r.summary||{};return `<section><h2><span class="cat">§ ${String(i+1).padStart(3,'0')}</span>${escapeHTML(r.scenario.name)}</h2><table><tbody>${[
- ['Facility / crop',`${r.scenario.facility} / ${r.scenario.crop}`],['Expected / valid hours',`${f(s.expectedHours,0)} / ${f(s.validHours,0)}`],['Joint climate-band attainment',`${f(s.compliancePct)}%`],['Equivalent compliant hours',f(s.compliantHours)],['Longest failure episode',`${f(s.longestFailureHours)} h`],...runtimeRows(r),['Purchased electricity',`${f(s.electricKWh)} kWh`],['Purchased heating/regeneration fuel',`${f(s.fuelKWh)} kWh`],['Period operating cost',`$${f(s.cost,2)}`],['Installed capital assumption',`$${f(r.scenario.installedCost,0)}`],['Electricity price basis',s.costBasis || r.energyContext?.appliedPriceMode || r.scenario.priceMode],['Missing data',`${f(s.missingHours,0)} hours`]
- ].map(([k,v])=>`<tr><th>${escapeHTML(k)}</th><td>${escapeHTML(v)}</td></tr>`).join('')}</tbody></table><h3>Warnings & assumptions</h3><ul>${(r.warnings||[]).map(w=>`<li>${escapeHTML(w)}</li>`).join('')}</ul><details open><summary>Full reproducible scenario</summary><pre>${escapeHTML(JSON.stringify(r.scenario,null,2))}</pre></details>${r.energyContext?`<details open><summary>Energy-source provenance</summary><pre>${escapeHTML(JSON.stringify(r.energyContext,null,2))}</pre></details>`:''}</section>`;}).join('');
- return shell('analysis report','Component efficacy & energy screening report',`<p class="notice">${escapeHTML(NOTICE)}</p><p class="meta">${escapeHTML(snapshot.startDate)} to ${escapeHTML(snapshot.endDate)} · ${escapeHTML(snapshot.timezone)} · ${escapeHTML(snapshot.source)} (${escapeHTML(snapshot.sourceKind)})</p>${body}${provenanceSection(String(results.length+1).padStart(3,'0'),snapshot)}`);
-}
 const BRIEF_STYLE=`.brief table{font-size:12px}.brief th,.brief td{padding:5px 6px}.brief th{width:auto}.brief td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7);white-space:nowrap}.brief section{margin:24px 0;padding-top:16px}.brief h2{font-size:1.15rem;margin-bottom:10px}.brief p{font-size:13px}.verdict{border:1px solid rgba(43,44,46,.3);padding:12px 16px;font-size:13px;max-width:none}.appendix{break-before:page}@media print{.brief section{margin:14px 0;padding-top:10px}.brief table{font-size:10px}.brief p{font-size:11px}}`;
-function localStamp(time,timezone){
- if(!Number.isFinite(time))return 'Not available';
- try{const p=new Intl.DateTimeFormat('en-CA',{timeZone:timezone||'UTC',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(time),g=k=>p.find(x=>x.type===k)?.value;return `${g('year')}-${g('month')}-${g('day')} ${g('hour')}:${g('minute')}`;}
- catch{return new Date(time).toISOString();}
-}
 // Design-basis brief: one printed page for the engineer of record, then an appendix with the reproducible assumptions.
 export function designBasisHTML(results,snapshot,{aggregate=null,sites=null}={}){
  const f=(value,digits=1)=>typeof value==='number'&&Number.isFinite(value)?value.toLocaleString('en-US',{maximumFractionDigits:digits}):'Not available';
@@ -100,7 +67,7 @@ export function designBasisHTML(results,snapshot,{aggregate=null,sites=null}={})
 }
 export function downloadRun(results,snapshot,format='json',extras={}){
  if(!Array.isArray(results)||!results.length)throw new Error('Run an analysis before exporting results.');
- if(format==='report'){download('cea-psychrometric-site-evaluator-report.html',reportHTML(results,snapshot),'text/html');return;}
+ if(format==='report'){download('cea-psychrometric-site-evaluator-report.html',reportHTML(results,snapshot,extras||{}),'text/html');return;}
  if(format==='design-basis'){download('cea-psychrometric-site-evaluator-design-basis.html',designBasisHTML(results,snapshot,extras||{}),'text/html');return;}
  if(format==='csv'){
  const keys=['time','valid','weatherMode','mode','reason','tempC','rh','vpd','compliantFraction','electricKWh','fuelKWh','waterL','condensateKg','lightKWh','solarDLI','lightDLI','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','regenerationKWh','cost','co2Kg','unmetSensibleKWh','unmetMoistureKg','energyResidualW','moistureResidualKgS'];

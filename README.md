@@ -1,107 +1,184 @@
 # CEA Psychrometric Site Evaluator
 
-A Grownetics tool. Free, open-source CEA historical-climate and component-investment screening. Compare greenhouse, hybrid and indoor configurations, greenhouse benches, walls and racks, and finite-capacity ventilation/pads, heating, DX, dehumidification, integrated reheat and generic desiccant/hybrid strategies.
+Screen a controlled-environment agriculture site against real historical weather: how many hours the climate gives you for free, what constraint binds, and which class of equipment closes the gap at what running cost.
 
-First client: One Season Farmers (Tulsa, OK). The bundled Tulsa 2025 example, ZIP 74103 default and the crop presets marked "Client assumption (OSF …)" are that engagement's inputs; the model, data catalogs and interface are client-independent.
+[![tests](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml/badge.svg)](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml)
+[![regression suite](https://img.shields.io/badge/regression%20suite-56%20tests-4DB405)](#testing)
+[![model](https://img.shields.io/badge/model-0.2.0--screening-4DB405)](docs/VERIFICATION.md)
+[![runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-none-4DB405)](#quick-start)
+[![licence](https://img.shields.io/badge/licence-MIT-4DB405)](LICENSE)
+[![demo](https://img.shields.io/badge/demo-GitHub%20Pages-4DB405)](https://vhark.github.io/cea-psychrometric-site-evaluator/)
 
-**This is a coarse planning screen, not a calibrated greenhouse digital twin, equipment-sizing certificate, manufacturer comparison or guarantee of indoor conditions.** The next iteration is specified in [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md).
+![The site evaluator running the bundled Tulsa 2025 example](docs/screenshots/app-overview.png)
 
-**v0.2 (model `0.2.0-screening`)** turns the single-year demonstration into a site evaluator: ten bundled Tulsa weather years with median/worst/spread/trend per strategy and a ranking-stability verdict, multi-site comparison by ZIP, sensible-versus-latent load decomposition with space SHR, a CO2 enrichment window, cost-of-precision sweeps, and a printable design-basis brief for the engineer of record. The default controller is now a staged deadband model that converges with dispatch cadence (0.38 pp attainment and 0.31% electricity between 1 and 0.5 minute steps, replacing the previous 4.1 pp / 23.5% caveat); the old per-minute optimizer remains selectable as a labeled upper bound. Crop moisture defaults to Stanghellini transpiration driven by LAI, absorbed radiation and zone VPD, with the fixed L/m²/day schedule kept as a fallback.
+A Grownetics tool. Static HTML and JavaScript, no build step, no backend, no account. Everything computes in your browser.
 
+> **Evidence tier: assumption-based screening.** This is a coarse planning screen. It is not a calibrated greenhouse digital twin, not equipment sizing, not a manufacturer comparison, and not a guarantee of indoor conditions. See [Evidence tiers](#evidence-tiers) and [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md).
 
-## Run locally
+## What it answers
 
-Requirements: Python 3 for static serving; a current browser with ES modules, Web Workers and IndexedDB. Node 20+ is needed only for tests and the reference-study scripts. No npm package installation or backend is required.
+Three questions about a specific site, crop band and equipment class, before capital is committed:
+
+1. **What does the climate give for free?** Hours the outside air alone can cool, dry or humidify the zone, with the pad-effective and free-cooling windows counted separately.
+2. **What is the binding constraint?** Temperature margin or moisture ceiling, hour by hour and month by month, with the sensible and latent split behind it.
+3. **What closes the gap, and at what running cost?** Six equipment strategies compared on joint-band attainment, energy, water and operating cost over ten weather years, with a computed ranking-stability verdict.
+
+## Live demo
+
+| Surface | URL |
+|---|---|
+| Explainer site | https://vhark.github.io/cea-psychrometric-site-evaluator/ |
+| The tool itself | https://vhark.github.io/cea-psychrometric-site-evaluator/app/ |
+
+The hosted tool is the same static folder as this repository. Nothing you enter leaves your browser except the public weather requests you trigger yourself (see [SECURITY.md](SECURITY.md)).
+
+## Quick start
+
+Requirements: Python 3 (any static server works) and a current browser with ES modules, Web Workers and IndexedDB. Node 20 or newer is needed only for tests and the reproduction scripts. No package installation.
 
 ```sh
+git clone https://github.com/vhark/cea-psychrometric-site-evaluator.git
+cd cea-psychrometric-site-evaluator
 python3 -m http.server 8150 --bind 127.0.0.1
 ```
 
-Open **http://127.0.0.1:8150/**. Do not open index.html through `file://`: module fetches and workers require HTTP. The interface follows the Grownetics brand system (brand.grownetics.com): Carbon canvas, Brand Green accent, DM Sans / Inter / IBM Plex Mono. Exported reports use the brand's Archive (parchment) register.
+Then open **http://127.0.0.1:8150/** and:
 
-To self-host, copy this folder to a static host that serves JavaScript/JSON with correct MIME types. Preserve relative paths and serve over HTTPS (or localhost). External Google Fonts are optional presentation assets; system fallbacks remain usable. No shared API key is embedded. Raw datasets and reports can be omitted from a lightweight deployment only if the runtime `data/us-zips.json`, `data/energy/*.json`, `data/weather/tulsa-2025.json`, `src/`, `vendor/`, styles and index are retained; preserve source/license attribution.
+1. Click **Load Tulsa 2025 example** to get a genuine 8,760-hour NASA POWER year without a network call.
+2. Import [docs/example-scenarios.json](docs/example-scenarios.json) for the six-strategy comparison.
+3. Press **Run all scenarios**, then read attainment, misses, loads, runtime and cost.
 
-## Workflow
+Do not open `index.html` through `file://`: module fetches and workers require HTTP.
 
-1. For a new site, enter a five-character ZIP, verify the centroid and IANA time zone, and review utility candidates. ZIPs do not identify exact street service. The bundled example selects Tulsa explicitly.
-2. Choose dates and retrieve NASA POWER weather, select station observations plus independent solar, or import a saved snapshot/CSV. Alternatively load the genuine Tulsa 2025 example.
-3. Choose facility, cultivation system and crop. Edit floor/canopy geometry, envelope, moisture, light/DLI, target bands, capacities, efficiencies and costs. Defaults are labeled assumptions. Inputs remain SI, with live °F/ft/ft² equivalents on corresponding fields.
-4. Add strategies or sensitivity scenarios. Comparisons share the selected site and electricity customer sector; price mode can be manual or historical per scenario.
-5. Run. Inspect joint-band attainment, misses, weather-side modes, equipment runtime (hours and days each component ran, plus pad viability from the weather screen), energy/water, daily light, hourly controls and common-eligible-hour comparisons. The first hour of every continuous weather segment is warm-up, excluded from comparative compliance.
-6. Save local scenarios and export portable scenario/run JSON, hourly CSV and the light-themed report. A report alone does not contain the full reproducibility bundle: keep the run JSON as well. Imported run outputs are recomputed rather than trusted.
+Full workflow, including ZIP selection, live weather retrieval, CSV import and exports, is in [docs/WORKFLOW.md](docs/WORKFLOW.md).
 
-Edits mark old results stale. Cancel terminates the worker. Retrieval failures do not generate substitute weather. A partially observed period remains partial; no multiplication of summer cost into a claimed annual result.
-For a reproducible six-strategy example, load Tulsa 2025, import [docs/example-scenarios.json](docs/example-scenarios.json), then run all scenarios. The [actual exported example report](docs/example-comparison.html) preserves the assumptions and caveats. Large comparisons produce large JSON files; imports are limited to 512 MB and may require splitting scenarios or periods.
+## What is modeled, and what is not
 
+| Modeled | Not modeled |
+|---|---|
+| Coupled single-zone sensible and moisture balance with finite equipment capacity, analytic linear exchange and physical equilibrium condensation | Spatial gradients, multi-zone or 3-D air movement, canopy-to-air temperature difference |
+| Staged deadband controller on a one-minute dispatch step (ideal per-substep optimizer retained as a labeled upper bound) | Real control hardware behaviour, commissioning, sensor placement, failure resilience |
+| Stanghellini transpiration from leaf area, absorbed radiation and zone VPD (fixed L/m²/day schedule kept as a fallback) | Crop physiology, growth stages, yield, CO2 feedback on stomata |
+| Condensing dehumidification returning latent plus compressor heat; DX with coupled sensible and latent capacity; integrated reheat with recovered and rejected heat | Manufacturer performance maps, part-load curves, cycling, defrost, minimum run times for specific products |
+| Generic desiccant with finite removal, regeneration energy, purchased electric and fuel split, explicit sorption heat; hybrid indirect evaporation with a separate wet secondary stream | Any named product (no Blue Frontier or AGronomic IQ map is claimed), desiccant storage scheduling, water quality and bleed |
+| Evaporative pad as an approximately isoenthalpic process at a stated saturation effectiveness | Face-velocity-dependent effectiveness, fouling, uneven wetting |
+| Historical solar driving optical DLI separately from thermal gain, footprint photons shared over stacked canopy, causal supplemental lighting | Detailed glazing optics, movable screens, incidence-angle models, real natural-vent pressure flow |
+| Historical state and sector average electricity prices applied to the resulting dispatch | Utility tariffs, demand charges, riders, time-of-use optimization, hourly marginal emissions |
 
-## What is modeled
+Constant-property and ideal-modulation assumptions are exported with every result, so a reader can see which of the above applied to a given number.
 
-- Coupled single-zone sensible/moisture balance with finite equipment and one-minute internal control steps, analytic linear exchange and physical equilibrium condensation. Hourly weather is not transformed into measured minute-level weather.
-- Crop evaporation removes sensible energy; all lighting input is counted once. Condensing dehumidifiers return latent plus compressor heat. DX sensible/latent capacity and integrated recovered/rejected heat remain coupled.
-- Generic desiccants have finite removal, regeneration energy, purchased electric/fuel split and explicit sorption heat. Hybrid indirect evaporation has a separate secondary wet stream. No Blue Frontier or AGronomic IQ performance map is claimed.
-- Historical solar drives optical DLI separately from thermal solar gain. Available footprint photons are shared over stacked canopy, not multiplied by tier area. Supplemental light uses current solar and accumulated photons, not hindsight.
-- The controller prioritizes sampled joint temperature/VPD/dew-point-band violations, then estimated instantaneous operating cost under manual price assumptions. It is not a global economic optimizer. Regional historical prices recost the resulting dispatch; they do not optimize time-of-use operation.
+## Evidence tiers
 
-Unmodeled detail includes spatial canopy gradients, crop physiology/stages, real natural-vent pressure flow, detailed glazing/screens, equipment cycling/defrost/manufacturer curves, desiccant storage scheduling, water-quality/bleed and failure-resilience engineering. Constant-property and ideal-modulation assumptions are exported with each result.
+| Tier | What it takes | Status here |
+|---|---|---|
+| 1. Weather feasibility | Traceable outside state, vetted psychrometrics, target bands | Met |
+| 2. Assumption-based equipment screen | Coupled model, conservation and numerical checks, declared assumptions | **Current tier** |
+| 3. Benchmarked simulation | Matched run against an independent model and published measured data | Not met (roadmap M5) |
+| 4. Site-calibrated analysis | Held-out facility sensor, energy and condensate data, documented calibration | Not met (roadmap M6) |
 
-## Public data and coverage
+The full ladder, with the output each tier permits and the implication each tier prohibits, is in [docs/EVALUATION.md](docs/EVALUATION.md).
 
-- **NASA POWER:** genuine 8,760-hour Tulsa 2025 snapshot, UTC source timestamps, source-native meteorology/solar provenance and original payloads. RE hourly solar Wh/m² becomes interval-mean W/m² over one hour. Canonical RH is authoritative; auxiliary dew/frost-point inconsistencies are flagged rather than overwriting RH.
-- **IEM:** routine station observations nearest UTC hour within 30 minutes, original timestamps retained. Estimated station pressure is flagged. Missing observations never receive NASA meteorology; solar is independently sourced and can be unavailable.
-- **ZIPs:** 42,185 source records, 39,146 with dated candidate utilities, 27,037 with multiple candidates and 3,039 without mapped candidates. Includes 479 mapping-only records without invented coordinates. Not a certified current USPS inventory.
-- **Electricity:** 30,729 state/sector monthly observations, generally 2010 through June 2026, with Puerto Rico starting later. Proxies are not utility tariffs. Utility associations are dated 2021. Full tariff schedules, demand charges, riders and time-of-use optimization are not implemented.
-- **Grid:** annual eGRID2023 generation mix and total-output CO₂, preserving multiple ZIP subregions. Ambiguous subregions use explicitly labeled state-generation context. Other years have no emissions estimate, not a silently reused 2023 factor. Regional generation is not utility procurement or marginal emissions.
+## Key results from the bundled example
 
-See [docs/ENERGY-DATA.md](docs/ENERGY-DATA.md), data manifests and [docs/RESEARCH.md](docs/RESEARCH.md) for original URLs, attribution and coverage. Historical price gaps produce an unknown total cost plus a labeled known subtotal; they never revert to today's price. Fuel/water use explicit scenario assumptions.
+Everything below is measured output from this repository, not illustration. Sources are linked per row.
 
-## Reproduce datasets and the supplied Tulsa study
+| Result | Value | Source |
+|---|---|---|
+| Controller cadence convergence, Tulsa 2025 full year, 1 min vs 0.5 min | 0.004 / 0.383 / 0.091 pp attainment; 0.31% electricity at most | [VERIFICATION.md](docs/VERIFICATION.md) |
+| Ideal optimizer on the same test | Does not converge: 1.5 pp attainment, 1.95% electricity | [VERIFICATION.md](docs/VERIFICATION.md) |
+| Bundled Tulsa weather years | Ten years, 2016 to 2025, complete coverage (8,760 or 8,784 h each) | [VERIFICATION.md](docs/VERIFICATION.md) |
+| Baseline attainment across five years, six strategies | Median 28.9%, worst year 2025 at 27.1%, spread 2.7 pts | [VERIFICATION.md](docs/VERIFICATION.md) |
+| Cost ranking stability across those years | **Not stable**: 2 distinct orders over 5 years | [VERIFICATION.md](docs/VERIFICATION.md) |
+| Tulsa vs Phoenix, pad-effective hours | 244 vs 2,334 h | [VERIFICATION.md](docs/VERIFICATION.md) |
+| Tulsa vs Phoenix, free-cooling hours | 401 vs 2,636 h | [VERIFICATION.md](docs/VERIFICATION.md) |
+| Tulsa pad runtime vs weather-side pad viability | Pad ran 2,772 h on 296 days; the weather screen clears both limits in only 244 h on 65 days | [AUDIT.md](docs/AUDIT.md) |
+| Binding limit at Tulsa | Moisture ceiling binds 3,851 h, temperature margin 2,952 h | [AUDIT.md](docs/AUDIT.md) |
+| Outside air vs a 2.5 L/kWh dehumidifier | Outside air wins on cost per kg in 4,970 h and on energy per kg in 1,752 h | [AUDIT.md](docs/AUDIT.md) |
+| Most influential assumption (Morris mu\*) | Leaf area and transpiration: 9.10 pp attainment, ahead of envelope U (5.89) and shade fraction (3.43) | [SENSITIVITY.md](docs/SENSITIVITY.md) |
+| Strategy ranking under the screened ranges | Unstable: 3 orders, most common 61.5%. The three cheapest positions are identical in 104 of 104 points | [SENSITIVITY.md](docs/SENSITIVITY.md) |
+| Conservation identities | Close between 1e-16 and 5e-13 relative | [AUDIT.md](docs/AUDIT.md) |
+
+Not claimed: no independent model benchmark, no site calibration, no equipment performance maps.
+
+## Documentation
+
+| Document | Purpose |
+|---|---|
+| [docs/README.md](docs/README.md) | Index of every document with reading order |
+| [docs/GLOSSARY.md](docs/GLOSSARY.md) | Every domain term the interface uses, with unit and how it is computed here |
+| [docs/WORKFLOW.md](docs/WORKFLOW.md) | Step-by-step use of the tool, import formats, exports and their limits |
+| [docs/PRD.md](docs/PRD.md) | Product requirements and approved scope, including the v0.2 site-evaluator contract (§10) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Deployment decision, module boundaries, data contracts, controller design |
+| [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md) | Cross-module interface contract and file ownership |
+| [docs/EVALUATION.md](docs/EVALUATION.md) | Evidence ladder, acceptance gates and the checks each tier requires |
+| [docs/VERIFICATION.md](docs/VERIFICATION.md) | Checks actually executed, with measured values and dates |
+| [docs/AUDIT.md](docs/AUDIT.md) | Independent review findings, fixes, and the status of every open item |
+| [docs/SENSITIVITY.md](docs/SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives |
+| [docs/ENERGY-DATA.md](docs/ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage, vintages and limits |
+| [docs/RESEARCH.md](docs/RESEARCH.md) | Landscape review and source register behind the build decision |
+| [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md) | Roadmap M1 to M6 to a calibrated twin, with the claim each milestone earns |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to run, the no-dependency rule, evidence discipline, test philosophy |
+| [SECURITY.md](SECURITY.md) | What leaves the browser, and how to report an issue |
+| [CHANGELOG.md](CHANGELOG.md) | Release history |
+
+## Data sources and vintages
+
+| Dataset | Vintage | What it is, and is not |
+|---|---|---|
+| NASA POWER hourly meteorology and solar | Ten Tulsa years, 2016 to 2025. The 2025 snapshot was retrieved 2026-09-11, the other nine 2026-09-13 | A gridded reconstruction with UTC source timestamps and original payloads retained. RE hourly solar Wh/m² becomes interval-mean W/m² over one hour. Canonical RH is authoritative; inconsistent auxiliary dew and frost points are flagged, never used to overwrite RH. Not station truth. |
+| Iowa Environmental Mesonet station observations | Archived study period 2026-01-01 to 2026-09-11 | Routine observations nearest the UTC hour within 30 minutes, original timestamps kept, estimated station pressure flagged. Missing observations never receive NASA meteorology. Solar is independently sourced and can be unavailable. |
+| GeoNames ZIP inventory | Retrieved 2026-09-11 | 42,185 records, 39,146 with dated candidate utilities, 27,037 with several candidates, 3,039 with none mapped, 479 mapping-only records without invented coordinates. Not a certified current USPS inventory, and a ZIP does not identify street service. |
+| OpenEI utility to ZIP mapping | Mapping year 2021 | Candidate providers only. Not a service-territory determination. |
+| EIA state and sector electricity prices | 30,729 monthly observations, generally 2010 through June 2026 (Puerto Rico starts later) | Average price proxies. Not utility tariffs, and no demand charges, riders or time-of-use structure. |
+| EPA eGRID generation mix and CO2 | 2023 | Annual subregion generation mix and total-output CO2, preserving multiple ZIP subregions. Other years receive no emissions estimate rather than a silently reused 2023 factor. Regional generation is not utility procurement and not marginal emissions. |
+| PsychroLib | 2.5.0, pinned commit | Vendored MIT psychrometric library. |
+
+Original URLs, licences, SHA-256 manifests and coverage counts are in [docs/ENERGY-DATA.md](docs/ENERGY-DATA.md), [docs/RESEARCH.md](docs/RESEARCH.md) and [NOTICE](NOTICE). Where a historical price is missing, the tool reports an unknown total plus a labeled known subtotal; it never falls back to today's price.
+
+## Reproducing the datasets and the screening
 
 ```sh
-python3 scripts/fetch-weather.py
-python3 scripts/build-energy.py
-node scripts/fetch-observed.mjs
-node scripts/reference-study.mjs
+python3 scripts/fetch-weather.py        # NASA POWER snapshots with original payloads
+python3 scripts/build-energy.py         # ZIP, utility, price and grid catalogs
+node scripts/fetch-observed.mjs         # IEM station observations plus independent solar
+node scripts/reference-study.mjs        # the observed weather-only Tulsa study
+node scripts/morris-screening.mjs       # Morris elementary-effects screening
 ```
 
-The Python energy ingestion uses openpyxl for the source workbooks; install with `python3 -m pip install openpyxl` in a virtual environment if unavailable. Downloaded source files and SHA-256 manifests are retained. Source updates can legitimately change data and cutoff dates.
+`build-energy.py` uses openpyxl for the source workbooks: `python3 -m pip install openpyxl` in a virtual environment if it is unavailable. Downloaded source files and SHA-256 manifests are retained, and `--refresh` re-downloads and verifies against them. Source updates can legitimately change data and cutoff dates.
 
-The observed study in [reference-study/](reference-study/) preserves the supplied brief separately from the coupled greenhouse screen: raw and derived hourly CSV, mode/month/day-night summaries, calendar exposures, episodes, percentiles, 16 sensitivity cases, NOAA daily-extrema cross-check, manifest, Markdown report and HTML charts. Its archived 2026 period contains 6,087 hourly slots, 6,064 observed valid hours and 23 missing, ending at 2026-09-11 21:00 UTC exclusive. Independently returned solar stops earlier and is not needed for weather-only classification. No complete-year claim is made.
-
-## Weather CSV import
-
-```csv
-time,tempC,rh,pressurePa,ghiWm2
-2025-01-01T00:00:00Z,20,0.6,101325,0
-2025-01-01T01:00:00Z,19,0.65,101325,0
-```
-
-These two lines illustrate the schema, not bundled weather observations. Values use °C, RH fraction, Pa and W/m². Optional columns: dewPointC and windMs (m/s). Supply RH or dew point, explicit UTC ISO timestamps ending `Z`, and exact documented headers. Blank values remain missing. JSON includes schemaVersion, explicit units, source/time-zone metadata and hourly data; exported run JSON is the easiest full template. UTC hours disambiguate daylight-saving folds.
-
-## Checks and limitations
+The committed Morris run is 1,872 simulations over 104 design points (8 trajectories, 12 parameters, three years, 120 sampled days each), seed 1, 290 s on 8 threads. Same seed and inputs give byte-identical output apart from `generatedAt` and `runtimeSeconds`. Faster variant:
 
 ```sh
-npm test
+node scripts/morris-screening.mjs --years 2016,2025 --trajectories 4 --days 60 --out /tmp/quick.json
 ```
 
-Tests defend actual physical/data boundaries: no photon creation, finite controls, dehu/regeneration energy, cadence-invariant unmet loads, unsaturable-candidate exclusion, pad runtime, missingness, DST, fractional-offset DLI days, bounded import ranges, temporal billing and manual/historical pricing. They are **not empirical greenhouse validation**. A prior client-owned load calculator was audited before this tool reused any of its geometry and lighting assumptions; that audit is held with the engagement and is not part of this repository.
+The observed study in [reference-study/](reference-study/) keeps the weather-only classification separate from the coupled screen: raw and derived hourly CSV, mode, month and day-night summaries, calendar exposures, episodes, percentiles, 16 sensitivity cases, a NOAA daily-extrema cross-check, manifest, Markdown report and HTML charts. Its archived 2026 period contains 6,087 hourly slots, 6,064 observed valid hours and 23 missing, ending 2026-09-11 21:00 UTC exclusive. No complete-year claim is made.
 
-[docs/EVALUATION.md](docs/EVALUATION.md) is the broader scientific evaluation plan, not a claim that measured-site validation has already occurred. Release evidence and remaining precision limits are recorded in [docs/VERIFICATION.md](docs/VERIFICATION.md).
+## Testing
 
-[docs/SENSITIVITY.md](docs/SENSITIVITY.md) reports the Morris elementary-effects screening (roadmap M3): which assumptions actually move the answer, and whether the strategy ranking survives them. Headline: crop leaf area and transpiration dominate every metric, and the cost ranking is **not stable** across the screened ranges, though the three cheapest positions hold in every one of the 104 screened points.
+```sh
+npm test                      # node --test test/*.test.mjs, 56 tests
+node --test test/model.test.mjs
+```
 
-[docs/AUDIT.md](docs/AUDIT.md) records the 2026-09-12 independent reviews: what was fixed, what was confirmed sound, and the prioritized open items. The accuracy roadmap with ordered milestones and the claim each earns is in [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md).
+56 tests pass. They defend physical and data boundaries that a plausible bug would break: no photon creation on stacked canopy, finite control authority, dehumidifier and regeneration energy, cadence-invariant unmet loads, unsaturable-candidate exclusion, pad runtime attribution, missingness, DST and fractional-offset DLI days, bounded import ranges, temporal billing, manual versus historical pricing, six closed-form conservation identities, and Morris design reproducibility.
 
-## Release notes: 0.2.0-screening
+They are **not empirical greenhouse validation**. A passing suite says the code does what the model says, not that the model matches a real greenhouse.
 
-Site-evaluator release. Ten bundled Tulsa weather years with median, worst, spread and trend per strategy plus a computed ranking-stability verdict; multi-site comparison by ZIP; sensible versus latent load decomposition with space sensible-heat ratio; CO2 enrichment window; outside-air dehumidification screen; equipment runtime and pad viability; cost-of-precision sweeps; and a printable design-basis brief. The default controller became a staged deadband model that converges with dispatch cadence, and crop moisture became Stanghellini transpiration driven by leaf area, absorbed radiation and zone VPD. Morris elementary-effects screening (roadmap M3) now quantifies which assumptions move the answer. Integration fixed an engine crash on pre-0.2 scenario JSON, a load chart that hid every loss, and a multi-site path that could never resolve a time zone. Accessibility: the calendar carries shape cues and a text table, the hour inspector announces politely, and imports parse in a worker.
+## Roadmap
 
-## Release notes: 0.1.0-screening
+| Milestone | Goal | Status |
+|---|---|---|
+| M0 | v0.2 site-evaluator sprint: multi-year, multi-site, load split, enrichment window, precision sweeps, design-basis brief | Done, 2026-09-13 |
+| M1 | Converged staged controller | Done, measured in [VERIFICATION.md](docs/VERIFICATION.md) |
+| M2 | State-coupled crop load (Stanghellini transpiration) | Done |
+| M3 | Quantified structural sensitivity (Morris) | Done, 2026-09-14, see [SENSITIVITY.md](docs/SENSITIVITY.md) |
+| M4 | Equipment maps where they matter | Open |
+| M5 | Benchmarked simulation against an independent model (evidence tier 3) | Open |
+| M6 | Site-calibrated analysis with held-out validation (evidence tier 4) | Open |
 
-Initial static implementation: six equipment strategies, editable facility/crop/light assumptions, historical weather, national public ZIP energy context, sensitivity comparisons and portable outputs. Verification corrected stacked-canopy photon allocation, local-day/DST accounting, frost-point/RH handling, opaque-indoor solar eligibility, imported/cached site association, portable schema rejection, manual-price provenance and mobile overflow. The separate observed Tulsa study and the next-iteration calibrated-twin plan are included. No public production deployment is claimed.
-
-## License
-
-Application code is MIT, see [LICENSE](LICENSE). Third-party software and dataset terms, including the vendored PsychroLib 2.5.0 and every public data source, are listed in [NOTICE](NOTICE). Brand names and marks are not licensed as trademarks.
+Each milestone states the claim it earns, and nothing beyond it, in [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md).
 
 ## Repository scope
 
@@ -109,3 +186,13 @@ This public repository holds the tool, its public data catalogs and its document
 
 - `private/`: material belonging to a client engagement, including an audit of a client's own separate internal calculator. It stays with that engagement.
 - `data/energy/raw/`: 36 MB of public-domain government workbooks and CSVs that `scripts/build-energy.py --refresh` re-downloads and verifies against the SHA-256 values already recorded in the committed manifests. The derived catalogs the application actually loads are committed.
+
+First client: One Season Farmers (Tulsa, OK). The bundled Tulsa 2025 example, the ZIP 74103 default and the crop presets marked "Client assumption (OSF …)" are that engagement's inputs. The model, data catalogs and interface are client-independent.
+
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) first. Three rules carry most of the weight: no runtime dependencies and no build step, every number carries its basis, and a test earns its place only by defending a real physical or data boundary.
+
+## Licence
+
+Application code is MIT, see [LICENSE](LICENSE). Third-party software and dataset terms, including the vendored PsychroLib 2.5.0 and every public data source, are listed in [NOTICE](NOTICE). Brand names and marks are not licensed as trademarks.
