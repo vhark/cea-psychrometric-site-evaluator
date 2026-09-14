@@ -106,6 +106,8 @@ Load a weather record, then **Import JSON / CSV** and pick a set from [docs/exam
 
 ## Learn tab
 
+![The Learn view: ten numbered sections, the first expanded](docs/screenshots/learn.png)
+
 The interface has two views. **Analyze** is the calculator. **Learn** is a ten-part curriculum that teaches the
 psychrometrics behind the screening in the order the tool applies it: reading the outdoor state, what attainment
 is a percentage of, what the climate gives free, the sensible/latent split, outside air as a dehumidifier, the
