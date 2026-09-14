@@ -104,6 +104,22 @@ Not claimed: no independent model benchmark, no site calibration, no equipment p
 
 Load a weather record, then **Import JSON / CSV** and pick a set from [docs/examples/](docs/examples/README.md). Each set is a comparison that answers one design question: coupled reheat against decoupled latent removal, an opaque indoor rack farm, a near-saturated mushroom room, a moisture-bound propagation nursery, and a semi-closed hybrid with a tall crop. The canonical six-strategy comparison stays in [docs/example-scenarios.json](docs/example-scenarios.json).
 
+## Learn tab
+
+The interface has two views. **Analyze** is the calculator. **Learn** is a ten-part curriculum that teaches the
+psychrometrics behind the screening in the order the tool applies it: reading the outdoor state, what attainment
+is a percentage of, what the climate gives free, the sensible/latent split, outside air as a dehumidifier, the
+capacity frontier, screens as a schedule, why one year is an anecdote, what actually moves the answer, and a
+closing section that reports what ten weather years recommend in each bundled region. Each part carries the
+relationship it teaches and a button that switches to Analyze and highlights the panel where you would read it,
+so the concept and its evidence are never separated. Modules are linkable: `#learn/uncertainty`,
+`#learn/regional-findings`.
+
+The closing section is generated, not written. [docs/regional-study.json](docs/regional-study.json) is produced by
+`node scripts/regional-study.mjs` (300 full-year simulations: 5 sites x 10 years x 6 strategies) and
+[docs/REGIONS.md](docs/REGIONS.md) states the recommendation rule, including when the evidence does not resolve a
+region and what measurement would. Two regions currently return no recommendation, by rule.
+
 ## Documentation
 
 | Document | Purpose |
@@ -118,6 +134,7 @@ Load a weather record, then **Import JSON / CSV** and pick a set from [docs/exam
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Checks actually executed, with measured values and dates |
 | [docs/AUDIT.md](docs/AUDIT.md) | Independent review findings, fixes, and the status of every open item |
 | [docs/SENSITIVITY.md](docs/SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives |
+| [docs/REGIONS.md](docs/REGIONS.md) | The ten-year regional study: method, recommendation rule, and the verdict for each bundled climate |
 | [docs/ENERGY-DATA.md](docs/ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage, vintages and limits |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Landscape review and source register behind the build decision |
 | [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md) | Roadmap M1 to M6 to a calibrated twin, with the claim each milestone earns |

@@ -6,18 +6,30 @@ Versions are model versions: the string the engine stamps into every result and 
 
 ## [Unreleased]
 
-### Changed
-
-- Cultivation system is greenhouse benches only. Harvest walls, microgreen racks, propagation racks and mushroom racks are retired: their canopy-area and tier-interception factors were unevidenced assumptions. Canopy area stays an explicit editable input. A scenario carrying a retired system now fails validation with a message naming it rather than a generic unknown-value error.
-- All content is generic. Crop presets state their own arithmetic as planning assumptions, and no customer name, site label or engagement material appears anywhere in the repository. Tulsa remains the bundled worked example because ten complete public weather years there let the tool run offline.
-
 ### Added
 
+- **Learn tab.** The interface has two views. Analyze is the calculator; Learn is a ten-part curriculum that teaches the psychrometrics in the order the tool applies it, each part stating the relationship it teaches and offering a button that switches to Analyze and highlights the panel where that quantity is read. Modules are linkable (`#learn/uncertainty`). `src/learn.js`, plus an exported `spotlight()` in `src/tour.js` so both views share one highlight implementation.
+- **Ten-year, five-climate regional study.** `scripts/regional-study.mjs` runs 300 full-year simulations (5 sites x 10 years x 6 strategies) and commits `docs/regional-study.json`; `docs/REGIONS.md` states the method and the recommendation rule. The Learn tab renders the verdicts. The rule refuses to separate strategies whose median costs sit inside the 16 percent band the Morris screening showed can reorder, so two of the five regions currently return no recommendation and name the measurement that would resolve them.
+- **Four more bundled climates.** Phoenix, Miami, Denver and Seattle at 2016 to 2025 complete coverage each, beside Tulsa's ten years, so the tool demonstrates cross-climate reasoning offline.
+- **Movable shade screens and thermal curtains**, scheduled hour by hour and reported as runtime rows with what each one cost: light given up for the shade screen, delivered heat saved for the curtain, both measured against the same run with the screen open. A shut curtain restricts the outside-air path, so its moisture penalty is visible rather than hidden.
+- **Air-source heat-pump heating** with a temperature-dependent COP, a cold-hour capacity derate and a hard cutoff that reports unmet heat instead of silently falling back to fuel.
+- **Envelope ladder** of glazing and infiltration presets, and `docs/COMPONENT-PARAMETERS.md`: 23 sources behind every movable-shade, screen, envelope and heat-pump number, separating what is measured from what is plausible mechanism. Unsourced inputs ship as nulls that block the run with a named error rather than as plausible-looking defaults.
 - `scripts/check-vintages.mjs` and `src/vintages.js`: per-dataset staleness budgets with rationale, an offline age report that exits non-zero past budget, and a CI step that reports without failing.
+- `docs/examples/`: an importable scenario library, one set per design question, each exercised by `test/examples.test.mjs` on a real weather year.
+
+### Changed
+
+- All content is generic. Crop presets state their own arithmetic as planning assumptions, and no customer name, site label or engagement material appears anywhere in the repository. Tulsa remains the bundled worked example because ten complete public weather years there let the tool run offline.
+- Aluminized shade screens get no automatic near-infrared bonus. The cited measurement shows the tested silver and black nets transmitting near-neutrally across 300 to 1100 nm, so PAR and shortwave multipliers ship equal until product spectra are supplied.
+- Cultivation systems state a default canopy area derived from the floor area, with the stacking factor written out and every value editable. A scenario carrying a retired system name fails validation with a message naming it rather than a generic unknown-value error.
 
 ### Fixed
 
 - The header overflowed horizontally at 390 px once the tour button was added; the bar now wraps and the tour control takes its own row on narrow screens.
+- `simulateScenario` never back-filled 0.2 keys, so a schemaVersion 1 scenario reaching the engine without a prior `validateScenario` call threw out of PsychroLib. Back-fill now happens at the physics entry point, on a copy.
+- The load decomposition chart plotted only positive terms, hiding every loss; January's envelope loss was invisible. Losses now draw below the axis.
+- Multi-site comparison was broken for most ZIPs: the public ZIP catalog carries no time-zone column. An explicit site time-zone field with a state-derived proposal, a split-zone warning and IANA validation replaced the silent failure.
+- The exported report's fixed print footer overlapped body text in paged output; it is a static end block now.
 
 ### Added
 

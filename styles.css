@@ -239,8 +239,8 @@ button.chip[aria-pressed="true"]::before { content: ""; width: 5px; height: 5px;
 .results-controls > label { min-width: 220px; max-width: 45%; }
 .segmented { border: 1px solid var(--hairline-strong); border-radius: var(--r-sm); padding: 3px; display: flex; gap: 3px; }
 .segmented button { border: 0; min-height: 32px; padding: 7px 12px; font-size: 10px; }
-.segmented button[aria-pressed="true"] { color: var(--text); position: relative; }
-.segmented button[aria-pressed="true"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 1px; background: var(--green); }
+.segmented button[aria-pressed="true"], .segmented button[aria-selected="true"] { color: var(--text); position: relative; }
+.segmented button[aria-pressed="true"]::after, .segmented button[aria-selected="true"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 1px; background: var(--green); }
 #view-explanation { margin-bottom: 8px; }
 .metrics-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); margin: 24px 0 28px; }
 .metric { padding: 28px 20px 24px; border-left: 1px solid var(--hairline); min-height: 150px; }
@@ -349,6 +349,45 @@ footer { position: relative; z-index: 1; max-width: 1440px; margin: auto; paddin
 .tour-invite p { font-size: 13px; line-height: 1.6; color: var(--text-2); }
 .tour-invite .primary { padding: 10px 18px; }
 
+/* Learn view. Two tabbed views share the header switch; the curriculum reuses the panel, table and
+   disclosure language of the analysis so nothing here is a second visual system. Callouts carry a full
+   hairline and a panel tint, never a coloured edge stripe. */
+.viewswitch { flex-shrink: 0; }
+.viewswitch button { letter-spacing: .14em; }
+.learn-intro h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); }
+.learn-shell { padding-bottom: 40px; }
+.learn-shell > .help { margin-bottom: 8px; }
+.learn-modules { margin-top: 12px; border-top: 1px solid var(--hairline); }
+.learn-module { border-bottom: 1px solid var(--hairline); }
+.learn-module > summary { display: flex; align-items: baseline; gap: 16px; padding: 18px 0; cursor: pointer; list-style: none; }
+.learn-module > summary::-webkit-details-marker { display: none; }
+.learn-num { font: 500 10px/1.5 var(--font-mono); letter-spacing: .16em; color: var(--green); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.learn-module-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -.015em; color: var(--text); margin-right: auto; }
+.learn-module[open] > summary .learn-module-title { color: var(--text); }
+.learn-module > summary .summary-meta { max-width: 42ch; }
+.learn-body { padding: 0 0 28px; display: grid; gap: 18px; max-width: 96ch; }
+.learn-body > .eyebrow { margin-bottom: -8px; }
+.learn-lede { font-size: 14px; line-height: 1.7; color: var(--text-2); max-width: 78ch; }
+.learn-relation, .learn-caveat { padding: 14px 16px; background: var(--canvas-2); border: 1px solid var(--hairline); border-radius: var(--r-sm); display: grid; gap: 8px; }
+.learn-formula { font-size: 12px; line-height: 1.7; color: var(--text); overflow-wrap: anywhere; }
+.learn-caveat p:not(.eyebrow) { font-size: 13px; line-height: 1.65; color: var(--text); max-width: 78ch; }
+.learn-source-cell { font-size: 11px; color: var(--text-3); white-space: nowrap; }
+.learn-show { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; }
+.learn-first { font: 400 11px/1.7 var(--font-mono); color: var(--text-3); max-width: 72ch; }
+.learn-module-regions > summary .learn-module-title { color: var(--text); }
+.learn-regions-body { max-width: none; gap: 24px; }
+.learn-method { display: grid; gap: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--hairline); }
+.learn-notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 12px; line-height: 1.65; color: var(--text-2); max-width: 88ch; }
+.learn-region { display: grid; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--hairline); }
+.learn-region h4 { margin: 8px 0 0; font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: -.02em; }
+.learn-verdict { display: grid; gap: 12px; padding: 16px 18px; background: var(--canvas-2); border: 1px solid var(--hairline); border-radius: var(--r-sm); }
+.learn-verdict-head { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
+.learn-verdict-basis { font-size: 13px; line-height: 1.65; color: var(--text-2); max-width: 82ch; }
+.learn-verdict .inspection-grid > div:first-child, .learn-method .inspection-grid > div:first-child { border-top: 1px solid var(--hairline); }
+.learn-empty { display: grid; gap: 12px; padding: 28px 0; }
+.learn-empty-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
+code { font: 400 12px/1.5 var(--font-mono); color: var(--text); overflow-wrap: anywhere; }
+
 /* Responsive */
 @media (max-width: 1150px) {
   main { padding: 0 24px; } .topbar { padding-inline: 24px; } footer { padding-inline: 24px; }
@@ -381,6 +420,10 @@ footer { position: relative; z-index: 1; max-width: 1440px; margin: auto; paddin
   .wordmark { font-size: 13px; letter-spacing: .22em; } .header-actions { gap: 10px 14px; } .version { display: none; }
   /* The resume label carries a step count, so it is the widest control in the bar. Let it take its own row. */
   .tour-button { order: 1; flex-basis: 100%; text-align: center; white-space: normal; }
+  /* The global .segmented stretch below is for the results tier control; the header switch stays compact. */
+  .viewswitch { align-self: center; } .viewswitch button { flex: 0 0 auto; padding: 6px 10px; }
+  .learn-module > summary { flex-direction: column; gap: 6px; } .learn-module > summary .summary-meta { text-align: left; max-width: none; }
+  .learn-source-cell { white-space: normal; }
   .intro { padding: 36px 0 32px; }
   .section-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
   .weather-grid { grid-template-columns: 1fr 1fr; gap: 20px; } .weather-grid > label:first-child { grid-column: span 2; } .weather-grid > label:nth-child(4) { grid-column: span 2; } .weather-grid > button { grid-column: span 2; }

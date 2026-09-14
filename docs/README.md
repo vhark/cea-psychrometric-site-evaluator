@@ -15,6 +15,7 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | Start from a worked comparison | [examples/](examples/README.md) |
 | Know how far to trust a result | [EVALUATION.md](EVALUATION.md), then [VERIFICATION.md](VERIFICATION.md) |
 | Know which assumption to measure first | [SENSITIVITY.md](SENSITIVITY.md) |
+| Learn the psychrometrics the tool applies | the **Learn** tab in the interface, then [REGIONS.md](REGIONS.md) |
 | Change the code | [ARCHITECTURE.md](ARCHITECTURE.md), then [IMPLEMENTATION.md](IMPLEMENTATION.md), then [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 | Know where the data came from | [ENERGY-DATA.md](ENERGY-DATA.md) and [RESEARCH.md](RESEARCH.md) |
 | Know what happens next | [DIGITAL-TWIN.md](DIGITAL-TWIN.md) |
@@ -33,6 +34,7 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | [VERIFICATION.md](VERIFICATION.md) | Checks actually executed, with measured values, commands and dates | Reviewer, auditor |
 | [AUDIT.md](AUDIT.md) | Independent review findings, the fix for each, and the status of every open item | Reviewer, maintainer |
 | [SENSITIVITY.md](SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives them | Engineer choosing what to measure, reviewer |
+| [REGIONS.md](REGIONS.md) | The ten-year, five-climate study: method, recommendation rule, per-region verdict and what each unresolved region needs measured | Anyone choosing equipment for a climate, reviewer |
 | [ENERGY-DATA.md](ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage counts, vintages, join limits, rebuild procedure | Data maintainer, anyone quoting a price or an emissions factor |
 | [RESEARCH.md](RESEARCH.md) | Landscape review, literature anchors and public source register behind the build decision | Reviewer, anyone asking why this exists |
 | [DIGITAL-TWIN.md](DIGITAL-TWIN.md) | Roadmap M1 to M6, with the claim each milestone earns and the gate it must pass | Product owner, reviewer |
@@ -44,6 +46,7 @@ These are data, not prose. They are the primary record behind the numbers in the
 | File | What it holds |
 |---|---|
 | [morris-screening.json](morris-screening.json) | The full committed Morris run: design, per-point results, effects and stability |
+| [regional-study.json](regional-study.json) | The full regional study: 300 full-year simulations, per-year rows, weather-side medians, design conditions and the verdict the Learn tab renders |
 | [browser-run-metrics.json](browser-run-metrics.json) | Measured metrics and export hashes from the full-year six-strategy browser run |
 | [seasonal-step-check.json](seasonal-step-check.json) | The seasonal cadence comparison behind the controller convergence evidence |
 | [step-sensitivity.json](step-sensitivity.json), [step-refinement.json](step-refinement.json) | Earlier cadence experiments, retained as development history, not as accuracy claims |

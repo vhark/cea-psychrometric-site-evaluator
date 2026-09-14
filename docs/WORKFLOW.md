@@ -16,6 +16,12 @@ Open http://127.0.0.1:8150/. Module fetches and Web Workers do not work over `fi
 
 A lightweight deployment may omit raw datasets and reports, but must retain `data/us-zips.json`, `data/energy/*.json`, `data/weather/`, `src/`, `vendor/`, `styles.css` and `index.html`, with source and licence attribution intact. Google Fonts are optional presentation assets; system fallbacks remain usable.
 
+The interface opens on **Analyze**, the calculator these steps describe. The **Learn** tab beside it is a
+ten-part curriculum on the psychrometrics behind the screening, each part pointing at the Analyze panel where
+its quantity is read, closing with what ten weather years recommend per bundled climate (see
+[REGIONS.md](REGIONS.md)). Reading it is optional; nothing in Analyze depends on it. The selected view persists
+across reloads and is linkable: `#analyze`, `#learn`, `#learn/<module>`.
+
 ## 2. Choose a site
 
 Enter a five-character ZIP, then verify the proposed centroid and IANA time zone and review the utility candidates. A ZIP does not identify an exact street service address, and the public catalog has no time-zone column, so the time zone is a state-derived proposal you confirm. States that are split across zones, or that do not observe daylight saving, raise an explicit warning.

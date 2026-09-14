@@ -13,13 +13,14 @@
   <script type="module" src="src/app.js"></script>
 </head>
 <body>
-<a class="skip-link" href="#workspace">Skip to analysis</a>
+<a id="skip-link" class="skip-link" href="#workspace">Skip to analysis</a>
 <div class="orbital" aria-hidden="true"><svg viewBox="0 0 800 800" fill="none"><circle cx="400" cy="400" r="380" stroke="#F5F5F0" stroke-width="1"/><circle cx="400" cy="400" r="280" stroke="#F5F5F0" stroke-width="0.5"/><circle cx="400" cy="120" r="4" fill="#4DB405"/></svg></div>
 <header class="topbar">
   <a class="wordmark" href="./" aria-label="CEA Psychrometric Site Evaluator home">Grownetics<em>.</em></a>
-  <div class="header-actions"><button id="tour-button" type="button" class="tour-button">Take the tour</button><a href="#sources">Sources &amp; limits</a><span class="version">Screening 0.2</span></div>
+  <div class="header-actions"><div id="view-switch" class="segmented viewswitch" role="tablist" aria-label="Workspace view"><button id="analyze-tab" type="button" role="tab" aria-selected="true" aria-controls="analyze-view" tabindex="0">Analyze</button><button id="learn-tab" type="button" role="tab" aria-selected="false" aria-controls="learn-view" tabindex="-1">Learn</button></div><button id="tour-button" type="button" class="tour-button">Take the tour</button><a href="#sources">Sources &amp; limits</a><span class="version">Screening 0.2</span></div>
 </header>
 <main>
+<div id="analyze-view" role="tabpanel" aria-labelledby="analyze-tab" tabindex="-1">
   <section class="intro" aria-labelledby="title">
     <div><div class="eyebrow">Grownetics · historical-climate &amp; equipment screening</div><h1 id="title">CEA Psychrometric<br>Site Evaluator<span class="title-dot">.</span></h1><p class="subtitle">Climate capability. Clearer investments.</p></div>
     <p class="intro-note">Start with the weather.<br>Compare what your equipment can change.<br><strong>Keep the assumptions in view.</strong></p>
@@ -117,6 +118,19 @@
     </section>
   </div>
   <section id="sources" class="panel sources"><div class="section-heading"><div><span class="step">↗</span><h2>Know what this screen can tell you</h2></div><span class="badge">TRANSPARENT BY DESIGN</span></div><div class="three-grid"><div><h3>Weather is evidence.</h3><p>NASA POWER is a gridded reconstruction. Station mode pairs observed meteorology with separately sourced solar. Missing intervals remain visible, not replaced with favorable conditions.</p><a href="docs/RESEARCH.md">Research &amp; source register ↗</a></div><div><h3>Equipment is an assumption.</h3><p>Constant component capacities, efficiencies and simplified controls compare strategies. Crop evaporation, uniform air, glazing and heat recovery need site-specific review. These are not sizing or yield guarantees.</p><a href="docs/EVALUATION.md">Evidence tiers &amp; evaluation gates ↗</a></div><div><h3>Technology, not brand rankings.</h3><p>Desiccant and hybrid strategies are generic, editable screens. <a href="https://www.bluefrontierac.com/" target="_blank" rel="noopener noreferrer">Blue Frontier</a> and <a href="https://agronomiciq.com/grow-room-hvac/" target="_blank" rel="noopener noreferrer">AGronomic IQ</a> are technology references only. No validated product maps or manufacturer results are implied.</p><a href="docs/ENERGY-DATA.md">Energy data provenance ↗</a></div></div></section>
+</div>
+<div id="learn-view" role="tabpanel" aria-labelledby="learn-tab" tabindex="-1" hidden>
+  <section class="intro learn-intro" aria-labelledby="learn-title">
+    <div><div class="eyebrow">Grownetics · how to read this screen</div><h1 id="learn-title">Learn the<br>model<span class="title-dot">.</span></h1><p class="subtitle">Ten sections, in order. Each one states the concept, the arithmetic behind it, a number measured in this repository, and the caveat that travels with it.</p></div>
+    <p class="intro-note">Concept, then relationship.<br>Then a measured number.<br><strong>Then what it cannot prove.</strong></p>
+  </section>
+  <section class="panel learn-shell" aria-labelledby="learn-curriculum-title">
+    <div class="section-heading"><div><span class="step">§</span><h2 id="learn-curriculum-title">The curriculum</h2></div><span class="badge">EVERY FIGURE CARRIES ITS SOURCE</span></div>
+    <p class="help">Each section carries a control that switches to the Analyze view and highlights the panel the concept lives in. Panels marked "after a run" do not exist until a scenario has been run, and the section says what to run first. Nothing on this page is computed here: the curriculum quotes figures already published in this repository, and the regional section reads <code>docs/regional-study.json</code> at load.</p>
+    <div id="learn-modules" class="learn-modules"></div>
+    <p class="source-line">Evidence tier: assumption-based component screening. Ten observed weather years are ten actual years, not a sample from a stationary distribution: no spread on this page is a forecast, a confidence interval or a design year.</p>
+  </section>
+</div>
 </main>
 <footer><span>Grownetics <span class="footer-divider">/</span> CEA Psychrometric Site Evaluator</span><span>Static-first. Open source. Your scenarios stay in your browser.</span></footer>
 <noscript><p class="notice">JavaScript is required for local calculation and charts. Serve this folder with a static HTTP server, then enable JavaScript.</p></noscript>

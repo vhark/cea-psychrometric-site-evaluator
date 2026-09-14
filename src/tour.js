@@ -268,6 +268,40 @@ function position() {
     height: `${Math.min(rect.height + pad * 2, window.innerHeight - top)}px`});
   place(rect);
 }
+/** Highlights one element without starting a tour, so other views can point at a panel and reuse
+    the single `.tour-spot` implementation rather than duplicating the CSS. Returns false when the
+    target is absent, and is a no-op while a tour owns the spotlight. `target` is an id or an Element. */
+export function spotlight(target, {ms = 1800} = {}) {
+  if (tour.active) return false;
+  const element = typeof target === 'string' ? $(target) : target;
+  if (!element) return false;
+  openAncestors(element);
+  const spot = document.createElement('div');
+  spot.className = 'tour-spot';
+  spot.setAttribute('aria-hidden', 'true');
+  document.body.append(spot);
+  const pad = 6;
+  const put = () => {
+    const rect = element.getBoundingClientRect();
+    const top = Math.max(0, rect.top - pad), left = Math.max(0, rect.left - pad);
+    Object.assign(spot.style, {top: `${top}px`, left: `${left}px`,
+      width: `${Math.min(rect.width + pad * 2, window.innerWidth - left)}px`,
+      height: `${Math.min(rect.height + pad * 2, window.innerHeight - top)}px`});
+  };
+  put();
+  const rect = element.getBoundingClientRect();
+  if (rect.top < 80 || rect.bottom > window.innerHeight - 80) element.scrollIntoView({block: 'center', inline: 'nearest', behavior: still() ? 'auto' : 'smooth'});
+  const follow = setInterval(put, 60);
+  window.addEventListener('scroll', put, {passive: true});
+  window.addEventListener('resize', put);
+  setTimeout(() => {
+    clearInterval(follow);
+    window.removeEventListener('scroll', put);
+    window.removeEventListener('resize', put);
+    spot.remove();
+  }, ms);
+  return true;
+}
 function show(index, skipped) {
   tour.index = index;
   const step = tour.steps[index], element = $(step.target);

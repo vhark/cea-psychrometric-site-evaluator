@@ -47,11 +47,25 @@
       "sourceElevationM": 494.49,
       "source": "NASA POWER",
       "years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
         2023,
         2024,
         2025
       ],
       "files": {
+        "2016": "phoenix-2016.json",
+        "2017": "phoenix-2017.json",
+        "2018": "phoenix-2018.json",
+        "2019": "phoenix-2019.json",
+        "2020": "phoenix-2020.json",
+        "2021": "phoenix-2021.json",
+        "2022": "phoenix-2022.json",
         "2023": "phoenix-2023.json",
         "2024": "phoenix-2024.json",
         "2025": "phoenix-2025.json"
@@ -68,11 +82,25 @@
       "sourceElevationM": 2.81,
       "source": "NASA POWER",
       "years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
         2023,
         2024,
         2025
       ],
       "files": {
+        "2016": "miami-2016.json",
+        "2017": "miami-2017.json",
+        "2018": "miami-2018.json",
+        "2019": "miami-2019.json",
+        "2020": "miami-2020.json",
+        "2021": "miami-2021.json",
+        "2022": "miami-2022.json",
         "2023": "miami-2023.json",
         "2024": "miami-2024.json",
         "2025": "miami-2025.json"
@@ -89,11 +117,25 @@
       "sourceElevationM": 2094.96,
       "source": "NASA POWER",
       "years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
         2023,
         2024,
         2025
       ],
       "files": {
+        "2016": "denver-2016.json",
+        "2017": "denver-2017.json",
+        "2018": "denver-2018.json",
+        "2019": "denver-2019.json",
+        "2020": "denver-2020.json",
+        "2021": "denver-2021.json",
+        "2022": "denver-2022.json",
         "2023": "denver-2023.json",
         "2024": "denver-2024.json",
         "2025": "denver-2025.json"
@@ -110,11 +152,25 @@
       "sourceElevationM": 110.01,
       "source": "NASA POWER",
       "years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
         2023,
         2024,
         2025
       ],
       "files": {
+        "2016": "seattle-2016.json",
+        "2017": "seattle-2017.json",
+        "2018": "seattle-2018.json",
+        "2019": "seattle-2019.json",
+        "2020": "seattle-2020.json",
+        "2021": "seattle-2021.json",
+        "2022": "seattle-2022.json",
         "2023": "seattle-2023.json",
         "2024": "seattle-2024.json",
         "2025": "seattle-2025.json"

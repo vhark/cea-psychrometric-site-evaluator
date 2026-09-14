@@ -6,6 +6,7 @@ import {downloadRun, downloadScenario} from './export.js';
 import {compareScenarios, aggregateYears, compareSites, loadDecomposition, co2Window} from './metrics.js';
 import {modeLabel, modeEntries, attainmentClass, attainmentText, renderMonthly, renderTimeline, renderTimelineTable, renderScatter, renderDLI, renderLoads, renderYears} from './charts.js';
 import {initTour} from './tour.js';
+import {initLearn} from './learn.js';
 
 const $ = id => document.getElementById(id);
 const state = {scenarios: [], selected: null, snapshot: null, results: [], resultSnapshot: null, resultId: null, revision: 0, resultRevision: -1, pool: null, runId: null, runController: null, catalog: null, zipInfo: null, energyContext: null, energyEpoch: 0, weatherEpoch: 0, weatherController: null, parseWorker: null, weatherOnly: false, hour: 0,
@@ -693,6 +694,7 @@ function bindEvents() {
   on('export-design-basis', 'click', () => downloadRun(state.results, state.resultSnapshot, 'design-basis', {aggregate: state.aggregate, sites: state.siteComparison}));
   on('import-button', 'click', () => $('import-file').click()); on('import-file', 'change', importFile);
   initTour();
+  initLearn();
 }
 async function initialize() {
   buildFields(); bindEvents();
