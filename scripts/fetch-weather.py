@@ -50,6 +50,13 @@ SITES = {
     'seattle': dict(key='seattle', label='Seattle, WA', zip='98104', latitude=47.6062, longitude=-122.3321,
                     timezone='America/Los_Angeles', climate='cool-marine',
                     rawPrefix='seattle-', notes=''),
+    'fairbanks': dict(key='fairbanks', label='Fairbanks, AK', zip='99701', latitude=64.8378, longitude=-147.7164,
+                      timezone='America/Anchorage', climate='subarctic, light-limited',
+                      rawPrefix='fairbanks-',
+                      notes='At 64.84 degrees north the limit is photons, not heat: the December '
+                            'photoperiod is under four hours and solar elevation stays low, so the '
+                            'light deficit and the heating load bind together. Bundled to test the '
+                            'boundary where a greenhouse envelope stops paying for itself.'),
 }
 DEFAULT_SITE = 'tulsa'
 DEFAULT_YEAR = 2025

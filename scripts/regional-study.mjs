@@ -33,7 +33,7 @@ import {aggregateYears,strategyFrontier,bindingConstraint,FREE_COOLING_MODES} fr
 import {weatherState,wetBulb,dewPoint,localClock} from '../src/physics.js';
 
 const YEARS=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
-const SITES=['tulsa','phoenix','miami','denver','seattle'];
+const SITES=['tulsa','phoenix','miami','denver','seattle','fairbanks'];
 // Cost margin below which two equally capable strategies are one answer at this evidence tier.
 const INDISTINGUISHABLE_PCT=16;
 // Attainment width of the capability tier, in percentage points of eligible hours.

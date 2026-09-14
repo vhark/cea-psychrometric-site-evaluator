@@ -1,6 +1,6 @@
 // Tests over the committed docs/regional-study.json. These are contract tests on the study artifact the
 // Learn tab reads at runtime: shape, coverage, internal consistency of the reductions, and the strictness of
-// the recommendation rule. They do not re-run the 300 simulations; scripts/regional-study.mjs does that.
+// the recommendation rule. They do not re-run the 360 simulations; scripts/regional-study.mjs does that.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -21,14 +21,14 @@ test('the committed study carries the contract shape the Learn tab codes against
   assert.ok(!Number.isNaN(Date.parse(study.generatedAt)));
   const m=study.method;
   assert.deepEqual(m.years,[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025]);
-  assert.deepEqual(m.sites,['tulsa','phoenix','miami','denver','seattle']);
+  assert.deepEqual(m.sites,['tulsa','phoenix','miami','denver','seattle','fairbanks']);
   assert.deepEqual(m.scenarios.map(s=>s.id),scenarios.map(s=>s.technology),'the study must run the canonical six strategies');
   assert.equal(m.stepMinutes,1);
   assert.equal(m.transpirationModel,'stanghellini');
   assert.ok(m.controller.length>10);
-  assert.equal(m.simulations,5*10*6,'five sites, ten years, six strategies');
+  assert.equal(m.simulations,6*10*6,'six sites, ten years, six strategies');
   assert.ok(Array.isArray(m.notes)&&m.notes.length>=8);
-  assert.equal(study.regions.length,5);
+  assert.equal(study.regions.length,6);
   for(const region of study.regions){
     for(const key of ['key','label','zip','climate'])assert.equal(typeof region[key],'string',`${key} on ${region.key}`);
     for(const key of WEATHER_KEYS)assert.ok(key in region.weather,`${region.key} weather is missing ${key}`);
@@ -177,7 +177,7 @@ test('weather-side medians are the medians of the ten years and the design condi
     assert.ok(w.meanSummerWetBulbC<w.designWetBulbC,`${region.key}: mean summer wet bulb must sit below the 0.4 percent wet bulb`);
     assert.equal(w.designHours,10*8760+3*24,'the design exceedance must pool all ten calendar years');
   }
-  // The bundled climates must remain distinguishable: this is why five sites are bundled rather than one.
+  // The bundled climates must remain distinguishable: this is why six sites are bundled rather than one.
   const byKey=Object.fromEntries(study.regions.map(r=>[r.key,r]));
   assert.ok(byKey.miami.weather.meanSummerWetBulbC>byKey.phoenix.weather.meanSummerWetBulbC+5,
     'hot-humid Miami must sit well above hot-dry Phoenix on summer wet bulb');

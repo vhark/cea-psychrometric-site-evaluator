@@ -118,9 +118,9 @@ so the concept and its evidence are never separated. Modules are linkable: `#lea
 `#learn/regional-findings`.
 
 The closing section is generated, not written. [docs/regional-study.json](docs/regional-study.json) is produced by
-`node scripts/regional-study.mjs` (300 full-year simulations: 5 sites x 10 years x 6 strategies) and
+`node scripts/regional-study.mjs` (360 full-year simulations: 6 sites x 10 years x 6 strategies) and
 [docs/REGIONS.md](docs/REGIONS.md) states the recommendation rule, including when the evidence does not resolve a
-region and what measurement would. Three of the five regions currently return no recommendation, by rule: Phoenix, Denver and Seattle.
+region and what measurement would. Three of the six regions currently return no recommendation, by rule: Phoenix, Denver and Seattle.
 
 ## Documentation
 
@@ -137,6 +137,7 @@ region and what measurement would. Three of the five regions currently return no
 | [docs/AUDIT.md](docs/AUDIT.md) | Independent review findings, fixes, and the status of every open item |
 | [docs/SENSITIVITY.md](docs/SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives |
 | [docs/REGIONS.md](docs/REGIONS.md) | The ten-year regional study: method, recommendation rule, and the verdict for each bundled climate |
+| [docs/CLASSES.md](docs/CLASSES.md) | Classes of environmental control, the condition that exhausts each, and what each achieved in six climates |
 | [docs/ENERGY-DATA.md](docs/ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage, vintages and limits |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Landscape review and source register behind the build decision |
 | [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md) | Roadmap M1 to M6 to a calibrated twin, with the claim each milestone earns |

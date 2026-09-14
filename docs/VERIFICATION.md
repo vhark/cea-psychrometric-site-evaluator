@@ -10,11 +10,14 @@ Read this if: you are deciding how far to trust a number, auditing the evidence 
 
 | Check | Result |
 |---|---|
-| Regression suite (`npm test`) | **56 passed, 0 failed**: 25 model, 9 data, 9 analysis, 6 conservation, 7 sensitivity |
+| Regression suite (`npm test`) | **87 passed, 0 failed**: 30 model, 10 screens, 9 data, 9 analysis, 7 regional, 7 sensitivity, 6 conservation, 5 vintages, 3 examples |
 | Model version | `0.2.0-screening`, staged deadband controller default, one-minute dispatch step |
 | Controller cadence convergence, Tulsa 2025 full year, 1 min vs 0.5 min | 0.004 / 0.383 / 0.091 pp attainment, 0.31% electricity at most (staged); the retained ideal optimizer does not converge: 1.5 pp, 1.95% |
 | Conservation identities | Close between 1e-16 and 5e-13 relative across six independently derived closed-form checks |
-| Bundled weather | Ten Tulsa NASA POWER years, 2016 to 2025, complete coverage each (8,760 or 8,784 h) |
+| Bundled weather | Six NASA POWER sites (Tulsa, Phoenix, Miami, Denver, Seattle, Fairbanks), 2016 to 2025 each, complete coverage (8,760 or 8,784 h per site-year, 87,672 per site) |
+| Regional study | 360 full-year simulations (6 sites x 10 years x 6 strategies), 281.7 s on 8 threads. Three of six regions return no recommendation by rule; see [REGIONS.md](REGIONS.md) |
+| Lighting delivery | A fixture with surplus capacity lands on the daily target exactly (14.000 of 14 mol) and is step-invariant at 5 and 1 minute; an undersized fixture still reports its shortfall. Regenerating the study after this fix left every verdict and strategy order unchanged, no strategy moving more than 0.05 pp or 50 dollars |
+| Control-class ladder | Nine configurations x six climates, 2025, ideal controller, per-site sizing; see [CLASSES.md](CLASSES.md). Under the staged controller a Miami pad house fell from 9.6% to 0.0% attainment as cooling grew from 100 to 406 kW, while the ideal controller rose from 10.1% to 18.7% and saturated |
 | Multi-year example, six strategies over five years | Baseline median attainment 28.9%, worst year 2025 at 27.1%, spread 2.7 pts; cost ranking **not stable** (2 distinct orders over 5 years) |
 | Multi-site example | Tulsa vs Phoenix: 244 vs 2,334 pad-effective hours, 401 vs 2,636 free-cooling hours |
 | Tulsa pad, runtime vs weather-side viability | Pad ran 2,772 h on 296 days; the weather screen clears both pad limits in only 244 h on 65 days; moisture ceiling binds 3,851 h against 2,952 h for the temperature margin |

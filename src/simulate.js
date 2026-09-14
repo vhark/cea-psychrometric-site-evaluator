@@ -437,8 +437,12 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       const transmittedWm2=irradiance*s.solarTransmission*(1-s.shadeFraction)*solarMultiplier;
       const solarPPFD=irradiance*2.02*s.parTransmission*(1-s.shadeFraction)*parMultiplier*canopySunShare;
       const solarDLI=solarPPFD*dt/1e6;
-      // Use only remaining time in this civil day, including crossing-midnight programs.
-      const remaining=target.isDay?Math.max(dt/3600,Math.min(target.remainingLitHours,24-target.hour)+dt/7200):0;
+      // Use only remaining time in this civil day, including crossing-midnight programs. The window must not
+      // be padded: spreading the remaining deficit over more time than is left under-delivers by half a step
+      // every step, which left a fixture with ample capacity short of its target on every single day and
+      // reported the crop as light-deficient. The floor is one step, so the final step asks for exactly the
+      // outstanding deficit and the fixture cap still decides what arrives.
+      const remaining=target.isDay?Math.max(dt/3600,Math.min(target.remainingLitHours,24-target.hour)):0;
       const requestedPPFD=target.isDay?Math.max(0,(s.dliTarget-accumulatedDLI)*1e6/(remaining*3600)-solarPPFD):0;
       const deliveredPPFD=Math.min(s.lightWm2*s.efficacy*s.lightDelivery,requestedPPFD);
       const lightW=s.canopyM2>0?deliveredPPFD*s.canopyM2/(s.efficacy*s.lightDelivery):0;

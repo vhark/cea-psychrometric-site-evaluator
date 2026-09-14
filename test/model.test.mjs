@@ -126,6 +126,24 @@ test('complete local DLI days survive half-hour time zone offsets',()=>{
  assert.equal(result.summary.daily.filter(d=>d.complete).length,2);
  assert.equal(result.summary.dliDeficitDays,2);
 });
+test('a fixture with surplus capacity reaches the daily light target and is not reported deficient',()=>{
+ // The controller spreads the outstanding deficit over the time left in the lit window. Padding that
+ // window under-delivers a little every step, which used to leave every day fractionally short and
+ // report a fully lit crop as light-deficient on all of them.
+ // 250 W/m2 at 2.5 umol/J and full delivery caps at 625 umol/m2/s, so a 12 h window can carry 27.0 mol.
+ const lit={lightWm2:250,efficacy:2.5,lightDelivery:1,photoperiod:12,dayStart:6,dliTarget:20,coolingKW:400,heaterKW:100};
+ for(const stepMinutes of [5,1]){
+  const result=simulateScenario(closed(lit),weather(48),{stepMinutes});
+  const days=result.summary.daily.filter(d=>d.complete);
+  assert.equal(days.length,2);
+  for(const day of days)assert.ok(day.dli>=20-1e-9,`delivered ${day.dli} of 20 mol at ${stepMinutes} min`);
+  assert.equal(result.summary.dliDeficitDays,0);
+ }
+ // The same fixture against a target beyond its ceiling must still report the shortfall at 27.0 mol.
+ const short=simulateScenario(closed({...lit,dliTarget:40}),weather(48),{stepMinutes:5});
+ assert.equal(short.summary.dliDeficitDays,2);
+ for(const day of short.summary.daily.filter(d=>d.complete))assert.ok(day.dli>26.9&&day.dli<27.1,`capped at ${day.dli}`);
+});
 test('staged controller results converge with control cadence on the Tulsa example strategies',()=>{
  const scenarios=JSON.parse(readFileSync(new URL('../docs/example-scenarios.json',import.meta.url),'utf8')).scenarios.map(s=>{assert.deepEqual(validateScenario(s),[]);return {...s,timezone:'UTC'};});
  const w=diurnal();

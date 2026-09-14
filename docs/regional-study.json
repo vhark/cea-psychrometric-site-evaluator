@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-09-14T15:15:08.830Z",
+ "generatedAt": "2026-09-14T17:51:02.677Z",
  "modelVersion": "0.2.0-screening",
  "method": {
   "years": [
@@ -20,7 +20,8 @@
    "phoenix",
    "miami",
    "denver",
-   "seattle"
+   "seattle",
+   "fairbanks"
   ],
   "scenarios": [
    {
@@ -63,8 +64,8 @@
   "controller": "Staged deadband controller, the interface default; the ideal per-substep optimizer is not used here.",
   "transpirationModel": "stanghellini",
   "stepMinutes": 1,
-  "simulations": 300,
-  "runtimeSeconds": 138.8,
+  "simulations": 360,
+  "runtimeSeconds": 281.7,
   "notes": [
    "Every number is computed from the committed NASA POWER snapshots in data/weather by src/simulate.js at model 0.2.0-screening. Nothing is quoted from a published climate summary and nothing is interpolated between sites.",
    "Each of the six strategies is the same 500 m2 greenhouse, crop band and target band as docs/example-scenarios.json, re-homed to the site coordinates, ZIP and IANA time zone so the day/night schedule and local-day accounting follow local time.",
@@ -200,15 +201,15 @@
      "label": "Pad + vent baseline",
      "scenarioId": "2d74ad0b-6724-4d1f-bfdd-faaf2a94996c",
      "attainmentMedianPct": 28.038,
-     "attainmentWorstPct": 22.588,
-     "attainmentBestPct": 30.314,
+     "attainmentWorstPct": 22.589,
+     "attainmentBestPct": 30.315,
      "attainmentSpreadPts": 7.726,
      "attainmentWorstYear": "2019",
      "attainmentBestYear": "2017",
-     "costMedianUsd": 22168.568,
-     "costSpreadUsd": 3012.102,
-     "electricMedianKWh": 59306.554,
-     "fuelMedianKWh": 310699.087,
+     "costMedianUsd": 22170.574,
+     "costSpreadUsd": 3012.789,
+     "electricMedianKWh": 59330.448,
+     "fuelMedianKWh": 310677.592,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -218,16 +219,16 @@
      "id": "dehu",
      "label": "Pads + condensing dehumidifier",
      "scenarioId": "a66b0673-51bc-4c82-b4b3-365ca0031dcb",
-     "attainmentMedianPct": 42.655,
-     "attainmentWorstPct": 39.144,
-     "attainmentBestPct": 45.35,
-     "attainmentSpreadPts": 6.207,
+     "attainmentMedianPct": 42.656,
+     "attainmentWorstPct": 39.143,
+     "attainmentBestPct": 45.353,
+     "attainmentSpreadPts": 6.209,
      "attainmentWorstYear": "2019",
      "attainmentBestYear": "2017",
-     "costMedianUsd": 27727.113,
-     "costSpreadUsd": 5134.282,
-     "electricMedianKWh": 123940.575,
-     "fuelMedianKWh": 259996.618,
+     "costMedianUsd": 27730.611,
+     "costSpreadUsd": 5134.612,
+     "electricMedianKWh": 123975.782,
+     "fuelMedianKWh": 259972.981,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -237,16 +238,16 @@
      "id": "desiccant",
      "label": "Desiccant + evaporative cooling",
      "scenarioId": "3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed",
-     "attainmentMedianPct": 52.321,
-     "attainmentWorstPct": 50.465,
-     "attainmentBestPct": 56.231,
-     "attainmentSpreadPts": 5.767,
+     "attainmentMedianPct": 52.322,
+     "attainmentWorstPct": 50.459,
+     "attainmentBestPct": 56.234,
+     "attainmentSpreadPts": 5.775,
      "attainmentWorstYear": "2018",
      "attainmentBestYear": "2020",
-     "costMedianUsd": 32576.419,
-     "costSpreadUsd": 7042.441,
-     "electricMedianKWh": 63213.005,
-     "fuelMedianKWh": 532475.792,
+     "costMedianUsd": 32578.699,
+     "costSpreadUsd": 7043.133,
+     "electricMedianKWh": 63237.42,
+     "fuelMedianKWh": 532464.607,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -256,16 +257,16 @@
      "id": "dx",
      "label": "DX / mini-split + dehumidifier",
      "scenarioId": "fd190fa2-ffba-4423-88ff-b474c81a8015",
-     "attainmentMedianPct": 71.474,
+     "attainmentMedianPct": 71.477,
      "attainmentWorstPct": 68.945,
-     "attainmentBestPct": 74.377,
-     "attainmentSpreadPts": 5.432,
+     "attainmentBestPct": 74.383,
+     "attainmentSpreadPts": 5.438,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2020",
-     "costMedianUsd": 38954.275,
-     "costSpreadUsd": 6660.132,
-     "electricMedianKWh": 201811.016,
-     "fuelMedianKWh": 308249.838,
+     "costMedianUsd": 38949.832,
+     "costSpreadUsd": 6664.57,
+     "electricMedianKWh": 201828.461,
+     "fuelMedianKWh": 308219.073,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -275,16 +276,16 @@
      "id": "hybridDesiccant",
      "label": "Liquid-desiccant hybrid (generic)",
      "scenarioId": "5bb76a09-13e9-45c8-bd29-c0ba9826e384",
-     "attainmentMedianPct": 52.598,
-     "attainmentWorstPct": 50.963,
-     "attainmentBestPct": 56.893,
-     "attainmentSpreadPts": 5.93,
+     "attainmentMedianPct": 52.599,
+     "attainmentWorstPct": 50.964,
+     "attainmentBestPct": 56.899,
+     "attainmentSpreadPts": 5.935,
      "attainmentWorstYear": "2018",
      "attainmentBestYear": "2020",
-     "costMedianUsd": 45385.086,
-     "costSpreadUsd": 10623.783,
-     "electricMedianKWh": 244097.681,
-     "fuelMedianKWh": 321086.895,
+     "costMedianUsd": 45387.375,
+     "costSpreadUsd": 10623.442,
+     "electricMedianKWh": 244122.596,
+     "fuelMedianKWh": 321068.845,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -294,16 +295,16 @@
      "id": "integrated",
      "label": "Integrated HVAC + reheat",
      "scenarioId": "9aeac14e-4e37-46d6-8ec5-caabc4e02351",
-     "attainmentMedianPct": 55.339,
+     "attainmentMedianPct": 55.338,
      "attainmentWorstPct": 51.563,
      "attainmentBestPct": 58.048,
-     "attainmentSpreadPts": 6.486,
+     "attainmentSpreadPts": 6.485,
      "attainmentWorstYear": "2019",
      "attainmentBestYear": "2017",
-     "costMedianUsd": 46062.369,
-     "costSpreadUsd": 7794.364,
-     "electricMedianKWh": 239790.129,
-     "fuelMedianKWh": 369465.322,
+     "costMedianUsd": 46064.455,
+     "costSpreadUsd": 7794.901,
+     "electricMedianKWh": 239813.221,
+     "fuelMedianKWh": 369439.952,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -319,44 +320,44 @@
       {
        "id": "pad",
        "attainmentPct": 25.94,
-       "costUsd": 20941.82,
-       "electricKWh": 54697.096,
-       "fuelKWh": 295603.017
+       "costUsd": 20943.59,
+       "electricKWh": 54717.441,
+       "fuelKWh": 295587.931
       },
       {
        "id": "dehu",
        "attainmentPct": 41.686,
-       "costUsd": 27069.486,
-       "electricKWh": 124386.63,
-       "fuelKWh": 242209.89
+       "costUsd": 27071.034,
+       "electricKWh": 124407.436,
+       "fuelKWh": 242188.821
       },
       {
        "id": "dx",
-       "attainmentPct": 70.882,
-       "costUsd": 38840.875,
-       "electricKWh": 204844.474,
-       "fuelKWh": 291318.132
+       "attainmentPct": 70.879,
+       "costUsd": 38842.711,
+       "electricKWh": 204866.893,
+       "fuelKWh": 291299.055
       },
       {
        "id": "integrated",
-       "attainmentPct": 54.554,
-       "costUsd": 46079.195,
-       "electricKWh": 241387.902,
-       "fuelKWh": 358128.846
+       "attainmentPct": 54.556,
+       "costUsd": 46081.06,
+       "electricKWh": 241407.912,
+       "fuelKWh": 358117.024
       },
       {
        "id": "desiccant",
-       "attainmentPct": 51.229,
-       "costUsd": 32289.297,
-       "electricKWh": 59494.782,
-       "fuelKWh": 530725.889
+       "attainmentPct": 51.226,
+       "costUsd": 32291.844,
+       "electricKWh": 59516.199,
+       "fuelKWh": 530725.465
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 51.056,
-       "costUsd": 45441.512,
-       "electricKWh": 247962.536,
-       "fuelKWh": 307052.529
+       "attainmentPct": 51.057,
+       "costUsd": 45442.994,
+       "electricKWh": 247979.817,
+       "fuelKWh": 307037.654
       }
      ]
     },
@@ -367,45 +368,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 30.314,
-       "costUsd": 22103.888,
-       "electricKWh": 59247.076,
-       "fuelKWh": 308101.114
+       "attainmentPct": 30.315,
+       "costUsd": 22105.835,
+       "electricKWh": 59271.423,
+       "fuelKWh": 308079.127
       },
       {
        "id": "dehu",
-       "attainmentPct": 45.35,
-       "costUsd": 27492.801,
-       "electricKWh": 122792.035,
-       "fuelKWh": 255031.797
+       "attainmentPct": 45.353,
+       "costUsd": 27495.04,
+       "electricKWh": 122816.933,
+       "fuelKWh": 255014.674
       },
       {
        "id": "dx",
-       "attainmentPct": 72.797,
-       "costUsd": 38215.233,
-       "electricKWh": 195983.555,
-       "fuelKWh": 300092.6
+       "attainmentPct": 72.794,
+       "costUsd": 38217.165,
+       "electricKWh": 196009.982,
+       "fuelKWh": 300064.405
       },
       {
        "id": "integrated",
        "attainmentPct": 58.048,
-       "costUsd": 45375.412,
-       "electricKWh": 232208.245,
-       "fuelKWh": 365647.223
+       "costUsd": 45376.376,
+       "electricKWh": 232224.644,
+       "fuelKWh": 365625.138
       },
       {
        "id": "desiccant",
-       "attainmentPct": 54.345,
-       "costUsd": 32167.208,
-       "electricKWh": 63391.575,
-       "fuelKWh": 516855.56
+       "attainmentPct": 54.341,
+       "costUsd": 32170.09,
+       "electricKWh": 63416.451,
+       "fuelKWh": 516852.63
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 55.115,
-       "costUsd": 44066.06,
-       "electricKWh": 233377.119,
-       "fuelKWh": 316070.619
+       "attainmentPct": 55.12,
+       "costUsd": 44069.212,
+       "electricKWh": 233407.764,
+       "fuelKWh": 316058.596
       }
      ]
     },
@@ -417,44 +418,44 @@
       {
        "id": "pad",
        "attainmentPct": 23.718,
-       "costUsd": 23104.5,
-       "electricKWh": 61402.16,
-       "fuelKWh": 327576.361
+       "costUsd": 23106.733,
+       "electricKWh": 61428.475,
+       "fuelKWh": 327555.365
       },
       {
        "id": "dehu",
        "attainmentPct": 39.205,
-       "costUsd": 29427.543,
-       "electricKWh": 132029.856,
-       "fuelKWh": 275767.963
+       "costUsd": 29428.868,
+       "electricKWh": 132055.536,
+       "fuelKWh": 275729.101
       },
       {
        "id": "dx",
-       "attainmentPct": 71.196,
-       "costUsd": 42219.367,
-       "electricKWh": 217289.661,
-       "fuelKWh": 334559.768
+       "attainmentPct": 71.192,
+       "costUsd": 42226.621,
+       "electricKWh": 217355.252,
+       "fuelKWh": 334544.865
       },
       {
        "id": "integrated",
-       "attainmentPct": 53.003,
-       "costUsd": 49572.335,
-       "electricKWh": 256069.559,
-       "fuelKWh": 398022.052
+       "attainmentPct": 53.004,
+       "costUsd": 49572.535,
+       "electricKWh": 256085.884,
+       "fuelKWh": 397983.35
       },
       {
        "id": "desiccant",
-       "attainmentPct": 50.465,
-       "costUsd": 34950.249,
-       "electricKWh": 66426.376,
-       "fuelKWh": 572750.853
+       "attainmentPct": 50.459,
+       "costUsd": 34952.811,
+       "electricKWh": 66452.058,
+       "fuelKWh": 572739.124
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 50.963,
-       "costUsd": 49494.478,
-       "electricKWh": 266735.237,
-       "fuelKWh": 346800.593
+       "attainmentPct": 50.964,
+       "costUsd": 49496.581,
+       "electricKWh": 266760.213,
+       "fuelKWh": 346780.54
       }
      ]
     },
@@ -465,45 +466,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 22.588,
-       "costUsd": 23599.913,
-       "electricKWh": 65508.851,
-       "fuelKWh": 330487.851
+       "attainmentPct": 22.589,
+       "costUsd": 23602.229,
+       "electricKWh": 65536.232,
+       "fuelKWh": 330466.014
       },
       {
        "id": "dehu",
-       "attainmentPct": 39.144,
-       "costUsd": 30803.051,
-       "electricKWh": 145017.695,
-       "fuelKWh": 274196.435
+       "attainmentPct": 39.143,
+       "costUsd": 30805.426,
+       "electricKWh": 145044.689,
+       "fuelKWh": 274177.316
       },
       {
        "id": "dx",
-       "attainmentPct": 73.112,
-       "costUsd": 43938.091,
-       "electricKWh": 228750.326,
-       "fuelKWh": 343698.732
+       "attainmentPct": 73.114,
+       "costUsd": 43941.294,
+       "electricKWh": 228780.613,
+       "fuelKWh": 343689.023
       },
       {
        "id": "integrated",
        "attainmentPct": 51.563,
-       "costUsd": 51670.68,
-       "electricKWh": 269457.702,
-       "fuelKWh": 410132.6
+       "costUsd": 51672.538,
+       "electricKWh": 269482.4,
+       "fuelKWh": 410108.016
       },
       {
        "id": "desiccant",
        "attainmentPct": 52.109,
-       "costUsd": 37071.437,
-       "electricKWh": 70563.527,
-       "fuelKWh": 611229.658
+       "costUsd": 37073.878,
+       "electricKWh": 70590.904,
+       "fuelKWh": 611210.795
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 52.039,
-       "costUsd": 52410.755,
-       "electricKWh": 291048.15,
-       "fuelKWh": 354145.491
+       "attainmentPct": 52.04,
+       "costUsd": 52412.93,
+       "electricKWh": 291074.174,
+       "fuelKWh": 354124.405
       }
      ]
     },
@@ -515,44 +516,44 @@
       {
        "id": "pad",
        "attainmentPct": 28.088,
-       "costUsd": 23388.638,
-       "electricKWh": 63221.36,
-       "fuelKWh": 328139.273
+       "costUsd": 23391.154,
+       "electricKWh": 63248.089,
+       "fuelKWh": 328123.513
       },
       {
        "id": "dehu",
        "attainmentPct": 44.42,
-       "costUsd": 29225.405,
-       "electricKWh": 131735.122,
-       "fuelKWh": 271303.815
+       "costUsd": 29227.828,
+       "electricKWh": 131761.757,
+       "fuelKWh": 271286.555
       },
       {
        "id": "dx",
-       "attainmentPct": 74.377,
-       "costUsd": 41075.053,
-       "electricKWh": 208867.372,
-       "fuelKWh": 330579.003
+       "attainmentPct": 74.383,
+       "costUsd": 41077.222,
+       "electricKWh": 208894.333,
+       "fuelKWh": 330555.455
       },
       {
        "id": "integrated",
-       "attainmentPct": 55.772,
-       "costUsd": 49003.884,
-       "electricKWh": 250260.229,
-       "fuelKWh": 399478.178
+       "attainmentPct": 55.769,
+       "costUsd": 49006.355,
+       "electricKWh": 250288.316,
+       "fuelKWh": 399458.123
       },
       {
        "id": "desiccant",
-       "attainmentPct": 56.231,
-       "costUsd": 34543.07,
-       "electricKWh": 67365.596,
-       "fuelKWh": 560470.367
+       "attainmentPct": 56.234,
+       "costUsd": 34544.468,
+       "electricKWh": 67393.087,
+       "fuelKWh": 560428.008
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 56.893,
-       "costUsd": 47573.369,
-       "electricKWh": 252223.976,
-       "fuelKWh": 345703.148
+       "attainmentPct": 56.899,
+       "costUsd": 47575.274,
+       "electricKWh": 252247.366,
+       "fuelKWh": 345682.891
       }
      ]
     },
@@ -563,45 +564,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 29.751,
-       "costUsd": 22233.247,
-       "electricKWh": 58640.152,
-       "fuelKWh": 313297.059
+       "attainmentPct": 29.752,
+       "costUsd": 22235.314,
+       "electricKWh": 58665.186,
+       "fuelKWh": 313276.058
       },
       {
        "id": "dehu",
-       "attainmentPct": 43.777,
-       "costUsd": 27961.425,
-       "electricKWh": 123494.52,
-       "fuelKWh": 264085.844
+       "attainmentPct": 43.775,
+       "costUsd": 27966.181,
+       "electricKWh": 123544.127,
+       "fuelKWh": 264056.925
       },
       {
        "id": "dx",
        "attainmentPct": 71.213,
-       "costUsd": 39067.674,
-       "electricKWh": 198738.839,
-       "fuelKWh": 312324.563
+       "costUsd": 39056.954,
+       "electricKWh": 198702.705,
+       "fuelKWh": 312180.168
       },
       {
        "id": "integrated",
-       "attainmentPct": 55.29,
-       "costUsd": 45615.596,
-       "electricKWh": 231768.499,
-       "fuelKWh": 372861.103
+       "attainmentPct": 55.281,
+       "costUsd": 45616.652,
+       "electricKWh": 231791.041,
+       "fuelKWh": 372824.542
       },
       {
        "id": "desiccant",
        "attainmentPct": 53.008,
-       "costUsd": 32863.542,
-       "electricKWh": 62849.1,
-       "fuelKWh": 534225.695
+       "costUsd": 32865.554,
+       "electricKWh": 62874.208,
+       "fuelKWh": 534203.749
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 53.763,
-       "costUsd": 45328.661,
-       "electricKWh": 240232.827,
-       "fuelKWh": 325964.708
+       "attainmentPct": 53.764,
+       "costUsd": 45331.756,
+       "electricKWh": 240265.375,
+       "fuelKWh": 325945.973
       }
      ]
     },
@@ -613,44 +614,44 @@
       {
        "id": "pad",
        "attainmentPct": 27.988,
-       "costUsd": 22247.231,
-       "electricKWh": 57111.395,
-       "fuelKWh": 313331.25
+       "costUsd": 22249.261,
+       "electricKWh": 57135.29,
+       "fuelKWh": 313312.375
       },
       {
        "id": "dehu",
        "attainmentPct": 42.675,
-       "costUsd": 26907.604,
-       "electricKWh": 112554.295,
-       "fuelKWh": 265460.372
+       "costUsd": 26909.814,
+       "electricKWh": 112578.739,
+       "fuelKWh": 265444.05
       },
       {
        "id": "dx",
        "attainmentPct": 68.945,
-       "costUsd": 38546.011,
-       "electricKWh": 193670.475,
-       "fuelKWh": 311619.229
+       "costUsd": 38547.893,
+       "electricKWh": 193693.391,
+       "fuelKWh": 311600.214
       },
       {
        "id": "integrated",
-       "attainmentPct": 55.38,
-       "costUsd": 45200.858,
-       "electricKWh": 227801.099,
-       "fuelKWh": 371610.064
+       "attainmentPct": 55.379,
+       "costUsd": 45202.28,
+       "electricKWh": 227822.497,
+       "fuelKWh": 371584.431
       },
       {
        "id": "desiccant",
-       "attainmentPct": 52.795,
-       "costUsd": 31160.996,
-       "electricKWh": 60025.718,
-       "fuelKWh": 499549.21
+       "attainmentPct": 52.793,
+       "costUsd": 31163.765,
+       "electricKWh": 60049.781,
+       "fuelKWh": 499545.826
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 52.58,
-       "costUsd": 43610.766,
-       "electricKWh": 220589.996,
-       "fuelKWh": 329384.98
+       "attainmentPct": 52.579,
+       "costUsd": 43612.587,
+       "electricKWh": 220612.875,
+       "fuelKWh": 329364.488
       }
      ]
     },
@@ -662,44 +663,44 @@
       {
        "id": "pad",
        "attainmentPct": 28.907,
-       "costUsd": 21930.977,
-       "electricKWh": 59366.033,
-       "fuelKWh": 301881.281
+       "costUsd": 21933.093,
+       "electricKWh": 59389.474,
+       "fuelKWh": 301865.628
       },
       {
        "id": "dehu",
        "attainmentPct": 43.315,
-       "costUsd": 27175.512,
-       "electricKWh": 118971.967,
-       "fuelKWh": 255907.391
+       "costUsd": 27177.445,
+       "electricKWh": 118994.964,
+       "fuelKWh": 255889.037
       },
       {
        "id": "dx",
-       "attainmentPct": 71.734,
-       "costUsd": 38817.805,
-       "electricKWh": 198777.558,
-       "fuelKWh": 304880.446
+       "attainmentPct": 71.74,
+       "costUsd": 38817.386,
+       "electricKWh": 198790.029,
+       "fuelKWh": 304837.932
       },
       {
        "id": "integrated",
        "attainmentPct": 57.598,
-       "costUsd": 46045.544,
-       "electricKWh": 238192.357,
-       "fuelKWh": 363346.102
+       "costUsd": 46047.85,
+       "electricKWh": 238218.531,
+       "fuelKWh": 363327.94
       },
       {
        "id": "desiccant",
-       "attainmentPct": 52.532,
-       "costUsd": 31587.683,
-       "electricKWh": 63034.435,
-       "fuelKWh": 502679.581
+       "attainmentPct": 52.535,
+       "costUsd": 31589.547,
+       "electricKWh": 63058.39,
+       "fuelKWh": 502656.534
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 53.684,
-       "costUsd": 43904.036,
-       "electricKWh": 229516.121,
-       "fuelKWh": 316209.082
+       "attainmentPct": 53.687,
+       "costUsd": 43906.519,
+       "electricKWh": 229543.184,
+       "fuelKWh": 316191.717
       }
      ]
     },
@@ -710,45 +711,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 29.872,
-       "costUsd": 20587.811,
-       "electricKWh": 55601.829,
-       "fuelKWh": 279091.734
+       "attainmentPct": 29.871,
+       "costUsd": 20589.44,
+       "electricKWh": 55623.816,
+       "fuelKWh": 279069.422
       },
       {
        "id": "dehu",
-       "attainmentPct": 42.636,
-       "costUsd": 25668.769,
-       "electricKWh": 113518.346,
-       "fuelKWh": 234102.932
+       "attainmentPct": 42.638,
+       "costUsd": 25670.814,
+       "electricKWh": 113539.985,
+       "fuelKWh": 234089.911
       },
       {
        "id": "dx",
-       "attainmentPct": 70.345,
-       "costUsd": 37277.959,
-       "electricKWh": 195508.566,
-       "fuelKWh": 276937.319
+       "attainmentPct": 70.344,
+       "costUsd": 37276.725,
+       "electricKWh": 195510.545,
+       "fuelKWh": 276904.282
       },
       {
        "id": "integrated",
        "attainmentPct": 56.514,
-       "costUsd": 43876.316,
-       "electricKWh": 229920.721,
-       "fuelKWh": 335156.644
+       "costUsd": 43877.637,
+       "electricKWh": 229938.858,
+       "fuelKWh": 335137.505
       },
       {
        "id": "desiccant",
-       "attainmentPct": 51.231,
-       "costUsd": 30028.995,
-       "electricKWh": 59414.01,
-       "fuelKWh": 474817.851
+       "attainmentPct": 51.228,
+       "costUsd": 30030.746,
+       "electricKWh": 59436.957,
+       "fuelKWh": 474795.482
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 51.819,
-       "costUsd": 41786.973,
-       "electricKWh": 219879.612,
-       "fuelKWh": 291774.944
+       "attainmentPct": 51.825,
+       "costUsd": 41789.488,
+       "electricKWh": 219907.132,
+       "fuelKWh": 291757.753
       }
      ]
     },
@@ -759,45 +760,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 27.136,
-       "costUsd": 22062.034,
-       "electricKWh": 61098.014,
-       "fuelKWh": 303246.479
+       "attainmentPct": 27.135,
+       "costUsd": 22064.287,
+       "electricKWh": 61122.974,
+       "fuelKWh": 303229.829
       },
       {
        "id": "dehu",
        "attainmentPct": 41.638,
-       "costUsd": 28490.958,
-       "electricKWh": 132940.812,
-       "fuelKWh": 250652.826
+       "costUsd": 28493.295,
+       "electricKWh": 132966.171,
+       "fuelKWh": 250636.962
       },
       {
        "id": "dx",
-       "attainmentPct": 73.062,
-       "costUsd": 39910.281,
-       "electricKWh": 210032.86,
-       "fuelKWh": 300566.18
+       "attainmentPct": 73.066,
+       "costUsd": 39915.374,
+       "electricKWh": 210077.04,
+       "fuelKWh": 300556.93
       },
       {
        "id": "integrated",
-       "attainmentPct": 55.298,
-       "costUsd": 47199.088,
-       "electricKWh": 246930.303,
-       "fuelKWh": 367320.58
+       "attainmentPct": 55.297,
+       "costUsd": 47201.102,
+       "electricKWh": 246956.567,
+       "fuelKWh": 367295.472
       },
       {
        "id": "desiccant",
-       "attainmentPct": 51.876,
-       "costUsd": 33824.653,
-       "electricKWh": 65584.353,
-       "fuelKWh": 548275.645
+       "attainmentPct": 51.875,
+       "costUsd": 33827.305,
+       "electricKWh": 65609.462,
+       "fuelKWh": 548267.076
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 52.616,
-       "costUsd": 47330.489,
-       "electricKWh": 261220.899,
-       "fuelKWh": 316115.703
+       "attainmentPct": 52.619,
+       "costUsd": 47332.884,
+       "electricKWh": 261245.661,
+       "fuelKWh": 316102.74
       }
      ]
     }
@@ -886,7 +887,7 @@
    },
    "verdict": {
     "recommended": "dx",
-    "recommendedBasis": "DX / mini-split + dehumidifier is the only strategy within 5 points of the best median attainment in this region, holding the joint band in 71.5% of eligible hours (worst year 68.9%) at $38,954 median annual operating cost; the next strategy is 16.1 points behind on attainment.",
+    "recommendedBasis": "DX / mini-split + dehumidifier is the only strategy within 5 points of the best median attainment in this region, holding the joint band in 71.5% of eligible hours (worst year 68.9%) at $38,950 median annual operating cost; the next strategy is 16.1 points behind on attainment.",
     "runnerUp": null,
     "marginPct": null,
     "resolved": true,
@@ -896,7 +897,7 @@
     "capabilityTier": [
      "dx"
     ],
-    "bestAttainmentPct": 71.474,
+    "bestAttainmentPct": 71.477,
     "indistinguishableThresholdPct": 16,
     "capabilityTierPts": 5,
     "stable": false,
@@ -913,7 +914,7 @@
      "These are 10 observed years (2016 to 2025), 10 particular years, not a sample from a stationary distribution: the worst-to-best spread is what happened, not a forecast, a confidence interval or a design year.",
      "Operating cost only, at the example scenarios' declared 0.12 USD/kWh electricity and 0.045 USD/kWh fuel at every site. Capital, maintenance, redundancy and real tariffs are outside the model, and the six strategies range from 15,000 to 125,000 USD of declared installed cost.",
      "The full six-strategy cost order is year-dependent at this region, so a ranking quoted from any single year is an anecdote.",
-     "Pad + vent baseline is cheaper again at $22,169 but holds the band in only 28.0% of hours, 43.4 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss."
+     "Pad + vent baseline is cheaper again at $22,171 but holds the band in only 28.0% of hours, 43.4 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss."
     ]
    }
   },
@@ -1035,15 +1036,15 @@
      "label": "Pad + vent baseline",
      "scenarioId": "2d74ad0b-6724-4d1f-bfdd-faaf2a94996c",
      "attainmentMedianPct": 45.845,
-     "attainmentWorstPct": 41.451,
+     "attainmentWorstPct": 41.461,
      "attainmentBestPct": 48.394,
-     "attainmentSpreadPts": 6.944,
+     "attainmentSpreadPts": 6.933,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2017",
-     "costMedianUsd": 14717.299,
-     "costSpreadUsd": 2343.391,
-     "electricMedianKWh": 35635.369,
-     "fuelMedianKWh": 164999.492,
+     "costMedianUsd": 14719.92,
+     "costSpreadUsd": 2343.438,
+     "electricMedianKWh": 35647.783,
+     "fuelMedianKWh": 164991.993,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -1054,15 +1055,15 @@
      "label": "Pads + condensing dehumidifier",
      "scenarioId": "a66b0673-51bc-4c82-b4b3-365ca0031dcb",
      "attainmentMedianPct": 49.15,
-     "attainmentWorstPct": 44.911,
-     "attainmentBestPct": 52.647,
-     "attainmentSpreadPts": 7.736,
+     "attainmentWorstPct": 44.921,
+     "attainmentBestPct": 52.653,
+     "attainmentSpreadPts": 7.732,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 15807.737,
-     "costSpreadUsd": 1611.619,
-     "electricMedianKWh": 46617.683,
-     "fuelMedianKWh": 157362.998,
+     "costMedianUsd": 15808.806,
+     "costSpreadUsd": 1611.621,
+     "electricMedianKWh": 46633.637,
+     "fuelMedianKWh": 157355.806,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -1073,15 +1074,15 @@
      "label": "Desiccant + evaporative cooling",
      "scenarioId": "3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed",
      "attainmentMedianPct": 50.168,
-     "attainmentWorstPct": 46.24,
-     "attainmentBestPct": 54.133,
-     "attainmentSpreadPts": 7.893,
+     "attainmentWorstPct": 46.241,
+     "attainmentBestPct": 54.127,
+     "attainmentSpreadPts": 7.886,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 16450.612,
-     "costSpreadUsd": 1632.003,
-     "electricMedianKWh": 36265.193,
-     "fuelMedianKWh": 196786.576,
+     "costMedianUsd": 16451.729,
+     "costSpreadUsd": 1632.097,
+     "electricMedianKWh": 36277.328,
+     "fuelMedianKWh": 196778.6,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -1091,16 +1092,16 @@
      "id": "dx",
      "label": "DX / mini-split + dehumidifier",
      "scenarioId": "fd190fa2-ffba-4423-88ff-b474c81a8015",
-     "attainmentMedianPct": 56.542,
-     "attainmentWorstPct": 53.59,
-     "attainmentBestPct": 58.582,
+     "attainmentMedianPct": 56.537,
+     "attainmentWorstPct": 53.588,
+     "attainmentBestPct": 58.581,
      "attainmentSpreadPts": 4.993,
      "attainmentWorstYear": "2020",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 23898.227,
-     "costSpreadUsd": 2001.715,
-     "electricMedianKWh": 113194.771,
-     "fuelMedianKWh": 163837.783,
+     "costMedianUsd": 23899.528,
+     "costSpreadUsd": 2002.924,
+     "electricMedianKWh": 113204.929,
+     "fuelMedianKWh": 163827.978,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -1111,15 +1112,15 @@
      "label": "Liquid-desiccant hybrid (generic)",
      "scenarioId": "5bb76a09-13e9-45c8-bd29-c0ba9826e384",
      "attainmentMedianPct": 44.272,
-     "attainmentWorstPct": 43.118,
+     "attainmentWorstPct": 43.117,
      "attainmentBestPct": 48.721,
-     "attainmentSpreadPts": 5.603,
+     "attainmentSpreadPts": 5.604,
      "attainmentWorstYear": "2024",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 18702.332,
-     "costSpreadUsd": 3271.011,
-     "electricMedianKWh": 60480.244,
-     "fuelMedianKWh": 166554.495,
+     "costMedianUsd": 18703.55,
+     "costSpreadUsd": 3267.623,
+     "electricMedianKWh": 60493.296,
+     "fuelMedianKWh": 166546.881,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -1129,16 +1130,16 @@
      "id": "integrated",
      "label": "Integrated HVAC + reheat",
      "scenarioId": "9aeac14e-4e37-46d6-8ec5-caabc4e02351",
-     "attainmentMedianPct": 56.465,
-     "attainmentWorstPct": 54.657,
-     "attainmentBestPct": 58.712,
-     "attainmentSpreadPts": 4.055,
+     "attainmentMedianPct": 56.473,
+     "attainmentWorstPct": 54.661,
+     "attainmentBestPct": 58.71,
+     "attainmentSpreadPts": 4.048,
      "attainmentWorstYear": "2020",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 26789.442,
-     "costSpreadUsd": 2838.372,
-     "electricMedianKWh": 132859.753,
-     "fuelMedianKWh": 174908.522,
+     "costMedianUsd": 26791.323,
+     "costSpreadUsd": 2830.994,
+     "electricMedianKWh": 132887.072,
+     "fuelMedianKWh": 174899.005,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -1153,45 +1154,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 46.677,
-       "costUsd": 14664.472,
-       "electricKWh": 36237.579,
-       "fuelKWh": 157417.027
+       "attainmentPct": 46.676,
+       "costUsd": 14665.516,
+       "electricKWh": 36250.075,
+       "fuelKWh": 157406.822
       },
       {
        "id": "dehu",
-       "attainmentPct": 49.559,
-       "costUsd": 15623.567,
-       "electricKWh": 47111.463,
-       "fuelKWh": 148296.632
+       "attainmentPct": 49.56,
+       "costUsd": 15624.432,
+       "electricKWh": 47125.697,
+       "fuelKWh": 148278.055
       },
       {
        "id": "dx",
-       "attainmentPct": 57.778,
-       "costUsd": 23465.918,
-       "electricKWh": 113977.107,
-       "fuelKWh": 155250.519
+       "attainmentPct": 57.782,
+       "costUsd": 23466.453,
+       "electricKWh": 113992.764,
+       "fuelKWh": 155222.192
       },
       {
        "id": "integrated",
-       "attainmentPct": 57.836,
-       "costUsd": 26291.917,
-       "electricKWh": 133250.895,
-       "fuelKWh": 168764.649
+       "attainmentPct": 57.831,
+       "costUsd": 26293.716,
+       "electricKWh": 133270.723,
+       "fuelKWh": 168752.932
       },
       {
        "id": "desiccant",
        "attainmentPct": 50.673,
-       "costUsd": 16302.557,
-       "electricKWh": 36662.353,
-       "fuelKWh": 191385.456
+       "costUsd": 16303.883,
+       "electricKWh": 36675.292,
+       "fuelKWh": 191379.021
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 45.978,
-       "costUsd": 18494.475,
-       "electricKWh": 61656.252,
-       "fuelKWh": 158893.733
+       "costUsd": 18495.678,
+       "electricKWh": 61668.671,
+       "fuelKWh": 158886.254
       }
      ]
     },
@@ -1203,44 +1204,44 @@
       {
        "id": "pad",
        "attainmentPct": 48.394,
-       "costUsd": 14599.684,
-       "electricKWh": 36744.163,
-       "fuelKWh": 151535.781
+       "costUsd": 14601.04,
+       "electricKWh": 36758.018,
+       "fuelKWh": 151525.158
       },
       {
        "id": "dehu",
-       "attainmentPct": 50.171,
-       "costUsd": 15537.141,
-       "electricKWh": 46161.176,
-       "fuelKWh": 146302.636
+       "attainmentPct": 50.169,
+       "costUsd": 15538.929,
+       "electricKWh": 46179.648,
+       "fuelKWh": 146292.028
       },
       {
        "id": "dx",
-       "attainmentPct": 56.513,
-       "costUsd": 23115.922,
-       "electricKWh": 111632.997,
-       "fuelKWh": 151292.901
+       "attainmentPct": 56.511,
+       "costUsd": 23117.181,
+       "electricKWh": 111647.315,
+       "fuelKWh": 151281.959
       },
       {
        "id": "integrated",
-       "attainmentPct": 57.026,
-       "costUsd": 25516.695,
-       "electricKWh": 129207.173,
-       "fuelKWh": 159406.158
+       "attainmentPct": 57.027,
+       "costUsd": 25518.236,
+       "electricKWh": 129223.804,
+       "fuelKWh": 159395.621
       },
       {
        "id": "desiccant",
        "attainmentPct": 50.917,
-       "costUsd": 16161.519,
-       "electricKWh": 37417.97,
-       "fuelKWh": 183507.199
+       "costUsd": 16162.846,
+       "electricKWh": 37431.784,
+       "fuelKWh": 183496.584
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 45.363,
-       "costUsd": 18135.985,
-       "electricKWh": 60694.41,
-       "fuelKWh": 152771.659
+       "attainmentPct": 45.362,
+       "costUsd": 18137.11,
+       "electricKWh": 60707.504,
+       "fuelKWh": 152761.455
       }
      ]
     },
@@ -1251,45 +1252,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 45.595,
-       "costUsd": 14638.083,
-       "electricKWh": 35576.563,
-       "fuelKWh": 160925.841
+       "attainmentPct": 45.597,
+       "costUsd": 14639.365,
+       "electricKWh": 35589.356,
+       "fuelKWh": 160919.41
       },
       {
        "id": "dehu",
-       "attainmentPct": 48.388,
-       "costUsd": 15774.295,
-       "electricKWh": 47143.932,
-       "fuelKWh": 154200.293
+       "attainmentPct": 48.391,
+       "costUsd": 15775.496,
+       "electricKWh": 47156.188,
+       "fuelKWh": 154194.126
       },
       {
        "id": "dx",
-       "attainmentPct": 56.923,
-       "costUsd": 23821.648,
-       "electricKWh": 115877.745,
-       "fuelKWh": 160490.476
+       "attainmentPct": 56.918,
+       "costUsd": 23823.297,
+       "electricKWh": 115893.683,
+       "fuelKWh": 160478.958
       },
       {
        "id": "integrated",
-       "attainmentPct": 56.715,
-       "costUsd": 26755.125,
-       "electricKWh": 136784.061,
-       "fuelKWh": 171474.711
+       "attainmentPct": 56.721,
+       "costUsd": 26758.198,
+       "electricKWh": 136813.634,
+       "fuelKWh": 171463.261
       },
       {
        "id": "desiccant",
-       "attainmentPct": 49.383,
-       "costUsd": 16541.556,
-       "electricKWh": 36366.903,
-       "fuelKWh": 200002.496
+       "attainmentPct": 49.387,
+       "costUsd": 16542.909,
+       "electricKWh": 36379.721,
+       "fuelKWh": 199998.514
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 44.122,
-       "costUsd": 19252.138,
-       "electricKWh": 67204.157,
-       "fuelKWh": 162214.956
+       "costUsd": 19253.247,
+       "electricKWh": 67216.377,
+       "fuelKWh": 162207.356
       }
      ]
     },
@@ -1300,45 +1301,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 47.793,
-       "costUsd": 16398.515,
-       "electricKWh": 37061.893,
-       "fuelKWh": 194817.249
+       "attainmentPct": 47.795,
+       "costUsd": 16399.642,
+       "electricKWh": 37075.308,
+       "fuelKWh": 194806.493
       },
       {
        "id": "dehu",
-       "attainmentPct": 52.647,
-       "costUsd": 17010.297,
-       "electricKWh": 47074.191,
-       "fuelKWh": 180755.702
+       "attainmentPct": 52.653,
+       "costUsd": 17011.428,
+       "electricKWh": 47087.626,
+       "fuelKWh": 180744.703
       },
       {
        "id": "dx",
-       "attainmentPct": 58.582,
-       "costUsd": 24312.264,
-       "electricKWh": 109265.376,
-       "fuelKWh": 188165.549
+       "attainmentPct": 58.581,
+       "costUsd": 24313.378,
+       "electricKWh": 109278.735,
+       "fuelKWh": 188154.456
       },
       {
        "id": "integrated",
-       "attainmentPct": 58.712,
-       "costUsd": 27422.175,
-       "electricKWh": 128887.582,
-       "fuelKWh": 206066.942
+       "attainmentPct": 58.71,
+       "costUsd": 27423.483,
+       "electricKWh": 128901.9,
+       "fuelKWh": 206057.352
       },
       {
        "id": "desiccant",
-       "attainmentPct": 54.133,
-       "costUsd": 17700.868,
-       "electricKWh": 37213.698,
-       "fuelKWh": 222400.646
+       "attainmentPct": 54.127,
+       "costUsd": 17701.853,
+       "electricKWh": 37226.994,
+       "fuelKWh": 222387.293
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 48.721,
-       "costUsd": 19738.307,
-       "electricKWh": 60266.077,
-       "fuelKWh": 194129.957
+       "costUsd": 19739.436,
+       "electricKWh": 60279.089,
+       "fuelKWh": 194120.716
       }
      ]
     },
@@ -1349,45 +1350,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 45.835,
-       "costUsd": 15541.994,
-       "electricKWh": 34458.768,
-       "fuelKWh": 169073.142
+       "attainmentPct": 45.836,
+       "costUsd": 15542.864,
+       "electricKWh": 34469.361,
+       "fuelKWh": 169064.577
       },
       {
        "id": "dehu",
-       "attainmentPct": 49.111,
-       "costUsd": 16129.655,
-       "electricKWh": 42242.767,
-       "fuelKWh": 160525.704
+       "attainmentPct": 49.112,
+       "costUsd": 16130.518,
+       "electricKWh": 42253.354,
+       "fuelKWh": 160517.486
       },
       {
        "id": "dx",
-       "attainmentPct": 53.59,
-       "costUsd": 23974.806,
-       "electricKWh": 110276.981,
-       "fuelKWh": 167185.091
+       "attainmentPct": 53.588,
+       "costUsd": 23975.759,
+       "electricKWh": 110287.976,
+       "fuelKWh": 167176.997
       },
       {
        "id": "integrated",
-       "attainmentPct": 54.657,
-       "costUsd": 26823.758,
-       "electricKWh": 130364.372,
-       "fuelKWh": 178342.334
+       "attainmentPct": 54.661,
+       "costUsd": 26824.448,
+       "electricKWh": 130373.005,
+       "fuelKWh": 178334.748
       },
       {
        "id": "desiccant",
-       "attainmentPct": 50.362,
-       "costUsd": 16682.99,
-       "electricKWh": 34586.336,
-       "fuelKWh": 193265.544
+       "attainmentPct": 50.363,
+       "costUsd": 16683.67,
+       "electricKWh": 34596.226,
+       "fuelKWh": 193257.435
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 43.463,
-       "costUsd": 17892.689,
-       "electricKWh": 49286.894,
-       "fuelKWh": 170894.034
+       "attainmentPct": 43.462,
+       "costUsd": 17893.509,
+       "electricKWh": 49296.202,
+       "fuelKWh": 170886.406
       }
      ]
     },
@@ -1399,44 +1400,44 @@
       {
        "id": "pad",
        "attainmentPct": 43.399,
-       "costUsd": 14055.124,
-       "electricKWh": 34493.953,
-       "fuelKWh": 155276.665
+       "costUsd": 14056.203,
+       "electricKWh": 34506.05,
+       "fuelKWh": 155267.779
       },
       {
        "id": "dehu",
-       "attainmentPct": 46.037,
-       "costUsd": 15398.678,
-       "electricKWh": 48087.514,
-       "fuelKWh": 147535.112
+       "attainmentPct": 46.039,
+       "costUsd": 15399.806,
+       "electricKWh": 48101.187,
+       "fuelKWh": 147522.395
       },
       {
        "id": "dx",
-       "attainmentPct": 56.57,
-       "costUsd": 23503.004,
-       "electricKWh": 116545.882,
-       "fuelKWh": 155207.971
+       "attainmentPct": 56.563,
+       "costUsd": 23503.028,
+       "electricKWh": 116549.467,
+       "fuelKWh": 155198.811
       },
       {
        "id": "integrated",
        "attainmentPct": 55.915,
-       "costUsd": 26522.876,
-       "electricKWh": 137440.958,
-       "fuelKWh": 168371.916
+       "costUsd": 26524.187,
+       "electricKWh": 137455.553,
+       "fuelKWh": 168362.989
       },
       {
        "id": "desiccant",
-       "attainmentPct": 47.229,
-       "costUsd": 16296.837,
-       "electricKWh": 35482.131,
-       "fuelKWh": 201128.782
+       "attainmentPct": 47.231,
+       "costUsd": 16297.797,
+       "electricKWh": 35494.223,
+       "fuelKWh": 201117.521
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 44.281,
-       "costUsd": 19489.584,
-       "electricKWh": 72000.826,
-       "fuelKWh": 156733.237
+       "attainmentPct": 44.282,
+       "costUsd": 19490.389,
+       "electricKWh": 72011.001,
+       "fuelKWh": 156723.896
       }
      ]
     },
@@ -1447,45 +1448,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 41.451,
-       "costUsd": 14770.125,
-       "electricKWh": 33280.357,
-       "fuelKWh": 175182.484
+       "attainmentPct": 41.461,
+       "costUsd": 14774.325,
+       "electricKWh": 33291.878,
+       "fuelKWh": 175245.201
       },
       {
        "id": "dehu",
-       "attainmentPct": 44.911,
-       "costUsd": 16038.248,
-       "electricKWh": 47159.699,
-       "fuelKWh": 164900.31
+       "attainmentPct": 44.921,
+       "costUsd": 16041.331,
+       "electricKWh": 47154.928,
+       "fuelKWh": 164981.533
       },
       {
        "id": "dx",
-       "attainmentPct": 56.372,
-       "costUsd": 24842.093,
-       "electricKWh": 121017.584,
-       "fuelKWh": 173674.99
+       "attainmentPct": 56.359,
+       "costUsd": 24844.187,
+       "electricKWh": 121018.46,
+       "fuelKWh": 173716.717
       },
       {
        "id": "integrated",
-       "attainmentPct": 55.909,
-       "costUsd": 28320.645,
-       "electricKWh": 144666.774,
-       "fuelKWh": 189936.578
+       "attainmentPct": 55.91,
+       "costUsd": 28316.515,
+       "electricKWh": 144627.178,
+       "fuelKWh": 189949.793
       },
       {
        "id": "desiccant",
-       "attainmentPct": 46.24,
-       "costUsd": 16944.967,
-       "electricKWh": 34124.361,
-       "fuelKWh": 219883.11
+       "attainmentPct": 46.241,
+       "costUsd": 16946.146,
+       "electricKWh": 34135.887,
+       "fuelKWh": 219880.041
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 43.267,
-       "costUsd": 20827.935,
-       "electricKWh": 74821.195,
-       "fuelKWh": 177125.623
+       "attainmentPct": 43.268,
+       "costUsd": 20825.64,
+       "electricKWh": 74788.838,
+       "fuelKWh": 177160.22
       }
      ]
     },
@@ -1496,45 +1497,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 45.839,
-       "costUsd": 15769.576,
-       "electricKWh": 36250.431,
-       "fuelKWh": 178800.934
+       "attainmentPct": 45.838,
+       "costUsd": 15770.722,
+       "electricKWh": 36264.174,
+       "fuelKWh": 178789.048
       },
       {
        "id": "dehu",
-       "attainmentPct": 50.341,
-       "costUsd": 16331.404,
-       "electricKWh": 45107.747,
-       "fuelKWh": 166695.15
+       "attainmentPct": 50.342,
+       "costUsd": 16332.596,
+       "electricKWh": 45121.303,
+       "fuelKWh": 166685.156
       },
       {
        "id": "dx",
-       "attainmentPct": 55.892,
-       "costUsd": 24188.097,
-       "electricKWh": 112412.436,
-       "fuelKWh": 174297.247
+       "attainmentPct": 55.903,
+       "costUsd": 24187.666,
+       "electricKWh": 112417.094,
+       "fuelKWh": 174274.081
       },
       {
        "id": "integrated",
-       "attainmentPct": 56.215,
-       "costUsd": 27184.232,
-       "electricKWh": 132468.61,
-       "fuelKWh": 189597.41
+       "attainmentPct": 56.224,
+       "costUsd": 27187.814,
+       "electricKWh": 132503.42,
+       "fuelKWh": 189591.418
       },
       {
        "id": "desiccant",
-       "attainmentPct": 51.784,
-       "costUsd": 16955.537,
-       "electricKWh": 36376.698,
-       "fuelKWh": 203875.728
+       "attainmentPct": 51.783,
+       "costUsd": 16956.924,
+       "electricKWh": 36390.895,
+       "fuelKWh": 203868.564
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 46.644,
-       "costUsd": 18910.19,
-       "electricKWh": 56419.74,
-       "fuelKWh": 179614.848
+       "costUsd": 18911.421,
+       "electricKWh": 56433.647,
+       "fuelKWh": 179604.391
       }
      ]
     },
@@ -1545,45 +1546,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 45.852,
-       "costUsd": 15327.575,
-       "electricKWh": 34656.368,
-       "fuelKWh": 171732.171
+       "attainmentPct": 45.851,
+       "costUsd": 15328.53,
+       "electricKWh": 34668.221,
+       "fuelKWh": 171721.534
       },
       {
        "id": "dehu",
-       "attainmentPct": 48.24,
-       "costUsd": 15841.178,
-       "electricKWh": 41933.277,
-       "fuelKWh": 162924.577
+       "attainmentPct": 48.239,
+       "costUsd": 15842.116,
+       "electricKWh": 41944.693,
+       "fuelKWh": 162915.028
       },
       {
        "id": "dx",
-       "attainmentPct": 53.836,
-       "costUsd": 24169.553,
-       "electricKWh": 114038.32,
-       "fuelKWh": 168994.576
+       "attainmentPct": 53.832,
+       "costUsd": 24170.795,
+       "electricKWh": 114057.423,
+       "fuelKWh": 168969.445
       },
       {
        "id": "integrated",
-       "attainmentPct": 54.833,
-       "costUsd": 26969.948,
-       "electricKWh": 133603.481,
-       "fuelKWh": 180454.126
+       "attainmentPct": 54.829,
+       "costUsd": 26970.549,
+       "electricKWh": 133610.383,
+       "fuelKWh": 180446.696
       },
       {
        "id": "desiccant",
        "attainmentPct": 49.273,
-       "costUsd": 16359.668,
-       "electricKWh": 34766.061,
-       "fuelKWh": 193570.657
+       "costUsd": 16360.548,
+       "electricKWh": 34777.894,
+       "fuelKWh": 193558.686
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 43.118,
-       "costUsd": 18179.609,
-       "electricKWh": 51255.528,
-       "fuelKWh": 172420.253
+       "attainmentPct": 43.117,
+       "costUsd": 18180.626,
+       "electricKWh": 51267.452,
+       "fuelKWh": 172410.449
       }
      ]
     },
@@ -1595,44 +1596,44 @@
       {
        "id": "pad",
        "attainmentPct": 46.754,
-       "costUsd": 14480.62,
-       "electricKWh": 35694.175,
-       "fuelKWh": 148554.457
+       "costUsd": 14481.81,
+       "electricKWh": 35706.21,
+       "fuelKWh": 148545.827
       },
       {
        "id": "dehu",
        "attainmentPct": 49.189,
-       "costUsd": 15464.404,
-       "electricKWh": 45824.354,
-       "fuelKWh": 142237.975
+       "costUsd": 15465.448,
+       "electricKWh": 45836.093,
+       "fuelKWh": 142230.064
       },
       {
        "id": "dx",
-       "attainmentPct": 56.835,
-       "costUsd": 22840.378,
-       "electricKWh": 109968.436,
-       "fuelKWh": 147530.562
+       "attainmentPct": 56.838,
+       "costUsd": 22841.263,
+       "electricKWh": 109978.735,
+       "fuelKWh": 147522.78
       },
       {
        "id": "integrated",
-       "attainmentPct": 57.171,
-       "costUsd": 25482.273,
-       "electricKWh": 128888.772,
-       "fuelKWh": 157556.658
+       "attainmentPct": 57.17,
+       "costUsd": 25485.52,
+       "electricKWh": 128920.328,
+       "fuelKWh": 157546.795
       },
       {
        "id": "desiccant",
        "attainmentPct": 49.974,
-       "costUsd": 16068.864,
-       "electricKWh": 36163.484,
-       "fuelKWh": 181515.802
+       "costUsd": 16069.757,
+       "electricKWh": 36174.935,
+       "fuelKWh": 181505.345
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 44.264,
-       "costUsd": 17556.923,
-       "electricKWh": 56185.989,
-       "fuelKWh": 149615.227
+       "attainmentPct": 44.262,
+       "costUsd": 17558.017,
+       "electricKWh": 56197.152,
+       "fuelKWh": 149609.139
       }
      ]
     }
@@ -1721,7 +1722,7 @@
    },
    "verdict": {
     "recommended": null,
-    "recommendedBasis": "Not resolved by this evidence: DX / mini-split + dehumidifier at $23,898 and Integrated HVAC + reheat at $26,789 median annual operating cost differ by 12.1 percent, inside the 16 percent band the Morris screening shows the screened parameter ranges can reorder, while holding the joint band in 56.5% and 56.5% of eligible hours; measuring canopy leaf area and transpiration and the as-built envelope U-value at the site, then comparing capital, maintenance and redundancy, is what would resolve it.",
+    "recommendedBasis": "Not resolved by this evidence: DX / mini-split + dehumidifier at $23,900 and Integrated HVAC + reheat at $26,791 median annual operating cost differ by 12.1 percent, inside the 16 percent band the Morris screening shows the screened parameter ranges can reorder, while holding the joint band in 56.5% and 56.5% of eligible hours; measuring canopy leaf area and transpiration and the as-built envelope U-value at the site, then comparing capital, maintenance and redundancy, is what would resolve it.",
     "runnerUp": "integrated",
     "marginPct": 12.1,
     "resolved": false,
@@ -1733,7 +1734,7 @@
      "dx",
      "integrated"
     ],
-    "bestAttainmentPct": 56.542,
+    "bestAttainmentPct": 56.537,
     "indistinguishableThresholdPct": 16,
     "capabilityTierPts": 5,
     "stable": true,
@@ -1750,7 +1751,7 @@
      "The 16 percent band is the measured Morris reorder band from docs/SENSITIVITY.md, not a confidence interval: nothing here says which of DX / mini-split + dehumidifier and Integrated HVAC + reheat is cheaper at a real site.",
      "These are 10 observed years (2016 to 2025), 10 particular years, not a sample from a stationary distribution: the worst-to-best spread is what happened, not a forecast, a confidence interval or a design year.",
      "Operating cost only, at the example scenarios' declared 0.12 USD/kWh electricity and 0.045 USD/kWh fuel at every site. Capital, maintenance, redundancy and real tariffs are outside the model, and the six strategies range from 15,000 to 125,000 USD of declared installed cost.",
-     "Pad + vent baseline is cheaper again at $14,717 but holds the band in only 45.8% of hours, 10.7 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss.",
+     "Pad + vent baseline is cheaper again at $14,720 but holds the band in only 45.8% of hours, 10.7 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss.",
      "No strategy here holds the joint band in more than 56.5% of eligible hours, so the band itself, the crop targets and the envelope are the first thing to revisit at this site, ahead of equipment class."
     ]
    }
@@ -1878,10 +1879,10 @@
      "attainmentSpreadPts": 4.087,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2018",
-     "costMedianUsd": 6983.765,
-     "costSpreadUsd": 750.583,
-     "electricMedianKWh": 45833.554,
-     "fuelMedianKWh": 13275.48,
+     "costMedianUsd": 6985.356,
+     "costSpreadUsd": 750.485,
+     "electricMedianKWh": 45847.447,
+     "fuelMedianKWh": 13274.99,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -1891,16 +1892,16 @@
      "id": "dehu",
      "label": "Pads + condensing dehumidifier",
      "scenarioId": "a66b0673-51bc-4c82-b4b3-365ca0031dcb",
-     "attainmentMedianPct": 9.779,
-     "attainmentWorstPct": 6.472,
+     "attainmentMedianPct": 9.783,
+     "attainmentWorstPct": 6.471,
      "attainmentBestPct": 11.177,
-     "attainmentSpreadPts": 4.704,
+     "attainmentSpreadPts": 4.705,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2018",
-     "costMedianUsd": 21801.472,
-     "costSpreadUsd": 1618.061,
-     "electricMedianKWh": 169546.242,
-     "fuelMedianKWh": 8252.464,
+     "costMedianUsd": 21803.44,
+     "costSpreadUsd": 1617.842,
+     "electricMedianKWh": 169559.726,
+     "fuelMedianKWh": 8251.839,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -1912,14 +1913,14 @@
      "scenarioId": "3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed",
      "attainmentMedianPct": 10.49,
      "attainmentWorstPct": 7.083,
-     "attainmentBestPct": 12.023,
+     "attainmentBestPct": 12.024,
      "attainmentSpreadPts": 4.941,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2018",
-     "costMedianUsd": 29978.806,
-     "costSpreadUsd": 2593.819,
-     "electricMedianKWh": 61473.632,
-     "fuelMedianKWh": 478099.967,
+     "costMedianUsd": 29980.617,
+     "costSpreadUsd": 2594.012,
+     "electricMedianKWh": 61487.064,
+     "fuelMedianKWh": 478105.158,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -1929,16 +1930,16 @@
      "id": "dx",
      "label": "DX / mini-split + dehumidifier",
      "scenarioId": "fd190fa2-ffba-4423-88ff-b474c81a8015",
-     "attainmentMedianPct": 59.678,
-     "attainmentWorstPct": 58.209,
-     "attainmentBestPct": 61.732,
-     "attainmentSpreadPts": 3.523,
+     "attainmentMedianPct": 59.681,
+     "attainmentWorstPct": 58.211,
+     "attainmentBestPct": 61.73,
+     "attainmentSpreadPts": 3.519,
      "attainmentWorstYear": "2023",
      "attainmentBestYear": "2018",
-     "costMedianUsd": 40353.267,
-     "costSpreadUsd": 2173.331,
-     "electricMedianKWh": 311980.977,
-     "fuelMedianKWh": 43767.617,
+     "costMedianUsd": 40354.305,
+     "costSpreadUsd": 2172.787,
+     "electricMedianKWh": 311995.384,
+     "fuelMedianKWh": 43758.138,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -1948,16 +1949,16 @@
      "id": "integrated",
      "label": "Integrated HVAC + reheat",
      "scenarioId": "9aeac14e-4e37-46d6-8ec5-caabc4e02351",
-     "attainmentMedianPct": 41.433,
-     "attainmentWorstPct": 39.773,
-     "attainmentBestPct": 42.965,
-     "attainmentSpreadPts": 3.192,
+     "attainmentMedianPct": 41.435,
+     "attainmentWorstPct": 39.776,
+     "attainmentBestPct": 42.962,
+     "attainmentSpreadPts": 3.185,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2021",
-     "costMedianUsd": 43825.681,
-     "costSpreadUsd": 1798.97,
-     "electricMedianKWh": 336902.753,
-     "fuelMedianKWh": 60202.014,
+     "costMedianUsd": 43826.791,
+     "costSpreadUsd": 1797.701,
+     "electricMedianKWh": 336915.071,
+     "fuelMedianKWh": 60194.317,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -1967,16 +1968,16 @@
      "id": "hybridDesiccant",
      "label": "Liquid-desiccant hybrid (generic)",
      "scenarioId": "5bb76a09-13e9-45c8-bd29-c0ba9826e384",
-     "attainmentMedianPct": 14.281,
-     "attainmentWorstPct": 11.068,
-     "attainmentBestPct": 16.924,
-     "attainmentSpreadPts": 5.855,
+     "attainmentMedianPct": 14.282,
+     "attainmentWorstPct": 11.065,
+     "attainmentBestPct": 16.926,
+     "attainmentSpreadPts": 5.86,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2017",
-     "costMedianUsd": 46963.13,
-     "costSpreadUsd": 2329.862,
-     "electricMedianKWh": 368947.582,
-     "fuelMedianKWh": 13377.764,
+     "costMedianUsd": 46961.955,
+     "costSpreadUsd": 2329.194,
+     "electricMedianKWh": 368938.703,
+     "fuelMedianKWh": 13376.348,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -1992,44 +1993,44 @@
       {
        "id": "pad",
        "attainmentPct": 9.209,
-       "costUsd": 7489.153,
-       "electricKWh": 48392.085,
-       "fuelKWh": 17580.804
+       "costUsd": 7490.874,
+       "electricKWh": 48406.907,
+       "fuelKWh": 17578.761
       },
       {
        "id": "dehu",
-       "attainmentPct": 10.865,
-       "costUsd": 21545.96,
-       "electricKWh": 166028.842,
-       "fuelKWh": 11080.332
+       "attainmentPct": 10.864,
+       "costUsd": 21547.608,
+       "electricKWh": 166043.189,
+       "fuelKWh": 11078.625
       },
       {
        "id": "dx",
-       "attainmentPct": 61.586,
-       "costUsd": 39909.534,
-       "electricKWh": 306206.678,
-       "fuelKWh": 48332.242
+       "attainmentPct": 61.595,
+       "costUsd": 39912.028,
+       "electricKWh": 306225.521,
+       "fuelKWh": 48337.065
       },
       {
        "id": "integrated",
-       "attainmentPct": 42.522,
-       "costUsd": 43384.34,
-       "electricKWh": 330756.214,
-       "fuelKWh": 65287.758
+       "attainmentPct": 42.521,
+       "costUsd": 43383.844,
+       "electricKWh": 330749.597,
+       "fuelKWh": 65291.054
       },
       {
        "id": "desiccant",
-       "attainmentPct": 11.628,
-       "costUsd": 29289.759,
-       "electricKWh": 62495.828,
-       "fuelKWh": 459282.957
+       "attainmentPct": 11.629,
+       "costUsd": 29291.544,
+       "electricKWh": 62511.39,
+       "fuelKWh": 459280.575
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 16.472,
-       "costUsd": 46648.493,
-       "electricKWh": 365614.366,
-       "fuelKWh": 17397.77
+       "costUsd": 46650.149,
+       "electricKWh": 365628.739,
+       "fuelKWh": 17395.937
       }
      ]
     },
@@ -2041,44 +2042,44 @@
       {
        "id": "pad",
        "attainmentPct": 9.17,
-       "costUsd": 6976.008,
-       "electricKWh": 45695.431,
-       "fuelKWh": 13111.042
+       "costUsd": 6977.669,
+       "electricKWh": 45709.304,
+       "fuelKWh": 13110.138
       },
       {
        "id": "dehu",
        "attainmentPct": 10.567,
-       "costUsd": 21002.323,
-       "electricKWh": 162377.463,
-       "fuelKWh": 8614.625
+       "costUsd": 21004.008,
+       "electricKWh": 162391.689,
+       "fuelKWh": 8613.986
       },
       {
        "id": "dx",
-       "attainmentPct": 60.282,
-       "costUsd": 39126.895,
-       "electricKWh": 302282.801,
-       "fuelKWh": 41412.909
+       "attainmentPct": 60.277,
+       "costUsd": 39127.737,
+       "electricKWh": 302292.261,
+       "fuelKWh": 41406.477
       },
       {
        "id": "integrated",
-       "attainmentPct": 42.696,
-       "costUsd": 42689.588,
-       "electricKWh": 326846.531,
-       "fuelKWh": 60249.267
+       "attainmentPct": 42.694,
+       "costUsd": 42691.045,
+       "electricKWh": 326858.208,
+       "fuelKWh": 60250.538
       },
       {
        "id": "desiccant",
-       "attainmentPct": 11.474,
-       "costUsd": 28531.427,
-       "electricKWh": 59890.705,
-       "fuelKWh": 449334.128
+       "attainmentPct": 11.473,
+       "costUsd": 28533.005,
+       "electricKWh": 59903.557,
+       "fuelKWh": 449334.621
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 16.924,
-       "costUsd": 46208.089,
-       "electricKWh": 363197.436,
-       "fuelKWh": 13676.301
+       "attainmentPct": 16.926,
+       "costUsd": 46209.595,
+       "electricKWh": 363210.163,
+       "fuelKWh": 13675.022
       }
      ]
     },
@@ -2090,44 +2091,44 @@
       {
        "id": "pad",
        "attainmentPct": 9.338,
-       "costUsd": 7216.599,
-       "electricKWh": 46021.376,
-       "fuelKWh": 18131.073
+       "costUsd": 7218.316,
+       "electricKWh": 46036.026,
+       "fuelKWh": 18129.878
       },
       {
        "id": "dehu",
        "attainmentPct": 11.177,
-       "costUsd": 21767.833,
-       "electricKWh": 167687.352,
-       "fuelKWh": 11809.922
+       "costUsd": 21770.188,
+       "electricKWh": 167707.133,
+       "fuelKWh": 11809.226
       },
       {
        "id": "dx",
-       "attainmentPct": 61.732,
-       "costUsd": 39728.853,
-       "electricKWh": 304641.286,
-       "fuelKWh": 48632.442
+       "attainmentPct": 61.73,
+       "costUsd": 39729.242,
+       "electricKWh": 304649.669,
+       "fuelKWh": 48618.65
       },
       {
        "id": "integrated",
        "attainmentPct": 41.779,
-       "costUsd": 43071.5,
-       "electricKWh": 328091.04,
-       "fuelKWh": 65643
+       "costUsd": 43072.731,
+       "electricKWh": 328103.24,
+       "fuelKWh": 65637.875
       },
       {
        "id": "desiccant",
-       "attainmentPct": 12.023,
-       "costUsd": 29842.359,
-       "electricKWh": 60880.354,
-       "fuelKWh": 476104.737
+       "attainmentPct": 12.024,
+       "costUsd": 29844.228,
+       "electricKWh": 60894.95,
+       "fuelKWh": 476106.965
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 15.496,
-       "costUsd": 46986.573,
-       "electricKWh": 368387.816,
-       "fuelKWh": 17539.703
+       "costUsd": 46982.853,
+       "electricKWh": 368358.362,
+       "fuelKWh": 17537.607
       }
      ]
     },
@@ -2138,45 +2139,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 6.288,
-       "costUsd": 6844.318,
-       "electricKWh": 45692.391,
-       "fuelKWh": 10701.208
+       "attainmentPct": 6.289,
+       "costUsd": 6845.994,
+       "electricKWh": 45706.464,
+       "fuelKWh": 10700.398
       },
       {
        "id": "dehu",
        "attainmentPct": 8.15,
-       "costUsd": 21835.111,
-       "electricKWh": 170147.555,
-       "fuelKWh": 6543.048
+       "costUsd": 21836.692,
+       "electricKWh": 170160.964,
+       "fuelKWh": 6542.335
       },
       {
        "id": "dx",
-       "attainmentPct": 60.033,
-       "costUsd": 40512.933,
-       "electricKWh": 313509.937,
-       "fuelKWh": 42503.211
+       "attainmentPct": 60.031,
+       "costUsd": 40514.117,
+       "electricKWh": 313523.437,
+       "fuelKWh": 42493.571
       },
       {
        "id": "integrated",
-       "attainmentPct": 41.024,
-       "costUsd": 43978.029,
-       "electricKWh": 338683.521,
-       "fuelKWh": 57927.912
+       "attainmentPct": 41.022,
+       "costUsd": 43980.156,
+       "electricKWh": 338701.041,
+       "fuelKWh": 57928.186
       },
       {
        "id": "desiccant",
-       "attainmentPct": 8.899,
-       "costUsd": 30045.496,
-       "electricKWh": 61307.025,
-       "fuelKWh": 479292.755
+       "attainmentPct": 8.898,
+       "costUsd": 30047.097,
+       "electricKWh": 61320.321,
+       "fuelKWh": 479292.675
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 13.679,
-       "costUsd": 47789.709,
-       "electricKWh": 376893.41,
-       "fuelKWh": 11395.529
+       "attainmentPct": 13.678,
+       "costUsd": 47789.658,
+       "electricKWh": 376893.281,
+       "fuelKWh": 11394.36
       }
      ]
     },
@@ -2187,45 +2188,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 7.53,
-       "costUsd": 7252.538,
-       "electricKWh": 47881.019,
-       "fuelKWh": 14296.481
+       "attainmentPct": 7.531,
+       "costUsd": 7254.556,
+       "electricKWh": 47897.696,
+       "fuelKWh": 14296.165
       },
       {
        "id": "dehu",
        "attainmentPct": 9.177,
-       "costUsd": 22451.697,
-       "electricKWh": 174510.383,
-       "fuelKWh": 8850.833
+       "costUsd": 22453.46,
+       "electricKWh": 174525.201,
+       "fuelKWh": 8850.349
       },
       {
        "id": "dx",
        "attainmentPct": 59.037,
-       "costUsd": 41091.751,
-       "electricKWh": 317315.508,
-       "fuelKWh": 45340.096
+       "costUsd": 41093.043,
+       "electricKWh": 317329.945,
+       "fuelKWh": 45330.482
       },
       {
        "id": "integrated",
        "attainmentPct": 40.442,
-       "costUsd": 44268.773,
-       "electricKWh": 340085.123,
-       "fuelKWh": 60687.993
+       "costUsd": 44270.493,
+       "electricKWh": 340100.208,
+       "fuelKWh": 60685.979
       },
       {
        "id": "desiccant",
        "attainmentPct": 9.879,
-       "costUsd": 30924.702,
-       "electricKWh": 63051.642,
-       "fuelKWh": 494412.059
+       "costUsd": 30926.473,
+       "electricKWh": 63066.727,
+       "fuelKWh": 494411.067
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 13.604,
-       "costUsd": 46663.147,
-       "electricKWh": 367705.115,
-       "fuelKWh": 13900.783
+       "costUsd": 46692.385,
+       "electricKWh": 367941.308,
+       "fuelKWh": 13899.918
       }
      ]
     },
@@ -2236,45 +2237,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 9.198,
-       "costUsd": 6920.751,
-       "electricKWh": 45204.299,
-       "fuelKWh": 13358.168
+       "attainmentPct": 9.199,
+       "costUsd": 6922.611,
+       "electricKWh": 45219.738,
+       "fuelKWh": 13357.33
       },
       {
        "id": "dehu",
-       "attainmentPct": 10.469,
-       "costUsd": 21177.636,
-       "electricKWh": 164106.301,
-       "fuelKWh": 7890.303
+       "attainmentPct": 10.47,
+       "costUsd": 21179.376,
+       "electricKWh": 164120.899,
+       "fuelKWh": 7889.693
       },
       {
        "id": "dx",
-       "attainmentPct": 61.489,
-       "costUsd": 39291.336,
-       "electricKWh": 303531.99,
-       "fuelKWh": 41774.866
+       "attainmentPct": 61.498,
+       "costUsd": 39292.24,
+       "electricKWh": 303545.334,
+       "fuelKWh": 41758.974
       },
       {
        "id": "integrated",
-       "attainmentPct": 42.965,
-       "costUsd": 42831.343,
-       "electricKWh": 328265.677,
-       "fuelKWh": 59807.614
+       "attainmentPct": 42.962,
+       "costUsd": 42832.9,
+       "electricKWh": 328278.403,
+       "fuelKWh": 59808.31
       },
       {
        "id": "desiccant",
        "attainmentPct": 11.306,
-       "costUsd": 28989.125,
-       "electricKWh": 59973.236,
-       "fuelKWh": 459257.935
+       "costUsd": 28990.662,
+       "electricKWh": 59987.125,
+       "fuelKWh": 459254.902
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 16.07,
-       "costUsd": 46416.777,
-       "electricKWh": 364972.016,
-       "fuelKWh": 12964.425
+       "costUsd": 46418.194,
+       "electricKWh": 364984.143,
+       "fuelKWh": 12963.265
       }
      ]
     },
@@ -2286,44 +2287,44 @@
       {
        "id": "pad",
        "attainmentPct": 5.251,
-       "costUsd": 6905.864,
-       "electricKWh": 45444.388,
-       "fuelKWh": 13240.546
+       "costUsd": 6907.616,
+       "electricKWh": 45459.056,
+       "fuelKWh": 13240.054
       },
       {
        "id": "dehu",
-       "attainmentPct": 6.472,
-       "costUsd": 22257.928,
-       "electricKWh": 172680.866,
-       "fuelKWh": 9683.112
+       "attainmentPct": 6.471,
+       "costUsd": 22259.622,
+       "electricKWh": 172695.227,
+       "fuelKWh": 9682.383
       },
       {
        "id": "dx",
-       "attainmentPct": 58.674,
-       "costUsd": 41181.944,
-       "electricKWh": 317314.402,
-       "fuelKWh": 47601.576
+       "attainmentPct": 58.671,
+       "costUsd": 41185.286,
+       "electricKWh": 317342.754,
+       "fuelKWh": 47601.535
       },
       {
        "id": "integrated",
-       "attainmentPct": 39.773,
-       "costUsd": 44488.558,
-       "electricKWh": 341783.796,
-       "fuelKWh": 61205.094
+       "attainmentPct": 39.776,
+       "costUsd": 44488.746,
+       "electricKWh": 341790.65,
+       "fuelKWh": 61191.267
       },
       {
        "id": "desiccant",
        "attainmentPct": 7.083,
-       "costUsd": 30768.554,
-       "electricKWh": 61640.24,
-       "fuelKWh": 494916.028
+       "costUsd": 30770.133,
+       "electricKWh": 61653.808,
+       "fuelKWh": 494914.727
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 11.068,
-       "costUsd": 48537.951,
-       "electricKWh": 382508.829,
-       "fuelKWh": 13435.19
+       "attainmentPct": 11.065,
+       "costUsd": 48538.789,
+       "electricKWh": 382516.275,
+       "fuelKWh": 13433.662
       }
      ]
     },
@@ -2335,44 +2336,44 @@
       {
        "id": "pad",
        "attainmentPct": 5.665,
-       "costUsd": 6738.57,
-       "electricKWh": 45850.429,
-       "fuelKWh": 7839.069
+       "costUsd": 6740.389,
+       "electricKWh": 45865.475,
+       "fuelKWh": 7838.521
       },
       {
        "id": "dehu",
-       "attainmentPct": 6.753,
-       "costUsd": 21936.996,
-       "electricKWh": 171617.353,
-       "fuelKWh": 4651.904
+       "attainmentPct": 6.75,
+       "costUsd": 21938.034,
+       "electricKWh": 171626.361,
+       "fuelKWh": 4651.287
       },
       {
        "id": "dx",
-       "attainmentPct": 58.209,
-       "costUsd": 41206.724,
-       "electricKWh": 319700.909,
-       "fuelKWh": 41379.838
+       "attainmentPct": 58.211,
+       "costUsd": 41206.519,
+       "electricKWh": 319723.382,
+       "fuelKWh": 41314.779
       },
       {
        "id": "integrated",
-       "attainmentPct": 39.916,
-       "costUsd": 44437.464,
-       "electricKWh": 343759.656,
-       "fuelKWh": 54763.374
+       "attainmentPct": 39.917,
+       "costUsd": 44438.237,
+       "electricKWh": 343769.225,
+       "fuelKWh": 54755.202
       },
       {
        "id": "desiccant",
-       "attainmentPct": 7.249,
-       "costUsd": 30351.812,
-       "electricKWh": 61982.486,
-       "fuelKWh": 484046.858
+       "attainmentPct": 7.248,
+       "costUsd": 30353.406,
+       "electricKWh": 61995.977,
+       "fuelKWh": 484046.211
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 11.364,
-       "costUsd": 48035.198,
-       "electricKWh": 379853.811,
-       "fuelKWh": 8198.839
+       "attainmentPct": 11.359,
+       "costUsd": 48037.711,
+       "electricKWh": 379875.201,
+       "fuelKWh": 8197.61
       }
      ]
     },
@@ -2384,44 +2385,44 @@
       {
        "id": "pad",
        "attainmentPct": 8.106,
-       "costUsd": 7294.879,
-       "electricKWh": 49394.525,
-       "fuelKWh": 10736.347
+       "costUsd": 7296.882,
+       "electricKWh": 49411.255,
+       "fuelKWh": 10735.465
       },
       {
        "id": "dehu",
-       "attainmentPct": 10.098,
-       "costUsd": 22620.383,
-       "electricKWh": 176868.786,
-       "fuelKWh": 5742.786
+       "attainmentPct": 10.097,
+       "costUsd": 22621.851,
+       "electricKWh": 176876.708,
+       "fuelKWh": 5753.536
       },
       {
        "id": "dx",
-       "attainmentPct": 59.098,
-       "costUsd": 41300.227,
-       "electricKWh": 319234.07,
-       "fuelKWh": 44321.42
+       "attainmentPct": 59.106,
+       "costUsd": 41300.524,
+       "electricKWh": 319236.217,
+       "fuelKWh": 44323.589
       },
       {
        "id": "integrated",
-       "attainmentPct": 41.088,
-       "costUsd": 44277.196,
-       "electricKWh": 341221.515,
-       "fuelKWh": 57400.463
+       "attainmentPct": 41.091,
+       "costUsd": 44279.853,
+       "electricKWh": 341238.44,
+       "fuelKWh": 57414.34
       },
       {
        "id": "desiccant",
-       "attainmentPct": 10.817,
-       "costUsd": 31125.246,
-       "electricKWh": 64298.77,
-       "fuelKWh": 494979.405
+       "attainmentPct": 10.816,
+       "costUsd": 31127.017,
+       "electricKWh": 64314.569,
+       "fuelKWh": 494976.444
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 14.156,
-       "costUsd": 47317.774,
-       "electricKWh": 373995.52,
-       "fuelKWh": 11538.253
+       "attainmentPct": 14.157,
+       "costUsd": 47314.532,
+       "electricKWh": 373969.759,
+       "fuelKWh": 11536.737
       }
      ]
     },
@@ -2433,44 +2434,44 @@
       {
        "id": "pad",
        "attainmentPct": 7.564,
-       "costUsd": 6991.523,
-       "electricKWh": 45816.678,
-       "fuelKWh": 13310.413
+       "costUsd": 6993.042,
+       "electricKWh": 45829.42,
+       "fuelKWh": 13309.926
       },
       {
        "id": "dehu",
-       "attainmentPct": 9.46,
-       "costUsd": 21730.195,
-       "electricKWh": 168944.929,
-       "fuelKWh": 7178.937
+       "attainmentPct": 9.468,
+       "costUsd": 21731.794,
+       "electricKWh": 168958.488,
+       "fuelKWh": 7178.255
       },
       {
        "id": "dx",
-       "attainmentPct": 59.324,
-       "costUsd": 40193.602,
-       "electricKWh": 310452.018,
-       "fuelKWh": 43213.815
+       "attainmentPct": 59.332,
+       "costUsd": 40194.493,
+       "electricKWh": 310467.332,
+       "fuelKWh": 43192.687
       },
       {
        "id": "integrated",
        "attainmentPct": 41.904,
-       "costUsd": 43673.332,
-       "electricKWh": 335121.985,
-       "fuelKWh": 60154.762
+       "costUsd": 43673.426,
+       "electricKWh": 335129.101,
+       "fuelKWh": 60138.095
       },
       {
        "id": "desiccant",
-       "attainmentPct": 10.164,
-       "costUsd": 29912.117,
-       "electricKWh": 60994.614,
-       "fuelKWh": 476907.179
+       "attainmentPct": 10.163,
+       "costUsd": 29914.137,
+       "electricKWh": 61007.426,
+       "fuelKWh": 476917.641
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 14.407,
-       "costUsd": 46939.688,
-       "electricKWh": 369507.348,
-       "fuelKWh": 13320.337
+       "costUsd": 46941.057,
+       "electricKWh": 369519.045,
+       "fuelKWh": 13319.034
       }
      ]
     }
@@ -2559,7 +2560,7 @@
    },
    "verdict": {
     "recommended": "dx",
-    "recommendedBasis": "DX / mini-split + dehumidifier is the only strategy within 5 points of the best median attainment in this region, holding the joint band in 59.7% of eligible hours (worst year 58.2%) at $40,353 median annual operating cost; the next strategy is 18.2 points behind on attainment.",
+    "recommendedBasis": "DX / mini-split + dehumidifier is the only strategy within 5 points of the best median attainment in this region, holding the joint band in 59.7% of eligible hours (worst year 58.2%) at $40,354 median annual operating cost; the next strategy is 18.2 points behind on attainment.",
     "runnerUp": null,
     "marginPct": null,
     "resolved": true,
@@ -2569,7 +2570,7 @@
     "capabilityTier": [
      "dx"
     ],
-    "bestAttainmentPct": 59.678,
+    "bestAttainmentPct": 59.681,
     "indistinguishableThresholdPct": 16,
     "capabilityTierPts": 5,
     "stable": true,
@@ -2585,7 +2586,7 @@
     "caveats": [
      "These are 10 observed years (2016 to 2025), 10 particular years, not a sample from a stationary distribution: the worst-to-best spread is what happened, not a forecast, a confidence interval or a design year.",
      "Operating cost only, at the example scenarios' declared 0.12 USD/kWh electricity and 0.045 USD/kWh fuel at every site. Capital, maintenance, redundancy and real tariffs are outside the model, and the six strategies range from 15,000 to 125,000 USD of declared installed cost.",
-     "Pad + vent baseline is cheaper again at $6,984 but holds the band in only 7.8% of hours, 51.8 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss.",
+     "Pad + vent baseline is cheaper again at $6,985 but holds the band in only 7.8% of hours, 51.8 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss.",
      "No strategy here holds the joint band in more than 59.7% of eligible hours, so the band itself, the crop targets and the envelope are the first thing to revisit at this site, ahead of equipment class."
     ]
    }
@@ -2708,15 +2709,15 @@
      "label": "Pad + vent baseline",
      "scenarioId": "2d74ad0b-6724-4d1f-bfdd-faaf2a94996c",
      "attainmentMedianPct": 41.987,
-     "attainmentWorstPct": 39.825,
-     "attainmentBestPct": 44.171,
-     "attainmentSpreadPts": 4.346,
+     "attainmentWorstPct": 39.839,
+     "attainmentBestPct": 44.172,
+     "attainmentSpreadPts": 4.334,
      "attainmentWorstYear": "2019",
      "attainmentBestYear": "2025",
-     "costMedianUsd": 25224.945,
-     "costSpreadUsd": 1883.577,
-     "electricMedianKWh": 43843.984,
-     "fuelMedianKWh": 414335.851,
+     "costMedianUsd": 25226.526,
+     "costSpreadUsd": 1886.021,
+     "electricMedianKWh": 43866.42,
+     "fuelMedianKWh": 414313.858,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -2727,15 +2728,15 @@
      "label": "Pads + condensing dehumidifier",
      "scenarioId": "a66b0673-51bc-4c82-b4b3-365ca0031dcb",
      "attainmentMedianPct": 68.865,
-     "attainmentWorstPct": 68.052,
-     "attainmentBestPct": 69.843,
-     "attainmentSpreadPts": 1.791,
+     "attainmentWorstPct": 68.05,
+     "attainmentBestPct": 69.844,
+     "attainmentSpreadPts": 1.794,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 26615.782,
-     "costSpreadUsd": 2279.063,
-     "electricMedianKWh": 69090.463,
-     "fuelMedianKWh": 374349.867,
+     "costMedianUsd": 26617.394,
+     "costSpreadUsd": 2281.243,
+     "electricMedianKWh": 69103.893,
+     "fuelMedianKWh": 374324.099,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -2747,14 +2748,14 @@
      "scenarioId": "fd190fa2-ffba-4423-88ff-b474c81a8015",
      "attainmentMedianPct": 69.486,
      "attainmentWorstPct": 68.807,
-     "attainmentBestPct": 70.624,
-     "attainmentSpreadPts": 1.816,
+     "attainmentBestPct": 70.626,
+     "attainmentSpreadPts": 1.819,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 28309.753,
-     "costSpreadUsd": 2204.252,
-     "electricMedianKWh": 82499.712,
-     "fuelMedianKWh": 375998.426,
+     "costMedianUsd": 28311.565,
+     "costSpreadUsd": 2206.192,
+     "electricMedianKWh": 82521.033,
+     "fuelMedianKWh": 375997.257,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -2764,16 +2765,16 @@
      "id": "desiccant",
      "label": "Desiccant + evaporative cooling",
      "scenarioId": "3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed",
-     "attainmentMedianPct": 68.156,
-     "attainmentWorstPct": 67.157,
-     "attainmentBestPct": 68.994,
-     "attainmentSpreadPts": 1.837,
+     "attainmentMedianPct": 68.152,
+     "attainmentWorstPct": 67.152,
+     "attainmentBestPct": 68.999,
+     "attainmentSpreadPts": 1.847,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 28248.869,
-     "costSpreadUsd": 2532.381,
-     "electricMedianKWh": 43764.909,
-     "fuelMedianKWh": 479634.585,
+     "costMedianUsd": 28251.03,
+     "costSpreadUsd": 2532.633,
+     "electricMedianKWh": 43787.254,
+     "fuelMedianKWh": 479622.703,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -2783,16 +2784,16 @@
      "id": "hybridDesiccant",
      "label": "Liquid-desiccant hybrid (generic)",
      "scenarioId": "5bb76a09-13e9-45c8-bd29-c0ba9826e384",
-     "attainmentMedianPct": 66.192,
-     "attainmentWorstPct": 64.996,
-     "attainmentBestPct": 66.894,
-     "attainmentSpreadPts": 1.898,
+     "attainmentMedianPct": 66.212,
+     "attainmentWorstPct": 64.994,
+     "attainmentBestPct": 66.891,
+     "attainmentSpreadPts": 1.897,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2017",
-     "costMedianUsd": 32666.598,
-     "costSpreadUsd": 3545.995,
-     "electricMedianKWh": 96769.315,
-     "fuelMedianKWh": 434387.941,
+     "costMedianUsd": 32667.714,
+     "costSpreadUsd": 3543.633,
+     "electricMedianKWh": 96780.002,
+     "fuelMedianKWh": 434375.344,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -2802,16 +2803,16 @@
      "id": "integrated",
      "label": "Integrated HVAC + reheat",
      "scenarioId": "9aeac14e-4e37-46d6-8ec5-caabc4e02351",
-     "attainmentMedianPct": 60.37,
+     "attainmentMedianPct": 60.366,
      "attainmentWorstPct": 58.366,
-     "attainmentBestPct": 61.829,
-     "attainmentSpreadPts": 3.463,
+     "attainmentBestPct": 61.839,
+     "attainmentSpreadPts": 3.472,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2017",
-     "costMedianUsd": 34027.63,
-     "costSpreadUsd": 3166.617,
-     "electricMedianKWh": 103903.074,
-     "fuelMedianKWh": 448920.205,
+     "costMedianUsd": 34027.236,
+     "costSpreadUsd": 3162.94,
+     "electricMedianKWh": 103910.404,
+     "fuelMedianKWh": 448905.001,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -2826,45 +2827,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 41.934,
-       "costUsd": 25053.308,
-       "electricKWh": 42129.785,
-       "fuelKWh": 415148.63
+       "attainmentPct": 41.933,
+       "costUsd": 25055.017,
+       "electricKWh": 42151.175,
+       "fuelKWh": 415129.266
       },
       {
        "id": "dehu",
-       "attainmentPct": 68.89,
-       "costUsd": 26402.147,
-       "electricKWh": 67002.364,
-       "fuelKWh": 376761.647
+       "attainmentPct": 68.889,
+       "costUsd": 26403.739,
+       "electricKWh": 67023.62,
+       "fuelKWh": 376740.057
       },
       {
        "id": "dx",
-       "attainmentPct": 69.572,
-       "costUsd": 27969.775,
-       "electricKWh": 80119.122,
-       "fuelKWh": 377933.689
+       "attainmentPct": 69.57,
+       "costUsd": 27971.409,
+       "electricKWh": 80140.735,
+       "fuelKWh": 377912.271
       },
       {
        "id": "integrated",
-       "attainmentPct": 60.729,
-       "costUsd": 33552.607,
-       "electricKWh": 100327.623,
-       "fuelKWh": 449089.995
+       "attainmentPct": 60.727,
+       "costUsd": 33549.277,
+       "electricKWh": 100305.88,
+       "fuelKWh": 449066.078
       },
       {
        "id": "desiccant",
        "attainmentPct": 68.206,
-       "costUsd": 27995.46,
-       "electricKWh": 42083.171,
-       "fuelKWh": 478600.847
+       "costUsd": 27997.083,
+       "electricKWh": 42104.61,
+       "fuelKWh": 478579.455
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 66.23,
-       "costUsd": 32269.106,
-       "electricKWh": 94169.959,
-       "fuelKWh": 434190.398
+       "attainmentPct": 66.228,
+       "costUsd": 32272.373,
+       "electricKWh": 94205.508,
+       "fuelKWh": 434167.233
       }
      ]
     },
@@ -2875,45 +2876,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 42.12,
-       "costUsd": 25148.126,
-       "electricKWh": 44327.482,
-       "fuelKWh": 412133.643
+       "attainmentPct": 42.134,
+       "costUsd": 25152.341,
+       "electricKWh": 44350.392,
+       "fuelKWh": 412164.745
       },
       {
        "id": "dehu",
        "attainmentPct": 69.223,
-       "costUsd": 26371.166,
-       "electricKWh": 69199.839,
-       "fuelKWh": 370976.538
+       "costUsd": 26374.378,
+       "electricKWh": 69206.066,
+       "fuelKWh": 371031.363
       },
       {
        "id": "dx",
-       "attainmentPct": 69.821,
-       "costUsd": 27858.661,
-       "electricKWh": 81460.656,
-       "fuelKWh": 372669.464
+       "attainmentPct": 69.82,
+       "costUsd": 27861.576,
+       "electricKWh": 81468.336,
+       "fuelKWh": 372715.214
       },
       {
        "id": "integrated",
-       "attainmentPct": 61.829,
-       "costUsd": 33874.384,
-       "electricKWh": 103701.588,
-       "fuelKWh": 447853.737
+       "attainmentPct": 61.839,
+       "costUsd": 33872.674,
+       "electricKWh": 103694.322,
+       "fuelKWh": 447838.293
       },
       {
        "id": "desiccant",
-       "attainmentPct": 68.737,
-       "costUsd": 27962.094,
-       "electricKWh": 44158.734,
-       "fuelKWh": 473077.757
+       "attainmentPct": 68.739,
+       "costUsd": 27963.001,
+       "electricKWh": 44181.086,
+       "fuelKWh": 473038.374
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 66.894,
-       "costUsd": 32323.753,
-       "electricKWh": 96706.827,
-       "fuelKWh": 429439.186
+       "attainmentPct": 66.891,
+       "costUsd": 32322.927,
+       "electricKWh": 96700.524,
+       "fuelKWh": 429437.669
       }
      ]
     },
@@ -2924,45 +2925,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 41.236,
-       "costUsd": 25345.171,
-       "electricKWh": 43832.526,
-       "fuelKWh": 415491.373
+       "attainmentPct": 41.235,
+       "costUsd": 25346.862,
+       "electricKWh": 43854.75,
+       "fuelKWh": 415469.603
       },
       {
        "id": "dehu",
        "attainmentPct": 68.84,
-       "costUsd": 26736.457,
-       "electricKWh": 70145.689,
-       "fuelKWh": 374117.073
+       "costUsd": 26737.89,
+       "electricKWh": 70169.032,
+       "fuelKWh": 374086.647
       },
       {
        "id": "dx",
-       "attainmentPct": 69.747,
-       "costUsd": 28327.902,
-       "electricKWh": 83301.451,
-       "fuelKWh": 375962.332
+       "attainmentPct": 69.746,
+       "costUsd": 28329.745,
+       "electricKWh": 83309.255,
+       "fuelKWh": 375981.163
       },
       {
        "id": "integrated",
-       "attainmentPct": 60.102,
-       "costUsd": 34303.773,
-       "electricKWh": 105102.235,
-       "fuelKWh": 451638.842
+       "attainmentPct": 60.097,
+       "costUsd": 34302.675,
+       "electricKWh": 105108.219,
+       "fuelKWh": 451598.216
       },
       {
        "id": "desiccant",
-       "attainmentPct": 68.4,
-       "costUsd": 28402.879,
-       "electricKWh": 43769.398,
-       "fuelKWh": 481458.802
+       "attainmentPct": 68.401,
+       "costUsd": 28404.303,
+       "electricKWh": 43791.425,
+       "fuelKWh": 481431.392
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 66.211,
-       "costUsd": 32858.987,
-       "electricKWh": 98331.458,
-       "fuelKWh": 434585.483
+       "attainmentPct": 66.216,
+       "costUsd": 32859.746,
+       "electricKWh": 98338.144,
+       "fuelKWh": 434583.455
       }
      ]
     },
@@ -2973,45 +2974,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 39.825,
-       "costUsd": 26454.961,
-       "electricKWh": 44691.979,
-       "fuelKWh": 440407.603
+       "attainmentPct": 39.839,
+       "costUsd": 26459.073,
+       "electricKWh": 44713.438,
+       "fuelKWh": 440440.712
       },
       {
        "id": "dehu",
-       "attainmentPct": 69.843,
-       "costUsd": 28093.362,
-       "electricKWh": 73527.641,
-       "fuelKWh": 397573.371
+       "attainmentPct": 69.844,
+       "costUsd": 28096.885,
+       "electricKWh": 73533.019,
+       "fuelKWh": 397637.3
       },
       {
        "id": "dx",
-       "attainmentPct": 70.624,
-       "costUsd": 29720.104,
-       "electricKWh": 86977.682,
-       "fuelKWh": 399196.775
+       "attainmentPct": 70.626,
+       "costUsd": 29723.441,
+       "electricKWh": 86981.559,
+       "fuelKWh": 399260.408
       },
       {
        "id": "integrated",
-       "attainmentPct": 59.446,
-       "costUsd": 35412.852,
-       "electricKWh": 105815.262,
-       "fuelKWh": 476657.915
+       "attainmentPct": 59.453,
+       "costUsd": 35410.208,
+       "electricKWh": 105799.855,
+       "fuelKWh": 476640.286
       },
       {
        "id": "desiccant",
-       "attainmentPct": 68.994,
-       "costUsd": 29913.672,
-       "electricKWh": 44687.293,
-       "fuelKWh": 514915.612
+       "attainmentPct": 68.999,
+       "costUsd": 29915.622,
+       "electricKWh": 44708.996,
+       "fuelKWh": 514901.222
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 66.708,
-       "costUsd": 34786.524,
-       "electricKWh": 104702.151,
-       "fuelKWh": 462701.62
+       "attainmentPct": 66.74,
+       "costUsd": 34785.439,
+       "electricKWh": 104685.328,
+       "fuelKWh": 462722.922
       }
      ]
     },
@@ -3023,44 +3024,44 @@
       {
        "id": "pad",
        "attainmentPct": 40.646,
-       "costUsd": 25226.775,
-       "electricKWh": 43377.548,
-       "fuelKWh": 413523.071
+       "costUsd": 25228.27,
+       "electricKWh": 43399.238,
+       "fuelKWh": 413498.45
       },
       {
        "id": "dehu",
        "attainmentPct": 68.312,
-       "costUsd": 26674.176,
-       "electricKWh": 69220.732,
-       "fuelKWh": 374582.662
+       "costUsd": 26675.718,
+       "electricKWh": 69241.614,
+       "fuelKWh": 374561.551
       },
       {
        "id": "dx",
-       "attainmentPct": 68.826,
-       "costUsd": 28291.603,
-       "electricKWh": 82734.007,
-       "fuelKWh": 376034.52
+       "attainmentPct": 68.825,
+       "costUsd": 28293.386,
+       "electricKWh": 82757.041,
+       "fuelKWh": 376013.351
       },
       {
        "id": "integrated",
-       "attainmentPct": 58.423,
-       "costUsd": 33809.545,
-       "electricKWh": 101893.417,
-       "fuelKWh": 448750.414
+       "attainmentPct": 58.424,
+       "costUsd": 33813.263,
+       "electricKWh": 101927.833,
+       "fuelKWh": 448743.924
       },
       {
        "id": "desiccant",
-       "attainmentPct": 67.574,
-       "costUsd": 28339.617,
-       "electricKWh": 43306.324,
-       "fuelKWh": 480668.323
+       "attainmentPct": 67.575,
+       "costUsd": 28342.133,
+       "electricKWh": 43328.097,
+       "fuelKWh": 480665.951
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 65.591,
-       "costUsd": 32877.809,
-       "electricKWh": 97708.688,
-       "fuelKWh": 435985.212
+       "attainmentPct": 65.59,
+       "costUsd": 32879.138,
+       "electricKWh": 97721.673,
+       "fuelKWh": 435980.432
       }
      ]
     },
@@ -3071,45 +3072,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 42.332,
-       "costUsd": 25223.114,
-       "electricKWh": 43855.442,
-       "fuelKWh": 413125.722
+       "attainmentPct": 42.329,
+       "costUsd": 25224.782,
+       "electricKWh": 43878.09,
+       "fuelKWh": 413103.038
       },
       {
        "id": "dehu",
-       "attainmentPct": 69.176,
-       "costUsd": 26557.389,
-       "electricKWh": 68877.939,
-       "fuelKWh": 373997.41
+       "attainmentPct": 69.173,
+       "costUsd": 26559.069,
+       "electricKWh": 68900.453,
+       "fuelKWh": 373975.338
       },
       {
        "id": "dx",
        "attainmentPct": 69.889,
-       "costUsd": 28341.898,
-       "electricKWh": 83741.186,
-       "fuelKWh": 375594.187
+       "costUsd": 28343.917,
+       "electricKWh": 83762.194,
+       "fuelKWh": 375581.416
       },
       {
        "id": "integrated",
        "attainmentPct": 60.668,
-       "costUsd": 34180.875,
-       "electricKWh": 105355.44,
-       "fuelKWh": 448620.359
+       "costUsd": 34181.797,
+       "electricKWh": 105374.22,
+       "fuelKWh": 448590.181
       },
       {
        "id": "desiccant",
-       "attainmentPct": 68.489,
-       "costUsd": 28158.121,
-       "electricKWh": 43760.42,
-       "fuelKWh": 476533.035
+       "attainmentPct": 68.497,
+       "costUsd": 28159.928,
+       "electricKWh": 43783.084,
+       "fuelKWh": 476513.324
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 66.5,
-       "costUsd": 32474.208,
-       "electricKWh": 96089.095,
-       "fuelKWh": 432392.67
+       "attainmentPct": 66.498,
+       "costUsd": 32475.682,
+       "electricKWh": 96108.758,
+       "fuelKWh": 432372.694
       }
      ]
     },
@@ -3120,45 +3121,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 40.925,
-       "costUsd": 25713.265,
-       "electricKWh": 45045.775,
-       "fuelKWh": 420974.629
+       "attainmentPct": 40.924,
+       "costUsd": 25714.866,
+       "electricKWh": 45067.603,
+       "fuelKWh": 420952.028
       },
       {
        "id": "dehu",
-       "attainmentPct": 68.052,
-       "costUsd": 27277.618,
-       "electricKWh": 71961.746,
-       "fuelKWh": 381718.077
+       "attainmentPct": 68.05,
+       "costUsd": 27279.267,
+       "electricKWh": 71983.812,
+       "fuelKWh": 381695.69
       },
       {
        "id": "dx",
        "attainmentPct": 68.807,
-       "costUsd": 29046.968,
-       "electricKWh": 86714.251,
-       "fuelKWh": 383210.787
+       "costUsd": 29048.653,
+       "electricKWh": 86736.685,
+       "fuelKWh": 383188.406
       },
       {
        "id": "integrated",
        "attainmentPct": 58.366,
-       "costUsd": 34443.944,
-       "electricKWh": 105085.201,
-       "fuelKWh": 455349.293
+       "costUsd": 34445.412,
+       "electricKWh": 105106.074,
+       "fuelKWh": 455326.294
       },
       {
        "id": "desiccant",
-       "attainmentPct": 67.157,
-       "costUsd": 28962.914,
-       "electricKWh": 45039.246,
-       "fuelKWh": 490960.37
+       "attainmentPct": 67.152,
+       "costUsd": 28964.847,
+       "electricKWh": 45061.107,
+       "fuelKWh": 490944.956
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 64.996,
-       "costUsd": 33529.477,
-       "electricKWh": 101056.256,
-       "fuelKWh": 442541.557
+       "attainmentPct": 64.994,
+       "costUsd": 33531.466,
+       "electricKWh": 101080.085,
+       "fuelKWh": 442522.117
       }
      ]
     },
@@ -3170,44 +3171,44 @@
       {
        "id": "pad",
        "attainmentPct": 42.04,
-       "costUsd": 26012.407,
-       "electricKWh": 43544.033,
-       "fuelKWh": 433664.815
+       "costUsd": 26014.039,
+       "electricKWh": 43565.714,
+       "fuelKWh": 433643.224
       },
       {
        "id": "dehu",
-       "attainmentPct": 68.898,
-       "costUsd": 27266.554,
-       "electricKWh": 68981.086,
-       "fuelKWh": 391635.332
+       "attainmentPct": 68.899,
+       "costUsd": 27268.066,
+       "electricKWh": 69001.719,
+       "fuelKWh": 391613.938
       },
       {
        "id": "dx",
-       "attainmentPct": 69.401,
-       "costUsd": 28863.105,
-       "electricKWh": 82175.115,
-       "fuelKWh": 393277.096
+       "attainmentPct": 69.402,
+       "costUsd": 28865.293,
+       "electricKWh": 82198.243,
+       "fuelKWh": 393263.965
       },
       {
        "id": "integrated",
-       "attainmentPct": 59.682,
-       "costUsd": 34483.206,
-       "electricKWh": 101613.798,
-       "fuelKWh": 467277.167
+       "attainmentPct": 59.679,
+       "costUsd": 34484.857,
+       "electricKWh": 101635.644,
+       "fuelKWh": 467255.564
       },
       {
        "id": "desiccant",
-       "attainmentPct": 68.044,
-       "costUsd": 28888.161,
-       "electricKWh": 43412.311,
-       "fuelKWh": 495826.962
+       "attainmentPct": 68.041,
+       "costUsd": 28890.294,
+       "electricKWh": 43434.042,
+       "fuelKWh": 495816.199
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 65.859,
-       "costUsd": 33295.868,
-       "electricKWh": 96831.803,
-       "fuelKWh": 450827.811
+       "attainmentPct": 65.854,
+       "costUsd": 33297.876,
+       "electricKWh": 96859.48,
+       "fuelKWh": 450799.262
       }
      ]
     },
@@ -3218,45 +3219,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 42.433,
-       "costUsd": 24571.385,
-       "electricKWh": 43535.237,
-       "fuelKWh": 397743.706
+       "attainmentPct": 42.431,
+       "costUsd": 24573.052,
+       "electricKWh": 43556.653,
+       "fuelKWh": 397722.808
       },
       {
        "id": "dehu",
        "attainmentPct": 68.661,
-       "costUsd": 25814.299,
-       "electricKWh": 67717.829,
-       "fuelKWh": 358881.918
+       "costUsd": 25815.643,
+       "electricKWh": 67738.447,
+       "fuelKWh": 358856.016
       },
       {
        "id": "dx",
-       "attainmentPct": 69.244,
-       "costUsd": 27556.758,
-       "electricKWh": 82265.417,
-       "fuelKWh": 360390.652
+       "attainmentPct": 69.245,
+       "costUsd": 27557.547,
+       "electricKWh": 82285.026,
+       "fuelKWh": 360355.274
       },
       {
        "id": "integrated",
-       "attainmentPct": 60.637,
-       "costUsd": 33378.457,
-       "electricKWh": 104104.56,
-       "fuelKWh": 432548.215
+       "attainmentPct": 60.635,
+       "costUsd": 33380.418,
+       "electricKWh": 104126.487,
+       "fuelKWh": 432532.225
       },
       {
        "id": "desiccant",
-       "attainmentPct": 68.106,
-       "costUsd": 27398.934,
-       "electricKWh": 43404.194,
-       "fuelKWh": 458895.354
+       "attainmentPct": 68.097,
+       "costUsd": 27401.121,
+       "electricKWh": 43425.936,
+       "fuelKWh": 458884.985
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 66.173,
-       "costUsd": 31613.925,
-       "electricKWh": 94484.88,
-       "fuelKWh": 415869.871
+       "attainmentPct": 66.207,
+       "costUsd": 31614.984,
+       "electricKWh": 94507.318,
+       "fuelKWh": 415832.171
       }
      ]
     },
@@ -3267,45 +3268,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 44.171,
-       "costUsd": 24823.13,
-       "electricKWh": 44086.576,
-       "fuelKWh": 403355.909
+       "attainmentPct": 44.172,
+       "costUsd": 24824.938,
+       "electricKWh": 44109.12,
+       "fuelKWh": 403336.198
       },
       {
        "id": "dehu",
        "attainmentPct": 68.569,
-       "costUsd": 25968.578,
-       "electricKWh": 66105.647,
-       "fuelKWh": 368294.456
+       "costUsd": 25970.269,
+       "electricKWh": 66126.559,
+       "fuelKWh": 368276.665
       },
       {
        "id": "dx",
        "attainmentPct": 69.091,
-       "costUsd": 27515.852,
-       "electricKWh": 79020.539,
-       "fuelKWh": 369812.567
+       "costUsd": 27517.249,
+       "electricKWh": 79038.681,
+       "fuelKWh": 369794.766
       },
       {
        "id": "integrated",
-       "attainmentPct": 60.715,
-       "costUsd": 32246.235,
-       "electricKWh": 95493.736,
-       "fuelKWh": 431981.547
+       "attainmentPct": 60.71,
+       "costUsd": 32247.268,
+       "electricKWh": 95512.027,
+       "fuelKWh": 431954.856
       },
       {
        "id": "desiccant",
-       "attainmentPct": 67.966,
-       "costUsd": 27381.29,
-       "electricKWh": 43982.692,
-       "fuelKWh": 458654.779
+       "attainmentPct": 67.969,
+       "costUsd": 27382.989,
+       "electricKWh": 44005.219,
+       "fuelKWh": 458632.842
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 65.798,
-       "costUsd": 31240.529,
-       "electricKWh": 90667.368,
-       "fuelKWh": 419517.561
+       "attainmentPct": 65.802,
+       "costUsd": 31241.807,
+       "electricKWh": 90685.253,
+       "fuelKWh": 419498.167
       }
      ]
     }
@@ -3394,7 +3395,7 @@
    },
    "verdict": {
     "recommended": null,
-    "recommendedBasis": "Not resolved by this evidence: Pads + condensing dehumidifier at $26,616 and Desiccant + evaporative cooling at $28,249 median annual operating cost differ by 6.1 percent, inside the 16 percent band the Morris screening shows the screened parameter ranges can reorder, while holding the joint band in 68.9% and 68.2% of eligible hours; measuring canopy leaf area and transpiration and the as-built envelope U-value at the site, then comparing capital, maintenance and redundancy, is what would resolve it.",
+    "recommendedBasis": "Not resolved by this evidence: Pads + condensing dehumidifier at $26,617 and Desiccant + evaporative cooling at $28,251 median annual operating cost differ by 6.1 percent, inside the 16 percent band the Morris screening shows the screened parameter ranges can reorder, while holding the joint band in 68.9% and 68.2% of eligible hours; measuring canopy leaf area and transpiration and the as-built envelope U-value at the site, then comparing capital, maintenance and redundancy, is what would resolve it.",
     "runnerUp": "desiccant",
     "marginPct": 6.14,
     "resolved": false,
@@ -3426,7 +3427,7 @@
      "These are 10 observed years (2016 to 2025), 10 particular years, not a sample from a stationary distribution: the worst-to-best spread is what happened, not a forecast, a confidence interval or a design year.",
      "Operating cost only, at the example scenarios' declared 0.12 USD/kWh electricity and 0.045 USD/kWh fuel at every site. Capital, maintenance, redundancy and real tariffs are outside the model, and the six strategies range from 15,000 to 125,000 USD of declared installed cost.",
      "The full six-strategy cost order is year-dependent at this region, so a ranking quoted from any single year is an anecdote.",
-     "Pad + vent baseline is cheaper again at $25,225 but holds the band in only 42.0% of hours, 26.9 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss.",
+     "Pad + vent baseline is cheaper again at $25,227 but holds the band in only 42.0% of hours, 26.9 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss.",
      "Station pressure runs 76 to 80 kPa at this source elevation, so every psychrometric quantity here depends on the pressure path; a sea-level assumption would be wrong in humidity ratio, enthalpy, wet bulb and fan mass flow at once."
     ]
    }
@@ -3548,16 +3549,16 @@
      "id": "pad",
      "label": "Pad + vent baseline",
      "scenarioId": "2d74ad0b-6724-4d1f-bfdd-faaf2a94996c",
-     "attainmentMedianPct": 43.22,
-     "attainmentWorstPct": 41.225,
+     "attainmentMedianPct": 43.221,
+     "attainmentWorstPct": 41.228,
      "attainmentBestPct": 48.239,
-     "attainmentSpreadPts": 7.013,
+     "attainmentSpreadPts": 7.011,
      "attainmentWorstYear": "2022",
      "attainmentBestYear": "2016",
-     "costMedianUsd": 34103.067,
-     "costSpreadUsd": 2821.813,
-     "electricMedianKWh": 78717.458,
-     "fuelMedianKWh": 527227.57,
+     "costMedianUsd": 34105.571,
+     "costSpreadUsd": 2821.48,
+     "electricMedianKWh": 78749.26,
+     "fuelMedianKWh": 527195.753,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -3568,15 +3569,15 @@
      "label": "Pads + condensing dehumidifier",
      "scenarioId": "a66b0673-51bc-4c82-b4b3-365ca0031dcb",
      "attainmentMedianPct": 68.233,
-     "attainmentWorstPct": 65.341,
+     "attainmentWorstPct": 65.342,
      "attainmentBestPct": 70.988,
-     "attainmentSpreadPts": 5.647,
+     "attainmentSpreadPts": 5.646,
      "attainmentWorstYear": "2017",
      "attainmentBestYear": "2016",
-     "costMedianUsd": 35667.728,
-     "costSpreadUsd": 2117.896,
-     "electricMedianKWh": 131774.914,
-     "fuelMedianKWh": 419383.855,
+     "costMedianUsd": 35671.046,
+     "costSpreadUsd": 2118.101,
+     "electricMedianKWh": 131805.953,
+     "fuelMedianKWh": 419352.277,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -3587,15 +3588,15 @@
      "label": "Desiccant + evaporative cooling",
      "scenarioId": "3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed",
      "attainmentMedianPct": 84.98,
-     "attainmentWorstPct": 82.579,
-     "attainmentBestPct": 86.584,
-     "attainmentSpreadPts": 4.005,
+     "attainmentWorstPct": 82.58,
+     "attainmentBestPct": 86.586,
+     "attainmentSpreadPts": 4.007,
      "attainmentWorstYear": "2021",
      "attainmentBestYear": "2025",
-     "costMedianUsd": 40137.053,
-     "costSpreadUsd": 2080.826,
-     "electricMedianKWh": 78371.073,
-     "fuelMedianKWh": 662430.632,
+     "costMedianUsd": 40139.093,
+     "costSpreadUsd": 2080.653,
+     "electricMedianKWh": 78403.001,
+     "fuelMedianKWh": 662396.197,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -3606,15 +3607,15 @@
      "label": "DX / mini-split + dehumidifier",
      "scenarioId": "fd190fa2-ffba-4423-88ff-b474c81a8015",
      "attainmentMedianPct": 87.106,
-     "attainmentWorstPct": 85.58,
-     "attainmentBestPct": 87.846,
+     "attainmentWorstPct": 85.582,
+     "attainmentBestPct": 87.849,
      "attainmentSpreadPts": 2.266,
      "attainmentWorstYear": "2021",
      "attainmentBestYear": "2019",
-     "costMedianUsd": 43254.905,
-     "costSpreadUsd": 2551.177,
-     "electricMedianKWh": 167260.093,
-     "fuelMedianKWh": 495649.018,
+     "costMedianUsd": 43255.04,
+     "costSpreadUsd": 2552.45,
+     "electricMedianKWh": 167291.484,
+     "fuelMedianKWh": 495631.362,
      "frontier": true,
      "dominated": false,
      "numericalFailureHours": 0,
@@ -3624,16 +3625,16 @@
      "id": "hybridDesiccant",
      "label": "Liquid-desiccant hybrid (generic)",
      "scenarioId": "5bb76a09-13e9-45c8-bd29-c0ba9826e384",
-     "attainmentMedianPct": 82.375,
+     "attainmentMedianPct": 82.377,
      "attainmentWorstPct": 80.89,
-     "attainmentBestPct": 84.549,
-     "attainmentSpreadPts": 3.659,
+     "attainmentBestPct": 84.552,
+     "attainmentSpreadPts": 3.662,
      "attainmentWorstYear": "2021",
      "attainmentBestYear": "2025",
-     "costMedianUsd": 51044.166,
-     "costSpreadUsd": 2980.551,
-     "electricMedianKWh": 215885.692,
-     "fuelMedianKWh": 541926.275,
+     "costMedianUsd": 51046.233,
+     "costSpreadUsd": 2986.52,
+     "electricMedianKWh": 215913.013,
+     "fuelMedianKWh": 541930.627,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -3644,15 +3645,15 @@
      "label": "Integrated HVAC + reheat",
      "scenarioId": "9aeac14e-4e37-46d6-8ec5-caabc4e02351",
      "attainmentMedianPct": 67.196,
-     "attainmentWorstPct": 65.219,
-     "attainmentBestPct": 68.767,
-     "attainmentSpreadPts": 3.548,
+     "attainmentWorstPct": 65.22,
+     "attainmentBestPct": 68.771,
+     "attainmentSpreadPts": 3.551,
      "attainmentWorstYear": "2017",
      "attainmentBestYear": "2016",
-     "costMedianUsd": 53099.666,
-     "costSpreadUsd": 2814.571,
-     "electricMedianKWh": 207053.313,
-     "fuelMedianKWh": 611446.391,
+     "costMedianUsd": 53101.813,
+     "costSpreadUsd": 2819.272,
+     "electricMedianKWh": 207083.791,
+     "fuelMedianKWh": 611429.14,
      "frontier": false,
      "dominated": true,
      "numericalFailureHours": 0,
@@ -3668,44 +3669,44 @@
       {
        "id": "pad",
        "attainmentPct": 48.239,
-       "costUsd": 35821.729,
-       "electricKWh": 81980.063,
-       "fuelKWh": 557355.173
+       "costUsd": 35824.435,
+       "electricKWh": 82012.616,
+       "fuelKWh": 557328.337
       },
       {
        "id": "dehu",
        "attainmentPct": 70.988,
-       "costUsd": 36441.29,
-       "electricKWh": 131844.75,
-       "fuelKWh": 435197.267
+       "costUsd": 36443.961,
+       "electricKWh": 131876.099,
+       "fuelKWh": 435172.97
       },
       {
        "id": "dx",
-       "attainmentPct": 86.78,
-       "costUsd": 42862.729,
-       "electricKWh": 161339.871,
-       "fuelKWh": 498824.522
+       "attainmentPct": 86.774,
+       "costUsd": 42866.064,
+       "electricKWh": 161374.208,
+       "fuelKWh": 498807.043
       },
       {
        "id": "integrated",
-       "attainmentPct": 68.767,
-       "costUsd": 52425.258,
-       "electricKWh": 193466.541,
-       "fuelKWh": 626381.786
+       "attainmentPct": 68.771,
+       "costUsd": 52427.331,
+       "electricKWh": 193495.868,
+       "fuelKWh": 626349.507
       },
       {
        "id": "desiccant",
-       "attainmentPct": 84.901,
-       "costUsd": 40616.135,
-       "electricKWh": 81199.687,
-       "fuelKWh": 662163.103
+       "attainmentPct": 84.902,
+       "costUsd": 40618.764,
+       "electricKWh": 81232.273,
+       "fuelKWh": 662134.508
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 82.267,
-       "costUsd": 51073.426,
-       "electricKWh": 210648.709,
-       "fuelKWh": 548709.956
+       "attainmentPct": 82.27,
+       "costUsd": 51075.288,
+       "electricKWh": 210676.813,
+       "fuelKWh": 548676.34
       }
      ]
     },
@@ -3716,45 +3717,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 41.459,
-       "costUsd": 34125.95,
-       "electricKWh": 80291.914,
-       "fuelKWh": 525251.26
+       "attainmentPct": 41.46,
+       "costUsd": 34128.427,
+       "electricKWh": 80325.948,
+       "fuelKWh": 525215.474
       },
       {
        "id": "dehu",
-       "attainmentPct": 65.341,
-       "costUsd": 36354.692,
-       "electricKWh": 136152.463,
-       "fuelKWh": 422019.281
+       "attainmentPct": 65.342,
+       "costUsd": 36357.658,
+       "electricKWh": 136186.249,
+       "fuelKWh": 421994.943
       },
       {
        "id": "dx",
        "attainmentPct": 87.179,
-       "costUsd": 44967.612,
-       "electricKWh": 175544.002,
-       "fuelKWh": 507780.563
+       "costUsd": 44969.801,
+       "electricKWh": 175578.818,
+       "fuelKWh": 507736.482
       },
       {
        "id": "integrated",
-       "attainmentPct": 65.219,
-       "costUsd": 54957.022,
-       "electricKWh": 218236.531,
-       "fuelKWh": 616899.037
+       "attainmentPct": 65.22,
+       "costUsd": 54959.209,
+       "electricKWh": 218271.682,
+       "fuelKWh": 616853.922
       },
       {
        "id": "desiccant",
        "attainmentPct": 84.706,
-       "costUsd": 41317.866,
-       "electricKWh": 80176.122,
-       "fuelKWh": 680411.256
+       "costUsd": 41319.028,
+       "electricKWh": 80208.556,
+       "fuelKWh": 680350.547
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 82.269,
-       "costUsd": 52680.929,
-       "electricKWh": 223836.778,
-       "fuelKWh": 548660.87
+       "attainmentPct": 82.271,
+       "costUsd": 52682.566,
+       "electricKWh": 223859.715,
+       "fuelKWh": 548635.963
       }
      ]
     },
@@ -3765,45 +3766,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 45.377,
-       "costUsd": 34514.637,
-       "electricKWh": 78191.287,
-       "fuelKWh": 538502.279
+       "attainmentPct": 45.389,
+       "costUsd": 34519.915,
+       "electricKWh": 78222.919,
+       "fuelKWh": 538533.222
       },
       {
        "id": "dehu",
-       "attainmentPct": 69.888,
-       "costUsd": 35803.05,
-       "electricKWh": 127377.776,
-       "fuelKWh": 432769.662
+       "attainmentPct": 69.898,
+       "costUsd": 35807.352,
+       "electricKWh": 127392.841,
+       "fuelKWh": 432824.528
       },
       {
        "id": "dx",
-       "attainmentPct": 86.783,
-       "costUsd": 43064.267,
-       "electricKWh": 161381.952,
-       "fuelKWh": 503006.337
+       "attainmentPct": 86.785,
+       "costUsd": 43063.332,
+       "electricKWh": 161365.873,
+       "fuelKWh": 503029.137
       },
       {
        "id": "integrated",
-       "attainmentPct": 68.093,
-       "costUsd": 52255.565,
-       "electricKWh": 196441.771,
-       "fuelKWh": 614614.21
+       "attainmentPct": 68.108,
+       "costUsd": 52254.354,
+       "electricKWh": 196428.834,
+       "fuelKWh": 614621.208
       },
       {
        "id": "desiccant",
        "attainmentPct": 85.058,
-       "costUsd": 39991.653,
-       "electricKWh": 77685.749,
-       "fuelKWh": 657423.835
+       "costUsd": 39994.058,
+       "electricKWh": 77717.447,
+       "fuelKWh": 657392.751
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 82.422,
-       "costUsd": 50366.98,
-       "electricKWh": 205889.235,
-       "fuelKWh": 545358.092
+       "attainmentPct": 82.425,
+       "costUsd": 50363.258,
+       "electricKWh": 205841.051,
+       "fuelKWh": 545403.771
       }
      ]
     },
@@ -3814,45 +3815,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 43.954,
-       "costUsd": 33674.661,
-       "electricKWh": 77297.141,
-       "fuelKWh": 522437.73
+       "attainmentPct": 43.956,
+       "costUsd": 33676.735,
+       "electricKWh": 77328.671,
+       "fuelKWh": 522399.766
       },
       {
        "id": "dehu",
-       "attainmentPct": 68.976,
-       "costUsd": 35485.147,
-       "electricKWh": 130708.257,
-       "fuelKWh": 416748.43
+       "attainmentPct": 68.977,
+       "costUsd": 35486.998,
+       "electricKWh": 130738.248,
+       "fuelKWh": 416709.61
       },
       {
        "id": "dx",
-       "attainmentPct": 87.846,
-       "costUsd": 42658.04,
-       "electricKWh": 161921.895,
-       "fuelKWh": 492473.513
+       "attainmentPct": 87.849,
+       "costUsd": 42660.259,
+       "electricKWh": 161947.142,
+       "fuelKWh": 492455.681
       },
       {
        "id": "integrated",
-       "attainmentPct": 68.254,
-       "costUsd": 52501.372,
-       "electricKWh": 201585.071,
-       "fuelKWh": 606258.252
+       "attainmentPct": 68.256,
+       "costUsd": 52503.997,
+       "electricKWh": 201617.373,
+       "fuelKWh": 606230.408
       },
       {
        "id": "desiccant",
        "attainmentPct": 86.425,
-       "costUsd": 40152.465,
-       "electricKWh": 76984.502,
-       "fuelKWh": 662698.161
+       "costUsd": 40154.491,
+       "electricKWh": 77016.524,
+       "fuelKWh": 662657.886
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 83.053,
-       "costUsd": 50758.533,
-       "electricKWh": 211859.025,
-       "fuelKWh": 538494.458
+       "attainmentPct": 83.05,
+       "costUsd": 50760.352,
+       "electricKWh": 211888.107,
+       "fuelKWh": 538457.483
       }
      ]
     },
@@ -3863,45 +3864,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 43.515,
-       "costUsd": 34080.185,
-       "electricKWh": 78258.212,
-       "fuelKWh": 529203.879
+       "attainmentPct": 43.516,
+       "costUsd": 34082.714,
+       "electricKWh": 78289.675,
+       "fuelKWh": 529176.031
       },
       {
        "id": "dehu",
-       "attainmentPct": 69.578,
-       "costUsd": 35532.407,
-       "electricKWh": 131705.078,
-       "fuelKWh": 415542.722
+       "attainmentPct": 69.579,
+       "costUsd": 35534.74,
+       "electricKWh": 131735.806,
+       "fuelKWh": 415512.683
       },
       {
        "id": "dx",
-       "attainmentPct": 87.669,
-       "costUsd": 42868.496,
-       "electricKWh": 164668.561,
-       "fuelKWh": 490121.109
+       "attainmentPct": 87.671,
+       "costUsd": 42870.502,
+       "electricKWh": 164701.341,
+       "fuelKWh": 490078.272
       },
       {
        "id": "integrated",
-       "attainmentPct": 68.009,
-       "costUsd": 52936.786,
-       "electricKWh": 204588.044,
-       "fuelKWh": 608278.572
+       "attainmentPct": 68.007,
+       "costUsd": 52938.058,
+       "electricKWh": 204614.189,
+       "fuelKWh": 608237.071
       },
       {
        "id": "desiccant",
-       "attainmentPct": 85.73,
-       "costUsd": 40068.863,
-       "electricKWh": 77689.456,
-       "fuelKWh": 659392.352
+       "attainmentPct": 85.732,
+       "costUsd": 40070.998,
+       "electricKWh": 77720.985,
+       "fuelKWh": 659355.98
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 83.228,
-       "costUsd": 51014.907,
-       "electricKWh": 214732.902,
-       "fuelKWh": 536717.086
+       "attainmentPct": 83.23,
+       "costUsd": 51017.179,
+       "electricKWh": 214765.334,
+       "fuelKWh": 536681.322
       }
      ]
     },
@@ -3912,45 +3913,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 41.916,
-       "costUsd": 33621.188,
-       "electricKWh": 79176.704,
-       "fuelKWh": 515613.03
+       "attainmentPct": 41.919,
+       "costUsd": 33623.538,
+       "electricKWh": 79208.846,
+       "fuelKWh": 515579.446
       },
       {
        "id": "dehu",
-       "attainmentPct": 65.621,
-       "costUsd": 35497.508,
-       "electricKWh": 132889.256,
-       "fuelKWh": 410559.946
+       "attainmentPct": 65.624,
+       "costUsd": 35499.783,
+       "electricKWh": 132921.415,
+       "fuelKWh": 410524.776
       },
       {
        "id": "dx",
-       "attainmentPct": 85.58,
-       "costUsd": 43573.772,
-       "electricKWh": 171332.509,
-       "fuelKWh": 487182.724
+       "attainmentPct": 85.582,
+       "costUsd": 43575.602,
+       "electricKWh": 171361.719,
+       "fuelKWh": 487145.471
       },
       {
        "id": "integrated",
-       "attainmentPct": 66.383,
-       "costUsd": 53090.643,
-       "electricKWh": 209816.871,
-       "fuelKWh": 597130.909
+       "attainmentPct": 66.384,
+       "costUsd": 53093.011,
+       "electricKWh": 209848.64,
+       "fuelKWh": 597098.779
       },
       {
        "id": "desiccant",
-       "attainmentPct": 82.579,
-       "costUsd": 40121.641,
-       "electricKWh": 79052.689,
-       "fuelKWh": 655862.304
+       "attainmentPct": 82.58,
+       "costUsd": 40123.695,
+       "electricKWh": 79085.017,
+       "fuelKWh": 655821.609
       },
       {
        "id": "hybridDesiccant",
        "attainmentPct": 80.89,
-       "costUsd": 50963.884,
-       "electricKWh": 216381.307,
-       "fuelKWh": 529071.954
+       "costUsd": 50965.559,
+       "electricKWh": 216406.019,
+       "fuelKWh": 529043.188
       }
      ]
     },
@@ -3961,45 +3962,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 41.225,
-       "costUsd": 33026.767,
-       "electricKWh": 75771.532,
-       "fuelKWh": 513026.112
+       "attainmentPct": 41.228,
+       "costUsd": 33029.472,
+       "electricKWh": 75803.052,
+       "fuelKWh": 513001.875
       },
       {
        "id": "dehu",
-       "attainmentPct": 66.624,
-       "costUsd": 35184.949,
-       "electricKWh": 131102.535,
-       "fuelKWh": 409790.163
+       "attainmentPct": 66.627,
+       "costUsd": 35187.017,
+       "electricKWh": 131132.529,
+       "fuelKWh": 409756.209
       },
       {
        "id": "dx",
-       "attainmentPct": 86.688,
-       "costUsd": 43445.543,
-       "electricKWh": 169851.626,
-       "fuelKWh": 489498.386
+       "attainmentPct": 86.69,
+       "costUsd": 43446.748,
+       "electricKWh": 169881.628,
+       "fuelKWh": 489445.213
       },
       {
        "id": "integrated",
        "attainmentPct": 65.954,
-       "costUsd": 53292.697,
-       "electricKWh": 211276.132,
-       "fuelKWh": 598896.879
+       "costUsd": 53293.525,
+       "electricKWh": 211295.356,
+       "fuelKWh": 598864.096
       },
       {
        "id": "desiccant",
-       "attainmentPct": 84.371,
-       "costUsd": 40006.199,
-       "electricKWh": 75675.922,
-       "fuelKWh": 663648.751
+       "attainmentPct": 84.373,
+       "costUsd": 40006.615,
+       "electricKWh": 75706.582,
+       "fuelKWh": 663576.433
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 82.329,
-       "costUsd": 51317.882,
-       "electricKWh": 218729.078,
-       "fuelKWh": 531938.5
+       "attainmentPct": 82.33,
+       "costUsd": 51315.688,
+       "electricKWh": 218709.429,
+       "fuelKWh": 531942.121
       }
      ]
     },
@@ -4011,44 +4012,44 @@
       {
        "id": "pad",
        "attainmentPct": 42.446,
-       "costUsd": 33717.898,
-       "electricKWh": 79393.874,
-       "fuelKWh": 516673.447
+       "costUsd": 33719.986,
+       "electricKWh": 79427.808,
+       "fuelKWh": 516629.45
       },
       {
        "id": "dehu",
-       "attainmentPct": 67.962,
-       "costUsd": 35421.195,
-       "electricKWh": 134283.278,
-       "fuelKWh": 404692.8
+       "attainmentPct": 67.963,
+       "costUsd": 35423.521,
+       "electricKWh": 134317.729,
+       "fuelKWh": 404652.673
       },
       {
        "id": "dx",
-       "attainmentPct": 87.556,
-       "costUsd": 43004.121,
-       "electricKWh": 170151.55,
-       "fuelKWh": 477275.265
+       "attainmentPct": 87.554,
+       "costUsd": 43007.309,
+       "electricKWh": 170185.666,
+       "fuelKWh": 477255.306
       },
       {
        "id": "integrated",
-       "attainmentPct": 68.056,
-       "costUsd": 53108.69,
-       "electricKWh": 209789.281,
-       "fuelKWh": 597109.9
+       "attainmentPct": 68.058,
+       "costUsd": 53110.615,
+       "electricKWh": 209818.759,
+       "fuelKWh": 597074.008
       },
       {
        "id": "desiccant",
        "attainmentPct": 84.402,
-       "costUsd": 40039.795,
-       "electricKWh": 79063.25,
-       "fuelKWh": 653624.031
+       "costUsd": 40042.183,
+       "electricKWh": 79097.197,
+       "fuelKWh": 653586.715
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 81.872,
-       "costUsd": 50765.861,
-       "electricKWh": 216850.676,
-       "fuelKWh": 523579.75
+       "attainmentPct": 81.871,
+       "costUsd": 50768.205,
+       "electricKWh": 216884.96,
+       "fuelKWh": 523540.463
       }
      ]
     },
@@ -4059,45 +4060,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 43.305,
-       "costUsd": 35463.461,
-       "electricKWh": 80365.11,
-       "fuelKWh": 555177.613
+       "attainmentPct": 43.307,
+       "costUsd": 35466.105,
+       "electricKWh": 80399.637,
+       "fuelKWh": 555144.228
       },
       {
        "id": "dehu",
-       "attainmentPct": 67.646,
-       "costUsd": 37302.846,
-       "electricKWh": 134381.421,
-       "fuelKWh": 448450.06
+       "attainmentPct": 67.647,
+       "costUsd": 37305.119,
+       "electricKWh": 134417.47,
+       "fuelKWh": 448404.3
       },
       {
        "id": "dx",
-       "attainmentPct": 87.032,
-       "costUsd": 45209.217,
-       "electricKWh": 170616.67,
-       "fuelKWh": 526931.187
+       "attainmentPct": 87.033,
+       "costUsd": 45212.708,
+       "electricKWh": 170660.002,
+       "fuelKWh": 526892.881
       },
       {
        "id": "integrated",
-       "attainmentPct": 66.22,
-       "costUsd": 54866.653,
-       "electricKWh": 209518.582,
-       "fuelKWh": 638766.149
+       "attainmentPct": 66.221,
+       "costUsd": 54869.336,
+       "electricKWh": 209553.394,
+       "fuelKWh": 638732.842
       },
       {
        "id": "desiccant",
        "attainmentPct": 85.34,
-       "costUsd": 42072.479,
-       "electricKWh": 80096.322,
-       "fuelKWh": 698125.951
+       "costUsd": 42074.711,
+       "electricKWh": 80130.767,
+       "fuelKWh": 698083.668
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 83.343,
-       "costUsd": 53047.298,
-       "electricKWh": 218969.428,
-       "fuelKWh": 570640.751
+       "attainmentPct": 83.344,
+       "costUsd": 53050.008,
+       "electricKWh": 218998.769,
+       "fuelKWh": 570622.675
       }
      ]
     },
@@ -4108,45 +4109,45 @@
      "strategies": [
       {
        "id": "pad",
-       "attainmentPct": 43.135,
-       "costUsd": 35848.58,
-       "electricKWh": 75951.532,
-       "fuelKWh": 576824.929
+       "attainmentPct": 43.136,
+       "costUsd": 35850.952,
+       "electricKWh": 75982.465,
+       "fuelKWh": 576795.077
       },
       {
        "id": "dehu",
        "attainmentPct": 68.504,
-       "costUsd": 37181.469,
-       "electricKWh": 128094.93,
-       "fuelKWh": 463838.44
+       "costUsd": 37183.798,
+       "electricKWh": 128125.295,
+       "fuelKWh": 463809.177
       },
       {
        "id": "dx",
-       "attainmentPct": 87.461,
-       "costUsd": 45137.775,
-       "electricKWh": 163228.481,
-       "fuelKWh": 546080.909
+       "attainmentPct": 87.46,
+       "costUsd": 45138.932,
+       "electricKWh": 163255.65,
+       "fuelKWh": 546034.287
       },
       {
        "id": "integrated",
-       "attainmentPct": 65.902,
-       "costUsd": 55070.137,
-       "electricKWh": 203165.424,
-       "fuelKWh": 661115.052
+       "attainmentPct": 65.901,
+       "costUsd": 55073.625,
+       "electricKWh": 203204.516,
+       "fuelKWh": 661088.181
       },
       {
        "id": "desiccant",
-       "attainmentPct": 86.584,
-       "costUsd": 41853.565,
-       "electricKWh": 75251.685,
-       "fuelKWh": 707443.866
+       "attainmentPct": 86.586,
+       "costUsd": 41855.635,
+       "electricKWh": 75282.651,
+       "fuelKWh": 707407.306
       },
       {
        "id": "hybridDesiccant",
-       "attainmentPct": 84.549,
-       "costUsd": 53347.531,
-       "electricKWh": 215390.077,
-       "fuelKWh": 588746.654
+       "attainmentPct": 84.552,
+       "costUsd": 53349.778,
+       "electricKWh": 215420.008,
+       "fuelKWh": 588716.734
       }
      ]
     }
@@ -4235,9 +4236,9 @@
    },
    "verdict": {
     "recommended": null,
-    "recommendedBasis": "Not resolved by this evidence: Desiccant + evaporative cooling at $40,137 and DX / mini-split + dehumidifier at $43,255 median annual operating cost differ by 7.8 percent, inside the 16 percent band the Morris screening shows the screened parameter ranges can reorder, while holding the joint band in 85.0% and 87.1% of eligible hours; measuring canopy leaf area and transpiration and the as-built envelope U-value at the site, then comparing capital, maintenance and redundancy, is what would resolve it.",
+    "recommendedBasis": "Not resolved by this evidence: Desiccant + evaporative cooling at $40,139 and DX / mini-split + dehumidifier at $43,255 median annual operating cost differ by 7.8 percent, inside the 16 percent band the Morris screening shows the screened parameter ranges can reorder, while holding the joint band in 85.0% and 87.1% of eligible hours; measuring canopy leaf area and transpiration and the as-built envelope U-value at the site, then comparing capital, maintenance and redundancy, is what would resolve it.",
     "runnerUp": "dx",
-    "marginPct": 7.77,
+    "marginPct": 7.76,
     "resolved": false,
     "candidates": [
      "desiccant",
@@ -4265,7 +4266,842 @@
      "The 16 percent band is the measured Morris reorder band from docs/SENSITIVITY.md, not a confidence interval: nothing here says which of Desiccant + evaporative cooling and DX / mini-split + dehumidifier is cheaper at a real site.",
      "These are 10 observed years (2016 to 2025), 10 particular years, not a sample from a stationary distribution: the worst-to-best spread is what happened, not a forecast, a confidence interval or a design year.",
      "Operating cost only, at the example scenarios' declared 0.12 USD/kWh electricity and 0.045 USD/kWh fuel at every site. Capital, maintenance, redundancy and real tariffs are outside the model, and the six strategies range from 15,000 to 125,000 USD of declared installed cost.",
-     "Pad + vent baseline is cheaper again at $34,103 but holds the band in only 43.2% of hours, 41.8 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss."
+     "Pad + vent baseline is cheaper again at $34,106 but holds the band in only 43.2% of hours, 41.8 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss."
+    ]
+   }
+  },
+  {
+   "key": "fairbanks",
+   "label": "Fairbanks, AK",
+   "zip": "99701",
+   "climate": "subarctic, light-limited",
+   "years": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "weather": {
+    "padEffectiveHoursMedian": 10,
+    "freeCoolingHoursMedian": 87.5,
+    "heatingHoursMedian": 8348,
+    "moistureLimitedHoursMedian": 165.446,
+    "temperatureLimitedHoursMedian": 0.55,
+    "designDryBulbC": 23.63,
+    "coincidentWetBulbC": 18.411,
+    "designDewPointC": 16.81,
+    "meanSummerWetBulbC": 11.857,
+    "designWetBulbC": 18.439,
+    "designHours": 87672,
+    "perYear": [
+     {
+      "year": 2016,
+      "padEffectiveHours": 7,
+      "freeCoolingHours": 74,
+      "heatingHours": 8468,
+      "moistureLimitedHours": 140.468,
+      "temperatureLimitedHours": 2.532
+     },
+     {
+      "year": 2017,
+      "padEffectiveHours": 9,
+      "freeCoolingHours": 132,
+      "heatingHours": 8235,
+      "moistureLimitedHours": 213.795,
+      "temperatureLimitedHours": 0.205
+     },
+     {
+      "year": 2018,
+      "padEffectiveHours": 19,
+      "freeCoolingHours": 56,
+      "heatingHours": 8472,
+      "moistureLimitedHours": 121.524,
+      "temperatureLimitedHours": 0.476
+     },
+     {
+      "year": 2019,
+      "padEffectiveHours": 13,
+      "freeCoolingHours": 90,
+      "heatingHours": 8229,
+      "moistureLimitedHours": 244.545,
+      "temperatureLimitedHours": 3.455
+     },
+     {
+      "year": 2020,
+      "padEffectiveHours": 0,
+      "freeCoolingHours": 41,
+      "heatingHours": 8649,
+      "moistureLimitedHours": 76,
+      "temperatureLimitedHours": 0
+     },
+     {
+      "year": 2021,
+      "padEffectiveHours": 10,
+      "freeCoolingHours": 77,
+      "heatingHours": 8360,
+      "moistureLimitedHours": 172.881,
+      "temperatureLimitedHours": 0.119
+     },
+     {
+      "year": 2022,
+      "padEffectiveHours": 6,
+      "freeCoolingHours": 92,
+      "heatingHours": 8352,
+      "moistureLimitedHours": 143.478,
+      "temperatureLimitedHours": 0.522
+     },
+     {
+      "year": 2023,
+      "padEffectiveHours": 10,
+      "freeCoolingHours": 133,
+      "heatingHours": 8163,
+      "moistureLimitedHours": 267.67,
+      "temperatureLimitedHours": 2.33
+     },
+     {
+      "year": 2024,
+      "padEffectiveHours": 14,
+      "freeCoolingHours": 86,
+      "heatingHours": 8344,
+      "moistureLimitedHours": 158.011,
+      "temperatureLimitedHours": 3.989
+     },
+     {
+      "year": 2025,
+      "padEffectiveHours": 40,
+      "freeCoolingHours": 89,
+      "heatingHours": 8272,
+      "moistureLimitedHours": 184.421,
+      "temperatureLimitedHours": 0.579
+     }
+    ]
+   },
+   "strategies": [
+    {
+     "id": "pad",
+     "label": "Pad + vent baseline",
+     "scenarioId": "2d74ad0b-6724-4d1f-bfdd-faaf2a94996c",
+     "attainmentMedianPct": 26.798,
+     "attainmentWorstPct": 23.132,
+     "attainmentBestPct": 28.027,
+     "attainmentSpreadPts": 4.895,
+     "attainmentWorstYear": "2023",
+     "attainmentBestYear": "2018",
+     "costMedianUsd": 47390.382,
+     "costSpreadUsd": 3100.758,
+     "electricMedianKWh": 96937.421,
+     "fuelMedianKWh": 784897.458,
+     "frontier": true,
+     "dominated": false,
+     "numericalFailureHours": 0,
+     "rank": 1
+    },
+    {
+     "id": "dehu",
+     "label": "Pads + condensing dehumidifier",
+     "scenarioId": "a66b0673-51bc-4c82-b4b3-365ca0031dcb",
+     "attainmentMedianPct": 43.271,
+     "attainmentWorstPct": 40.624,
+     "attainmentBestPct": 46.576,
+     "attainmentSpreadPts": 5.951,
+     "attainmentWorstYear": "2021",
+     "attainmentBestYear": "2016",
+     "costMedianUsd": 51610.637,
+     "costSpreadUsd": 3152.625,
+     "electricMedianKWh": 162687.264,
+     "fuelMedianKWh": 696656.698,
+     "frontier": true,
+     "dominated": false,
+     "numericalFailureHours": 0,
+     "rank": 2
+    },
+    {
+     "id": "dx",
+     "label": "DX / mini-split + dehumidifier",
+     "scenarioId": "fd190fa2-ffba-4423-88ff-b474c81a8015",
+     "attainmentMedianPct": 56.106,
+     "attainmentWorstPct": 52.081,
+     "attainmentBestPct": 61.242,
+     "attainmentSpreadPts": 9.16,
+     "attainmentWorstYear": "2021",
+     "attainmentBestYear": "2025",
+     "costMedianUsd": 55900.351,
+     "costSpreadUsd": 2349.469,
+     "electricMedianKWh": 181624.65,
+     "fuelMedianKWh": 741447.205,
+     "frontier": true,
+     "dominated": false,
+     "numericalFailureHours": 0,
+     "rank": 3
+    },
+    {
+     "id": "desiccant",
+     "label": "Desiccant + evaporative cooling",
+     "scenarioId": "3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed",
+     "attainmentMedianPct": 63.954,
+     "attainmentWorstPct": 59.583,
+     "attainmentBestPct": 69.663,
+     "attainmentSpreadPts": 10.08,
+     "attainmentWorstYear": "2021",
+     "attainmentBestYear": "2025",
+     "costMedianUsd": 58751.846,
+     "costSpreadUsd": 2960.918,
+     "electricMedianKWh": 96481.283,
+     "fuelMedianKWh": 1029915.166,
+     "frontier": true,
+     "dominated": false,
+     "numericalFailureHours": 0,
+     "rank": 4
+    },
+    {
+     "id": "integrated",
+     "label": "Integrated HVAC + reheat",
+     "scenarioId": "9aeac14e-4e37-46d6-8ec5-caabc4e02351",
+     "attainmentMedianPct": 40.61,
+     "attainmentWorstPct": 35.886,
+     "attainmentBestPct": 43.423,
+     "attainmentSpreadPts": 7.537,
+     "attainmentWorstYear": "2023",
+     "attainmentBestYear": "2016",
+     "costMedianUsd": 58979.496,
+     "costSpreadUsd": 3144.64,
+     "electricMedianKWh": 171663.527,
+     "fuelMedianKWh": 837477.354,
+     "frontier": false,
+     "dominated": true,
+     "numericalFailureHours": 0,
+     "rank": 5
+    },
+    {
+     "id": "hybridDesiccant",
+     "label": "Liquid-desiccant hybrid (generic)",
+     "scenarioId": "5bb76a09-13e9-45c8-bd29-c0ba9826e384",
+     "attainmentMedianPct": 56.161,
+     "attainmentWorstPct": 51.968,
+     "attainmentBestPct": 60.99,
+     "attainmentSpreadPts": 9.021,
+     "attainmentWorstYear": "2021",
+     "attainmentBestYear": "2025",
+     "costMedianUsd": 73064.028,
+     "costSpreadUsd": 4511.013,
+     "electricMedianKWh": 296231.328,
+     "fuelMedianKWh": 817105.308,
+     "frontier": false,
+     "dominated": true,
+     "numericalFailureHours": 0,
+     "rank": 6
+    }
+   ],
+   "perYear": [
+    {
+     "year": 2016,
+     "validHours": 8784,
+     "expectedHours": 8784,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 27.994,
+       "costUsd": 46844,
+       "electricKWh": 96212.934,
+       "fuelKWh": 771528.234
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 46.576,
+       "costUsd": 50805.286,
+       "electricKWh": 164129.973,
+       "fuelKWh": 672476.508
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 59.327,
+       "costUsd": 55187.227,
+       "electricKWh": 182236.038,
+       "fuelKWh": 721033.261
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 43.423,
+       "costUsd": 58596.73,
+       "electricKWh": 172081.399,
+       "fuelKWh": 827836.363
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 69.077,
+       "costUsd": 57592.139,
+       "electricKWh": 95661.037,
+       "fuelKWh": 1003715.871
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 60.643,
+       "costUsd": 72862.301,
+       "electricKWh": 299519.823,
+       "fuelKWh": 799506.091
+      }
+     ]
+    },
+    {
+     "year": 2017,
+     "validHours": 8760,
+     "expectedHours": 8760,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 26.822,
+       "costUsd": 46579.973,
+       "electricKWh": 94455.528,
+       "fuelKWh": 770698.637
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 43.577,
+       "costUsd": 50834.93,
+       "electricKWh": 158643.522,
+       "fuelKWh": 688349.188
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 55.31,
+       "costUsd": 54814.166,
+       "electricKWh": 175090.193,
+       "fuelKWh": 732435.076
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 40.315,
+       "costUsd": 57780.515,
+       "electricKWh": 167351.021,
+       "fuelKWh": 822853.358
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 63.733,
+       "costUsd": 57988.736,
+       "electricKWh": 94149.792,
+       "fuelKWh": 1016746.53
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 55.737,
+       "costUsd": 71883.678,
+       "electricKWh": 290350.097,
+       "fuelKWh": 802622.075
+      }
+     ]
+    },
+    {
+     "year": 2018,
+     "validHours": 8760,
+     "expectedHours": 8760,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 28.027,
+       "costUsd": 47281.424,
+       "electricKWh": 96602.406,
+       "fuelKWh": 780532.668
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 46.456,
+       "costUsd": 51579.924,
+       "electricKWh": 163045.579,
+       "fuelKWh": 692877.566
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 59.092,
+       "costUsd": 55909.279,
+       "electricKWh": 181013.261,
+       "fuelKWh": 740652.163
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 42.3,
+       "costUsd": 58855.729,
+       "electricKWh": 171245.654,
+       "fuelKWh": 836207.776
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 68.822,
+       "costUsd": 58569.22,
+       "electricKWh": 96238.54,
+       "fuelKWh": 1024000.574
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 59.935,
+       "costUsd": 73254.931,
+       "electricKWh": 296234.155,
+       "fuelKWh": 817208.201
+      }
+     ]
+    },
+    {
+     "year": 2019,
+     "validHours": 8760,
+     "expectedHours": 8760,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 27.307,
+       "costUsd": 45974.668,
+       "electricKWh": 97844.577,
+       "fuelKWh": 748071.277
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 45.562,
+       "costUsd": 49991.347,
+       "electricKWh": 164988.465,
+       "fuelKWh": 652421.468
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 60.803,
+       "costUsd": 55108.829,
+       "electricKWh": 186168.522,
+       "fuelKWh": 709064.206
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 43.322,
+       "costUsd": 59747.113,
+       "electricKWh": 186872.234,
+       "fuelKWh": 813814.575
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 68.955,
+       "costUsd": 57342.855,
+       "electricKWh": 97548.43,
+       "fuelKWh": 993163.925
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 60.921,
+       "costUsd": 71923.193,
+       "electricKWh": 297162.499,
+       "fuelKWh": 785125.502
+      }
+     ]
+    },
+    {
+     "year": 2020,
+     "validHours": 8784,
+     "expectedHours": 8784,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 26.858,
+       "costUsd": 49075.426,
+       "electricKWh": 97272.437,
+       "fuelKWh": 819271.16
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 42.161,
+       "costUsd": 52707.141,
+       "electricKWh": 158382.264,
+       "fuelKWh": 731626.168
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 52.291,
+       "costUsd": 56244.906,
+       "electricKWh": 172672.475,
+       "fuelKWh": 771627.87
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 37.863,
+       "costUsd": 58538.171,
+       "electricKWh": 158886.52,
+       "fuelKWh": 863125.978
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 60.156,
+       "costUsd": 60072.87,
+       "electricKWh": 96724.025,
+       "fuelKWh": 1056796.868
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 52.819,
+       "costUsd": 73911.428,
+       "electricKWh": 294449.665,
+       "fuelKWh": 837506.047
+      }
+     ]
+    },
+    {
+     "year": 2021,
+     "validHours": 8760,
+     "expectedHours": 8760,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 25.288,
+       "costUsd": 48405.645,
+       "electricKWh": 95909.515,
+       "fuelKWh": 807885.54
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 40.624,
+       "costUsd": 52510.043,
+       "electricKWh": 159253.753,
+       "fuelKWh": 724549.107
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 52.081,
+       "costUsd": 56323.933,
+       "electricKWh": 174950.944,
+       "fuelKWh": 767003.696
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 40.031,
+       "costUsd": 59103.262,
+       "electricKWh": 165241.585,
+       "fuelKWh": 858489.09
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 59.583,
+       "costUsd": 60066.14,
+       "electricKWh": 95536.853,
+       "fuelKWh": 1059461.17
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 51.968,
+       "costUsd": 74039.108,
+       "electricKWh": 296228.5,
+       "fuelKWh": 835209.314
+      }
+     ]
+    },
+    {
+     "year": 2022,
+     "validHours": 8760,
+     "expectedHours": 8760,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 26.773,
+       "costUsd": 47499.34,
+       "electricKWh": 95234.189,
+       "fuelKWh": 789262.248
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 42.683,
+       "costUsd": 51641.35,
+       "electricKWh": 158521.927,
+       "fuelKWh": 706864.283
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 53.732,
+       "costUsd": 55461.487,
+       "electricKWh": 174485.836,
+       "fuelKWh": 748721.383
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 39.105,
+       "costUsd": 57945.237,
+       "electricKWh": 163110.78,
+       "fuelKWh": 838199.527
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 62.316,
+       "costUsd": 58934.473,
+       "electricKWh": 94925.503,
+       "fuelKWh": 1035829.758
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 54.453,
+       "costUsd": 72873.125,
+       "electricKWh": 293304.577,
+       "fuelKWh": 817002.416
+      }
+     ]
+    },
+    {
+     "year": 2023,
+     "validHours": 8760,
+     "expectedHours": 8760,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 23.132,
+       "costUsd": 48048.941,
+       "electricKWh": 98126.893,
+       "fuelKWh": 794199.444
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 41.046,
+       "costUsd": 53143.972,
+       "electricKWh": 173254.276,
+       "fuelKWh": 700435.831
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 52.647,
+       "costUsd": 57082.301,
+       "electricKWh": 190222.689,
+       "fuelKWh": 742242.247
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 35.886,
+       "costUsd": 59249.096,
+       "electricKWh": 172229.97,
+       "fuelKWh": 843262.983
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 63.149,
+       "costUsd": 60303.773,
+       "electricKWh": 97797.917,
+       "fuelKWh": 1058545.752
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 53.71,
+       "costUsd": 76394.69,
+       "electricKWh": 319374.595,
+       "fuelKWh": 825224.376
+      }
+     ]
+    },
+    {
+     "year": 2024,
+     "validHours": 8784,
+     "expectedHours": 8784,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 26.094,
+       "costUsd": 48037.745,
+       "electricKWh": 97854.187,
+       "fuelKWh": 794418.441
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 42.965,
+       "costUsd": 52461.812,
+       "electricKWh": 163402.836,
+       "fuelKWh": 712076.637
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 56.902,
+       "costUsd": 57163.635,
+       "electricKWh": 183439.563,
+       "fuelKWh": 762593.601
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 40.904,
+       "costUsd": 60651.521,
+       "electricKWh": 179401.555,
+       "fuelKWh": 854629.718
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 64.174,
+       "costUsd": 59602.107,
+       "electricKWh": 97630.399,
+       "fuelKWh": 1043616.301
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 56.584,
+       "costUsd": 73938.235,
+       "electricKWh": 297804.176,
+       "fuelKWh": 828596.316
+      }
+     ]
+    },
+    {
+     "year": 2025,
+     "validHours": 8760,
+     "expectedHours": 8760,
+     "strategies": [
+      {
+       "id": "pad",
+       "attainmentPct": 26.479,
+       "costUsd": 46684.689,
+       "electricKWh": 97275.26,
+       "fuelKWh": 765587.352
+      },
+      {
+       "id": "dehu",
+       "attainmentPct": 45.142,
+       "costUsd": 50546.349,
+       "electricKWh": 162328.949,
+       "fuelKWh": 672170.048
+      },
+      {
+       "id": "dx",
+       "attainmentPct": 61.242,
+       "costUsd": 55891.422,
+       "electricKWh": 184244.669,
+       "fuelKWh": 731929.813
+      },
+      {
+       "id": "integrated",
+       "attainmentPct": 42.788,
+       "costUsd": 60925.155,
+       "electricKWh": 188112.62,
+       "fuelKWh": 836755.181
+      },
+      {
+       "id": "desiccant",
+       "attainmentPct": 69.663,
+       "costUsd": 57894.962,
+       "electricKWh": 96912.69,
+       "fuelKWh": 1007306.775
+      },
+      {
+       "id": "hybridDesiccant",
+       "attainmentPct": 60.99,
+       "costUsd": 72257.958,
+       "electricKWh": 292678.892,
+       "fuelKWh": 804904.07
+      }
+     ]
+    }
+   ],
+   "costOrderByYear": {
+    "2016": [
+     "pad",
+     "dehu",
+     "dx",
+     "desiccant",
+     "integrated",
+     "hybridDesiccant"
+    ],
+    "2017": [
+     "pad",
+     "dehu",
+     "dx",
+     "integrated",
+     "desiccant",
+     "hybridDesiccant"
+    ],
+    "2018": [
+     "pad",
+     "dehu",
+     "dx",
+     "desiccant",
+     "integrated",
+     "hybridDesiccant"
+    ],
+    "2019": [
+     "pad",
+     "dehu",
+     "dx",
+     "desiccant",
+     "integrated",
+     "hybridDesiccant"
+    ],
+    "2020": [
+     "pad",
+     "dehu",
+     "dx",
+     "integrated",
+     "desiccant",
+     "hybridDesiccant"
+    ],
+    "2021": [
+     "pad",
+     "dehu",
+     "dx",
+     "integrated",
+     "desiccant",
+     "hybridDesiccant"
+    ],
+    "2022": [
+     "pad",
+     "dehu",
+     "dx",
+     "integrated",
+     "desiccant",
+     "hybridDesiccant"
+    ],
+    "2023": [
+     "pad",
+     "dehu",
+     "dx",
+     "integrated",
+     "desiccant",
+     "hybridDesiccant"
+    ],
+    "2024": [
+     "pad",
+     "dehu",
+     "dx",
+     "desiccant",
+     "integrated",
+     "hybridDesiccant"
+    ],
+    "2025": [
+     "pad",
+     "dehu",
+     "dx",
+     "desiccant",
+     "integrated",
+     "hybridDesiccant"
+    ]
+   },
+   "verdict": {
+    "recommended": "desiccant",
+    "recommendedBasis": "Desiccant + evaporative cooling is the only strategy within 5 points of the best median attainment in this region, holding the joint band in 64.0% of eligible hours (worst year 59.6%) at $58,752 median annual operating cost; the next strategy is 7.8 points behind on attainment.",
+    "runnerUp": null,
+    "marginPct": null,
+    "resolved": true,
+    "candidates": [
+     "desiccant"
+    ],
+    "capabilityTier": [
+     "desiccant"
+    ],
+    "bestAttainmentPct": 63.954,
+    "indistinguishableThresholdPct": 16,
+    "capabilityTierPts": 5,
+    "stable": false,
+    "stabilityBasis": "2 distinct operating-cost orders of the six strategies over 10 weather years; the most common holds in 5 of 10 (50 percent), against the pre-set rule that one order must hold in at least 90 percent of years. The cheapest member of the capability tier is Desiccant + evaporative cooling in 10 of 10 years.",
+    "bindingConstraint": "heating",
+    "bindingConstraintHours": {
+     "moisture": 172.279,
+     "temperature": 1.421,
+     "heating": 8354.4
+    },
+    "coolingSideConstraint": "moisture",
+    "bindingConstraintBasis": "Mean hours per year from the weather-side screen at this band: 8354 h below the heating threshold (20 C by day, 16 C by night here), 172 h moisture-limited and 1 h temperature-limited. Hours below a 20 C daytime threshold are plentiful at every temperate site, so the heating count says the band is cool, not that the site is a heating climate; the cooling-side comparison, moisture, is what separates one warm climate from another.",
+    "caveats": [
+     "These are 10 observed years (2016 to 2025), 10 particular years, not a sample from a stationary distribution: the worst-to-best spread is what happened, not a forecast, a confidence interval or a design year.",
+     "Operating cost only, at the example scenarios' declared 0.12 USD/kWh electricity and 0.045 USD/kWh fuel at every site. Capital, maintenance, redundancy and real tariffs are outside the model, and the six strategies range from 15,000 to 125,000 USD of declared installed cost.",
+     "The full six-strategy cost order is year-dependent at this region, so a ranking quoted from any single year is an anecdote.",
+     "Pad + vent baseline is cheaper again at $47,390 but holds the band in only 26.8% of hours, 37.2 points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss."
     ]
    }
   }

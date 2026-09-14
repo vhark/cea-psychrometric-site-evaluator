@@ -175,6 +175,41 @@
         "2024": "seattle-2024.json",
         "2025": "seattle-2025.json"
       }
+    },
+    {
+      "key": "fairbanks",
+      "label": "Fairbanks, AK",
+      "zip": "99701",
+      "latitude": 64.8378,
+      "longitude": -147.7164,
+      "timezone": "America/Anchorage",
+      "climate": "subarctic, light-limited",
+      "sourceElevationM": 366.64,
+      "source": "NASA POWER",
+      "years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "files": {
+        "2016": "fairbanks-2016.json",
+        "2017": "fairbanks-2017.json",
+        "2018": "fairbanks-2018.json",
+        "2019": "fairbanks-2019.json",
+        "2020": "fairbanks-2020.json",
+        "2021": "fairbanks-2021.json",
+        "2022": "fairbanks-2022.json",
+        "2023": "fairbanks-2023.json",
+        "2024": "fairbanks-2024.json",
+        "2025": "fairbanks-2025.json"
+      }
     }
   ]
 }
