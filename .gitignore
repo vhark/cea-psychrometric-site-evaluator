@@ -1,0 +1,14 @@
+# Client-confidential material. Not part of the product.
+# private/LOAD-AUDIT.md audits a client's separate internal calculator and names a defect in it;
+# private/resources holds the client's original engagement brief. Both stay with the engagement.
+private/
+
+# Retained source workbooks and CSVs for the energy catalog: 36 MB of public-domain government
+# downloads that scripts/build-energy.py re-fetches and verifies against the SHA-256 values already
+# recorded in data/energy/*manifest*.json. The derived catalogs the app actually loads are committed.
+data/energy/raw/
+
+# Local tooling noise
+.DS_Store
+node_modules/
+*.log

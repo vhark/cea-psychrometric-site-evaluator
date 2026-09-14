@@ -1,0 +1,181 @@
+{
+  "source": "Actual Tulsa2025 two-day samples in four seasons; numerical sensitivity only",
+  "results": [
+    {
+      "month": "01",
+      "technology": "pad",
+      "steps": [
+        {
+          "stepMinutes": 1,
+          "compliancePct": 58.829787234042556,
+          "electricKWh": 283.9840152407505,
+          "fuelKWh": 3207.327050039742,
+          "numericalFailures": 0
+        },
+        {
+          "stepMinutes": 0.5,
+          "compliancePct": 62.4468085106383,
+          "electricKWh": 283.6513620134,
+          "fuelKWh": 3164.9179161675765,
+          "numericalFailures": 0
+        }
+      ],
+      "complianceDifferencePoints": 3.617021276595743,
+      "electricityDifferencePct": 0.11727538517330253
+    },
+    {
+      "month": "01",
+      "technology": "dx",
+      "steps": [
+        {
+          "stepMinutes": 1,
+          "compliancePct": 89.8936170212766,
+          "electricKWh": 589.3551817302247,
+          "fuelKWh": 2315.5107643314122,
+          "numericalFailures": 0
+        },
+        {
+          "stepMinutes": 0.5,
+          "compliancePct": 89.30851063829785,
+          "electricKWh": 557.0140708705775,
+          "fuelKWh": 2333.1573768711473,
+          "numericalFailures": 0
+        }
+      ],
+      "complianceDifferencePoints": 0.5851063829787506,
+      "electricityDifferencePct": 5.806156890992016
+    },
+    {
+      "month": "04",
+      "technology": "pad",
+      "steps": [
+        {
+          "stepMinutes": 1,
+          "compliancePct": 48.26241134751773,
+          "electricKWh": 209.64712088626663,
+          "fuelKWh": 850.9261538861655,
+          "numericalFailures": 0
+        },
+        {
+          "stepMinutes": 0.5,
+          "compliancePct": 48.723404255319146,
+          "electricKWh": 209.38478053352367,
+          "fuelKWh": 835.4248869622253,
+          "numericalFailures": 0
+        }
+      ],
+      "complianceDifferencePoints": 0.460992907801419,
+      "electricityDifferencePct": 0.12529103217268706
+    },
+    {
+      "month": "04",
+      "technology": "dx",
+      "steps": [
+        {
+          "stepMinutes": 1,
+          "compliancePct": 67.6950354609929,
+          "electricKWh": 619.6504940916193,
+          "fuelKWh": 571.2531264219028,
+          "numericalFailures": 0
+        },
+        {
+          "stepMinutes": 0.5,
+          "compliancePct": 63.93617021276595,
+          "electricKWh": 533.683579464529,
+          "fuelKWh": 574.6733030741213,
+          "numericalFailures": 0
+        }
+      ],
+      "complianceDifferencePoints": 3.7588652482269467,
+      "electricityDifferencePct": 16.108218040612222
+    },
+    {
+      "month": "07",
+      "technology": "pad",
+      "steps": [
+        {
+          "stepMinutes": 1,
+          "compliancePct": 0,
+          "electricKWh": 361.67907481901153,
+          "fuelKWh": 0,
+          "numericalFailures": 0
+        },
+        {
+          "stepMinutes": 0.5,
+          "compliancePct": 0,
+          "electricKWh": 359.85310999484983,
+          "fuelKWh": 0,
+          "numericalFailures": 0
+        }
+      ],
+      "complianceDifferencePoints": 0,
+      "electricityDifferencePct": 0.507419492411177
+    },
+    {
+      "month": "07",
+      "technology": "dx",
+      "steps": [
+        {
+          "stepMinutes": 1,
+          "compliancePct": 49.64539007092199,
+          "electricKWh": 1622.9820996206247,
+          "fuelKWh": 0,
+          "numericalFailures": 0
+        },
+        {
+          "stepMinutes": 0.5,
+          "compliancePct": 49.929078014184405,
+          "electricKWh": 1620.7342492788764,
+          "fuelKWh": 0.7058630930843821,
+          "numericalFailures": 0
+        }
+      ],
+      "complianceDifferencePoints": 0.2836879432624144,
+      "electricityDifferencePct": 0.13869333252804647
+    },
+    {
+      "month": "10",
+      "technology": "pad",
+      "steps": [
+        {
+          "stepMinutes": 1,
+          "compliancePct": 25.425531914893618,
+          "electricKWh": 289.50777723726554,
+          "fuelKWh": 252.69814137613375,
+          "numericalFailures": 0
+        },
+        {
+          "stepMinutes": 0.5,
+          "compliancePct": 25.49645390070922,
+          "electricKWh": 288.0664779193231,
+          "fuelKWh": 248.83043882309119,
+          "numericalFailures": 0
+        }
+      ],
+      "complianceDifferencePoints": 0.07092198581560183,
+      "electricityDifferencePct": 0.5003356615295164
+    },
+    {
+      "month": "10",
+      "technology": "dx",
+      "steps": [
+        {
+          "stepMinutes": 1,
+          "compliancePct": 70.60283687943264,
+          "electricKWh": 746.1801231376935,
+          "fuelKWh": 29.925258221431434,
+          "numericalFailures": 0
+        },
+        {
+          "stepMinutes": 0.5,
+          "compliancePct": 66.54255319148936,
+          "electricKWh": 604.5989822748788,
+          "fuelKWh": 32.28780175266399,
+          "numericalFailures": 0
+        }
+      ],
+      "complianceDifferencePoints": 4.060283687943283,
+      "electricityDifferencePct": 23.41736341171102
+    }
+  ]
+}

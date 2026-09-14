@@ -1,0 +1,2834 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CEA Psychrometric Site Evaluator | analysis report | Grownetics</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;600&display=swap" rel="stylesheet"><style>:root{color-scheme:light}body{background:#F3F0ED;color:#2B2C2E;font:15px/1.6 'Inter',system-ui,sans-serif;max-width:1000px;margin:auto;padding:40px 32px}.mark{font:700 13px 'DM Sans',sans-serif;letter-spacing:.28em;text-transform:uppercase;margin-bottom:40px}.mark em{font-style:normal;color:#4DB405}.cat{display:block;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#9A8860;margin-bottom:8px}h1,h2{font-family:'DM Sans',sans-serif;font-weight:700;letter-spacing:-.025em;margin:0}h1{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:14px}h2{font-size:1.5rem;margin-bottom:20px}h3{font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:#9A8860;margin:28px 0 8px}p{max-width:68ch;margin:0 0 14px}section{margin:56px 0;padding-top:28px;border-top:1px solid rgba(43,44,46,.15)}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid rgba(43,44,46,.15);vertical-align:top}th{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7);width:34%}td,pre{font-family:'IBM Plex Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}ul{padding-left:18px;font-size:13px;max-width:68ch}summary{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(43,44,46,.7);cursor:pointer;padding:10px 0}.notice{border:1px solid rgba(43,44,46,.3);padding:16px 18px;font-size:13px;max-width:none}.meta{font:11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(43,44,46,.7)}.foot{font:10px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(43,44,46,.55);margin-top:48px}@media print{body{padding:0}details{display:block}section{break-inside:avoid}}</style><div class="mark">Grownetics<em>.</em></div><span class="cat">Component efficacy &amp; energy screening report</span><h1>CEA Psychrometric Site Evaluator</h1><p class="notice">Assumption-based screening, not a calibrated greenhouse digital twin, guaranteed indoor condition, equipment selection certificate or crop-yield forecast. Hourly source weather does not establish minute-scale or canopy-level precision. Installed costs and component efficiencies are editable assumptions unless separately sourced. Regional grid mix is not utility procurement or marginal emissions.</p><p class="meta">2025-01-01 to 2025-12-31 · America/Chicago · NASA POWER (gridded reanalysis + satellite solar)</p><section><h2><span class="cat">§ 001</span>Pad + vent baseline</h2><table><tbody><tr><th>Facility / crop</th><td>greenhouse / lettuce</td></tr><tr><th>Expected / valid hours</th><td>8,760 / 8,760</td></tr><tr><th>Joint climate-band attainment</th><td>33.5%</td></tr><tr><th>Equivalent compliant hours</th><td>2,937.9</td></tr><tr><th>Longest failure episode</th><td>2,014 h</td></tr><tr><th>Evaporative pad runtime</th><td>2,772 h on 296 days (1,830.1 equivalent full-load h); 217,429 L water</td></tr><tr><th>Pad viability, weather only</th><td>244 h effective on 65 days (30 days with 4 h or more); 18 h marginal; 2,680 h too warm or humid for pad alone on 171 days</td></tr><tr><th>Heating runtime</th><td>3,400 h on 279 days (1,773.7 equivalent full-load h)</td></tr><tr><th>Supplemental light runtime</th><td>2,226 h on 365 days (2,226 equivalent full-load h)</td></tr><tr><th>Purchased electricity</th><td>64,842.5 kWh</td></tr><tr><th>Purchased heating/regeneration fuel</th><td>236,493.1 kWh</td></tr><tr><th>Period operating cost</th><td>$19,285.2</td></tr><tr><th>Installed capital assumption</th><td>$15,000</td></tr><tr><th>Electricity price basis</th><td>Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.</td></tr><tr><th>Missing data</th><td>0 hours</td></tr></tbody></table><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture is a declared L/m²/day schedule, dark-hour rate relative to a lit hour. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Controller enumerates finite airflow and device duty combinations, minimizes joint target excursion first and instantaneous manual-price operating cost second. This is not a guaranteed global economic optimum.</li><li>Control cadence is a substantive assumption, not a proven numerical-precision bound: halving 1-minute dispatch to 30 seconds in four seasonal two-day checks changed attainment by up to 4.1 percentage points and electricity by up to 23.5%. These sample differences are not universal error bars. Close equipment-cost rankings require controller/site validation.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Full reproducible scenario</summary><pre>{
+  &quot;schemaVersion&quot;: 1,
+  &quot;id&quot;: &quot;2d74ad0b-6724-4d1f-bfdd-faaf2a94996c&quot;,
+  &quot;name&quot;: &quot;Pad + vent baseline&quot;,
+  &quot;facility&quot;: &quot;greenhouse&quot;,
+  &quot;system&quot;: &quot;bench&quot;,
+  &quot;crop&quot;: &quot;lettuce&quot;,
+  &quot;technology&quot;: &quot;pad&quot;,
+  &quot;areaM2&quot;: 500,
+  &quot;canopyM2&quot;: 350,
+  &quot;heightM&quot;: 4,
+  &quot;envelopeRatio&quot;: 1.8,
+  &quot;uValue&quot;: 4,
+  &quot;thermalMassKJm2K&quot;: 100,
+  &quot;infiltrationACH&quot;: 0.3,
+  &quot;solarTransmission&quot;: 0.65,
+  &quot;parTransmission&quot;: 0.65,
+  &quot;shadeFraction&quot;: 0.25,
+  &quot;solarHeatFraction&quot;: 1,
+  &quot;minVentACH&quot;: 0.3,
+  &quot;maxVentACH&quot;: 40,
+  &quot;fanWPerM3s&quot;: 180,
+  &quot;padEnabled&quot;: true,
+  &quot;padEffectiveness&quot;: 0.8,
+  &quot;padPumpW&quot;: 250,
+  &quot;heaterKW&quot;: 120,
+  &quot;heaterEfficiency&quot;: 0.9,
+  &quot;coolingKW&quot;: 0,
+  &quot;coolingCOP&quot;: 3,
+  &quot;coolingSHR&quot;: 0.75,
+  &quot;coolingMinOutdoorC&quot;: -5,
+  &quot;coolingMaxOutdoorC&quot;: 46,
+  &quot;dehuKgH&quot;: 0,
+  &quot;dehuLPerKWh&quot;: 2.5,
+  &quot;integratedHVAC&quot;: false,
+  &quot;reheatFraction&quot;: 0.5,
+  &quot;humidifierKgH&quot;: 0,
+  &quot;desiccantKgH&quot;: 0,
+  &quot;regenerationKWhPerKg&quot;: 1.2,
+  &quot;regenerationElectricFraction&quot;: 0,
+  &quot;desiccantHeatFraction&quot;: 1,
+  &quot;hybridEvapEffectiveness&quot;: 0.8,
+  &quot;lightWm2&quot;: 80,
+  &quot;efficacy&quot;: 2.5,
+  &quot;lightDelivery&quot;: 0.85,
+  &quot;dayStart&quot;: 6,
+  &quot;photoperiod&quot;: 16,
+  &quot;dayTargetC&quot;: 22,
+  &quot;nightTargetC&quot;: 18,
+  &quot;tempToleranceC&quot;: 2,
+  &quot;vpdMin&quot;: 0.6,
+  &quot;vpdMax&quot;: 1,
+  &quot;maxDewPointC&quot;: 19,
+  &quot;dliTarget&quot;: 14,
+  &quot;transpirationLDayM2&quot;: 1.6714285714285715,
+  &quot;darkTranspirationFraction&quot;: 0.15,
+  &quot;cropSensibleWm2&quot;: 0,
+  &quot;electricityPrice&quot;: 0.12,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002,
+  &quot;installedCost&quot;: 15000,
+  &quot;maintenanceYear&quot;: 500,
+  &quot;lifeYears&quot;: 15,
+  &quot;discountRate&quot;: 0.06,
+  &quot;latitude&quot;: 36.15,
+  &quot;longitude&quot;: -95.99,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;priceMode&quot;: &quot;manual&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;
+}</pre></details><details open><summary>Energy-source provenance</summary><pre>{
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;state&quot;: &quot;OK&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;utilities&quot;: [
+    {
+      &quot;id&quot;: &quot;15474&quot;,
+      &quot;name&quot;: &quot;Public Service Co of Oklahoma&quot;,
+      &quot;state&quot;: &quot;OK&quot;,
+      &quot;serviceType&quot;: &quot;Bundled&quot;,
+      &quot;ownership&quot;: &quot;Investor Owned&quot;,
+      &quot;source&quot;: &quot;oedi2021&quot;,
+      &quot;vintage&quot;: 2021
+    }
+  ],
+  &quot;prices&quot;: [
+    {
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;status&quot;: &quot;Final&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    }
+  ],
+  &quot;grid&quot;: {
+    &quot;year&quot;: 2023,
+    &quot;region&quot;: &quot;SPSO&quot;,
+    &quot;name&quot;: &quot;SPP South&quot;,
+    &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+    &quot;mix&quot;: [
+      {
+        &quot;fuel&quot;: &quot;Coal&quot;,
+        &quot;percent&quot;: 16.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Oil&quot;,
+        &quot;percent&quot;: 0.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Natural gas&quot;,
+        &quot;percent&quot;: 46.1
+      },
+      {
+        &quot;fuel&quot;: &quot;Nuclear&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Hydro&quot;,
+        &quot;percent&quot;: 2.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Biomass&quot;,
+        &quot;percent&quot;: 1.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Wind&quot;,
+        &quot;percent&quot;: 32.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Solar&quot;,
+        &quot;percent&quot;: 0.4
+      },
+      {
+        &quot;fuel&quot;: &quot;Geothermal&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Other fossil&quot;,
+        &quot;percent&quot;: 0.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+        &quot;percent&quot;: 0.2
+      }
+    ],
+    &quot;mixUnit&quot;: &quot;percent&quot;,
+    &quot;generationMWh&quot;: 158074959.653,
+    &quot;co2KgPerKWh&quot;: 0.395551598,
+    &quot;originalCO2LbPerMWh&quot;: 872.042,
+    &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+    &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+    &quot;source&quot;: &quot;egrid2023&quot;,
+    &quot;selectionBasis&quot;: &quot;single-ZIP-subregion-candidate&quot;,
+    &quot;mappingSource&quot;: &quot;epaZip2023&quot;
+  },
+  &quot;gridCandidates&quot;: [
+    {
+      &quot;year&quot;: 2023,
+      &quot;region&quot;: &quot;SPSO&quot;,
+      &quot;name&quot;: &quot;SPP South&quot;,
+      &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+      &quot;mix&quot;: [
+        {
+          &quot;fuel&quot;: &quot;Coal&quot;,
+          &quot;percent&quot;: 16.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Oil&quot;,
+          &quot;percent&quot;: 0.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Natural gas&quot;,
+          &quot;percent&quot;: 46.1
+        },
+        {
+          &quot;fuel&quot;: &quot;Nuclear&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Hydro&quot;,
+          &quot;percent&quot;: 2.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Biomass&quot;,
+          &quot;percent&quot;: 1.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Wind&quot;,
+          &quot;percent&quot;: 32.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Solar&quot;,
+          &quot;percent&quot;: 0.4
+        },
+        {
+          &quot;fuel&quot;: &quot;Geothermal&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Other fossil&quot;,
+          &quot;percent&quot;: 0.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+          &quot;percent&quot;: 0.2
+        }
+      ],
+      &quot;mixUnit&quot;: &quot;percent&quot;,
+      &quot;generationMWh&quot;: 158074959.653,
+      &quot;co2KgPerKWh&quot;: 0.395551598,
+      &quot;originalCO2LbPerMWh&quot;: 872.042,
+      &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+      &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+      &quot;source&quot;: &quot;egrid2023&quot;
+    }
+  ],
+  &quot;coverage&quot;: {
+    &quot;mappingStatus&quot;: &quot;candidate-2021&quot;,
+    &quot;priceAvailability&quot;: {
+      &quot;status&quot;: &quot;state-sector-proxy&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sectors&quot;: {
+        &quot;residential&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;commercial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;industrial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        }
+      },
+      &quot;utilityTariff&quot;: &quot;not-ingested&quot;
+    },
+    &quot;gridAvailability&quot;: {
+      &quot;status&quot;: &quot;subregion-candidate&quot;,
+      &quot;year&quot;: 2023,
+      &quot;regions&quot;: [
+        &quot;SPSO&quot;
+      ],
+      &quot;stateAvailable&quot;: true,
+      &quot;source&quot;: &quot;epaZip2023&quot;
+    },
+    &quot;requestedPricePeriods&quot;: 14,
+    &quot;priceBasis&quot;: &quot;state-sector-average-proxy&quot;,
+    &quot;tariffStatus&quot;: &quot;not-ingested&quot;,
+    &quot;snapshotDate&quot;: &quot;2026-09-11&quot;
+  },
+  &quot;warnings&quot;: [
+    &quot;Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.&quot;,
+    &quot;Utility associations are possible providers from 2021, not verified street-level service or current tariffs.&quot;,
+    &quot;State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.&quot;,
+    &quot;Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.&quot;,
+    &quot;Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.&quot;,
+    &quot;Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.&quot;
+  ],
+  &quot;sources&quot;: [
+    {
+      &quot;id&quot;: &quot;geonames&quot;,
+      &quot;publisher&quot;: &quot;GeoNames&quot;,
+      &quot;title&quot;: &quot;Public postal-code inventory&quot;,
+      &quot;url&quot;: &quot;https://download.geonames.org/export/zip/&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0 (download README declaration)&quot;,
+      &quot;evidenceKind&quot;: &quot;public postal inventory; approximate coordinates&quot;,
+      &quot;vintage&quot;: &quot;retrieval snapshot; not USPS-authoritative&quot;
+    },
+    {
+      &quot;id&quot;: &quot;oedi2021&quot;,
+      &quot;publisher&quot;: &quot;NREL / OpenEI&quot;,
+      &quot;title&quot;: &quot;U.S. Electric Utility Companies and Rates: Look-up by Zipcode (2021)&quot;,
+      &quot;url&quot;: &quot;https://data.openei.org/submissions/5806&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0&quot;,
+      &quot;vintage&quot;: 2021,
+      &quot;published&quot;: &quot;2022-11&quot;,
+      &quot;evidenceKind&quot;: &quot;likely ZIP utility associations; not verified street service&quot;
+    },
+    {
+      &quot;id&quot;: &quot;eia861m&quot;,
+      &quot;publisher&quot;: &quot;US Energy Information Administration&quot;,
+      &quot;title&quot;: &quot;EIA-861M monthly state-sector electricity prices&quot;,
+      &quot;url&quot;: &quot;https://www.eia.gov/electricity/data/eia861m/xls/sales_revenue.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.eia.gov/about/copyrights_reuse.php&quot;,
+      &quot;evidenceKind&quot;: &quot;state-sector realized average retail price; survey estimates, preliminary/final status per row&quot;,
+      &quot;units&quot;: &quot;USD/kWh converted from cents/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;egrid2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;eGRID2023 rev2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/egrid2023_data_rev2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.epa.gov/egrid/frequent-questions-about-egrid&quot;,
+      &quot;vintage&quot;: 2023,
+      &quot;published&quot;: &quot;2025-06-12&quot;,
+      &quot;evidenceKind&quot;: &quot;annual regional generation resource mix and CO2 total-output emission rate&quot;,
+      &quot;units&quot;: {
+        &quot;mix&quot;: &quot;percent (0..100)&quot;,
+        &quot;originalCO2&quot;: &quot;lb/MWh&quot;,
+        &quot;co2KgPerKWh&quot;: &quot;kg CO2/kWh&quot;
+      },
+      &quot;conversion&quot;: &quot;lb/MWh * 0.45359237 / 1000 = kg/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;epaZip2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;Power Profiler ZIP tool v14.2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/power_profiler_zipcode_tool_v14.2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;vintage&quot;: &quot;eGRID2023_rev1 associations, published 2025-06&quot;,
+      &quot;evidenceKind&quot;: &quot;possible ZIP subregions; all alternatives retained; embedded rev1 rates unused&quot;
+    },
+    {
+      &quot;id&quot;: &quot;urdb&quot;,
+      &quot;publisher&quot;: &quot;OpenEI&quot;,
+      &quot;title&quot;: &quot;Utility Rate Database&quot;,
+      &quot;url&quot;: &quot;https://openei.org/wiki/Utility_Rate_Database&quot;,
+      &quot;bulkUrl&quot;: &quot;https://openei.org/apps/USURDB/download/usurdb.json.gz&quot;,
+      &quot;license&quot;: &quot;OpenEI CC0 unless otherwise noted; underlying tariff documents may differ&quot;,
+      &quot;evidenceKind&quot;: &quot;external tariff research source only; schedules not ingested or evaluated&quot;,
+      &quot;coverageStatus&quot;: &quot;not-ingested&quot;
+    }
+  ],
+  &quot;appliedPriceMode&quot;: &quot;manual&quot;,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002
+}</pre></details></section><section><h2><span class="cat">§ 002</span>Pads + condensing dehumidifier</h2><table><tbody><tr><th>Facility / crop</th><td>greenhouse / lettuce</td></tr><tr><th>Expected / valid hours</th><td>8,760 / 8,760</td></tr><tr><th>Joint climate-band attainment</th><td>45.7%</td></tr><tr><th>Equivalent compliant hours</th><td>4,006.6</td></tr><tr><th>Longest failure episode</th><td>551 h</td></tr><tr><th>Evaporative pad runtime</th><td>4,708 h on 347 days (2,453 equivalent full-load h); 241,024 L water</td></tr><tr><th>Pad viability, weather only</th><td>244 h effective on 65 days (30 days with 4 h or more); 18 h marginal; 2,680 h too warm or humid for pad alone on 171 days</td></tr><tr><th>Condensing dehumidifier runtime</th><td>7,290 h on 365 days (3,298.1 equivalent full-load h)</td></tr><tr><th>Heating runtime</th><td>2,793 h on 249 days (912.8 equivalent full-load h)</td></tr><tr><th>Supplemental light runtime</th><td>2,226 h on 365 days (2,226 equivalent full-load h)</td></tr><tr><th>Purchased electricity</th><td>106,276.1 kWh</td></tr><tr><th>Purchased heating/regeneration fuel</th><td>121,701.5 kWh</td></tr><tr><th>Period operating cost</th><td>$19,138.8</td></tr><tr><th>Installed capital assumption</th><td>$35,000</td></tr><tr><th>Electricity price basis</th><td>Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.</td></tr><tr><th>Missing data</th><td>0 hours</td></tr></tbody></table><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture is a declared L/m²/day schedule, dark-hour rate relative to a lit hour. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Controller enumerates finite airflow and device duty combinations, minimizes joint target excursion first and instantaneous manual-price operating cost second. This is not a guaranteed global economic optimum.</li><li>Control cadence is a substantive assumption, not a proven numerical-precision bound: halving 1-minute dispatch to 30 seconds in four seasonal two-day checks changed attainment by up to 4.1 percentage points and electricity by up to 23.5%. These sample differences are not universal error bars. Close equipment-cost rankings require controller/site validation.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Full reproducible scenario</summary><pre>{
+  &quot;schemaVersion&quot;: 1,
+  &quot;id&quot;: &quot;a66b0673-51bc-4c82-b4b3-365ca0031dcb&quot;,
+  &quot;name&quot;: &quot;Pads + condensing dehumidifier&quot;,
+  &quot;facility&quot;: &quot;greenhouse&quot;,
+  &quot;system&quot;: &quot;bench&quot;,
+  &quot;crop&quot;: &quot;lettuce&quot;,
+  &quot;technology&quot;: &quot;dehu&quot;,
+  &quot;areaM2&quot;: 500,
+  &quot;canopyM2&quot;: 350,
+  &quot;heightM&quot;: 4,
+  &quot;envelopeRatio&quot;: 1.8,
+  &quot;uValue&quot;: 4,
+  &quot;thermalMassKJm2K&quot;: 100,
+  &quot;infiltrationACH&quot;: 0.3,
+  &quot;solarTransmission&quot;: 0.65,
+  &quot;parTransmission&quot;: 0.65,
+  &quot;shadeFraction&quot;: 0.25,
+  &quot;solarHeatFraction&quot;: 1,
+  &quot;minVentACH&quot;: 0.3,
+  &quot;maxVentACH&quot;: 40,
+  &quot;fanWPerM3s&quot;: 180,
+  &quot;padEnabled&quot;: true,
+  &quot;padEffectiveness&quot;: 0.8,
+  &quot;padPumpW&quot;: 250,
+  &quot;heaterKW&quot;: 120,
+  &quot;heaterEfficiency&quot;: 0.9,
+  &quot;coolingKW&quot;: 0,
+  &quot;coolingCOP&quot;: 3,
+  &quot;coolingSHR&quot;: 0.75,
+  &quot;coolingMinOutdoorC&quot;: -5,
+  &quot;coolingMaxOutdoorC&quot;: 46,
+  &quot;dehuKgH&quot;: 40,
+  &quot;dehuLPerKWh&quot;: 2.5,
+  &quot;integratedHVAC&quot;: false,
+  &quot;reheatFraction&quot;: 0.5,
+  &quot;humidifierKgH&quot;: 0,
+  &quot;desiccantKgH&quot;: 0,
+  &quot;regenerationKWhPerKg&quot;: 1.2,
+  &quot;regenerationElectricFraction&quot;: 0,
+  &quot;desiccantHeatFraction&quot;: 1,
+  &quot;hybridEvapEffectiveness&quot;: 0.8,
+  &quot;lightWm2&quot;: 80,
+  &quot;efficacy&quot;: 2.5,
+  &quot;lightDelivery&quot;: 0.85,
+  &quot;dayStart&quot;: 6,
+  &quot;photoperiod&quot;: 16,
+  &quot;dayTargetC&quot;: 22,
+  &quot;nightTargetC&quot;: 18,
+  &quot;tempToleranceC&quot;: 2,
+  &quot;vpdMin&quot;: 0.6,
+  &quot;vpdMax&quot;: 1,
+  &quot;maxDewPointC&quot;: 19,
+  &quot;dliTarget&quot;: 14,
+  &quot;transpirationLDayM2&quot;: 1.6714285714285715,
+  &quot;darkTranspirationFraction&quot;: 0.15,
+  &quot;cropSensibleWm2&quot;: 0,
+  &quot;electricityPrice&quot;: 0.12,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002,
+  &quot;installedCost&quot;: 35000,
+  &quot;maintenanceYear&quot;: 500,
+  &quot;lifeYears&quot;: 15,
+  &quot;discountRate&quot;: 0.06,
+  &quot;latitude&quot;: 36.15,
+  &quot;longitude&quot;: -95.99,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;priceMode&quot;: &quot;manual&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;
+}</pre></details><details open><summary>Energy-source provenance</summary><pre>{
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;state&quot;: &quot;OK&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;utilities&quot;: [
+    {
+      &quot;id&quot;: &quot;15474&quot;,
+      &quot;name&quot;: &quot;Public Service Co of Oklahoma&quot;,
+      &quot;state&quot;: &quot;OK&quot;,
+      &quot;serviceType&quot;: &quot;Bundled&quot;,
+      &quot;ownership&quot;: &quot;Investor Owned&quot;,
+      &quot;source&quot;: &quot;oedi2021&quot;,
+      &quot;vintage&quot;: 2021
+    }
+  ],
+  &quot;prices&quot;: [
+    {
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;status&quot;: &quot;Final&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    }
+  ],
+  &quot;grid&quot;: {
+    &quot;year&quot;: 2023,
+    &quot;region&quot;: &quot;SPSO&quot;,
+    &quot;name&quot;: &quot;SPP South&quot;,
+    &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+    &quot;mix&quot;: [
+      {
+        &quot;fuel&quot;: &quot;Coal&quot;,
+        &quot;percent&quot;: 16.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Oil&quot;,
+        &quot;percent&quot;: 0.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Natural gas&quot;,
+        &quot;percent&quot;: 46.1
+      },
+      {
+        &quot;fuel&quot;: &quot;Nuclear&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Hydro&quot;,
+        &quot;percent&quot;: 2.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Biomass&quot;,
+        &quot;percent&quot;: 1.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Wind&quot;,
+        &quot;percent&quot;: 32.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Solar&quot;,
+        &quot;percent&quot;: 0.4
+      },
+      {
+        &quot;fuel&quot;: &quot;Geothermal&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Other fossil&quot;,
+        &quot;percent&quot;: 0.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+        &quot;percent&quot;: 0.2
+      }
+    ],
+    &quot;mixUnit&quot;: &quot;percent&quot;,
+    &quot;generationMWh&quot;: 158074959.653,
+    &quot;co2KgPerKWh&quot;: 0.395551598,
+    &quot;originalCO2LbPerMWh&quot;: 872.042,
+    &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+    &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+    &quot;source&quot;: &quot;egrid2023&quot;,
+    &quot;selectionBasis&quot;: &quot;single-ZIP-subregion-candidate&quot;,
+    &quot;mappingSource&quot;: &quot;epaZip2023&quot;
+  },
+  &quot;gridCandidates&quot;: [
+    {
+      &quot;year&quot;: 2023,
+      &quot;region&quot;: &quot;SPSO&quot;,
+      &quot;name&quot;: &quot;SPP South&quot;,
+      &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+      &quot;mix&quot;: [
+        {
+          &quot;fuel&quot;: &quot;Coal&quot;,
+          &quot;percent&quot;: 16.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Oil&quot;,
+          &quot;percent&quot;: 0.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Natural gas&quot;,
+          &quot;percent&quot;: 46.1
+        },
+        {
+          &quot;fuel&quot;: &quot;Nuclear&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Hydro&quot;,
+          &quot;percent&quot;: 2.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Biomass&quot;,
+          &quot;percent&quot;: 1.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Wind&quot;,
+          &quot;percent&quot;: 32.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Solar&quot;,
+          &quot;percent&quot;: 0.4
+        },
+        {
+          &quot;fuel&quot;: &quot;Geothermal&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Other fossil&quot;,
+          &quot;percent&quot;: 0.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+          &quot;percent&quot;: 0.2
+        }
+      ],
+      &quot;mixUnit&quot;: &quot;percent&quot;,
+      &quot;generationMWh&quot;: 158074959.653,
+      &quot;co2KgPerKWh&quot;: 0.395551598,
+      &quot;originalCO2LbPerMWh&quot;: 872.042,
+      &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+      &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+      &quot;source&quot;: &quot;egrid2023&quot;
+    }
+  ],
+  &quot;coverage&quot;: {
+    &quot;mappingStatus&quot;: &quot;candidate-2021&quot;,
+    &quot;priceAvailability&quot;: {
+      &quot;status&quot;: &quot;state-sector-proxy&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sectors&quot;: {
+        &quot;residential&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;commercial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;industrial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        }
+      },
+      &quot;utilityTariff&quot;: &quot;not-ingested&quot;
+    },
+    &quot;gridAvailability&quot;: {
+      &quot;status&quot;: &quot;subregion-candidate&quot;,
+      &quot;year&quot;: 2023,
+      &quot;regions&quot;: [
+        &quot;SPSO&quot;
+      ],
+      &quot;stateAvailable&quot;: true,
+      &quot;source&quot;: &quot;epaZip2023&quot;
+    },
+    &quot;requestedPricePeriods&quot;: 14,
+    &quot;priceBasis&quot;: &quot;state-sector-average-proxy&quot;,
+    &quot;tariffStatus&quot;: &quot;not-ingested&quot;,
+    &quot;snapshotDate&quot;: &quot;2026-09-11&quot;
+  },
+  &quot;warnings&quot;: [
+    &quot;Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.&quot;,
+    &quot;Utility associations are possible providers from 2021, not verified street-level service or current tariffs.&quot;,
+    &quot;State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.&quot;,
+    &quot;Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.&quot;,
+    &quot;Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.&quot;,
+    &quot;Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.&quot;
+  ],
+  &quot;sources&quot;: [
+    {
+      &quot;id&quot;: &quot;geonames&quot;,
+      &quot;publisher&quot;: &quot;GeoNames&quot;,
+      &quot;title&quot;: &quot;Public postal-code inventory&quot;,
+      &quot;url&quot;: &quot;https://download.geonames.org/export/zip/&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0 (download README declaration)&quot;,
+      &quot;evidenceKind&quot;: &quot;public postal inventory; approximate coordinates&quot;,
+      &quot;vintage&quot;: &quot;retrieval snapshot; not USPS-authoritative&quot;
+    },
+    {
+      &quot;id&quot;: &quot;oedi2021&quot;,
+      &quot;publisher&quot;: &quot;NREL / OpenEI&quot;,
+      &quot;title&quot;: &quot;U.S. Electric Utility Companies and Rates: Look-up by Zipcode (2021)&quot;,
+      &quot;url&quot;: &quot;https://data.openei.org/submissions/5806&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0&quot;,
+      &quot;vintage&quot;: 2021,
+      &quot;published&quot;: &quot;2022-11&quot;,
+      &quot;evidenceKind&quot;: &quot;likely ZIP utility associations; not verified street service&quot;
+    },
+    {
+      &quot;id&quot;: &quot;eia861m&quot;,
+      &quot;publisher&quot;: &quot;US Energy Information Administration&quot;,
+      &quot;title&quot;: &quot;EIA-861M monthly state-sector electricity prices&quot;,
+      &quot;url&quot;: &quot;https://www.eia.gov/electricity/data/eia861m/xls/sales_revenue.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.eia.gov/about/copyrights_reuse.php&quot;,
+      &quot;evidenceKind&quot;: &quot;state-sector realized average retail price; survey estimates, preliminary/final status per row&quot;,
+      &quot;units&quot;: &quot;USD/kWh converted from cents/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;egrid2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;eGRID2023 rev2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/egrid2023_data_rev2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.epa.gov/egrid/frequent-questions-about-egrid&quot;,
+      &quot;vintage&quot;: 2023,
+      &quot;published&quot;: &quot;2025-06-12&quot;,
+      &quot;evidenceKind&quot;: &quot;annual regional generation resource mix and CO2 total-output emission rate&quot;,
+      &quot;units&quot;: {
+        &quot;mix&quot;: &quot;percent (0..100)&quot;,
+        &quot;originalCO2&quot;: &quot;lb/MWh&quot;,
+        &quot;co2KgPerKWh&quot;: &quot;kg CO2/kWh&quot;
+      },
+      &quot;conversion&quot;: &quot;lb/MWh * 0.45359237 / 1000 = kg/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;epaZip2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;Power Profiler ZIP tool v14.2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/power_profiler_zipcode_tool_v14.2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;vintage&quot;: &quot;eGRID2023_rev1 associations, published 2025-06&quot;,
+      &quot;evidenceKind&quot;: &quot;possible ZIP subregions; all alternatives retained; embedded rev1 rates unused&quot;
+    },
+    {
+      &quot;id&quot;: &quot;urdb&quot;,
+      &quot;publisher&quot;: &quot;OpenEI&quot;,
+      &quot;title&quot;: &quot;Utility Rate Database&quot;,
+      &quot;url&quot;: &quot;https://openei.org/wiki/Utility_Rate_Database&quot;,
+      &quot;bulkUrl&quot;: &quot;https://openei.org/apps/USURDB/download/usurdb.json.gz&quot;,
+      &quot;license&quot;: &quot;OpenEI CC0 unless otherwise noted; underlying tariff documents may differ&quot;,
+      &quot;evidenceKind&quot;: &quot;external tariff research source only; schedules not ingested or evaluated&quot;,
+      &quot;coverageStatus&quot;: &quot;not-ingested&quot;
+    }
+  ],
+  &quot;appliedPriceMode&quot;: &quot;manual&quot;,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002
+}</pre></details></section><section><h2><span class="cat">§ 003</span>DX / mini-split + dehumidifier</h2><table><tbody><tr><th>Facility / crop</th><td>greenhouse / lettuce</td></tr><tr><th>Expected / valid hours</th><td>8,760 / 8,760</td></tr><tr><th>Joint climate-band attainment</th><td>74.7%</td></tr><tr><th>Equivalent compliant hours</th><td>6,540.8</td></tr><tr><th>Longest failure episode</th><td>13 h</td></tr><tr><th>Evaporative pad runtime</th><td>3,951 h on 347 days (2,160.1 equivalent full-load h); 237,981 L water</td></tr><tr><th>Pad viability, weather only</th><td>244 h effective on 65 days (30 days with 4 h or more); 18 h marginal; 2,680 h too warm or humid for pad alone on 171 days</td></tr><tr><th>DX cooling runtime</th><td>3,964 h on 320 days (2,257.5 equivalent full-load h)</td></tr><tr><th>Condensing dehumidifier runtime</th><td>7,104 h on 365 days (2,668.3 equivalent full-load h)</td></tr><tr><th>Heating runtime</th><td>3,125 h on 282 days (953 equivalent full-load h)</td></tr><tr><th>Supplemental light runtime</th><td>2,226 h on 365 days (2,226 equivalent full-load h)</td></tr><tr><th>Purchased electricity</th><td>167,775.8 kWh</td></tr><tr><th>Purchased heating/regeneration fuel</th><td>127,068.4 kWh</td></tr><tr><th>Period operating cost</th><td>$26,754.18</td></tr><tr><th>Installed capital assumption</th><td>$85,000</td></tr><tr><th>Electricity price basis</th><td>Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.</td></tr><tr><th>Missing data</th><td>0 hours</td></tr></tbody></table><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture is a declared L/m²/day schedule, dark-hour rate relative to a lit hour. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Controller enumerates finite airflow and device duty combinations, minimizes joint target excursion first and instantaneous manual-price operating cost second. This is not a guaranteed global economic optimum.</li><li>Control cadence is a substantive assumption, not a proven numerical-precision bound: halving 1-minute dispatch to 30 seconds in four seasonal two-day checks changed attainment by up to 4.1 percentage points and electricity by up to 23.5%. These sample differences are not universal error bars. Close equipment-cost rankings require controller/site validation.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Full reproducible scenario</summary><pre>{
+  &quot;schemaVersion&quot;: 1,
+  &quot;id&quot;: &quot;fd190fa2-ffba-4423-88ff-b474c81a8015&quot;,
+  &quot;name&quot;: &quot;DX / mini-split + dehumidifier&quot;,
+  &quot;facility&quot;: &quot;greenhouse&quot;,
+  &quot;system&quot;: &quot;bench&quot;,
+  &quot;crop&quot;: &quot;lettuce&quot;,
+  &quot;technology&quot;: &quot;dx&quot;,
+  &quot;areaM2&quot;: 500,
+  &quot;canopyM2&quot;: 350,
+  &quot;heightM&quot;: 4,
+  &quot;envelopeRatio&quot;: 1.8,
+  &quot;uValue&quot;: 4,
+  &quot;thermalMassKJm2K&quot;: 100,
+  &quot;infiltrationACH&quot;: 0.3,
+  &quot;solarTransmission&quot;: 0.65,
+  &quot;parTransmission&quot;: 0.65,
+  &quot;shadeFraction&quot;: 0.25,
+  &quot;solarHeatFraction&quot;: 1,
+  &quot;minVentACH&quot;: 0.3,
+  &quot;maxVentACH&quot;: 40,
+  &quot;fanWPerM3s&quot;: 180,
+  &quot;padEnabled&quot;: true,
+  &quot;padEffectiveness&quot;: 0.8,
+  &quot;padPumpW&quot;: 250,
+  &quot;heaterKW&quot;: 120,
+  &quot;heaterEfficiency&quot;: 0.9,
+  &quot;coolingKW&quot;: 100,
+  &quot;coolingCOP&quot;: 3,
+  &quot;coolingSHR&quot;: 0.75,
+  &quot;coolingMinOutdoorC&quot;: -5,
+  &quot;coolingMaxOutdoorC&quot;: 46,
+  &quot;dehuKgH&quot;: 40,
+  &quot;dehuLPerKWh&quot;: 2.5,
+  &quot;integratedHVAC&quot;: false,
+  &quot;reheatFraction&quot;: 0.5,
+  &quot;humidifierKgH&quot;: 0,
+  &quot;desiccantKgH&quot;: 0,
+  &quot;regenerationKWhPerKg&quot;: 1.2,
+  &quot;regenerationElectricFraction&quot;: 0,
+  &quot;desiccantHeatFraction&quot;: 1,
+  &quot;hybridEvapEffectiveness&quot;: 0.8,
+  &quot;lightWm2&quot;: 80,
+  &quot;efficacy&quot;: 2.5,
+  &quot;lightDelivery&quot;: 0.85,
+  &quot;dayStart&quot;: 6,
+  &quot;photoperiod&quot;: 16,
+  &quot;dayTargetC&quot;: 22,
+  &quot;nightTargetC&quot;: 18,
+  &quot;tempToleranceC&quot;: 2,
+  &quot;vpdMin&quot;: 0.6,
+  &quot;vpdMax&quot;: 1,
+  &quot;maxDewPointC&quot;: 19,
+  &quot;dliTarget&quot;: 14,
+  &quot;transpirationLDayM2&quot;: 1.6714285714285715,
+  &quot;darkTranspirationFraction&quot;: 0.15,
+  &quot;cropSensibleWm2&quot;: 0,
+  &quot;electricityPrice&quot;: 0.12,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002,
+  &quot;installedCost&quot;: 85000,
+  &quot;maintenanceYear&quot;: 500,
+  &quot;lifeYears&quot;: 15,
+  &quot;discountRate&quot;: 0.06,
+  &quot;latitude&quot;: 36.15,
+  &quot;longitude&quot;: -95.99,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;priceMode&quot;: &quot;manual&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;
+}</pre></details><details open><summary>Energy-source provenance</summary><pre>{
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;state&quot;: &quot;OK&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;utilities&quot;: [
+    {
+      &quot;id&quot;: &quot;15474&quot;,
+      &quot;name&quot;: &quot;Public Service Co of Oklahoma&quot;,
+      &quot;state&quot;: &quot;OK&quot;,
+      &quot;serviceType&quot;: &quot;Bundled&quot;,
+      &quot;ownership&quot;: &quot;Investor Owned&quot;,
+      &quot;source&quot;: &quot;oedi2021&quot;,
+      &quot;vintage&quot;: 2021
+    }
+  ],
+  &quot;prices&quot;: [
+    {
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;status&quot;: &quot;Final&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    }
+  ],
+  &quot;grid&quot;: {
+    &quot;year&quot;: 2023,
+    &quot;region&quot;: &quot;SPSO&quot;,
+    &quot;name&quot;: &quot;SPP South&quot;,
+    &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+    &quot;mix&quot;: [
+      {
+        &quot;fuel&quot;: &quot;Coal&quot;,
+        &quot;percent&quot;: 16.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Oil&quot;,
+        &quot;percent&quot;: 0.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Natural gas&quot;,
+        &quot;percent&quot;: 46.1
+      },
+      {
+        &quot;fuel&quot;: &quot;Nuclear&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Hydro&quot;,
+        &quot;percent&quot;: 2.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Biomass&quot;,
+        &quot;percent&quot;: 1.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Wind&quot;,
+        &quot;percent&quot;: 32.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Solar&quot;,
+        &quot;percent&quot;: 0.4
+      },
+      {
+        &quot;fuel&quot;: &quot;Geothermal&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Other fossil&quot;,
+        &quot;percent&quot;: 0.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+        &quot;percent&quot;: 0.2
+      }
+    ],
+    &quot;mixUnit&quot;: &quot;percent&quot;,
+    &quot;generationMWh&quot;: 158074959.653,
+    &quot;co2KgPerKWh&quot;: 0.395551598,
+    &quot;originalCO2LbPerMWh&quot;: 872.042,
+    &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+    &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+    &quot;source&quot;: &quot;egrid2023&quot;,
+    &quot;selectionBasis&quot;: &quot;single-ZIP-subregion-candidate&quot;,
+    &quot;mappingSource&quot;: &quot;epaZip2023&quot;
+  },
+  &quot;gridCandidates&quot;: [
+    {
+      &quot;year&quot;: 2023,
+      &quot;region&quot;: &quot;SPSO&quot;,
+      &quot;name&quot;: &quot;SPP South&quot;,
+      &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+      &quot;mix&quot;: [
+        {
+          &quot;fuel&quot;: &quot;Coal&quot;,
+          &quot;percent&quot;: 16.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Oil&quot;,
+          &quot;percent&quot;: 0.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Natural gas&quot;,
+          &quot;percent&quot;: 46.1
+        },
+        {
+          &quot;fuel&quot;: &quot;Nuclear&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Hydro&quot;,
+          &quot;percent&quot;: 2.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Biomass&quot;,
+          &quot;percent&quot;: 1.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Wind&quot;,
+          &quot;percent&quot;: 32.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Solar&quot;,
+          &quot;percent&quot;: 0.4
+        },
+        {
+          &quot;fuel&quot;: &quot;Geothermal&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Other fossil&quot;,
+          &quot;percent&quot;: 0.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+          &quot;percent&quot;: 0.2
+        }
+      ],
+      &quot;mixUnit&quot;: &quot;percent&quot;,
+      &quot;generationMWh&quot;: 158074959.653,
+      &quot;co2KgPerKWh&quot;: 0.395551598,
+      &quot;originalCO2LbPerMWh&quot;: 872.042,
+      &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+      &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+      &quot;source&quot;: &quot;egrid2023&quot;
+    }
+  ],
+  &quot;coverage&quot;: {
+    &quot;mappingStatus&quot;: &quot;candidate-2021&quot;,
+    &quot;priceAvailability&quot;: {
+      &quot;status&quot;: &quot;state-sector-proxy&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sectors&quot;: {
+        &quot;residential&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;commercial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;industrial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        }
+      },
+      &quot;utilityTariff&quot;: &quot;not-ingested&quot;
+    },
+    &quot;gridAvailability&quot;: {
+      &quot;status&quot;: &quot;subregion-candidate&quot;,
+      &quot;year&quot;: 2023,
+      &quot;regions&quot;: [
+        &quot;SPSO&quot;
+      ],
+      &quot;stateAvailable&quot;: true,
+      &quot;source&quot;: &quot;epaZip2023&quot;
+    },
+    &quot;requestedPricePeriods&quot;: 14,
+    &quot;priceBasis&quot;: &quot;state-sector-average-proxy&quot;,
+    &quot;tariffStatus&quot;: &quot;not-ingested&quot;,
+    &quot;snapshotDate&quot;: &quot;2026-09-11&quot;
+  },
+  &quot;warnings&quot;: [
+    &quot;Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.&quot;,
+    &quot;Utility associations are possible providers from 2021, not verified street-level service or current tariffs.&quot;,
+    &quot;State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.&quot;,
+    &quot;Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.&quot;,
+    &quot;Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.&quot;,
+    &quot;Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.&quot;
+  ],
+  &quot;sources&quot;: [
+    {
+      &quot;id&quot;: &quot;geonames&quot;,
+      &quot;publisher&quot;: &quot;GeoNames&quot;,
+      &quot;title&quot;: &quot;Public postal-code inventory&quot;,
+      &quot;url&quot;: &quot;https://download.geonames.org/export/zip/&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0 (download README declaration)&quot;,
+      &quot;evidenceKind&quot;: &quot;public postal inventory; approximate coordinates&quot;,
+      &quot;vintage&quot;: &quot;retrieval snapshot; not USPS-authoritative&quot;
+    },
+    {
+      &quot;id&quot;: &quot;oedi2021&quot;,
+      &quot;publisher&quot;: &quot;NREL / OpenEI&quot;,
+      &quot;title&quot;: &quot;U.S. Electric Utility Companies and Rates: Look-up by Zipcode (2021)&quot;,
+      &quot;url&quot;: &quot;https://data.openei.org/submissions/5806&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0&quot;,
+      &quot;vintage&quot;: 2021,
+      &quot;published&quot;: &quot;2022-11&quot;,
+      &quot;evidenceKind&quot;: &quot;likely ZIP utility associations; not verified street service&quot;
+    },
+    {
+      &quot;id&quot;: &quot;eia861m&quot;,
+      &quot;publisher&quot;: &quot;US Energy Information Administration&quot;,
+      &quot;title&quot;: &quot;EIA-861M monthly state-sector electricity prices&quot;,
+      &quot;url&quot;: &quot;https://www.eia.gov/electricity/data/eia861m/xls/sales_revenue.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.eia.gov/about/copyrights_reuse.php&quot;,
+      &quot;evidenceKind&quot;: &quot;state-sector realized average retail price; survey estimates, preliminary/final status per row&quot;,
+      &quot;units&quot;: &quot;USD/kWh converted from cents/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;egrid2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;eGRID2023 rev2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/egrid2023_data_rev2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.epa.gov/egrid/frequent-questions-about-egrid&quot;,
+      &quot;vintage&quot;: 2023,
+      &quot;published&quot;: &quot;2025-06-12&quot;,
+      &quot;evidenceKind&quot;: &quot;annual regional generation resource mix and CO2 total-output emission rate&quot;,
+      &quot;units&quot;: {
+        &quot;mix&quot;: &quot;percent (0..100)&quot;,
+        &quot;originalCO2&quot;: &quot;lb/MWh&quot;,
+        &quot;co2KgPerKWh&quot;: &quot;kg CO2/kWh&quot;
+      },
+      &quot;conversion&quot;: &quot;lb/MWh * 0.45359237 / 1000 = kg/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;epaZip2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;Power Profiler ZIP tool v14.2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/power_profiler_zipcode_tool_v14.2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;vintage&quot;: &quot;eGRID2023_rev1 associations, published 2025-06&quot;,
+      &quot;evidenceKind&quot;: &quot;possible ZIP subregions; all alternatives retained; embedded rev1 rates unused&quot;
+    },
+    {
+      &quot;id&quot;: &quot;urdb&quot;,
+      &quot;publisher&quot;: &quot;OpenEI&quot;,
+      &quot;title&quot;: &quot;Utility Rate Database&quot;,
+      &quot;url&quot;: &quot;https://openei.org/wiki/Utility_Rate_Database&quot;,
+      &quot;bulkUrl&quot;: &quot;https://openei.org/apps/USURDB/download/usurdb.json.gz&quot;,
+      &quot;license&quot;: &quot;OpenEI CC0 unless otherwise noted; underlying tariff documents may differ&quot;,
+      &quot;evidenceKind&quot;: &quot;external tariff research source only; schedules not ingested or evaluated&quot;,
+      &quot;coverageStatus&quot;: &quot;not-ingested&quot;
+    }
+  ],
+  &quot;appliedPriceMode&quot;: &quot;manual&quot;,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002
+}</pre></details></section><section><h2><span class="cat">§ 004</span>Integrated HVAC + reheat</h2><table><tbody><tr><th>Facility / crop</th><td>greenhouse / lettuce</td></tr><tr><th>Expected / valid hours</th><td>8,760 / 8,760</td></tr><tr><th>Joint climate-band attainment</th><td>75.6%</td></tr><tr><th>Equivalent compliant hours</th><td>6,625.8</td></tr><tr><th>Longest failure episode</th><td>76 h</td></tr><tr><th>Evaporative pad runtime</th><td>4,012 h on 342 days (2,164.2 equivalent full-load h); 184,315 L water</td></tr><tr><th>Pad viability, weather only</th><td>244 h effective on 65 days (30 days with 4 h or more); 18 h marginal; 2,680 h too warm or humid for pad alone on 171 days</td></tr><tr><th>DX cooling runtime</th><td>7,250 h on 362 days (3,409 equivalent full-load h)</td></tr><tr><th>Heating runtime</th><td>4,061 h on 365 days (1,581.7 equivalent full-load h)</td></tr><tr><th>Supplemental light runtime</th><td>2,226 h on 365 days (2,226 equivalent full-load h)</td></tr><tr><th>Purchased electricity</th><td>212,231.8 kWh</td></tr><tr><th>Purchased heating/regeneration fuel</th><td>210,890.8 kWh</td></tr><tr><th>Period operating cost</th><td>$35,753.58</td></tr><tr><th>Installed capital assumption</th><td>$110,000</td></tr><tr><th>Electricity price basis</th><td>Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.</td></tr><tr><th>Missing data</th><td>0 hours</td></tr></tbody></table><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture is a declared L/m²/day schedule, dark-hour rate relative to a lit hour. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Controller enumerates finite airflow and device duty combinations, minimizes joint target excursion first and instantaneous manual-price operating cost second. This is not a guaranteed global economic optimum.</li><li>Control cadence is a substantive assumption, not a proven numerical-precision bound: halving 1-minute dispatch to 30 seconds in four seasonal two-day checks changed attainment by up to 4.1 percentage points and electricity by up to 23.5%. These sample differences are not universal error bars. Close equipment-cost rankings require controller/site validation.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Full reproducible scenario</summary><pre>{
+  &quot;schemaVersion&quot;: 1,
+  &quot;id&quot;: &quot;9aeac14e-4e37-46d6-8ec5-caabc4e02351&quot;,
+  &quot;name&quot;: &quot;Integrated HVAC + reheat&quot;,
+  &quot;facility&quot;: &quot;greenhouse&quot;,
+  &quot;system&quot;: &quot;bench&quot;,
+  &quot;crop&quot;: &quot;lettuce&quot;,
+  &quot;technology&quot;: &quot;integrated&quot;,
+  &quot;areaM2&quot;: 500,
+  &quot;canopyM2&quot;: 350,
+  &quot;heightM&quot;: 4,
+  &quot;envelopeRatio&quot;: 1.8,
+  &quot;uValue&quot;: 4,
+  &quot;thermalMassKJm2K&quot;: 100,
+  &quot;infiltrationACH&quot;: 0.3,
+  &quot;solarTransmission&quot;: 0.65,
+  &quot;parTransmission&quot;: 0.65,
+  &quot;shadeFraction&quot;: 0.25,
+  &quot;solarHeatFraction&quot;: 1,
+  &quot;minVentACH&quot;: 0.3,
+  &quot;maxVentACH&quot;: 40,
+  &quot;fanWPerM3s&quot;: 180,
+  &quot;padEnabled&quot;: true,
+  &quot;padEffectiveness&quot;: 0.8,
+  &quot;padPumpW&quot;: 250,
+  &quot;heaterKW&quot;: 120,
+  &quot;heaterEfficiency&quot;: 0.9,
+  &quot;coolingKW&quot;: 140,
+  &quot;coolingCOP&quot;: 3,
+  &quot;coolingSHR&quot;: 0.75,
+  &quot;coolingMinOutdoorC&quot;: -5,
+  &quot;coolingMaxOutdoorC&quot;: 46,
+  &quot;dehuKgH&quot;: 0,
+  &quot;dehuLPerKWh&quot;: 2.5,
+  &quot;integratedHVAC&quot;: true,
+  &quot;reheatFraction&quot;: 0.5,
+  &quot;humidifierKgH&quot;: 0,
+  &quot;desiccantKgH&quot;: 0,
+  &quot;regenerationKWhPerKg&quot;: 1.2,
+  &quot;regenerationElectricFraction&quot;: 0,
+  &quot;desiccantHeatFraction&quot;: 1,
+  &quot;hybridEvapEffectiveness&quot;: 0.8,
+  &quot;lightWm2&quot;: 80,
+  &quot;efficacy&quot;: 2.5,
+  &quot;lightDelivery&quot;: 0.85,
+  &quot;dayStart&quot;: 6,
+  &quot;photoperiod&quot;: 16,
+  &quot;dayTargetC&quot;: 22,
+  &quot;nightTargetC&quot;: 18,
+  &quot;tempToleranceC&quot;: 2,
+  &quot;vpdMin&quot;: 0.6,
+  &quot;vpdMax&quot;: 1,
+  &quot;maxDewPointC&quot;: 19,
+  &quot;dliTarget&quot;: 14,
+  &quot;transpirationLDayM2&quot;: 1.6714285714285715,
+  &quot;darkTranspirationFraction&quot;: 0.15,
+  &quot;cropSensibleWm2&quot;: 0,
+  &quot;electricityPrice&quot;: 0.12,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002,
+  &quot;installedCost&quot;: 110000,
+  &quot;maintenanceYear&quot;: 500,
+  &quot;lifeYears&quot;: 15,
+  &quot;discountRate&quot;: 0.06,
+  &quot;latitude&quot;: 36.15,
+  &quot;longitude&quot;: -95.99,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;priceMode&quot;: &quot;manual&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;
+}</pre></details><details open><summary>Energy-source provenance</summary><pre>{
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;state&quot;: &quot;OK&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;utilities&quot;: [
+    {
+      &quot;id&quot;: &quot;15474&quot;,
+      &quot;name&quot;: &quot;Public Service Co of Oklahoma&quot;,
+      &quot;state&quot;: &quot;OK&quot;,
+      &quot;serviceType&quot;: &quot;Bundled&quot;,
+      &quot;ownership&quot;: &quot;Investor Owned&quot;,
+      &quot;source&quot;: &quot;oedi2021&quot;,
+      &quot;vintage&quot;: 2021
+    }
+  ],
+  &quot;prices&quot;: [
+    {
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;status&quot;: &quot;Final&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    }
+  ],
+  &quot;grid&quot;: {
+    &quot;year&quot;: 2023,
+    &quot;region&quot;: &quot;SPSO&quot;,
+    &quot;name&quot;: &quot;SPP South&quot;,
+    &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+    &quot;mix&quot;: [
+      {
+        &quot;fuel&quot;: &quot;Coal&quot;,
+        &quot;percent&quot;: 16.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Oil&quot;,
+        &quot;percent&quot;: 0.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Natural gas&quot;,
+        &quot;percent&quot;: 46.1
+      },
+      {
+        &quot;fuel&quot;: &quot;Nuclear&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Hydro&quot;,
+        &quot;percent&quot;: 2.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Biomass&quot;,
+        &quot;percent&quot;: 1.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Wind&quot;,
+        &quot;percent&quot;: 32.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Solar&quot;,
+        &quot;percent&quot;: 0.4
+      },
+      {
+        &quot;fuel&quot;: &quot;Geothermal&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Other fossil&quot;,
+        &quot;percent&quot;: 0.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+        &quot;percent&quot;: 0.2
+      }
+    ],
+    &quot;mixUnit&quot;: &quot;percent&quot;,
+    &quot;generationMWh&quot;: 158074959.653,
+    &quot;co2KgPerKWh&quot;: 0.395551598,
+    &quot;originalCO2LbPerMWh&quot;: 872.042,
+    &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+    &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+    &quot;source&quot;: &quot;egrid2023&quot;,
+    &quot;selectionBasis&quot;: &quot;single-ZIP-subregion-candidate&quot;,
+    &quot;mappingSource&quot;: &quot;epaZip2023&quot;
+  },
+  &quot;gridCandidates&quot;: [
+    {
+      &quot;year&quot;: 2023,
+      &quot;region&quot;: &quot;SPSO&quot;,
+      &quot;name&quot;: &quot;SPP South&quot;,
+      &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+      &quot;mix&quot;: [
+        {
+          &quot;fuel&quot;: &quot;Coal&quot;,
+          &quot;percent&quot;: 16.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Oil&quot;,
+          &quot;percent&quot;: 0.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Natural gas&quot;,
+          &quot;percent&quot;: 46.1
+        },
+        {
+          &quot;fuel&quot;: &quot;Nuclear&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Hydro&quot;,
+          &quot;percent&quot;: 2.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Biomass&quot;,
+          &quot;percent&quot;: 1.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Wind&quot;,
+          &quot;percent&quot;: 32.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Solar&quot;,
+          &quot;percent&quot;: 0.4
+        },
+        {
+          &quot;fuel&quot;: &quot;Geothermal&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Other fossil&quot;,
+          &quot;percent&quot;: 0.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+          &quot;percent&quot;: 0.2
+        }
+      ],
+      &quot;mixUnit&quot;: &quot;percent&quot;,
+      &quot;generationMWh&quot;: 158074959.653,
+      &quot;co2KgPerKWh&quot;: 0.395551598,
+      &quot;originalCO2LbPerMWh&quot;: 872.042,
+      &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+      &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+      &quot;source&quot;: &quot;egrid2023&quot;
+    }
+  ],
+  &quot;coverage&quot;: {
+    &quot;mappingStatus&quot;: &quot;candidate-2021&quot;,
+    &quot;priceAvailability&quot;: {
+      &quot;status&quot;: &quot;state-sector-proxy&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sectors&quot;: {
+        &quot;residential&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;commercial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;industrial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        }
+      },
+      &quot;utilityTariff&quot;: &quot;not-ingested&quot;
+    },
+    &quot;gridAvailability&quot;: {
+      &quot;status&quot;: &quot;subregion-candidate&quot;,
+      &quot;year&quot;: 2023,
+      &quot;regions&quot;: [
+        &quot;SPSO&quot;
+      ],
+      &quot;stateAvailable&quot;: true,
+      &quot;source&quot;: &quot;epaZip2023&quot;
+    },
+    &quot;requestedPricePeriods&quot;: 14,
+    &quot;priceBasis&quot;: &quot;state-sector-average-proxy&quot;,
+    &quot;tariffStatus&quot;: &quot;not-ingested&quot;,
+    &quot;snapshotDate&quot;: &quot;2026-09-11&quot;
+  },
+  &quot;warnings&quot;: [
+    &quot;Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.&quot;,
+    &quot;Utility associations are possible providers from 2021, not verified street-level service or current tariffs.&quot;,
+    &quot;State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.&quot;,
+    &quot;Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.&quot;,
+    &quot;Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.&quot;,
+    &quot;Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.&quot;
+  ],
+  &quot;sources&quot;: [
+    {
+      &quot;id&quot;: &quot;geonames&quot;,
+      &quot;publisher&quot;: &quot;GeoNames&quot;,
+      &quot;title&quot;: &quot;Public postal-code inventory&quot;,
+      &quot;url&quot;: &quot;https://download.geonames.org/export/zip/&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0 (download README declaration)&quot;,
+      &quot;evidenceKind&quot;: &quot;public postal inventory; approximate coordinates&quot;,
+      &quot;vintage&quot;: &quot;retrieval snapshot; not USPS-authoritative&quot;
+    },
+    {
+      &quot;id&quot;: &quot;oedi2021&quot;,
+      &quot;publisher&quot;: &quot;NREL / OpenEI&quot;,
+      &quot;title&quot;: &quot;U.S. Electric Utility Companies and Rates: Look-up by Zipcode (2021)&quot;,
+      &quot;url&quot;: &quot;https://data.openei.org/submissions/5806&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0&quot;,
+      &quot;vintage&quot;: 2021,
+      &quot;published&quot;: &quot;2022-11&quot;,
+      &quot;evidenceKind&quot;: &quot;likely ZIP utility associations; not verified street service&quot;
+    },
+    {
+      &quot;id&quot;: &quot;eia861m&quot;,
+      &quot;publisher&quot;: &quot;US Energy Information Administration&quot;,
+      &quot;title&quot;: &quot;EIA-861M monthly state-sector electricity prices&quot;,
+      &quot;url&quot;: &quot;https://www.eia.gov/electricity/data/eia861m/xls/sales_revenue.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.eia.gov/about/copyrights_reuse.php&quot;,
+      &quot;evidenceKind&quot;: &quot;state-sector realized average retail price; survey estimates, preliminary/final status per row&quot;,
+      &quot;units&quot;: &quot;USD/kWh converted from cents/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;egrid2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;eGRID2023 rev2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/egrid2023_data_rev2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.epa.gov/egrid/frequent-questions-about-egrid&quot;,
+      &quot;vintage&quot;: 2023,
+      &quot;published&quot;: &quot;2025-06-12&quot;,
+      &quot;evidenceKind&quot;: &quot;annual regional generation resource mix and CO2 total-output emission rate&quot;,
+      &quot;units&quot;: {
+        &quot;mix&quot;: &quot;percent (0..100)&quot;,
+        &quot;originalCO2&quot;: &quot;lb/MWh&quot;,
+        &quot;co2KgPerKWh&quot;: &quot;kg CO2/kWh&quot;
+      },
+      &quot;conversion&quot;: &quot;lb/MWh * 0.45359237 / 1000 = kg/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;epaZip2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;Power Profiler ZIP tool v14.2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/power_profiler_zipcode_tool_v14.2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;vintage&quot;: &quot;eGRID2023_rev1 associations, published 2025-06&quot;,
+      &quot;evidenceKind&quot;: &quot;possible ZIP subregions; all alternatives retained; embedded rev1 rates unused&quot;
+    },
+    {
+      &quot;id&quot;: &quot;urdb&quot;,
+      &quot;publisher&quot;: &quot;OpenEI&quot;,
+      &quot;title&quot;: &quot;Utility Rate Database&quot;,
+      &quot;url&quot;: &quot;https://openei.org/wiki/Utility_Rate_Database&quot;,
+      &quot;bulkUrl&quot;: &quot;https://openei.org/apps/USURDB/download/usurdb.json.gz&quot;,
+      &quot;license&quot;: &quot;OpenEI CC0 unless otherwise noted; underlying tariff documents may differ&quot;,
+      &quot;evidenceKind&quot;: &quot;external tariff research source only; schedules not ingested or evaluated&quot;,
+      &quot;coverageStatus&quot;: &quot;not-ingested&quot;
+    }
+  ],
+  &quot;appliedPriceMode&quot;: &quot;manual&quot;,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002
+}</pre></details></section><section><h2><span class="cat">§ 005</span>Desiccant + evaporative cooling</h2><table><tbody><tr><th>Facility / crop</th><td>greenhouse / lettuce</td></tr><tr><th>Expected / valid hours</th><td>8,760 / 8,760</td></tr><tr><th>Joint climate-band attainment</th><td>47.2%</td></tr><tr><th>Equivalent compliant hours</th><td>4,131.7</td></tr><tr><th>Longest failure episode</th><td>551 h</td></tr><tr><th>Evaporative pad runtime</th><td>5,396 h on 349 days (2,906 equivalent full-load h); 247,312 L water</td></tr><tr><th>Pad viability, weather only</th><td>244 h effective on 65 days (30 days with 4 h or more); 18 h marginal; 2,680 h too warm or humid for pad alone on 171 days</td></tr><tr><th>Desiccant runtime</th><td>7,046 h on 365 days (2,415.1 equivalent full-load h)</td></tr><tr><th>Heating runtime</th><td>2,895 h on 254 days (1,060.3 equivalent full-load h)</td></tr><tr><th>Supplemental light runtime</th><td>2,226 h on 365 days (2,226 equivalent full-load h)</td></tr><tr><th>Purchased electricity</th><td>57,557 kWh</td></tr><tr><th>Purchased heating/regeneration fuel</th><td>315,258.8 kWh</td></tr><tr><th>Period operating cost</th><td>$22,015.16</td></tr><tr><th>Installed capital assumption</th><td>$90,000</td></tr><tr><th>Electricity price basis</th><td>Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.</td></tr><tr><th>Missing data</th><td>0 hours</td></tr></tbody></table><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture is a declared L/m²/day schedule, dark-hour rate relative to a lit hour. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Controller enumerates finite airflow and device duty combinations, minimizes joint target excursion first and instantaneous manual-price operating cost second. This is not a guaranteed global economic optimum.</li><li>Control cadence is a substantive assumption, not a proven numerical-precision bound: halving 1-minute dispatch to 30 seconds in four seasonal two-day checks changed attainment by up to 4.1 percentage points and electricity by up to 23.5%. These sample differences are not universal error bars. Close equipment-cost rankings require controller/site validation.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Full reproducible scenario</summary><pre>{
+  &quot;schemaVersion&quot;: 1,
+  &quot;id&quot;: &quot;3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed&quot;,
+  &quot;name&quot;: &quot;Desiccant + evaporative cooling&quot;,
+  &quot;facility&quot;: &quot;greenhouse&quot;,
+  &quot;system&quot;: &quot;bench&quot;,
+  &quot;crop&quot;: &quot;lettuce&quot;,
+  &quot;technology&quot;: &quot;desiccant&quot;,
+  &quot;areaM2&quot;: 500,
+  &quot;canopyM2&quot;: 350,
+  &quot;heightM&quot;: 4,
+  &quot;envelopeRatio&quot;: 1.8,
+  &quot;uValue&quot;: 4,
+  &quot;thermalMassKJm2K&quot;: 100,
+  &quot;infiltrationACH&quot;: 0.3,
+  &quot;solarTransmission&quot;: 0.65,
+  &quot;parTransmission&quot;: 0.65,
+  &quot;shadeFraction&quot;: 0.25,
+  &quot;solarHeatFraction&quot;: 1,
+  &quot;minVentACH&quot;: 0.3,
+  &quot;maxVentACH&quot;: 40,
+  &quot;fanWPerM3s&quot;: 180,
+  &quot;padEnabled&quot;: true,
+  &quot;padEffectiveness&quot;: 0.8,
+  &quot;padPumpW&quot;: 250,
+  &quot;heaterKW&quot;: 120,
+  &quot;heaterEfficiency&quot;: 0.9,
+  &quot;coolingKW&quot;: 0,
+  &quot;coolingCOP&quot;: 3,
+  &quot;coolingSHR&quot;: 0.75,
+  &quot;coolingMinOutdoorC&quot;: -5,
+  &quot;coolingMaxOutdoorC&quot;: 46,
+  &quot;dehuKgH&quot;: 0,
+  &quot;dehuLPerKWh&quot;: 2.5,
+  &quot;integratedHVAC&quot;: false,
+  &quot;reheatFraction&quot;: 0.5,
+  &quot;humidifierKgH&quot;: 0,
+  &quot;desiccantKgH&quot;: 60,
+  &quot;regenerationKWhPerKg&quot;: 1.2,
+  &quot;regenerationElectricFraction&quot;: 0,
+  &quot;desiccantHeatFraction&quot;: 1,
+  &quot;hybridEvapEffectiveness&quot;: 0.8,
+  &quot;lightWm2&quot;: 80,
+  &quot;efficacy&quot;: 2.5,
+  &quot;lightDelivery&quot;: 0.85,
+  &quot;dayStart&quot;: 6,
+  &quot;photoperiod&quot;: 16,
+  &quot;dayTargetC&quot;: 22,
+  &quot;nightTargetC&quot;: 18,
+  &quot;tempToleranceC&quot;: 2,
+  &quot;vpdMin&quot;: 0.6,
+  &quot;vpdMax&quot;: 1,
+  &quot;maxDewPointC&quot;: 19,
+  &quot;dliTarget&quot;: 14,
+  &quot;transpirationLDayM2&quot;: 1.6714285714285715,
+  &quot;darkTranspirationFraction&quot;: 0.15,
+  &quot;cropSensibleWm2&quot;: 0,
+  &quot;electricityPrice&quot;: 0.12,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002,
+  &quot;installedCost&quot;: 90000,
+  &quot;maintenanceYear&quot;: 500,
+  &quot;lifeYears&quot;: 15,
+  &quot;discountRate&quot;: 0.06,
+  &quot;latitude&quot;: 36.15,
+  &quot;longitude&quot;: -95.99,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;priceMode&quot;: &quot;manual&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;
+}</pre></details><details open><summary>Energy-source provenance</summary><pre>{
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;state&quot;: &quot;OK&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;utilities&quot;: [
+    {
+      &quot;id&quot;: &quot;15474&quot;,
+      &quot;name&quot;: &quot;Public Service Co of Oklahoma&quot;,
+      &quot;state&quot;: &quot;OK&quot;,
+      &quot;serviceType&quot;: &quot;Bundled&quot;,
+      &quot;ownership&quot;: &quot;Investor Owned&quot;,
+      &quot;source&quot;: &quot;oedi2021&quot;,
+      &quot;vintage&quot;: 2021
+    }
+  ],
+  &quot;prices&quot;: [
+    {
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;status&quot;: &quot;Final&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    }
+  ],
+  &quot;grid&quot;: {
+    &quot;year&quot;: 2023,
+    &quot;region&quot;: &quot;SPSO&quot;,
+    &quot;name&quot;: &quot;SPP South&quot;,
+    &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+    &quot;mix&quot;: [
+      {
+        &quot;fuel&quot;: &quot;Coal&quot;,
+        &quot;percent&quot;: 16.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Oil&quot;,
+        &quot;percent&quot;: 0.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Natural gas&quot;,
+        &quot;percent&quot;: 46.1
+      },
+      {
+        &quot;fuel&quot;: &quot;Nuclear&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Hydro&quot;,
+        &quot;percent&quot;: 2.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Biomass&quot;,
+        &quot;percent&quot;: 1.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Wind&quot;,
+        &quot;percent&quot;: 32.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Solar&quot;,
+        &quot;percent&quot;: 0.4
+      },
+      {
+        &quot;fuel&quot;: &quot;Geothermal&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Other fossil&quot;,
+        &quot;percent&quot;: 0.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+        &quot;percent&quot;: 0.2
+      }
+    ],
+    &quot;mixUnit&quot;: &quot;percent&quot;,
+    &quot;generationMWh&quot;: 158074959.653,
+    &quot;co2KgPerKWh&quot;: 0.395551598,
+    &quot;originalCO2LbPerMWh&quot;: 872.042,
+    &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+    &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+    &quot;source&quot;: &quot;egrid2023&quot;,
+    &quot;selectionBasis&quot;: &quot;single-ZIP-subregion-candidate&quot;,
+    &quot;mappingSource&quot;: &quot;epaZip2023&quot;
+  },
+  &quot;gridCandidates&quot;: [
+    {
+      &quot;year&quot;: 2023,
+      &quot;region&quot;: &quot;SPSO&quot;,
+      &quot;name&quot;: &quot;SPP South&quot;,
+      &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+      &quot;mix&quot;: [
+        {
+          &quot;fuel&quot;: &quot;Coal&quot;,
+          &quot;percent&quot;: 16.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Oil&quot;,
+          &quot;percent&quot;: 0.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Natural gas&quot;,
+          &quot;percent&quot;: 46.1
+        },
+        {
+          &quot;fuel&quot;: &quot;Nuclear&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Hydro&quot;,
+          &quot;percent&quot;: 2.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Biomass&quot;,
+          &quot;percent&quot;: 1.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Wind&quot;,
+          &quot;percent&quot;: 32.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Solar&quot;,
+          &quot;percent&quot;: 0.4
+        },
+        {
+          &quot;fuel&quot;: &quot;Geothermal&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Other fossil&quot;,
+          &quot;percent&quot;: 0.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+          &quot;percent&quot;: 0.2
+        }
+      ],
+      &quot;mixUnit&quot;: &quot;percent&quot;,
+      &quot;generationMWh&quot;: 158074959.653,
+      &quot;co2KgPerKWh&quot;: 0.395551598,
+      &quot;originalCO2LbPerMWh&quot;: 872.042,
+      &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+      &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+      &quot;source&quot;: &quot;egrid2023&quot;
+    }
+  ],
+  &quot;coverage&quot;: {
+    &quot;mappingStatus&quot;: &quot;candidate-2021&quot;,
+    &quot;priceAvailability&quot;: {
+      &quot;status&quot;: &quot;state-sector-proxy&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sectors&quot;: {
+        &quot;residential&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;commercial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;industrial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        }
+      },
+      &quot;utilityTariff&quot;: &quot;not-ingested&quot;
+    },
+    &quot;gridAvailability&quot;: {
+      &quot;status&quot;: &quot;subregion-candidate&quot;,
+      &quot;year&quot;: 2023,
+      &quot;regions&quot;: [
+        &quot;SPSO&quot;
+      ],
+      &quot;stateAvailable&quot;: true,
+      &quot;source&quot;: &quot;epaZip2023&quot;
+    },
+    &quot;requestedPricePeriods&quot;: 14,
+    &quot;priceBasis&quot;: &quot;state-sector-average-proxy&quot;,
+    &quot;tariffStatus&quot;: &quot;not-ingested&quot;,
+    &quot;snapshotDate&quot;: &quot;2026-09-11&quot;
+  },
+  &quot;warnings&quot;: [
+    &quot;Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.&quot;,
+    &quot;Utility associations are possible providers from 2021, not verified street-level service or current tariffs.&quot;,
+    &quot;State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.&quot;,
+    &quot;Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.&quot;,
+    &quot;Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.&quot;,
+    &quot;Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.&quot;
+  ],
+  &quot;sources&quot;: [
+    {
+      &quot;id&quot;: &quot;geonames&quot;,
+      &quot;publisher&quot;: &quot;GeoNames&quot;,
+      &quot;title&quot;: &quot;Public postal-code inventory&quot;,
+      &quot;url&quot;: &quot;https://download.geonames.org/export/zip/&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0 (download README declaration)&quot;,
+      &quot;evidenceKind&quot;: &quot;public postal inventory; approximate coordinates&quot;,
+      &quot;vintage&quot;: &quot;retrieval snapshot; not USPS-authoritative&quot;
+    },
+    {
+      &quot;id&quot;: &quot;oedi2021&quot;,
+      &quot;publisher&quot;: &quot;NREL / OpenEI&quot;,
+      &quot;title&quot;: &quot;U.S. Electric Utility Companies and Rates: Look-up by Zipcode (2021)&quot;,
+      &quot;url&quot;: &quot;https://data.openei.org/submissions/5806&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0&quot;,
+      &quot;vintage&quot;: 2021,
+      &quot;published&quot;: &quot;2022-11&quot;,
+      &quot;evidenceKind&quot;: &quot;likely ZIP utility associations; not verified street service&quot;
+    },
+    {
+      &quot;id&quot;: &quot;eia861m&quot;,
+      &quot;publisher&quot;: &quot;US Energy Information Administration&quot;,
+      &quot;title&quot;: &quot;EIA-861M monthly state-sector electricity prices&quot;,
+      &quot;url&quot;: &quot;https://www.eia.gov/electricity/data/eia861m/xls/sales_revenue.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.eia.gov/about/copyrights_reuse.php&quot;,
+      &quot;evidenceKind&quot;: &quot;state-sector realized average retail price; survey estimates, preliminary/final status per row&quot;,
+      &quot;units&quot;: &quot;USD/kWh converted from cents/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;egrid2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;eGRID2023 rev2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/egrid2023_data_rev2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.epa.gov/egrid/frequent-questions-about-egrid&quot;,
+      &quot;vintage&quot;: 2023,
+      &quot;published&quot;: &quot;2025-06-12&quot;,
+      &quot;evidenceKind&quot;: &quot;annual regional generation resource mix and CO2 total-output emission rate&quot;,
+      &quot;units&quot;: {
+        &quot;mix&quot;: &quot;percent (0..100)&quot;,
+        &quot;originalCO2&quot;: &quot;lb/MWh&quot;,
+        &quot;co2KgPerKWh&quot;: &quot;kg CO2/kWh&quot;
+      },
+      &quot;conversion&quot;: &quot;lb/MWh * 0.45359237 / 1000 = kg/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;epaZip2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;Power Profiler ZIP tool v14.2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/power_profiler_zipcode_tool_v14.2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;vintage&quot;: &quot;eGRID2023_rev1 associations, published 2025-06&quot;,
+      &quot;evidenceKind&quot;: &quot;possible ZIP subregions; all alternatives retained; embedded rev1 rates unused&quot;
+    },
+    {
+      &quot;id&quot;: &quot;urdb&quot;,
+      &quot;publisher&quot;: &quot;OpenEI&quot;,
+      &quot;title&quot;: &quot;Utility Rate Database&quot;,
+      &quot;url&quot;: &quot;https://openei.org/wiki/Utility_Rate_Database&quot;,
+      &quot;bulkUrl&quot;: &quot;https://openei.org/apps/USURDB/download/usurdb.json.gz&quot;,
+      &quot;license&quot;: &quot;OpenEI CC0 unless otherwise noted; underlying tariff documents may differ&quot;,
+      &quot;evidenceKind&quot;: &quot;external tariff research source only; schedules not ingested or evaluated&quot;,
+      &quot;coverageStatus&quot;: &quot;not-ingested&quot;
+    }
+  ],
+  &quot;appliedPriceMode&quot;: &quot;manual&quot;,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002
+}</pre></details></section><section><h2><span class="cat">§ 006</span>Liquid-desiccant hybrid (generic)</h2><table><tbody><tr><th>Facility / crop</th><td>greenhouse / lettuce</td></tr><tr><th>Expected / valid hours</th><td>8,760 / 8,760</td></tr><tr><th>Joint climate-band attainment</th><td>51.6%</td></tr><tr><th>Equivalent compliant hours</th><td>4,517.3</td></tr><tr><th>Longest failure episode</th><td>119 h</td></tr><tr><th>Evaporative pad runtime</th><td>4,193 h on 349 days (2,153.3 equivalent full-load h); 267,624 L water</td></tr><tr><th>Pad viability, weather only</th><td>244 h effective on 65 days (30 days with 4 h or more); 18 h marginal; 2,680 h too warm or humid for pad alone on 171 days</td></tr><tr><th>Indirect evaporative runtime</th><td>4,473 h on 349 days (2,437.8 equivalent full-load h)</td></tr><tr><th>Desiccant runtime</th><td>6,949 h on 365 days (2,426.7 equivalent full-load h)</td></tr><tr><th>Heating runtime</th><td>3,131 h on 275 days (1,249.5 equivalent full-load h)</td></tr><tr><th>Supplemental light runtime</th><td>2,226 h on 365 days (2,226 equivalent full-load h)</td></tr><tr><th>Purchased electricity</th><td>172,680.9 kWh</td></tr><tr><th>Purchased heating/regeneration fuel</th><td>166,602.2 kWh</td></tr><tr><th>Period operating cost</th><td>$29,181.11</td></tr><tr><th>Installed capital assumption</th><td>$125,000</td></tr><tr><th>Electricity price basis</th><td>Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.</td></tr><tr><th>Missing data</th><td>0 hours</td></tr></tbody></table><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture is a declared L/m²/day schedule, dark-hour rate relative to a lit hour. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Controller enumerates finite airflow and device duty combinations, minimizes joint target excursion first and instantaneous manual-price operating cost second. This is not a guaranteed global economic optimum.</li><li>Control cadence is a substantive assumption, not a proven numerical-precision bound: halving 1-minute dispatch to 30 seconds in four seasonal two-day checks changed attainment by up to 4.1 percentage points and electricity by up to 23.5%. These sample differences are not universal error bars. Close equipment-cost rankings require controller/site validation.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Full reproducible scenario</summary><pre>{
+  &quot;schemaVersion&quot;: 1,
+  &quot;id&quot;: &quot;5bb76a09-13e9-45c8-bd29-c0ba9826e384&quot;,
+  &quot;name&quot;: &quot;Liquid-desiccant hybrid (generic)&quot;,
+  &quot;facility&quot;: &quot;greenhouse&quot;,
+  &quot;system&quot;: &quot;bench&quot;,
+  &quot;crop&quot;: &quot;lettuce&quot;,
+  &quot;technology&quot;: &quot;hybridDesiccant&quot;,
+  &quot;areaM2&quot;: 500,
+  &quot;canopyM2&quot;: 350,
+  &quot;heightM&quot;: 4,
+  &quot;envelopeRatio&quot;: 1.8,
+  &quot;uValue&quot;: 4,
+  &quot;thermalMassKJm2K&quot;: 100,
+  &quot;infiltrationACH&quot;: 0.3,
+  &quot;solarTransmission&quot;: 0.65,
+  &quot;parTransmission&quot;: 0.65,
+  &quot;shadeFraction&quot;: 0.25,
+  &quot;solarHeatFraction&quot;: 1,
+  &quot;minVentACH&quot;: 0.3,
+  &quot;maxVentACH&quot;: 40,
+  &quot;fanWPerM3s&quot;: 180,
+  &quot;padEnabled&quot;: true,
+  &quot;padEffectiveness&quot;: 0.8,
+  &quot;padPumpW&quot;: 250,
+  &quot;heaterKW&quot;: 120,
+  &quot;heaterEfficiency&quot;: 0.9,
+  &quot;coolingKW&quot;: 0,
+  &quot;coolingCOP&quot;: 3,
+  &quot;coolingSHR&quot;: 0.75,
+  &quot;coolingMinOutdoorC&quot;: -5,
+  &quot;coolingMaxOutdoorC&quot;: 46,
+  &quot;dehuKgH&quot;: 0,
+  &quot;dehuLPerKWh&quot;: 2.5,
+  &quot;integratedHVAC&quot;: false,
+  &quot;reheatFraction&quot;: 0.5,
+  &quot;humidifierKgH&quot;: 0,
+  &quot;desiccantKgH&quot;: 60,
+  &quot;regenerationKWhPerKg&quot;: 0.8,
+  &quot;regenerationElectricFraction&quot;: 1,
+  &quot;desiccantHeatFraction&quot;: 0.2,
+  &quot;hybridEvapEffectiveness&quot;: 0.8,
+  &quot;lightWm2&quot;: 80,
+  &quot;efficacy&quot;: 2.5,
+  &quot;lightDelivery&quot;: 0.85,
+  &quot;dayStart&quot;: 6,
+  &quot;photoperiod&quot;: 16,
+  &quot;dayTargetC&quot;: 22,
+  &quot;nightTargetC&quot;: 18,
+  &quot;tempToleranceC&quot;: 2,
+  &quot;vpdMin&quot;: 0.6,
+  &quot;vpdMax&quot;: 1,
+  &quot;maxDewPointC&quot;: 19,
+  &quot;dliTarget&quot;: 14,
+  &quot;transpirationLDayM2&quot;: 1.6714285714285715,
+  &quot;darkTranspirationFraction&quot;: 0.15,
+  &quot;cropSensibleWm2&quot;: 0,
+  &quot;electricityPrice&quot;: 0.12,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002,
+  &quot;installedCost&quot;: 125000,
+  &quot;maintenanceYear&quot;: 500,
+  &quot;lifeYears&quot;: 15,
+  &quot;discountRate&quot;: 0.06,
+  &quot;latitude&quot;: 36.15,
+  &quot;longitude&quot;: -95.99,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;priceMode&quot;: &quot;manual&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;
+}</pre></details><details open><summary>Energy-source provenance</summary><pre>{
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;state&quot;: &quot;OK&quot;,
+  &quot;sector&quot;: &quot;commercial&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;utilities&quot;: [
+    {
+      &quot;id&quot;: &quot;15474&quot;,
+      &quot;name&quot;: &quot;Public Service Co of Oklahoma&quot;,
+      &quot;state&quot;: &quot;OK&quot;,
+      &quot;serviceType&quot;: &quot;Bundled&quot;,
+      &quot;ownership&quot;: &quot;Investor Owned&quot;,
+      &quot;source&quot;: &quot;oedi2021&quot;,
+      &quot;vintage&quot;: 2021
+    }
+  ],
+  &quot;prices&quot;: [
+    {
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
+      &quot;status&quot;: &quot;Final&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    },
+    {
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
+      &quot;source&quot;: &quot;eia861m&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sector&quot;: &quot;commercial&quot;,
+      &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+    }
+  ],
+  &quot;grid&quot;: {
+    &quot;year&quot;: 2023,
+    &quot;region&quot;: &quot;SPSO&quot;,
+    &quot;name&quot;: &quot;SPP South&quot;,
+    &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+    &quot;mix&quot;: [
+      {
+        &quot;fuel&quot;: &quot;Coal&quot;,
+        &quot;percent&quot;: 16.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Oil&quot;,
+        &quot;percent&quot;: 0.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Natural gas&quot;,
+        &quot;percent&quot;: 46.1
+      },
+      {
+        &quot;fuel&quot;: &quot;Nuclear&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Hydro&quot;,
+        &quot;percent&quot;: 2.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Biomass&quot;,
+        &quot;percent&quot;: 1.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Wind&quot;,
+        &quot;percent&quot;: 32.5
+      },
+      {
+        &quot;fuel&quot;: &quot;Solar&quot;,
+        &quot;percent&quot;: 0.4
+      },
+      {
+        &quot;fuel&quot;: &quot;Geothermal&quot;,
+        &quot;percent&quot;: 0
+      },
+      {
+        &quot;fuel&quot;: &quot;Other fossil&quot;,
+        &quot;percent&quot;: 0.2
+      },
+      {
+        &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+        &quot;percent&quot;: 0.2
+      }
+    ],
+    &quot;mixUnit&quot;: &quot;percent&quot;,
+    &quot;generationMWh&quot;: 158074959.653,
+    &quot;co2KgPerKWh&quot;: 0.395551598,
+    &quot;originalCO2LbPerMWh&quot;: 872.042,
+    &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+    &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+    &quot;source&quot;: &quot;egrid2023&quot;,
+    &quot;selectionBasis&quot;: &quot;single-ZIP-subregion-candidate&quot;,
+    &quot;mappingSource&quot;: &quot;epaZip2023&quot;
+  },
+  &quot;gridCandidates&quot;: [
+    {
+      &quot;year&quot;: 2023,
+      &quot;region&quot;: &quot;SPSO&quot;,
+      &quot;name&quot;: &quot;SPP South&quot;,
+      &quot;geography&quot;: &quot;eGRID-subregion&quot;,
+      &quot;mix&quot;: [
+        {
+          &quot;fuel&quot;: &quot;Coal&quot;,
+          &quot;percent&quot;: 16.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Oil&quot;,
+          &quot;percent&quot;: 0.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Natural gas&quot;,
+          &quot;percent&quot;: 46.1
+        },
+        {
+          &quot;fuel&quot;: &quot;Nuclear&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Hydro&quot;,
+          &quot;percent&quot;: 2.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Biomass&quot;,
+          &quot;percent&quot;: 1.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Wind&quot;,
+          &quot;percent&quot;: 32.5
+        },
+        {
+          &quot;fuel&quot;: &quot;Solar&quot;,
+          &quot;percent&quot;: 0.4
+        },
+        {
+          &quot;fuel&quot;: &quot;Geothermal&quot;,
+          &quot;percent&quot;: 0
+        },
+        {
+          &quot;fuel&quot;: &quot;Other fossil&quot;,
+          &quot;percent&quot;: 0.2
+        },
+        {
+          &quot;fuel&quot;: &quot;Other / purchased fuel&quot;,
+          &quot;percent&quot;: 0.2
+        }
+      ],
+      &quot;mixUnit&quot;: &quot;percent&quot;,
+      &quot;generationMWh&quot;: 158074959.653,
+      &quot;co2KgPerKWh&quot;: 0.395551598,
+      &quot;originalCO2LbPerMWh&quot;: 872.042,
+      &quot;co2Unit&quot;: &quot;kg CO2/kWh&quot;,
+      &quot;evidenceKind&quot;: &quot;annual-regional-total-output-CO2&quot;,
+      &quot;source&quot;: &quot;egrid2023&quot;
+    }
+  ],
+  &quot;coverage&quot;: {
+    &quot;mappingStatus&quot;: &quot;candidate-2021&quot;,
+    &quot;priceAvailability&quot;: {
+      &quot;status&quot;: &quot;state-sector-proxy&quot;,
+      &quot;geography&quot;: &quot;OK&quot;,
+      &quot;sectors&quot;: {
+        &quot;residential&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;commercial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        },
+        &quot;industrial&quot;: {
+          &quot;firstPeriod&quot;: &quot;2010-01&quot;,
+          &quot;lastPeriod&quot;: &quot;2026-06&quot;,
+          &quot;periods&quot;: 198,
+          &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
+        }
+      },
+      &quot;utilityTariff&quot;: &quot;not-ingested&quot;
+    },
+    &quot;gridAvailability&quot;: {
+      &quot;status&quot;: &quot;subregion-candidate&quot;,
+      &quot;year&quot;: 2023,
+      &quot;regions&quot;: [
+        &quot;SPSO&quot;
+      ],
+      &quot;stateAvailable&quot;: true,
+      &quot;source&quot;: &quot;epaZip2023&quot;
+    },
+    &quot;requestedPricePeriods&quot;: 14,
+    &quot;priceBasis&quot;: &quot;state-sector-average-proxy&quot;,
+    &quot;tariffStatus&quot;: &quot;not-ingested&quot;,
+    &quot;snapshotDate&quot;: &quot;2026-09-11&quot;
+  },
+  &quot;warnings&quot;: [
+    &quot;Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.&quot;,
+    &quot;Utility associations are possible providers from 2021, not verified street-level service or current tariffs.&quot;,
+    &quot;State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.&quot;,
+    &quot;Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.&quot;,
+    &quot;Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.&quot;,
+    &quot;Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.&quot;
+  ],
+  &quot;sources&quot;: [
+    {
+      &quot;id&quot;: &quot;geonames&quot;,
+      &quot;publisher&quot;: &quot;GeoNames&quot;,
+      &quot;title&quot;: &quot;Public postal-code inventory&quot;,
+      &quot;url&quot;: &quot;https://download.geonames.org/export/zip/&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0 (download README declaration)&quot;,
+      &quot;evidenceKind&quot;: &quot;public postal inventory; approximate coordinates&quot;,
+      &quot;vintage&quot;: &quot;retrieval snapshot; not USPS-authoritative&quot;
+    },
+    {
+      &quot;id&quot;: &quot;oedi2021&quot;,
+      &quot;publisher&quot;: &quot;NREL / OpenEI&quot;,
+      &quot;title&quot;: &quot;U.S. Electric Utility Companies and Rates: Look-up by Zipcode (2021)&quot;,
+      &quot;url&quot;: &quot;https://data.openei.org/submissions/5806&quot;,
+      &quot;license&quot;: &quot;CC BY 4.0&quot;,
+      &quot;vintage&quot;: 2021,
+      &quot;published&quot;: &quot;2022-11&quot;,
+      &quot;evidenceKind&quot;: &quot;likely ZIP utility associations; not verified street service&quot;
+    },
+    {
+      &quot;id&quot;: &quot;eia861m&quot;,
+      &quot;publisher&quot;: &quot;US Energy Information Administration&quot;,
+      &quot;title&quot;: &quot;EIA-861M monthly state-sector electricity prices&quot;,
+      &quot;url&quot;: &quot;https://www.eia.gov/electricity/data/eia861m/xls/sales_revenue.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.eia.gov/about/copyrights_reuse.php&quot;,
+      &quot;evidenceKind&quot;: &quot;state-sector realized average retail price; survey estimates, preliminary/final status per row&quot;,
+      &quot;units&quot;: &quot;USD/kWh converted from cents/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;egrid2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;eGRID2023 rev2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/egrid2023_data_rev2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;licenseUrl&quot;: &quot;https://www.epa.gov/egrid/frequent-questions-about-egrid&quot;,
+      &quot;vintage&quot;: 2023,
+      &quot;published&quot;: &quot;2025-06-12&quot;,
+      &quot;evidenceKind&quot;: &quot;annual regional generation resource mix and CO2 total-output emission rate&quot;,
+      &quot;units&quot;: {
+        &quot;mix&quot;: &quot;percent (0..100)&quot;,
+        &quot;originalCO2&quot;: &quot;lb/MWh&quot;,
+        &quot;co2KgPerKWh&quot;: &quot;kg CO2/kWh&quot;
+      },
+      &quot;conversion&quot;: &quot;lb/MWh * 0.45359237 / 1000 = kg/kWh&quot;
+    },
+    {
+      &quot;id&quot;: &quot;epaZip2023&quot;,
+      &quot;publisher&quot;: &quot;US Environmental Protection Agency&quot;,
+      &quot;title&quot;: &quot;Power Profiler ZIP tool v14.2&quot;,
+      &quot;url&quot;: &quot;https://www.epa.gov/system/files/documents/2025-06/power_profiler_zipcode_tool_v14.2.xlsx&quot;,
+      &quot;license&quot;: &quot;US public domain&quot;,
+      &quot;vintage&quot;: &quot;eGRID2023_rev1 associations, published 2025-06&quot;,
+      &quot;evidenceKind&quot;: &quot;possible ZIP subregions; all alternatives retained; embedded rev1 rates unused&quot;
+    },
+    {
+      &quot;id&quot;: &quot;urdb&quot;,
+      &quot;publisher&quot;: &quot;OpenEI&quot;,
+      &quot;title&quot;: &quot;Utility Rate Database&quot;,
+      &quot;url&quot;: &quot;https://openei.org/wiki/Utility_Rate_Database&quot;,
+      &quot;bulkUrl&quot;: &quot;https://openei.org/apps/USURDB/download/usurdb.json.gz&quot;,
+      &quot;license&quot;: &quot;OpenEI CC0 unless otherwise noted; underlying tariff documents may differ&quot;,
+      &quot;evidenceKind&quot;: &quot;external tariff research source only; schedules not ingested or evaluated&quot;,
+      &quot;coverageStatus&quot;: &quot;not-ingested&quot;
+    }
+  ],
+  &quot;appliedPriceMode&quot;: &quot;manual&quot;,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;fuelPrice&quot;: 0.045,
+  &quot;waterPrice&quot;: 0.002
+}</pre></details></section><section><h2><span class="cat">§ 007</span>Weather provenance</h2><pre>{
+  &quot;schemaVersion&quot;: 1,
+  &quot;source&quot;: &quot;NASA POWER&quot;,
+  &quot;sourceKind&quot;: &quot;gridded reanalysis + satellite solar&quot;,
+  &quot;latitude&quot;: 36.15,
+  &quot;longitude&quot;: -95.99,
+  &quot;timezone&quot;: &quot;America/Chicago&quot;,
+  &quot;zip&quot;: &quot;74103&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;retrievedAt&quot;: &quot;2026-09-11T21:12:17.231016+00:00&quot;,
+  &quot;sourceUrl&quot;: &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20241231&amp;end=20241231&amp;format=JSON&amp;time-standard=UTC&quot;,
+  &quot;sourceUrls&quot;: [
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20241231&amp;end=20241231&amp;format=JSON&amp;time-standard=UTC&quot;,
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20250101&amp;end=20251231&amp;format=JSON&amp;time-standard=UTC&quot;,
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20260101&amp;end=20260101&amp;format=JSON&amp;time-standard=UTC&quot;
+  ],
+  &quot;units&quot;: {
+    &quot;time&quot;: &quot;UTC epoch milliseconds&quot;,
+    &quot;tempC&quot;: &quot;C&quot;,
+    &quot;dewPointC&quot;: &quot;C&quot;,
+    &quot;rh&quot;: &quot;fraction&quot;,
+    &quot;pressurePa&quot;: &quot;Pa&quot;,
+    &quot;ghiWm2&quot;: &quot;W/m2&quot;,
+    &quot;windMs&quot;: &quot;m/s&quot;
+  },
+  &quot;interval&quot;: &quot;UTC hour start; hourly mean meteorology; Wh/m² over one hour divided by 1 hour = W/m²&quot;,
+  &quot;sourceVersions&quot;: [
+    {
+      &quot;title&quot;: &quot;NASA/POWER Source Native Resolution Hourly Data&quot;,
+      &quot;api&quot;: {
+        &quot;version&quot;: &quot;v2.10.0&quot;,
+        &quot;name&quot;: &quot;POWER Hourly API&quot;
+      },
+      &quot;sources&quot;: [
+        &quot;SYN1DEG&quot;,
+        &quot;MERRA2&quot;,
+        &quot;POWER&quot;
+      ],
+      &quot;fill_value&quot;: -999,
+      &quot;time_standard&quot;: &quot;UTC&quot;,
+      &quot;start&quot;: &quot;20241231&quot;,
+      &quot;end&quot;: &quot;20241231&quot;
+    },
+    {
+      &quot;title&quot;: &quot;NASA/POWER Source Native Resolution Hourly Data&quot;,
+      &quot;api&quot;: {
+        &quot;version&quot;: &quot;v2.10.0&quot;,
+        &quot;name&quot;: &quot;POWER Hourly API&quot;
+      },
+      &quot;sources&quot;: [
+        &quot;SYN1DEG&quot;,
+        &quot;MERRA2&quot;,
+        &quot;POWER&quot;
+      ],
+      &quot;fill_value&quot;: -999,
+      &quot;time_standard&quot;: &quot;UTC&quot;,
+      &quot;start&quot;: &quot;20250101&quot;,
+      &quot;end&quot;: &quot;20251231&quot;
+    },
+    {
+      &quot;title&quot;: &quot;NASA/POWER Source Native Resolution Hourly Data&quot;,
+      &quot;api&quot;: {
+        &quot;version&quot;: &quot;v2.10.0&quot;,
+        &quot;name&quot;: &quot;POWER Hourly API&quot;
+      },
+      &quot;sources&quot;: [
+        &quot;SYN1DEG&quot;,
+        &quot;MERRA2&quot;,
+        &quot;POWER&quot;
+      ],
+      &quot;fill_value&quot;: -999,
+      &quot;time_standard&quot;: &quot;UTC&quot;,
+      &quot;start&quot;: &quot;20260101&quot;,
+      &quot;end&quot;: &quot;20260101&quot;
+    }
+  ],
+  &quot;coordinateNotes&quot;: &quot;Requested 36.15,-95.99 is not an airport station. POWER returns source-native grids: MERRA-2 meteorology 0.5° latitude × 0.625° longitude; SYN1deg solar 1° × 1°. Returned point coordinates do not identify grid-cell centers. Elevation from source geometry, not measured site elevation.&quot;,
+  &quot;coverage&quot;: {
+    &quot;expectedHours&quot;: 8760,
+    &quot;weatherHours&quot;: 8760,
+    &quot;solarHours&quot;: 8760,
+    &quot;startUTC&quot;: &quot;2025-01-01T06:00:00.000Z&quot;,
+    &quot;endExclusiveUTC&quot;: &quot;2026-01-01T06:00:00.000Z&quot;,
+    &quot;sourceQueryPadding&quot;: &quot;One UTC day before first local day, through UTC date of exclusive local end&quot;,
+    &quot;actualWeatherCutoffUTC&quot;: &quot;2026-01-01T05:00:00.000Z&quot;,
+    &quot;actualSolarCutoffUTC&quot;: &quot;2026-01-01T05:00:00.000Z&quot;,
+    &quot;incompleteTrailingHours&quot;: 0
+  },
+  &quot;startUTC&quot;: &quot;2025-01-01T06:00:00.000Z&quot;,
+  &quot;endExclusiveUTC&quot;: &quot;2026-01-01T06:00:00.000Z&quot;
+}</pre><p>Export JSON alongside this report to retain raw weather, hourly results and all configuration values. This report alone is not the complete reproducibility bundle.</p></section><p class="foot">Grownetics · CEA Psychrometric Site Evaluator · Model 0.1.0-screening · Generated 2026-09-12T16:52:25.420Z</p></html>

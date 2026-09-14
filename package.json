@@ -1,0 +1,13 @@
+{
+  "name": "cea-psychrometric-site-evaluator",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Grownetics CEA Psychrometric Site Evaluator: open-source CEA component efficacy and historical climate screening",
+  "author": "Grownetics",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "serve": "python3 -m http.server 8150 --bind 127.0.0.1"
+  }
+}

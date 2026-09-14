@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#1C1C1A">
+  <meta name="description" content="Compare climate-control strategies against historical weather. An open, assumption-based screening tool for controlled-environment agriculture.">
+  <title>CEA Psychrometric Site Evaluator | Grownetics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#workspace">Skip to analysis</a>
+<div class="orbital" aria-hidden="true"><svg viewBox="0 0 800 800" fill="none"><circle cx="400" cy="400" r="380" stroke="#F5F5F0" stroke-width="1"/><circle cx="400" cy="400" r="280" stroke="#F5F5F0" stroke-width="0.5"/><circle cx="400" cy="120" r="4" fill="#4DB405"/></svg></div>
+<header class="topbar">
+  <a class="wordmark" href="./" aria-label="CEA Psychrometric Site Evaluator home">Grownetics<em>.</em></a>
+  <div class="header-actions"><a href="#sources">Sources &amp; limits</a><span class="version">Screening 0.2</span></div>
+</header>
+<main>
+  <section class="intro" aria-labelledby="title">
+    <div><div class="eyebrow">Grownetics · historical-climate &amp; equipment screening</div><h1 id="title">CEA Psychrometric<br>Site Evaluator<span class="title-dot">.</span></h1><p class="subtitle">Climate capability. Clearer investments.</p></div>
+    <p class="intro-note">Start with the weather.<br>Compare what your equipment can change.<br><strong>Keep the assumptions in view.</strong></p>
+  </section>
+  <section class="location-panel panel" aria-labelledby="location-title">
+    <div class="section-heading"><div><span class="step">01</span><h2 id="location-title">Set the climate context</h2></div><span id="weather-badge" class="badge">No weather loaded</span></div>
+    <form id="weather-form">
+      <div class="weather-grid">
+        <label>US ZIP code<span class="inline-input"><input id="zip" name="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" value="74103" aria-describedby="location-description"><button id="lookup-zip" type="button">Locate</button></span></label>
+        <label>Start date <span class="unit">local day</span><input id="start-date" type="date" value="2025-01-01" required></label>
+        <label>End date <span class="unit">local day, inclusive</span><input id="end-date" type="date" value="2025-12-31" required></label>
+        <label>Weather source<select id="weather-provider"><option value="nasa">NASA POWER · gridded</option><option value="iem">Station observations + NASA solar</option></select></label>
+        <button id="fetch-weather" class="primary" type="submit">Retrieve weather</button>
+      </div>
+      <div class="context-bottom"><p id="location-description">Tulsa, Oklahoma · ZIP centroid, not an exact facility location</p><button id="load-example" type="button" class="text-button">Load Tulsa 2025 example</button></div>
+      <details class="location-details"><summary>Coordinates, time zone &amp; station</summary><div class="four-grid">
+        <label>Latitude <span class="unit">° north</span><input id="latitude" type="number" min="-90" max="90" step="any" value="36.15" required></label>
+        <label>Longitude <span class="unit">° east</span><input id="longitude" type="number" min="-180" max="180" step="any" value="-95.99" required></label>
+        <label>IANA time zone<input id="timezone" value="America/Chicago" required></label>
+        <label>Observation station <span class="unit">IEM identifier</span><input id="station" value="TUL" maxlength="12" aria-describedby="station-note"></label>
+      </div><p id="station-note" class="help">Station selection is explicit, not automatically moved with the ZIP. TUL is Tulsa International Airport. Verify the station for other sites. Gridded solar is a separate source from observed temperature and humidity.</p></details>
+    </form>
+    <div class="climate-row" id="years-row">
+      <div class="climate-row-head"><span class="eyebrow">Weather years</span><span id="years-note" class="summary-meta">Select the calendar years to run. Every scenario runs against each selected year.</span></div>
+      <div id="year-chips" class="chip-row" role="group" aria-label="Weather years to run"></div>
+      <div class="climate-row-actions"><label>Retrieve <input id="retrieve-years-count" type="number" min="1" max="10" step="1" value="5" aria-label="Number of most recent complete years to retrieve"> most recent complete years <span class="unit">source above, cached locally</span></label><button id="retrieve-years" type="button">Retrieve years</button></div>
+    </div>
+    <div class="climate-row" id="sites-row">
+      <div class="climate-row-head"><span class="eyebrow">Compare sites</span><span class="summary-meta">Same facility, crop and years at other ZIP centroids. Extra sites are costed at manual scenario prices.</span></div>
+      <div id="site-chips" class="chip-row" role="list" aria-label="Additional comparison sites"></div>
+      <div class="climate-row-actions"><label>Add a site by ZIP<span class="inline-input"><input id="site-zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" aria-label="ZIP code of an additional site"><button id="add-site" type="button">Add site</button></span></label><label>Site time zone <span class="unit">IANA, verify</span><input id="site-timezone" aria-describedby="site-timezone-note" placeholder="America/Phoenix"></label></div>
+      <p id="site-timezone-note" class="help">The public ZIP catalog carries no time zone. A default is proposed from the state and must be verified: several states span two zones and Arizona does not observe daylight saving.</p>
+    </div>
+    <div id="weather-detail" class="source-line">The bundled example is real historical source data. No synthetic weather is substituted when retrieval fails.</div>
+    <div id="weather-status" role="status" aria-live="polite" class="status-line"></div>
+  </section>
+  <details class="panel energy-panel" id="energy-panel"><summary><span>Local energy context</span><span id="energy-summary" class="summary-meta">Loading public catalog…</span></summary><div class="details-body">
+    <p class="help">All scenarios in a comparison share the selected ZIP, site coordinates, time zone, weather period and customer sector, including imported scenarios. Electricity costing mode and manual prices remain scenario-specific. A ZIP can overlap multiple service territories; candidates are not a service guarantee. State average prices are not a utility tariff, and regional generation is not supplier-specific electricity.</p>
+    <div class="three-grid"><label>Working scenario electricity costing<select id="price-mode"><option value="manual">Manual scenario price</option><option value="state">Historical state/sector proxy</option></select></label><label>Shared customer sector<select id="sector"><option value="commercial">Commercial</option><option value="industrial">Industrial</option><option value="residential">Residential</option></select></label><label>Provider candidate <span class="unit">context only</span><select id="utility"><option value="">No mapping loaded</option></select></label></div>
+    <div id="catalog-coverage" class="source-line"></div><div id="energy-warnings" class="status-line"></div>
+    <div class="two-grid"><section><h3>Historical price context</h3><div id="price-history" class="table-wrap"></div></section><section><h3>Regional generation mix</h3><div id="grid-mix"></div></section></div>
+    <div id="energy-sources" class="source-line"></div>
+  </div></details>
+  <div id="app-message" class="notice" role="status" aria-live="polite" hidden></div>
+  <div class="workspace" id="workspace">
+    <aside class="configuration panel" aria-labelledby="scenario-title">
+      <div class="section-heading"><div><span class="step">02</span><h2 id="scenario-title">Build a scenario</h2></div><span id="scenario-count" class="badge">1 scenario</span></div>
+      <label class="scenario-picker">Working scenario<select id="scenario-select"></select></label>
+      <div class="button-row scenario-actions"><button id="duplicate-scenario" type="button">Duplicate</button><button id="remove-scenario" type="button" class="quiet">Remove</button><button id="save-scenario" type="button" class="quiet">Save</button></div>
+      <form id="scenario-form" novalidate>
+        <label>Scenario name<input id="scenario-name" name="name" maxlength="120" required></label>
+        <div class="two-grid"><label>Facility<select id="facility" name="facility"></select></label><label>Cultivation system<select id="system" name="system"></select></label></div>
+        <label>Crop program<select id="crop" name="crop"></select></label>
+        <p id="crop-source" class="help assumption"></p>
+        <label>Technology assumption<select id="technology" name="technology"></select></label>
+        <div class="toggle-row"><label><input id="pad-enabled" name="padEnabled" type="checkbox"> Evaporative pad</label><label><input id="integrated-hvac" name="integratedHVAC" type="checkbox"> Integrated reheat</label></div>
+        <div class="two-grid"><label>Control model<select id="control-mode" name="controlMode"><option value="staged">Staged deadband controller (default)</option><option value="ideal">Ideal per-minute modulation (upper bound)</option></select></label><label>Crop moisture model<select id="transpiration-model" name="transpirationModel"><option value="stanghellini">Stanghellini transpiration (LAI, light, VPD)</option><option value="schedule">Fixed L/m²/day schedule</option></select></label></div>
+        <p class="help">Changing facility or cultivation system loads a complete template. Changing technology replaces equipment capacities and installed-cost assumptions. All are editable below.</p>
+        <div id="core-fields" class="two-grid"></div>
+        <div id="advanced-fields" class="advanced-fields"></div>
+      </form>
+      <div class="add-upgrade"><label>Add a comparison<select id="upgrade-select"></select></label><button id="add-upgrade" type="button">+ Add strategy</button></div>
+      <p class="help">The first scenario is the comparison baseline. New strategies copy its non-equipment assumptions. Installed costs are illustrative, not quotations.</p>
+      <details class="sensitivity-controls"><summary>Sensitivity comparisons</summary><p class="help">Change one assumption at a time. These ranges are not statistical confidence intervals.</p><label>Assumption to vary<select id="sensitivity-select"><option value="pad">Pad effectiveness: 70 / 80 / 85 / 90%</option><option value="crop">Crop evaporation: −25 / +25%</option><option value="solar">Solar transmission: −20 / +20%</option><option value="envelope">Envelope U-value: −20 / +20%</option><option value="price">Manual electricity price: −25 / +25%</option><option value="temperature">Temperature tolerance: ±1 / ±2 / ±3 °C</option><option value="vpd">VPD band: −0.2 / +0.2 kPa on both bounds</option><option value="dewPoint">Dew-point ceiling: −2 / +2 °C</option><option value="photoperiod">Photoperiod start: 0 / 6 / 12 / 18 h</option></select></label><button id="add-sensitivity" type="button">Add sensitivity scenarios</button></details>
+      <div class="button-row file-actions"><button id="export-scenario" type="button" class="quiet">Export scenario</button><button id="import-button" type="button" class="quiet" aria-describedby="import-note">Import JSON / CSV</button><input id="import-file" type="file" accept=".json,.csv,application/json,text/csv" hidden></div>
+      <div id="import-progress" class="run-progress" hidden><progress id="import-progress-bar" max="1" value="0"></progress><span id="import-progress-label" role="status">Preparing import…</span></div>
+      <p id="import-note" class="help">Imports are read and parsed in a background worker, so the interface stays responsive. There is no fixed file-size limit: the ceiling is the memory the browser can allocate for this tab, and a file beyond it fails to parse rather than loading partially.</p>
+      <p id="save-status" class="source-line" role="status">Saved only in this browser. Export to keep a portable copy.</p>
+    </aside>
+    <section class="results-column" aria-labelledby="results-title">
+      <div class="runbar"><div><span class="eyebrow">03 · COMPARE THE TRADE-OFFS</span><h2 id="results-title">Find your control window</h2></div><div class="button-row"><button id="cancel-run" type="button" hidden>Cancel</button><button id="run-all" type="button" class="primary" disabled>Run all scenarios <span aria-hidden="true">↗</span></button></div></div>
+      <div id="run-progress" class="run-progress" hidden><progress id="progress" max="1" value="0"></progress><span id="progress-label" role="status">Preparing analysis…</span></div>
+      <div class="evidence-note"><span class="evidence-dot" aria-hidden="true"></span><p><strong>Assumption-based statistical screening.</strong> Coarse component models, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</p></div>
+      <div id="stale-notice" class="notice warning" hidden>Inputs have changed. These results belong to the previous run. Run all scenarios to update.</div>
+      <div id="empty-results" class="empty-state panel"><div class="window-symbol" aria-hidden="true"><span></span><span></span><span></span><span></span></div><h3>A clear comparison starts<br>with a real weather record.</h3><p>Review the facility and crop assumptions, then run the baseline. Add a strategy to see its change in target hours and period operating cost.</p><p class="help">Nothing is calculated until you run a scenario.</p></div>
+      <div id="results" hidden>
+        <div class="results-controls"><label>Inspect result<select id="result-select"></select></label><label id="primary-year-label" hidden>Primary year<select id="primary-year"></select></label><div class="segmented" role="group" aria-label="Analysis evidence tier"><button id="equipment-tab" type="button" aria-pressed="true">Equipment estimate</button><button id="weather-tab" type="button" aria-pressed="false">Weather only</button></div></div>
+        <p id="view-explanation" class="help"></p>
+        <div id="headline-metrics" class="metrics-grid"></div>
+        <details id="warning-disclosure" class="notice warning"><summary>Model assumptions and source coverage</summary><div id="result-warnings" hidden></div></details>
+        <section class="panel chart-panel"><div class="chart-heading"><div><span class="eyebrow">SEASONAL PATTERN</span><h3>Operating modes by month</h3></div><span class="chart-unit">elapsed hours</span></div><div id="monthly-chart" class="chart"></div><div id="mode-legend" class="legend"></div><details><summary>Mode hours, table view</summary><div id="mode-table" class="table-wrap"></div></details></section>
+        <section class="panel chart-panel"><div class="chart-heading"><div><span class="eyebrow">COMPONENT USE</span><h3 id="runtime-title">Equipment runtime</h3></div></div><p id="runtime-help" class="help"></p><div id="runtime-table" class="table-wrap"></div></section>
+        <section class="panel chart-panel"><div class="chart-heading"><div><span class="eyebrow">OUTSIDE AIR AS DEHUMIDIFIER</span><h3>When ventilation dries the zone</h3></div></div><p id="drying-help" class="help"></p><div id="drying-table" class="table-wrap"></div></section>
+        <section class="panel chart-panel" id="loads-panel"><div class="chart-heading"><div><span class="eyebrow">SENSIBLE VS LATENT</span><h3>Where the load comes from</h3></div><span class="chart-unit">kWh per month · latent as L·kg below axis</span></div><p class="help">Monthly sensible gains (solar, light, envelope, infiltration, ventilation, fan, crop) against the crop's evaporative load expressed as latent heat. The space sensible-heat ratio shows whether coupled cooling and reheat or decoupled moisture removal fits the load. Model balance terms, not measurements.</p><div id="loads-chart" class="chart"></div><div id="loads-legend" class="legend"></div><details><summary>Monthly decomposition, table view</summary><div id="loads-table" class="table-wrap"></div></details></section>
+        <section class="panel chart-panel" id="co2-panel"><div class="chart-heading"><div><span class="eyebrow">CO₂ ENRICHMENT WINDOW</span><h3>When the zone can stay closed</h3></div></div><p id="co2-help" class="help"></p><div id="co2-table" class="table-wrap"></div></section>
+        <section class="panel chart-panel"><div class="chart-heading"><div><span class="eyebrow">CHRONOLOGICAL RECORD</span><h3 id="timeline-title">Where the gaps occur</h3></div><label>View month <span class="unit">UTC</span><select id="timeline-month"></select></label></div><p id="timeline-help" class="help">Day × hour. Each cell carries a shape as well as a colour. Select a cell to inspect its hour. UTC labels keep repeated local daylight-saving hours distinct.</p><div id="timeline-chart" class="chart timeline"></div><details><summary>Day by hour, table view</summary><div id="timeline-table" class="table-wrap timeline-table"></div></details></section>
+        <div class="two-grid result-charts"><section class="panel chart-panel"><div class="chart-heading"><div><span class="eyebrow">WEATHER-SIDE STATES</span><h3>Temperature &amp; moisture</h3></div></div><p class="help">Dry-bulb versus dew point, not a full psychrometric chart. Outdoor and pad process points.</p><div id="scatter-chart" class="chart"></div><div class="legend"><span><i class="swatch muted"></i>Outdoor</span><span><i class="swatch green"></i>Pad leaving air</span></div></section><section class="panel chart-panel" id="light-panel"><div class="chart-heading"><div><span class="eyebrow">CROP LIGHT</span><h3>Daily light integral</h3></div></div><p class="help">Natural + supplemental light. Dashed line is the selected target; partial days are not full-day proof.</p><div id="dli-chart" class="chart"></div><div class="legend"><span><i class="swatch amber"></i>Natural</span><span><i class="swatch green"></i>Supplemental</span></div></section></div>
+        <section class="panel inspector"><div class="chart-heading"><div><span class="eyebrow">FOLLOW THE ASSUMPTIONS</span><h3>Hourly inspector</h3></div><span id="hour-position" class="chart-unit"></span></div><div class="hour-controls"><button id="hour-prev" type="button" aria-label="Previous hour">←</button><input id="hour-slider" type="range" min="0" max="0" value="0" aria-label="Hour in weather record" aria-describedby="hour-announcement"><button id="hour-next" type="button" aria-label="Next hour">→</button></div><p id="hour-announcement" class="status-line" role="status" aria-live="polite"></p><div id="hour-detail"></div></section>
+        <section class="panel comparison"><div class="chart-heading"><div><span class="eyebrow">INVESTMENT SCREEN</span><h3>More control, at what cost?</h3></div></div><p class="help">Same historical record. Capex and selected-period operating costs are separate. Added target hours are relative to the first scenario, not crop revenue or annual ROI.</p><div id="comparison-table" class="table-wrap"></div></section>
+        <section class="panel chart-panel" id="years-panel" hidden><div class="chart-heading"><div><span class="eyebrow">CLIMATE RISK ACROSS YEARS</span><h3>Median year, worst year, spread</h3></div><span class="chart-unit">joint attainment by year · median line</span></div><p class="help">Same scenarios, one weather year each. Median, worst and best years, the spread between them, and the least-squares trend where five or more calendar years exist. Ten years of gridded weather is climate evidence, not a forecast.</p><div id="years-chart" class="chart"></div><div id="years-table" class="table-wrap"></div><p id="years-ranking" class="source-line"></p></section>
+        <section class="panel chart-panel" id="sites-panel" hidden><div class="chart-heading"><div><span class="eyebrow">ACROSS SITES</span><h3>Which climate gives the most for free?</h3></div></div><p class="help">Per site: weather-side free-cooling hours (median over the selected years), pad-effective hours, the binding constraint, the cheapest non-dominated strategy by median operating cost, and the worst-year attainment. Additional sites use manual scenario prices, not their local historical proxies.</p><div id="sites-table" class="table-wrap"></div></section>
+        <section class="panel export-panel"><div><h3>Keep the evidence with the result.</h3><p class="help">Portable inputs, source provenance and hourly outputs. The design-basis brief summarizes peak hours, air and water requirements and the strategy verdict for the engineer of record.</p></div><div class="button-row"><button id="export-json" type="button">Run JSON</button><button id="export-csv" type="button">Hourly CSV</button><button id="export-report" type="button">Printable report</button><button id="export-design-basis" type="button">Design-basis brief</button></div></section>
+        <p id="run-manifest" class="source-line"></p>
+      </div>
+    </section>
+  </div>
+  <section id="sources" class="panel sources"><div class="section-heading"><div><span class="step">↗</span><h2>Know what this screen can tell you</h2></div><span class="badge">TRANSPARENT BY DESIGN</span></div><div class="three-grid"><div><h3>Weather is evidence.</h3><p>NASA POWER is a gridded reconstruction. Station mode pairs observed meteorology with separately sourced solar. Missing intervals remain visible, not replaced with favorable conditions.</p><a href="docs/RESEARCH.md">Research &amp; source register ↗</a></div><div><h3>Equipment is an assumption.</h3><p>Constant component capacities, efficiencies and simplified controls compare strategies. Crop evaporation, uniform air, glazing and heat recovery need site-specific review. These are not sizing or yield guarantees.</p><a href="docs/EVALUATION.md">Evidence tiers &amp; evaluation gates ↗</a></div><div><h3>Technology, not brand rankings.</h3><p>Desiccant and hybrid strategies are generic, editable screens. <a href="https://www.bluefrontierac.com/" target="_blank" rel="noopener noreferrer">Blue Frontier</a> and <a href="https://agronomiciq.com/grow-room-hvac/" target="_blank" rel="noopener noreferrer">AGronomic IQ</a> are technology references only. No validated product maps or manufacturer results are implied.</p><a href="docs/ENERGY-DATA.md">Energy data provenance ↗</a></div></div></section>
+</main>
+<footer><span>Grownetics <span class="footer-divider">/</span> CEA Psychrometric Site Evaluator</span><span>Static-first. Open source. Your scenarios stay in your browser.</span></footer>
+<noscript><p class="notice">JavaScript is required for local calculation and charts. Serve this folder with a static HTTP server, then enable JavaScript.</p></noscript>
+</body>
+</html>

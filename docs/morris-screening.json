@@ -1,0 +1,7675 @@
+{
+ "design": {
+  "parameters": [
+   {
+    "key": "uValue",
+    "label": "Envelope U-value",
+    "unit": "W/m²K",
+    "low": 0.7,
+    "high": 1.4,
+    "kind": "factor",
+    "rationale": "Nominal glazing U-values are quoted for clean, still, new assemblies. Aged, dirty, wind-exposed envelopes with unaccounted thermal bridges run higher; a tight double layer runs lower. Roughly 3 to 6 W/m²K around the 4 W/m²K default."
+   },
+   {
+    "key": "infiltrationACH",
+    "label": "Air leakage",
+    "unit": "ACH",
+    "low": 0.5,
+    "high": 2,
+    "kind": "factor",
+    "rationale": "Greenhouse leakage is almost never blower-door measured. Published envelope leakage for film and polycarbonate houses spans about half to twice a nominal 0.3 ACH, and rises with wind."
+   },
+   {
+    "key": "lai",
+    "label": "Crop transpiration scale (LAI and the L/m²/day fallback)",
+    "unit": "×",
+    "low": 0.7,
+    "high": 1.3,
+    "kind": "factor",
+    "alsoScales": [
+     "transpirationLDayM2"
+    ],
+    "rationale": "Leaf area index moves through the crop cycle, between cultivars and with plant density; Stanghellini transpiration scales with it. The declared L/m²/day schedule is scaled by the same factor so scheduled scenarios respond identically."
+   },
+   {
+    "key": "padEffectiveness",
+    "label": "Pad saturation effectiveness",
+    "unit": "fraction",
+    "low": 0.7,
+    "high": 0.9,
+    "kind": "absolute",
+    "rationale": "Cellulose pad manufacturer data: about 0.70 for 100 mm media at high face velocity to about 0.90 for 200 mm media at low face velocity. Fouling and uneven wetting sit at the low end."
+   },
+   {
+    "key": "coolingSHR",
+    "label": "DX sensible heat ratio",
+    "unit": "fraction",
+    "low": 0.65,
+    "high": 0.85,
+    "kind": "absolute",
+    "rationale": "Coil sensible heat ratio at CEA entering conditions depends on coil rows, airflow and entering wet bulb. 0.65 to 0.85 covers ordinary equipment without an equipment map (roadmap M4)."
+   },
+   {
+    "key": "coolingCOP",
+    "label": "Cooling COP",
+    "unit": "W/W",
+    "low": 0.8,
+    "high": 1.25,
+    "kind": "factor",
+    "rationale": "A single constant COP stands in for condensing temperature, part-load degradation and fan power. Seasonal performance around a nominal 3 commonly lands within minus 20 to plus 25 percent."
+   },
+   {
+    "key": "solarTransmission",
+    "label": "Thermal solar transmission",
+    "unit": "fraction",
+    "low": 0.85,
+    "high": 1.15,
+    "kind": "factor",
+    "rationale": "Glazing transmission falls with age, dust and condensation and varies with structure shading and incidence angle; a nominal value is a clean-new figure."
+   },
+   {
+    "key": "shadeFraction",
+    "label": "Shade fraction",
+    "unit": "fraction",
+    "low": 0.1,
+    "high": 0.4,
+    "kind": "absolute",
+    "rationale": "Operational shading ranges from light screening to heavy summer whitewash or a deployed screen. It is a management decision, not a fixed property, so it is screened as an absolute range."
+   },
+   {
+    "key": "solarHeatFraction",
+    "label": "Absorbed share of transmitted solar",
+    "unit": "fraction",
+    "low": 0.8,
+    "high": 1,
+    "kind": "absolute",
+    "rationale": "Not all transmitted shortwave becomes zone sensible heat in the same hour: part is reflected back out, part is absorbed by floor and structure and released later or conducted away. 0.8 to 1.0 brackets the single-zone assumption."
+   },
+   {
+    "key": "dehuLPerKWh",
+    "label": "Dehumidifier efficiency",
+    "unit": "L/kWh",
+    "low": 0.8,
+    "high": 1.25,
+    "kind": "factor",
+    "rationale": "Rated L/kWh is measured at a test point (typically warm and humid). Field performance at CEA dew points and part load differs, and integral fan and control power is often excluded from the rating."
+   },
+   {
+    "key": "maxVentACH",
+    "label": "Installed maximum ventilation",
+    "unit": "ACH",
+    "low": 0.6,
+    "high": 1.4,
+    "kind": "factor",
+    "rationale": "Fan tables are free-delivery ratings; achievable airflow depends on pad and louver pressure drop, wind and inlet area. Natural vent capacity depends on wind and stack, which this screen does not resolve (roadmap M4)."
+   },
+   {
+    "key": "thermalMassKJm2K",
+    "label": "Effective thermal mass",
+    "unit": "kJ/m²K",
+    "low": 0.5,
+    "high": 2,
+    "kind": "factor",
+    "rationale": "The capacitance actually coupled to zone air on hourly timescales (floor surface layer, benches, growing medium, structure) is never measured for a screen; half to twice a nominal 100 kJ/m²K is the honest span."
+   }
+  ],
+  "levels": 4,
+  "trajectories": 8,
+  "seed": 1,
+  "delta": 0.6666666666666666,
+  "basis": "Morris one-at-a-time trajectories in unit parameter space; elementary effects are per unit-range step (delta), so parameters with different physical units are comparable.",
+  "points": [
+   {
+    "id": "t0s0",
+    "trajectory": 0,
+    "step": 0,
+    "changedKey": null,
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 0.5,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t0s1",
+    "trajectory": 0,
+    "step": 1,
+    "changedKey": "maxVentACH",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 0.5,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t0s2",
+    "trajectory": 0,
+    "step": 2,
+    "changedKey": "thermalMassKJm2K",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 0.5,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s3",
+    "trajectory": 0,
+    "step": 3,
+    "changedKey": "uValue",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s4",
+    "trajectory": 0,
+    "step": 4,
+    "changedKey": "lai",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s5",
+    "trajectory": 0,
+    "step": 5,
+    "changedKey": "solarTransmission",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s6",
+    "trajectory": 0,
+    "step": 6,
+    "changedKey": "coolingSHR",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s7",
+    "trajectory": 0,
+    "step": 7,
+    "changedKey": "infiltrationACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s8",
+    "trajectory": 0,
+    "step": 8,
+    "changedKey": "shadeFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s9",
+    "trajectory": 0,
+    "step": 9,
+    "changedKey": "padEffectiveness",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s10",
+    "trajectory": 0,
+    "step": 10,
+    "changedKey": "solarHeatFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s11",
+    "trajectory": 0,
+    "step": 11,
+    "changedKey": "dehuLPerKWh",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t0s12",
+    "trajectory": 0,
+    "step": 12,
+    "changedKey": "coolingCOP",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t1s0",
+    "trajectory": 1,
+    "step": 0,
+    "changedKey": null,
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t1s1",
+    "trajectory": 1,
+    "step": 1,
+    "changedKey": "thermalMassKJm2K",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s2",
+    "trajectory": 1,
+    "step": 2,
+    "changedKey": "maxVentACH",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s3",
+    "trajectory": 1,
+    "step": 3,
+    "changedKey": "solarHeatFraction",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s4",
+    "trajectory": 1,
+    "step": 4,
+    "changedKey": "solarTransmission",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s5",
+    "trajectory": 1,
+    "step": 5,
+    "changedKey": "uValue",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s6",
+    "trajectory": 1,
+    "step": 6,
+    "changedKey": "shadeFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s7",
+    "trajectory": 1,
+    "step": 7,
+    "changedKey": "dehuLPerKWh",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s8",
+    "trajectory": 1,
+    "step": 8,
+    "changedKey": "padEffectiveness",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s9",
+    "trajectory": 1,
+    "step": 9,
+    "changedKey": "infiltrationACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s10",
+    "trajectory": 1,
+    "step": 10,
+    "changedKey": "lai",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s11",
+    "trajectory": 1,
+    "step": 11,
+    "changedKey": "coolingSHR",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t1s12",
+    "trajectory": 1,
+    "step": 12,
+    "changedKey": "coolingCOP",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t2s0",
+    "trajectory": 2,
+    "step": 0,
+    "changedKey": null,
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s1",
+    "trajectory": 2,
+    "step": 1,
+    "changedKey": "lai",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s2",
+    "trajectory": 2,
+    "step": 2,
+    "changedKey": "shadeFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s3",
+    "trajectory": 2,
+    "step": 3,
+    "changedKey": "padEffectiveness",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s4",
+    "trajectory": 2,
+    "step": 4,
+    "changedKey": "dehuLPerKWh",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s5",
+    "trajectory": 2,
+    "step": 5,
+    "changedKey": "coolingCOP",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s6",
+    "trajectory": 2,
+    "step": 6,
+    "changedKey": "maxVentACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 0.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s7",
+    "trajectory": 2,
+    "step": 7,
+    "changedKey": "infiltrationACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s8",
+    "trajectory": 2,
+    "step": 8,
+    "changedKey": "uValue",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s9",
+    "trajectory": 2,
+    "step": 9,
+    "changedKey": "solarTransmission",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s10",
+    "trajectory": 2,
+    "step": 10,
+    "changedKey": "coolingSHR",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s11",
+    "trajectory": 2,
+    "step": 11,
+    "changedKey": "solarHeatFraction",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t2s12",
+    "trajectory": 2,
+    "step": 12,
+    "changedKey": "thermalMassKJm2K",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t3s0",
+    "trajectory": 3,
+    "step": 0,
+    "changedKey": null,
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.9,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s1",
+    "trajectory": 3,
+    "step": 1,
+    "changedKey": "infiltrationACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.9,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s2",
+    "trajectory": 3,
+    "step": 2,
+    "changedKey": "maxVentACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.9,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s3",
+    "trajectory": 3,
+    "step": 3,
+    "changedKey": "dehuLPerKWh",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.9,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s4",
+    "trajectory": 3,
+    "step": 4,
+    "changedKey": "solarHeatFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.9,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s5",
+    "trajectory": 3,
+    "step": 5,
+    "changedKey": "padEffectiveness",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.766667,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s6",
+    "trajectory": 3,
+    "step": 6,
+    "changedKey": "shadeFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.766667,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s7",
+    "trajectory": 3,
+    "step": 7,
+    "changedKey": "uValue",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.766667,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s8",
+    "trajectory": 3,
+    "step": 8,
+    "changedKey": "solarTransmission",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.766667,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1.5
+    }
+   },
+   {
+    "id": "t3s9",
+    "trajectory": 3,
+    "step": 9,
+    "changedKey": "thermalMassKJm2K",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.766667,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t3s10",
+    "trajectory": 3,
+    "step": 10,
+    "changedKey": "lai",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.766667,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t3s11",
+    "trajectory": 3,
+    "step": 11,
+    "changedKey": "coolingSHR",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.766667,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t3s12",
+    "trajectory": 3,
+    "step": 12,
+    "changedKey": "coolingCOP",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.766667,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 0.5
+    }
+   },
+   {
+    "id": "t4s0",
+    "trajectory": 4,
+    "step": 0,
+    "changedKey": null,
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 0.5,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t4s1",
+    "trajectory": 4,
+    "step": 1,
+    "changedKey": "coolingSHR",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 0.5,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t4s2",
+    "trajectory": 4,
+    "step": 2,
+    "changedKey": "uValue",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t4s3",
+    "trajectory": 4,
+    "step": 3,
+    "changedKey": "lai",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t4s4",
+    "trajectory": 4,
+    "step": 4,
+    "changedKey": "thermalMassKJm2K",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t4s5",
+    "trajectory": 4,
+    "step": 5,
+    "changedKey": "padEffectiveness",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t4s6",
+    "trajectory": 4,
+    "step": 6,
+    "changedKey": "infiltrationACH",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t4s7",
+    "trajectory": 4,
+    "step": 7,
+    "changedKey": "shadeFraction",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t4s8",
+    "trajectory": 4,
+    "step": 8,
+    "changedKey": "dehuLPerKWh",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.95,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t4s9",
+    "trajectory": 4,
+    "step": 9,
+    "changedKey": "solarTransmission",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t4s10",
+    "trajectory": 4,
+    "step": 10,
+    "changedKey": "solarHeatFraction",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t4s11",
+    "trajectory": 4,
+    "step": 11,
+    "changedKey": "coolingCOP",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 0.6,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t4s12",
+    "trajectory": 4,
+    "step": 12,
+    "changedKey": "maxVentACH",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 1.5,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.15,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.133333,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s0",
+    "trajectory": 5,
+    "step": 0,
+    "changedKey": null,
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.9,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s1",
+    "trajectory": 5,
+    "step": 1,
+    "changedKey": "padEffectiveness",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s2",
+    "trajectory": 5,
+    "step": 2,
+    "changedKey": "infiltrationACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.95,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s3",
+    "trajectory": 5,
+    "step": 3,
+    "changedKey": "coolingCOP",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s4",
+    "trajectory": 5,
+    "step": 4,
+    "changedKey": "shadeFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s5",
+    "trajectory": 5,
+    "step": 5,
+    "changedKey": "coolingSHR",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s6",
+    "trajectory": 5,
+    "step": 6,
+    "changedKey": "maxVentACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s7",
+    "trajectory": 5,
+    "step": 7,
+    "changedKey": "solarTransmission",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s8",
+    "trajectory": 5,
+    "step": 8,
+    "changedKey": "solarHeatFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 2,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s9",
+    "trajectory": 5,
+    "step": 9,
+    "changedKey": "uValue",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 0.9,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s10",
+    "trajectory": 5,
+    "step": 10,
+    "changedKey": "lai",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t5s11",
+    "trajectory": 5,
+    "step": 11,
+    "changedKey": "thermalMassKJm2K",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t5s12",
+    "trajectory": 5,
+    "step": 12,
+    "changedKey": "dehuLPerKWh",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.3,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t6s0",
+    "trajectory": 6,
+    "step": 0,
+    "changedKey": null,
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.933333,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t6s1",
+    "trajectory": 6,
+    "step": 1,
+    "changedKey": "solarHeatFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.2,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t6s2",
+    "trajectory": 6,
+    "step": 2,
+    "changedKey": "shadeFraction",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 0.95,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t6s3",
+    "trajectory": 6,
+    "step": 3,
+    "changedKey": "coolingCOP",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t6s4",
+    "trajectory": 6,
+    "step": 4,
+    "changedKey": "padEffectiveness",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t6s5",
+    "trajectory": 6,
+    "step": 5,
+    "changedKey": "maxVentACH",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 1.25,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t6s6",
+    "trajectory": 6,
+    "step": 6,
+    "changedKey": "dehuLPerKWh",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.85,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t6s7",
+    "trajectory": 6,
+    "step": 7,
+    "changedKey": "coolingSHR",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t6s8",
+    "trajectory": 6,
+    "step": 8,
+    "changedKey": "thermalMassKJm2K",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t6s9",
+    "trajectory": 6,
+    "step": 9,
+    "changedKey": "lai",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 1.25,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t6s10",
+    "trajectory": 6,
+    "step": 10,
+    "changedKey": "solarTransmission",
+    "values": {
+     "uValue": 0.933333,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t6s11",
+    "trajectory": 6,
+    "step": 11,
+    "changedKey": "uValue",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 1,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t6s12",
+    "trajectory": 6,
+    "step": 12,
+    "changedKey": "infiltrationACH",
+    "values": {
+     "uValue": 1.4,
+     "infiltrationACH": 2,
+     "lai": 1.1,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.716667,
+     "coolingCOP": 1.25,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.4,
+     "solarHeatFraction": 0.8,
+     "dehuLPerKWh": 0.95,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t7s0",
+    "trajectory": 7,
+    "step": 0,
+    "changedKey": null,
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.8,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 1.1,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s1",
+    "trajectory": 7,
+    "step": 1,
+    "changedKey": "dehuLPerKWh",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.8,
+     "solarTransmission": 0.85,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s2",
+    "trajectory": 7,
+    "step": 2,
+    "changedKey": "solarTransmission",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 0.8,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s3",
+    "trajectory": 7,
+    "step": 3,
+    "changedKey": "coolingCOP",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 0.866667,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s4",
+    "trajectory": 7,
+    "step": 4,
+    "changedKey": "solarHeatFraction",
+    "values": {
+     "uValue": 1.166667,
+     "infiltrationACH": 0.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s5",
+    "trajectory": 7,
+    "step": 5,
+    "changedKey": "uValue",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 0.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 1.4,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s6",
+    "trajectory": 7,
+    "step": 6,
+    "changedKey": "maxVentACH",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 0.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s7",
+    "trajectory": 7,
+    "step": 7,
+    "changedKey": "infiltrationACH",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 1.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.1,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s8",
+    "trajectory": 7,
+    "step": 8,
+    "changedKey": "shadeFraction",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 1.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.7,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s9",
+    "trajectory": 7,
+    "step": 9,
+    "changedKey": "padEffectiveness",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 1.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 2
+    }
+   },
+   {
+    "id": "t7s10",
+    "trajectory": 7,
+    "step": 10,
+    "changedKey": "thermalMassKJm2K",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 1.5,
+     "lai": 0.7,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t7s11",
+    "trajectory": 7,
+    "step": 11,
+    "changedKey": "lai",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 1.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.65,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   },
+   {
+    "id": "t7s12",
+    "trajectory": 7,
+    "step": 12,
+    "changedKey": "coolingSHR",
+    "values": {
+     "uValue": 0.7,
+     "infiltrationACH": 1.5,
+     "lai": 1.1,
+     "padEffectiveness": 0.833333,
+     "coolingSHR": 0.783333,
+     "coolingCOP": 1.1,
+     "solarTransmission": 1.05,
+     "shadeFraction": 0.3,
+     "solarHeatFraction": 1,
+     "dehuLPerKWh": 0.8,
+     "maxVentACH": 0.866667,
+     "thermalMassKJm2K": 1
+    }
+   }
+  ]
+ },
+ "observations": [
+  {
+   "id": "t0s0",
+   "changedKey": null,
+   "metrics": {
+    "compliancePct@pad": 26.791667,
+    "compliancePct@dehu": 44.521135,
+    "compliancePct@dx": 53.288647,
+    "compliancePct@integrated": 48.231317,
+    "compliancePct@desiccant": 46.14372,
+    "compliancePct@hybridDesiccant": 45.328502,
+    "compliancePct": 44.050831,
+    "cost@pad": 8840.851229,
+    "cost@dehu": 11022.404501,
+    "cost@dx": 16094.903349,
+    "cost@integrated": 17298.502412,
+    "cost@desiccant": 12970.261158,
+    "cost@hybridDesiccant": 17567.247396,
+    "cost": 13965.695008,
+    "electricKWh@pad": 19796.084293,
+    "electricKWh@dehu": 42093.737147,
+    "electricKWh@dx": 73116.363597,
+    "electricKWh@integrated": 78390.102637,
+    "electricKWh@desiccant": 20029.80021,
+    "electricKWh@hybridDesiccant": 85966.228501,
+    "electricKWh": 53232.052731
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s1",
+   "changedKey": "maxVentACH",
+   "metrics": {
+    "compliancePct@pad": 25.785947,
+    "compliancePct@dehu": 42.934179,
+    "compliancePct@dx": 53.131039,
+    "compliancePct@integrated": 49.392732,
+    "compliancePct@desiccant": 44.197464,
+    "compliancePct@hybridDesiccant": 45.134662,
+    "compliancePct": 43.429337,
+    "cost@pad": 8282.290943,
+    "cost@dehu": 10704.961099,
+    "cost@dx": 16249.457597,
+    "cost@integrated": 17255.932969,
+    "cost@desiccant": 12790.780084,
+    "cost@hybridDesiccant": 17568.889593,
+    "cost": 13808.718714,
+    "electricKWh@pad": 20453.941543,
+    "electricKWh@dehu": 43427.821951,
+    "electricKWh@dx": 74635.153005,
+    "electricKWh@integrated": 80222.456601,
+    "electricKWh@desiccant": 21182.090293,
+    "electricKWh@hybridDesiccant": 87206.208446,
+    "electricKWh": 54521.27864
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s2",
+   "changedKey": "thermalMassKJm2K",
+   "metrics": {
+    "compliancePct@pad": 26.056381,
+    "compliancePct@dehu": 43.808575,
+    "compliancePct@dx": 49.943237,
+    "compliancePct@integrated": 47.781601,
+    "compliancePct@desiccant": 45.763285,
+    "compliancePct@hybridDesiccant": 46.046498,
+    "compliancePct": 43.233263,
+    "cost@pad": 8329.26011,
+    "cost@dehu": 10647.21053,
+    "cost@dx": 16499.532671,
+    "cost@integrated": 17327.371368,
+    "cost@desiccant": 12794.879651,
+    "cost@hybridDesiccant": 17608.682433,
+    "cost": 13867.822794,
+    "electricKWh@pad": 20630.35896,
+    "electricKWh@dehu": 42964.080441,
+    "electricKWh@dx": 76177.032352,
+    "electricKWh@integrated": 79888.700771,
+    "electricKWh@desiccant": 20906.764432,
+    "electricKWh@hybridDesiccant": 87093.569474,
+    "electricKWh": 54610.084405
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s3",
+   "changedKey": "uValue",
+   "metrics": {
+    "compliancePct@pad": 29.147048,
+    "compliancePct@dehu": 46.663647,
+    "compliancePct@dx": 53.271739,
+    "compliancePct@integrated": 51.278986,
+    "compliancePct@desiccant": 49.019928,
+    "compliancePct@hybridDesiccant": 50.138285,
+    "compliancePct": 46.586605,
+    "cost@pad": 7637.968188,
+    "cost@dehu": 9796.114088,
+    "cost@dx": 15221.583795,
+    "cost@integrated": 16216.850557,
+    "cost@desiccant": 11716.943272,
+    "cost@hybridDesiccant": 16363.338995,
+    "cost": 12825.466483,
+    "electricKWh@pad": 20692.339654,
+    "electricKWh@dehu": 41506.945314,
+    "electricKWh@dx": 71719.539285,
+    "electricKWh@integrated": 76854.619302,
+    "electricKWh@desiccant": 20924.008071,
+    "electricKWh@hybridDesiccant": 83590.075585,
+    "electricKWh": 52547.921202
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s4",
+   "changedKey": "lai",
+   "metrics": {
+    "compliancePct@pad": 30.725242,
+    "compliancePct@dehu": 45.984903,
+    "compliancePct@dx": 73.362912,
+    "compliancePct@integrated": 53.939614,
+    "compliancePct@desiccant": 59.492937,
+    "compliancePct@hybridDesiccant": 62.524448,
+    "compliancePct": 54.338343,
+    "cost@pad": 6986.87719,
+    "cost@dehu": 8611.934067,
+    "cost@dx": 11805.243267,
+    "cost@integrated": 14050.888557,
+    "cost@desiccant": 9977.412426,
+    "cost@hybridDesiccant": 13873.482499,
+    "cost": 10884.306334,
+    "electricKWh@pad": 20854.076737,
+    "electricKWh@dehu": 37848.303452,
+    "electricKWh@dx": 58695.792574,
+    "electricKWh@integrated": 67840.043524,
+    "electricKWh@desiccant": 21017.767918,
+    "electricKWh@hybridDesiccant": 72096.947501,
+    "electricKWh": 46392.155285
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s5",
+   "changedKey": "solarTransmission",
+   "metrics": {
+    "compliancePct@pad": 29.551329,
+    "compliancePct@dehu": 44.878019,
+    "compliancePct@dx": 70.657371,
+    "compliancePct@integrated": 52.653986,
+    "compliancePct@desiccant": 57.756851,
+    "compliancePct@hybridDesiccant": 60.491368,
+    "compliancePct": 52.664821,
+    "cost@pad": 6925.958421,
+    "cost@dehu": 8413.87626,
+    "cost@dx": 11645.654376,
+    "cost@integrated": 13855.541301,
+    "cost@desiccant": 9687.435833,
+    "cost@hybridDesiccant": 13553.105406,
+    "cost": 10680.261933,
+    "electricKWh@pad": 21201.678807,
+    "electricKWh@dehu": 37481.531634,
+    "electricKWh@dx": 58953.171322,
+    "electricKWh@integrated": 68097.130828,
+    "electricKWh@desiccant": 21354.977335,
+    "electricKWh@hybridDesiccant": 71011.952154,
+    "electricKWh": 46350.07368
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s6",
+   "changedKey": "coolingSHR",
+   "metrics": {
+    "compliancePct@pad": 29.551329,
+    "compliancePct@dehu": 44.878019,
+    "compliancePct@dx": 65.662803,
+    "compliancePct@integrated": 61.553785,
+    "compliancePct@desiccant": 57.756851,
+    "compliancePct@hybridDesiccant": 60.491368,
+    "compliancePct": 53.315693,
+    "cost@pad": 6925.958421,
+    "cost@dehu": 8413.87626,
+    "cost@dx": 11119.044466,
+    "cost@integrated": 12177.425727,
+    "cost@desiccant": 9687.435833,
+    "cost@hybridDesiccant": 13553.105406,
+    "cost": 10312.807685,
+    "electricKWh@pad": 21201.678807,
+    "electricKWh@dehu": 37481.531634,
+    "electricKWh@dx": 55721.892091,
+    "electricKWh@integrated": 57723.63425,
+    "electricKWh@desiccant": 21354.977335,
+    "electricKWh@hybridDesiccant": 71011.952154,
+    "electricKWh": 44082.611045
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s7",
+   "changedKey": "infiltrationACH",
+   "metrics": {
+    "compliancePct@pad": 29.606884,
+    "compliancePct@dehu": 45.607488,
+    "compliancePct@dx": 66.962453,
+    "compliancePct@integrated": 62.988048,
+    "compliancePct@desiccant": 57.124834,
+    "compliancePct@hybridDesiccant": 59.45853,
+    "compliancePct": 53.624706,
+    "cost@pad": 7131.495483,
+    "cost@dehu": 8596.951788,
+    "cost@dx": 11182.289876,
+    "cost@integrated": 12373.605513,
+    "cost@desiccant": 9829.380483,
+    "cost@hybridDesiccant": 13556.174135,
+    "cost": 10444.98288,
+    "electricKWh@pad": 21159.172251,
+    "electricKWh@dehu": 37640.187167,
+    "electricKWh@dx": 55702.916319,
+    "electricKWh@integrated": 58243.916624,
+    "electricKWh@desiccant": 21391.835654,
+    "electricKWh@hybridDesiccant": 69999.078724,
+    "electricKWh": 44022.851123
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s8",
+   "changedKey": "shadeFraction",
+   "metrics": {
+    "compliancePct@pad": 28.854469,
+    "compliancePct@dehu": 44.564614,
+    "compliancePct@dx": 63.121454,
+    "compliancePct@integrated": 59.639623,
+    "compliancePct@desiccant": 54.057105,
+    "compliancePct@hybridDesiccant": 56.298443,
+    "compliancePct": 51.089284,
+    "cost@pad": 6609.412595,
+    "cost@dehu": 7896.932415,
+    "cost@dx": 10475.733356,
+    "cost@integrated": 11678.346064,
+    "cost@desiccant": 8984.606531,
+    "cost@hybridDesiccant": 12424.258871,
+    "cost": 9678.214972,
+    "electricKWh@pad": 17827.645601,
+    "electricKWh@dehu": 32764.070807,
+    "electricKWh@dx": 51440.079707,
+    "electricKWh@integrated": 55320.621143,
+    "electricKWh@desiccant": 18018.086281,
+    "electricKWh@hybridDesiccant": 62479.506587,
+    "electricKWh": 39641.668354
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s9",
+   "changedKey": "padEffectiveness",
+   "metrics": {
+    "compliancePct@pad": 27.736715,
+    "compliancePct@dehu": 43.523551,
+    "compliancePct@dx": 62.369914,
+    "compliancePct@integrated": 58.630931,
+    "compliancePct@desiccant": 53.442593,
+    "compliancePct@hybridDesiccant": 56.298443,
+    "compliancePct": 50.333691,
+    "cost@pad": 6619.893963,
+    "cost@dehu": 7895.865028,
+    "cost@dx": 10526.42898,
+    "cost@integrated": 11772.238861,
+    "cost@desiccant": 8984.462179,
+    "cost@hybridDesiccant": 12424.258871,
+    "cost": 9703.85798,
+    "electricKWh@pad": 17928.556504,
+    "electricKWh@dehu": 32734.704887,
+    "electricKWh@dx": 52049.59568,
+    "electricKWh@integrated": 56219.765175,
+    "electricKWh@desiccant": 18109.940101,
+    "electricKWh@hybridDesiccant": 62479.506587,
+    "electricKWh": 39920.344822
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s10",
+   "changedKey": "solarHeatFraction",
+   "metrics": {
+    "compliancePct@pad": 26.283213,
+    "compliancePct@dehu": 42.366292,
+    "compliancePct@dx": 60.080285,
+    "compliancePct@integrated": 56.652783,
+    "compliancePct@desiccant": 52.202101,
+    "compliancePct@hybridDesiccant": 54.494748,
+    "compliancePct": 48.679904,
+    "cost@pad": 6543.804971,
+    "cost@dehu": 7799.368927,
+    "cost@dx": 10457.295085,
+    "cost@integrated": 11756.356264,
+    "cost@desiccant": 8842.917199,
+    "cost@hybridDesiccant": 12163.198341,
+    "cost": 9593.823465,
+    "electricKWh@pad": 18167.929518,
+    "electricKWh@dehu": 32527.7155,
+    "electricKWh@dx": 52452.608243,
+    "electricKWh@integrated": 57202.138511,
+    "electricKWh@desiccant": 18336.91217,
+    "electricKWh@hybridDesiccant": 61151.210934,
+    "electricKWh": 39973.085813
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s11",
+   "changedKey": "dehuLPerKWh",
+   "metrics": {
+    "compliancePct@pad": 26.283213,
+    "compliancePct@dehu": 42.020531,
+    "compliancePct@dx": 59.955934,
+    "compliancePct@integrated": 56.652783,
+    "compliancePct@desiccant": 52.202101,
+    "compliancePct@hybridDesiccant": 54.494748,
+    "compliancePct": 48.601552,
+    "cost@pad": 6543.804971,
+    "cost@dehu": 8346.809143,
+    "cost@dx": 10902.130651,
+    "cost@integrated": 11756.356264,
+    "cost@desiccant": 8842.917199,
+    "cost@hybridDesiccant": 12163.198341,
+    "cost": 9759.202762,
+    "electricKWh@pad": 18167.929518,
+    "electricKWh@dehu": 37763.439018,
+    "electricKWh@dx": 57090.872276,
+    "electricKWh@integrated": 57202.138511,
+    "electricKWh@desiccant": 18336.91217,
+    "electricKWh@hybridDesiccant": 61151.210934,
+    "electricKWh": 41618.750405
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t0s12",
+   "changedKey": "coolingCOP",
+   "metrics": {
+    "compliancePct@pad": 26.283213,
+    "compliancePct@dehu": 42.020531,
+    "compliancePct@dx": 59.955934,
+    "compliancePct@integrated": 56.851382,
+    "compliancePct@desiccant": 52.202101,
+    "compliancePct@hybridDesiccant": 54.494748,
+    "compliancePct": 48.634652,
+    "cost@pad": 6543.804971,
+    "cost@dehu": 8346.809143,
+    "cost@dx": 11809.468236,
+    "cost@integrated": 13198.072309,
+    "cost@desiccant": 8842.917199,
+    "cost@hybridDesiccant": 12163.198341,
+    "cost": 10150.7117,
+    "electricKWh@pad": 18167.929518,
+    "electricKWh@dehu": 37763.439018,
+    "electricKWh@dx": 65103.053756,
+    "electricKWh@integrated": 70266.536731,
+    "electricKWh@desiccant": 18336.91217,
+    "electricKWh@hybridDesiccant": 61151.210934,
+    "electricKWh": 45131.513688
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s0",
+   "changedKey": null,
+   "metrics": {
+    "compliancePct@pad": 25.531401,
+    "compliancePct@dehu": 39.91244,
+    "compliancePct@dx": 56.998672,
+    "compliancePct@integrated": 48.060485,
+    "compliancePct@desiccant": 44.556924,
+    "compliancePct@hybridDesiccant": 44.316069,
+    "compliancePct": 43.229332,
+    "cost@pad": 7849.148832,
+    "cost@dehu": 9189.943183,
+    "cost@dx": 13435.002696,
+    "cost@integrated": 15382.66133,
+    "cost@desiccant": 10429.525749,
+    "cost@hybridDesiccant": 13845.542875,
+    "cost": 11688.637444,
+    "electricKWh@pad": 16581.594129,
+    "electricKWh@dehu": 32342.80177,
+    "electricKWh@dx": 65639.005027,
+    "electricKWh@integrated": 77067.401853,
+    "electricKWh@desiccant": 16742.43417,
+    "electricKWh@hybridDesiccant": 64321.044837,
+    "electricKWh": 45449.046964
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s1",
+   "changedKey": "thermalMassKJm2K",
+   "metrics": {
+    "compliancePct@pad": 26.490338,
+    "compliancePct@dehu": 40.878623,
+    "compliancePct@dx": 63.32609,
+    "compliancePct@integrated": 52.00785,
+    "compliancePct@desiccant": 45.521135,
+    "compliancePct@hybridDesiccant": 45.802849,
+    "compliancePct": 45.671148,
+    "cost@pad": 7829.921556,
+    "cost@dehu": 9261.113145,
+    "cost@dx": 13082.635449,
+    "cost@integrated": 15121.904006,
+    "cost@desiccant": 10583.028314,
+    "cost@hybridDesiccant": 13792.047195,
+    "cost": 11611.774944,
+    "electricKWh@pad": 16412.549629,
+    "electricKWh@dehu": 32703.066455,
+    "electricKWh@dx": 63057.02515,
+    "electricKWh@integrated": 75429.975069,
+    "electricKWh@desiccant": 16935.651212,
+    "electricKWh@hybridDesiccant": 63890.174254,
+    "electricKWh": 44738.073628
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s2",
+   "changedKey": "maxVentACH",
+   "metrics": {
+    "compliancePct@pad": 23.356272,
+    "compliancePct@dehu": 38.709541,
+    "compliancePct@dx": 63.623083,
+    "compliancePct@integrated": 52.967995,
+    "compliancePct@desiccant": 46.779548,
+    "compliancePct@hybridDesiccant": 48.322468,
+    "compliancePct": 45.626485,
+    "cost@pad": 7615.402793,
+    "cost@dehu": 9278.099828,
+    "cost@dx": 13264.739655,
+    "cost@integrated": 15324.124382,
+    "cost@desiccant": 10823.785637,
+    "cost@hybridDesiccant": 14527.31723,
+    "cost": 11805.578254,
+    "electricKWh@pad": 17750.522726,
+    "electricKWh@dehu": 35782.24125,
+    "electricKWh@dx": 64554.459933,
+    "electricKWh@integrated": 77174.860588,
+    "electricKWh@desiccant": 18899.47542,
+    "electricKWh@hybridDesiccant": 70075.32842,
+    "electricKWh": 47372.814723
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s3",
+   "changedKey": "solarHeatFraction",
+   "metrics": {
+    "compliancePct@pad": 24.207126,
+    "compliancePct@dehu": 39.664855,
+    "compliancePct@dx": 65.356151,
+    "compliancePct@integrated": 54.010266,
+    "compliancePct@desiccant": 47.875604,
+    "compliancePct@hybridDesiccant": 49.221297,
+    "compliancePct": 46.72255,
+    "cost@pad": 7667.445367,
+    "cost@dehu": 9425.69212,
+    "cost@dx": 13391.315645,
+    "cost@integrated": 15396.122854,
+    "cost@desiccant": 11020.136657,
+    "cost@hybridDesiccant": 14838.053248,
+    "cost": 11956.460982,
+    "electricKWh@pad": 17534.700573,
+    "electricKWh@dehu": 35999.782515,
+    "electricKWh@dx": 64377.379743,
+    "electricKWh@integrated": 76373.486193,
+    "electricKWh@desiccant": 18711.90724,
+    "electricKWh@hybridDesiccant": 71479.107934,
+    "electricKWh": 47412.727366
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s4",
+   "changedKey": "solarTransmission",
+   "metrics": {
+    "compliancePct@pad": 24.952295,
+    "compliancePct@dehu": 40.599638,
+    "compliancePct@dx": 67.161053,
+    "compliancePct@integrated": 55.095411,
+    "compliancePct@desiccant": 49.557367,
+    "compliancePct@hybridDesiccant": 50.223349,
+    "compliancePct": 47.931519,
+    "cost@pad": 7746.399638,
+    "cost@dehu": 9626.079671,
+    "cost@dx": 13590.530949,
+    "cost@integrated": 15508.84564,
+    "cost@desiccant": 11287.914866,
+    "cost@hybridDesiccant": 15241.613347,
+    "cost": 12166.897352,
+    "electricKWh@pad": 17223.673184,
+    "electricKWh@dehu": 36480.781362,
+    "electricKWh@dx": 64372.527032,
+    "electricKWh@integrated": 75978.507754,
+    "electricKWh@desiccant": 18441.159545,
+    "electricKWh@hybridDesiccant": 73318.891781,
+    "electricKWh": 47635.923443
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s5",
+   "changedKey": "uValue",
+   "metrics": {
+    "compliancePct@pad": 29.099034,
+    "compliancePct@dehu": 42.792874,
+    "compliancePct@dx": 70.329591,
+    "compliancePct@integrated": 59.07971,
+    "compliancePct@desiccant": 51.973319,
+    "compliancePct@hybridDesiccant": 55.834842,
+    "compliancePct": 51.518228,
+    "cost@pad": 7008.821212,
+    "cost@dehu": 8627.278236,
+    "cost@dx": 12295.061969,
+    "cost@integrated": 14126.759823,
+    "cost@desiccant": 10142.35995,
+    "cost@hybridDesiccant": 13671.743745,
+    "cost": 10978.670822,
+    "electricKWh@pad": 17294.893656,
+    "electricKWh@dehu": 35125.204519,
+    "electricKWh@dx": 61555.602291,
+    "electricKWh@integrated": 72180.969177,
+    "electricKWh@desiccant": 18508.522795,
+    "electricKWh@hybridDesiccant": 68059.734434,
+    "electricKWh": 45454.154479
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s6",
+   "changedKey": "shadeFraction",
+   "metrics": {
+    "compliancePct@pad": 29.753623,
+    "compliancePct@dehu": 42.785628,
+    "compliancePct@dx": 74.11928,
+    "compliancePct@integrated": 60.226449,
+    "compliancePct@desiccant": 54.82615,
+    "compliancePct@hybridDesiccant": 58.020041,
+    "compliancePct": 53.288529,
+    "cost@pad": 7523.823469,
+    "cost@dehu": 9413.315149,
+    "cost@dx": 13181.139733,
+    "cost@integrated": 15057.586528,
+    "cost@desiccant": 11117.516786,
+    "cost@hybridDesiccant": 14993.097451,
+    "cost": 11881.079853,
+    "electricKWh@pad": 20702.655696,
+    "electricKWh@dehu": 40150.835394,
+    "electricKWh@dx": 65883.007766,
+    "electricKWh@integrated": 76811.580111,
+    "electricKWh@desiccant": 21958.415807,
+    "electricKWh@hybridDesiccant": 76487.277307,
+    "electricKWh": 50332.295347
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s7",
+   "changedKey": "dehuLPerKWh",
+   "metrics": {
+    "compliancePct@pad": 29.753623,
+    "compliancePct@dehu": 42.72343,
+    "compliancePct@dx": 73.772788,
+    "compliancePct@integrated": 60.226449,
+    "compliancePct@desiccant": 54.82615,
+    "compliancePct@hybridDesiccant": 58.020041,
+    "compliancePct": 53.220414,
+    "cost@pad": 7523.823469,
+    "cost@dehu": 10107.235755,
+    "cost@dx": 13774.373121,
+    "cost@integrated": 15057.586528,
+    "cost@desiccant": 11117.516786,
+    "cost@hybridDesiccant": 14993.097451,
+    "cost": 12095.605518,
+    "electricKWh@pad": 20702.655696,
+    "electricKWh@dehu": 46932.176494,
+    "electricKWh@dx": 72104.845916,
+    "electricKWh@integrated": 76811.580111,
+    "electricKWh@desiccant": 21958.415807,
+    "electricKWh@hybridDesiccant": 76487.277307,
+    "electricKWh": 52499.491888
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s8",
+   "changedKey": "padEffectiveness",
+   "metrics": {
+    "compliancePct@pad": 30.875604,
+    "compliancePct@dehu": 43.990942,
+    "compliancePct@dx": 74.213449,
+    "compliancePct@integrated": 61.994565,
+    "compliancePct@desiccant": 55.292165,
+    "compliancePct@hybridDesiccant": 58.020041,
+    "compliancePct": 54.064461,
+    "cost@pad": 7510.171559,
+    "cost@dehu": 10078.647422,
+    "cost@dx": 13738.837666,
+    "cost@integrated": 14999.28605,
+    "cost@desiccant": 11102.405836,
+    "cost@hybridDesiccant": 14993.097451,
+    "cost": 12070.407664,
+    "electricKWh@pad": 20562.536793,
+    "electricKWh@dehu": 46749.067021,
+    "electricKWh@dx": 71805.691351,
+    "electricKWh@integrated": 76298.156013,
+    "electricKWh@desiccant": 21820.841293,
+    "electricKWh@hybridDesiccant": 76487.277307,
+    "electricKWh": 52287.26163
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s9",
+   "changedKey": "infiltrationACH",
+   "metrics": {
+    "compliancePct@pad": 30.793795,
+    "compliancePct@dehu": 44.583937,
+    "compliancePct@dx": 76.206688,
+    "compliancePct@integrated": 62.253623,
+    "compliancePct@desiccant": 53.002535,
+    "compliancePct@hybridDesiccant": 55.595195,
+    "compliancePct": 53.739296,
+    "cost@pad": 7320.736406,
+    "cost@dehu": 9907.539388,
+    "cost@dx": 13560.3707,
+    "cost@integrated": 14866.539055,
+    "cost@desiccant": 10875.136856,
+    "cost@hybridDesiccant": 14788.078673,
+    "cost": 11886.40018,
+    "electricKWh@pad": 20613.124321,
+    "electricKWh@dehu": 46977.790544,
+    "electricKWh@dx": 71764.72485,
+    "electricKWh@integrated": 76209.098738,
+    "electricKWh@desiccant": 21723.142029,
+    "electricKWh@hybridDesiccant": 75938.572668,
+    "electricKWh": 52204.408858
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s10",
+   "changedKey": "lai",
+   "metrics": {
+    "compliancePct@pad": 30.845411,
+    "compliancePct@dehu": 53.598334,
+    "compliancePct@dx": 73.61584,
+    "compliancePct@integrated": 71.850175,
+    "compliancePct@desiccant": 54.8841,
+    "compliancePct@hybridDesiccant": 59.82615,
+    "compliancePct": 57.436668,
+    "cost@pad": 6552.730066,
+    "cost@dehu": 8435.230927,
+    "cost@dx": 10401.641026,
+    "cost@integrated": 11804.184438,
+    "cost@desiccant": 8922.673008,
+    "cost@hybridDesiccant": 11852.727318,
+    "cost": 9661.53113,
+    "electricKWh@pad": 20863.725057,
+    "electricKWh@dehu": 41665.258501,
+    "electricKWh@dx": 57976.319009,
+    "electricKWh@integrated": 61429.18766,
+    "electricKWh@desiccant": 21951.40571,
+    "electricKWh@hybridDesiccant": 61936.789043,
+    "electricKWh": 44303.78083
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s11",
+   "changedKey": "coolingSHR",
+   "metrics": {
+    "compliancePct@pad": 30.845411,
+    "compliancePct@dehu": 53.598334,
+    "compliancePct@dx": 76.020765,
+    "compliancePct@integrated": 63.673913,
+    "compliancePct@desiccant": 54.8841,
+    "compliancePct@hybridDesiccant": 59.82615,
+    "compliancePct": 56.474779,
+    "cost@pad": 6552.730066,
+    "cost@dehu": 8435.230927,
+    "cost@dx": 10712.112506,
+    "cost@integrated": 13760.452812,
+    "cost@desiccant": 8922.673008,
+    "cost@hybridDesiccant": 11852.727318,
+    "cost": 10039.321106,
+    "electricKWh@pad": 20863.725057,
+    "electricKWh@dehu": 41665.258501,
+    "electricKWh@dx": 60584.491385,
+    "electricKWh@integrated": 75333.812993,
+    "electricKWh@desiccant": 21951.40571,
+    "electricKWh@hybridDesiccant": 61936.789043,
+    "electricKWh": 47055.913782
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t1s12",
+   "changedKey": "coolingCOP",
+   "metrics": {
+    "compliancePct@pad": 30.845411,
+    "compliancePct@dehu": 53.598334,
+    "compliancePct@dx": 76.020765,
+    "compliancePct@integrated": 63.576691,
+    "compliancePct@desiccant": 54.8841,
+    "compliancePct@hybridDesiccant": 59.82615,
+    "compliancePct": 56.458575,
+    "cost@pad": 6552.730066,
+    "cost@dehu": 8435.230927,
+    "cost@dx": 10028.626521,
+    "cost@integrated": 12283.940915,
+    "cost@desiccant": 8922.673008,
+    "cost@hybridDesiccant": 11852.727318,
+    "cost": 9679.321459,
+    "electricKWh@pad": 20863.725057,
+    "electricKWh@dehu": 41665.258501,
+    "electricKWh@dx": 54888.774849,
+    "electricKWh@integrated": 61886.760821,
+    "electricKWh@desiccant": 21951.40571,
+    "electricKWh@hybridDesiccant": 61936.789043,
+    "electricKWh": 43865.45233
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s0",
+   "changedKey": null,
+   "metrics": {
+    "compliancePct@pad": 27.522343,
+    "compliancePct@dehu": 54.960159,
+    "compliancePct@dx": 75.962212,
+    "compliancePct@integrated": 53.964976,
+    "compliancePct@desiccant": 57.476156,
+    "compliancePct@hybridDesiccant": 61.983581,
+    "compliancePct": 55.311571,
+    "cost@pad": 6141.892483,
+    "cost@dehu": 7546.529526,
+    "cost@dx": 9305.033698,
+    "cost@integrated": 13468.343088,
+    "cost@desiccant": 8619.900053,
+    "cost@hybridDesiccant": 11936.94658,
+    "cost": 9503.107571,
+    "electricKWh@pad": 19015.61175,
+    "electricKWh@dehu": 35232.459764,
+    "electricKWh@dx": 49540.145511,
+    "electricKWh@integrated": 68588.36525,
+    "electricKWh@desiccant": 19909.637708,
+    "electricKWh@hybridDesiccant": 62186.19625,
+    "electricKWh": 42412.069372
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s1",
+   "changedKey": "lai",
+   "metrics": {
+    "compliancePct@pad": 27.59266,
+    "compliancePct@dehu": 43.856884,
+    "compliancePct@dx": 57.324275,
+    "compliancePct@integrated": 52.352053,
+    "compliancePct@desiccant": 48.062198,
+    "compliancePct@hybridDesiccant": 50.197996,
+    "compliancePct": 46.564344,
+    "cost@pad": 6695.809631,
+    "cost@dehu": 8753.559693,
+    "cost@dx": 14117.643192,
+    "cost@integrated": 15876.342233,
+    "cost@desiccant": 10472.897983,
+    "cost@hybridDesiccant": 14821.369454,
+    "cost": 11789.603698,
+    "electricKWh@pad": 18604.190625,
+    "electricKWh@dehu": 38794.76044,
+    "electricKWh@dx": 67805.870086,
+    "electricKWh@integrated": 78700.375542,
+    "electricKWh@desiccant": 19517.875458,
+    "electricKWh@hybridDesiccant": 77120.420792,
+    "electricKWh": 50090.582157
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s2",
+   "changedKey": "shadeFraction",
+   "metrics": {
+    "compliancePct@pad": 28.955089,
+    "compliancePct@dehu": 44.232488,
+    "compliancePct@dx": 57.165882,
+    "compliancePct@integrated": 52.334903,
+    "compliancePct@desiccant": 47.73913,
+    "compliancePct@hybridDesiccant": 49.761473,
+    "compliancePct": 46.698161,
+    "cost@pad": 7321.332305,
+    "cost@dehu": 9580.643285,
+    "cost@dx": 15468.544206,
+    "cost@integrated": 16904.02291,
+    "cost@desiccant": 11486.372658,
+    "cost@hybridDesiccant": 16012.036453,
+    "cost": 12795.491969,
+    "electricKWh@pad": 23250.811899,
+    "electricKWh@dehu": 44791.970261,
+    "electricKWh@dx": 75274.641591,
+    "electricKWh@integrated": 85081.921926,
+    "electricKWh@desiccant": 24198.288774,
+    "electricKWh@hybridDesiccant": 85136.434607,
+    "electricKWh": 56289.01151
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s3",
+   "changedKey": "padEffectiveness",
+   "metrics": {
+    "compliancePct@pad": 28.234903,
+    "compliancePct@dehu": 43.089372,
+    "compliancePct@dx": 56.389493,
+    "compliancePct@integrated": 52.184595,
+    "compliancePct@desiccant": 46.621377,
+    "compliancePct@hybridDesiccant": 49.761473,
+    "compliancePct": 46.046869,
+    "cost@pad": 7345.282958,
+    "cost@dehu": 9607.549889,
+    "cost@dx": 15467.698799,
+    "cost@integrated": 16887.884009,
+    "cost@desiccant": 11500.790047,
+    "cost@hybridDesiccant": 16012.036453,
+    "cost": 12803.540359,
+    "electricKWh@pad": 23431.742524,
+    "electricKWh@dehu": 44937.721557,
+    "electricKWh@dx": 75283.371316,
+    "electricKWh@integrated": 85002.619551,
+    "electricKWh@desiccant": 24367.422565,
+    "electricKWh@hybridDesiccant": 85136.434607,
+    "electricKWh": 56359.885353
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s4",
+   "changedKey": "dehuLPerKWh",
+   "metrics": {
+    "compliancePct@pad": 28.234903,
+    "compliancePct@dehu": 42.854469,
+    "compliancePct@dx": 56.791667,
+    "compliancePct@integrated": 52.184595,
+    "compliancePct@desiccant": 46.621377,
+    "compliancePct@hybridDesiccant": 49.761473,
+    "compliancePct": 46.074747,
+    "cost@pad": 7345.282958,
+    "cost@dehu": 10369.318834,
+    "cost@dx": 16043.686282,
+    "cost@integrated": 16887.884009,
+    "cost@desiccant": 11500.790047,
+    "cost@hybridDesiccant": 16012.036453,
+    "cost": 13026.499764,
+    "electricKWh@pad": 23431.742524,
+    "electricKWh@dehu": 52512.906228,
+    "electricKWh@dx": 82150.632638,
+    "electricKWh@integrated": 85002.619551,
+    "electricKWh@desiccant": 24367.422565,
+    "electricKWh@hybridDesiccant": 85136.434607,
+    "electricKWh": 58766.959686
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s5",
+   "changedKey": "coolingCOP",
+   "metrics": {
+    "compliancePct@pad": 28.234903,
+    "compliancePct@dehu": 42.854469,
+    "compliancePct@dx": 56.791667,
+    "compliancePct@integrated": 52.480985,
+    "compliancePct@desiccant": 46.621377,
+    "compliancePct@hybridDesiccant": 49.761473,
+    "compliancePct": 46.124146,
+    "cost@pad": 7345.282958,
+    "cost@dehu": 10369.318834,
+    "cost@dx": 17281.850493,
+    "cost@integrated": 18956.314587,
+    "cost@desiccant": 11500.790047,
+    "cost@hybridDesiccant": 16012.036453,
+    "cost": 13577.598895,
+    "electricKWh@pad": 23431.742524,
+    "electricKWh@dehu": 52512.906228,
+    "electricKWh@dx": 92468.667725,
+    "electricKWh@integrated": 104661.988934,
+    "electricKWh@desiccant": 24367.422565,
+    "electricKWh@hybridDesiccant": 85136.434607,
+    "electricKWh": 63763.193764
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s6",
+   "changedKey": "maxVentACH",
+   "metrics": {
+    "compliancePct@pad": 33.964372,
+    "compliancePct@dehu": 47.126208,
+    "compliancePct@dx": 60.566425,
+    "compliancePct@integrated": 56.210145,
+    "compliancePct@desiccant": 50.89372,
+    "compliancePct@hybridDesiccant": 53.621272,
+    "compliancePct": 50.397024,
+    "cost@pad": 7984.626077,
+    "cost@dehu": 10609.757964,
+    "cost@dx": 16292.634822,
+    "cost@integrated": 18406.088845,
+    "cost@desiccant": 11486.772833,
+    "cost@hybridDesiccant": 15348.293381,
+    "cost": 13354.695654,
+    "electricKWh@pad": 22868.681885,
+    "electricKWh@dehu": 48796.892684,
+    "electricKWh@dx": 84670.670276,
+    "electricKWh@integrated": 97364.65824,
+    "electricKWh@desiccant": 23358.816607,
+    "electricKWh@hybridDesiccant": 77692.99251,
+    "electricKWh": 59125.452034
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s7",
+   "changedKey": "infiltrationACH",
+   "metrics": {
+    "compliancePct@pad": 33.818841,
+    "compliancePct@dehu": 46.5157,
+    "compliancePct@dx": 61.892512,
+    "compliancePct@integrated": 52.61413,
+    "compliancePct@desiccant": 57.677774,
+    "compliancePct@hybridDesiccant": 60.228782,
+    "compliancePct": 52.124623,
+    "cost@pad": 8196.01777,
+    "cost@dehu": 10770.849216,
+    "cost@dx": 16536.783036,
+    "cost@integrated": 18673.191891,
+    "cost@desiccant": 11673.093624,
+    "cost@hybridDesiccant": 15535.151711,
+    "cost": 13564.181208,
+    "electricKWh@pad": 22813.594746,
+    "electricKWh@dehu": 48831.83242,
+    "electricKWh@dx": 85712.838036,
+    "electricKWh@integrated": 98733.119637,
+    "electricKWh@desiccant": 23400.841885,
+    "electricKWh@hybridDesiccant": 78360.43951,
+    "electricKWh": 59642.111039
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s8",
+   "changedKey": "uValue",
+   "metrics": {
+    "compliancePct@pad": 29.78744,
+    "compliancePct@dehu": 43.687198,
+    "compliancePct@dx": 54.775362,
+    "compliancePct@integrated": 48.074275,
+    "compliancePct@desiccant": 53.621272,
+    "compliancePct@hybridDesiccant": 52.370169,
+    "compliancePct": 47.052619,
+    "cost@pad": 8952.829457,
+    "cost@dehu": 11798.502501,
+    "cost@dx": 18190.087326,
+    "cost@integrated": 20170.483788,
+    "cost@desiccant": 12874.630346,
+    "cost@hybridDesiccant": 17111.330143,
+    "cost": 14849.643927,
+    "electricKWh@pad": 22782.014412,
+    "electricKWh@dehu": 50786.718479,
+    "electricKWh@dx": 92519.001266,
+    "electricKWh@integrated": 104855.147587,
+    "electricKWh@desiccant": 23396.711107,
+    "electricKWh@hybridDesiccant": 83669.733246,
+    "electricKWh": 63001.55435
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s9",
+   "changedKey": "solarTransmission",
+   "metrics": {
+    "compliancePct@pad": 29.113527,
+    "compliancePct@dehu": 42.760266,
+    "compliancePct@dx": 53.829106,
+    "compliancePct@integrated": 47.118961,
+    "compliancePct@desiccant": 52.526862,
+    "compliancePct@hybridDesiccant": 51.207126,
+    "compliancePct": 46.092641,
+    "cost@pad": 8867.592598,
+    "cost@dehu": 11549.931395,
+    "cost@dx": 17930.030242,
+    "cost@integrated": 19894.985742,
+    "cost@desiccant": 12571.521556,
+    "cost@hybridDesiccant": 16711.984981,
+    "cost": 14587.674419,
+    "electricKWh@pad": 22986.161218,
+    "electricKWh@dehu": 49939.933372,
+    "electricKWh@dx": 92083.060286,
+    "electricKWh@integrated": 104227.971569,
+    "electricKWh@desiccant": 23604.908857,
+    "electricKWh@hybridDesiccant": 81768.302676,
+    "electricKWh": 62435.05633
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s10",
+   "changedKey": "coolingSHR",
+   "metrics": {
+    "compliancePct@pad": 29.113527,
+    "compliancePct@dehu": 42.760266,
+    "compliancePct@dx": 69.859954,
+    "compliancePct@integrated": 53.057971,
+    "compliancePct@desiccant": 52.526862,
+    "compliancePct@hybridDesiccant": 51.207126,
+    "compliancePct": 49.754284,
+    "cost@pad": 8867.592598,
+    "cost@dehu": 11549.931395,
+    "cost@dx": 16165.764967,
+    "cost@integrated": 17722.240077,
+    "cost@desiccant": 12571.521556,
+    "cost@hybridDesiccant": 16711.984981,
+    "cost": 13931.505929,
+    "electricKWh@pad": 22986.161218,
+    "electricKWh@dehu": 49939.933372,
+    "electricKWh@dx": 81692.358887,
+    "electricKWh@integrated": 88081.186847,
+    "electricKWh@desiccant": 23604.908857,
+    "electricKWh@hybridDesiccant": 81768.302676,
+    "electricKWh": 58012.141976
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s11",
+   "changedKey": "solarHeatFraction",
+   "metrics": {
+    "compliancePct@pad": 28.505435,
+    "compliancePct@dehu": 42.009058,
+    "compliancePct@dx": 68.081009,
+    "compliancePct@integrated": 52.322464,
+    "compliancePct@desiccant": 51.369069,
+    "compliancePct@hybridDesiccant": 50.033213,
+    "compliancePct": 48.720041,
+    "cost@pad": 8819.899274,
+    "cost@dehu": 11343.723856,
+    "cost@dx": 15973.763226,
+    "cost@integrated": 17569.288017,
+    "cost@desiccant": 12316.846608,
+    "cost@hybridDesiccant": 16422.940578,
+    "cost": 13741.076927,
+    "electricKWh@pad": 23155.395176,
+    "electricKWh@dehu": 49431.979344,
+    "electricKWh@dx": 81569.905192,
+    "electricKWh@integrated": 88226.93414,
+    "electricKWh@desiccant": 23757.755037,
+    "electricKWh@hybridDesiccant": 80829.272787,
+    "electricKWh": 57828.54028
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t2s12",
+   "changedKey": "thermalMassKJm2K",
+   "metrics": {
+    "compliancePct@pad": 28.007246,
+    "compliancePct@dehu": 42.103261,
+    "compliancePct@dx": 64.058916,
+    "compliancePct@integrated": 49.172101,
+    "compliancePct@desiccant": 51.617771,
+    "compliancePct@hybridDesiccant": 49.837619,
+    "compliancePct": 47.466153,
+    "cost@pad": 8846.762968,
+    "cost@dehu": 11299.175385,
+    "cost@dx": 16302.941568,
+    "cost@integrated": 17749.032645,
+    "cost@desiccant": 12284.995525,
+    "cost@hybridDesiccant": 16455.570865,
+    "cost": 13823.079826,
+    "electricKWh@pad": 23297.475162,
+    "electricKWh@dehu": 49158.397249,
+    "electricKWh@dx": 83786.987284,
+    "electricKWh@integrated": 89253.749858,
+    "electricKWh@desiccant": 23501.424579,
+    "electricKWh@hybridDesiccant": 80875.562968,
+    "electricKWh": 58312.266183
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s0",
+   "changedKey": null,
+   "metrics": {
+    "compliancePct@pad": 27.987923,
+    "compliancePct@dehu": 42.438406,
+    "compliancePct@dx": 71.297235,
+    "compliancePct@integrated": 57.483092,
+    "compliancePct@desiccant": 56.861644,
+    "compliancePct@hybridDesiccant": 59.18206,
+    "compliancePct": 52.541727,
+    "cost@pad": 7616.743311,
+    "cost@dehu": 9978.001762,
+    "cost@dx": 14800.642441,
+    "cost@integrated": 16946.945763,
+    "cost@desiccant": 11476.111876,
+    "cost@hybridDesiccant": 16023.852802,
+    "cost": 12807.049659,
+    "electricKWh@pad": 23623.497315,
+    "electricKWh@dehu": 47157.213191,
+    "electricKWh@dx": 78737.025831,
+    "electricKWh@integrated": 90443.804313,
+    "electricKWh@desiccant": 24433.298649,
+    "electricKWh@hybridDesiccant": 84819.24294,
+    "electricKWh": 58202.34704
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s1",
+   "changedKey": "infiltrationACH",
+   "metrics": {
+    "compliancePct@pad": 27.955314,
+    "compliancePct@dehu": 43.282005,
+    "compliancePct@dx": 71.894845,
+    "compliancePct@integrated": 52.646135,
+    "compliancePct@desiccant": 53.950863,
+    "compliancePct@hybridDesiccant": 55.098394,
+    "compliancePct": 50.804593,
+    "cost@pad": 7385.679697,
+    "cost@dehu": 9772.994044,
+    "cost@dx": 14743.539285,
+    "cost@integrated": 16757.123523,
+    "cost@desiccant": 11273.177778,
+    "cost@hybridDesiccant": 15808.678322,
+    "cost": 12623.532108,
+    "electricKWh@pad": 23676.81219,
+    "electricKWh@dehu": 46950.010017,
+    "electricKWh@dx": 78976.025701,
+    "electricKWh@integrated": 89955.808011,
+    "electricKWh@desiccant": 24364.278899,
+    "electricKWh@hybridDesiccant": 84153.945857,
+    "electricKWh": 58012.813446
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s2",
+   "changedKey": "maxVentACH",
+   "metrics": {
+    "compliancePct@pad": 33.333937,
+    "compliancePct@dehu": 46.900966,
+    "compliancePct@dx": 72.629482,
+    "compliancePct@integrated": 55.8593,
+    "compliancePct@desiccant": 55.871061,
+    "compliancePct@hybridDesiccant": 57.060848,
+    "compliancePct": 53.609266,
+    "cost@pad": 7986.002328,
+    "cost@dehu": 9971.460458,
+    "cost@dx": 14317.500234,
+    "cost@integrated": 16066.394242,
+    "cost@desiccant": 11217.022913,
+    "cost@hybridDesiccant": 15080.974869,
+    "cost": 12439.892507,
+    "electricKWh@pad": 23068.428857,
+    "electricKWh@dehu": 43894.347481,
+    "electricKWh@dx": 74225.92907,
+    "electricKWh@integrated": 82199.131993,
+    "electricKWh@desiccant": 23360.450565,
+    "electricKWh@hybridDesiccant": 76743.23026,
+    "electricKWh": 53915.253038
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s3",
+   "changedKey": "dehuLPerKWh",
+   "metrics": {
+    "compliancePct@pad": 33.333937,
+    "compliancePct@dehu": 47.006643,
+    "compliancePct@dx": 72.535313,
+    "compliancePct@integrated": 55.8593,
+    "compliancePct@desiccant": 55.871061,
+    "compliancePct@hybridDesiccant": 57.060848,
+    "compliancePct": 53.611184,
+    "cost@pad": 7986.002328,
+    "cost@dehu": 9464.071186,
+    "cost@dx": 13861.080005,
+    "cost@integrated": 16066.394242,
+    "cost@desiccant": 11217.022913,
+    "cost@hybridDesiccant": 15080.974869,
+    "cost": 12279.25759,
+    "electricKWh@pad": 23068.428857,
+    "electricKWh@dehu": 38972.170968,
+    "electricKWh@dx": 69190.087049,
+    "electricKWh@integrated": 82199.131993,
+    "electricKWh@desiccant": 23360.450565,
+    "electricKWh@hybridDesiccant": 76743.23026,
+    "electricKWh": 52255.583282
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s4",
+   "changedKey": "solarHeatFraction",
+   "metrics": {
+    "compliancePct@pad": 33.896739,
+    "compliancePct@dehu": 47.684783,
+    "compliancePct@dx": 74.249668,
+    "compliancePct@integrated": 56.84058,
+    "compliancePct@desiccant": 56.774116,
+    "compliancePct@hybridDesiccant": 58.237957,
+    "compliancePct": 54.613974,
+    "cost@pad": 8064.789168,
+    "cost@dehu": 9631.673218,
+    "cost@dx": 14052.352452,
+    "cost@integrated": 16235.032092,
+    "cost@desiccant": 11450.837676,
+    "cost@hybridDesiccant": 15339.298046,
+    "cost": 12462.330442,
+    "electricKWh@pad": 22895.151885,
+    "electricKWh@dehu": 39301.439579,
+    "electricKWh@dx": 69122.510995,
+    "electricKWh@integrated": 82060.113993,
+    "electricKWh@desiccant": 23191.016065,
+    "electricKWh@hybridDesiccant": 77596.052676,
+    "electricKWh": 52361.047532
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s5",
+   "changedKey": "padEffectiveness",
+   "metrics": {
+    "compliancePct@pad": 33.292874,
+    "compliancePct@dehu": 47.141908,
+    "compliancePct@dx": 74.114451,
+    "compliancePct@integrated": 57.184783,
+    "compliancePct@desiccant": 56.681154,
+    "compliancePct@hybridDesiccant": 58.237957,
+    "compliancePct": 54.442188,
+    "cost@pad": 8076.772901,
+    "cost@dehu": 9644.186107,
+    "cost@dx": 14051.837366,
+    "cost@integrated": 16261.899783,
+    "cost@desiccant": 11469.556444,
+    "cost@hybridDesiccant": 15339.298046,
+    "cost": 12473.925108,
+    "electricKWh@pad": 22989.499593,
+    "electricKWh@dehu": 39351.279121,
+    "electricKWh@dx": 69740.579688,
+    "electricKWh@integrated": 82447.706694,
+    "electricKWh@desiccant": 23286.519815,
+    "electricKWh@hybridDesiccant": 77596.052676,
+    "electricKWh": 52568.606265
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s6",
+   "changedKey": "shadeFraction",
+   "metrics": {
+    "compliancePct@pad": 31.296498,
+    "compliancePct@dehu": 45.78442,
+    "compliancePct@dx": 70.9272,
+    "compliancePct@integrated": 55.720411,
+    "compliancePct@desiccant": 54.510443,
+    "compliancePct@hybridDesiccant": 56.250755,
+    "compliancePct": 52.414954,
+    "cost@pad": 7336.029482,
+    "cost@dehu": 8713.326067,
+    "cost@dx": 13013.497327,
+    "cost@integrated": 15221.813699,
+    "cost@desiccant": 10372.613063,
+    "cost@hybridDesiccant": 14119.984408,
+    "cost": 11462.877341,
+    "electricKWh@pad": 18210.021569,
+    "electricKWh@dehu": 33494.303965,
+    "electricKWh@dx": 64738.133727,
+    "electricKWh@integrated": 77702.11364,
+    "electricKWh@desiccant": 18487.064889,
+    "electricKWh@hybridDesiccant": 69894.756014,
+    "electricKWh": 47087.732301
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s7",
+   "changedKey": "uValue",
+   "metrics": {
+    "compliancePct@pad": 28.387661,
+    "compliancePct@dehu": 43.207729,
+    "compliancePct@dx": 65.112278,
+    "compliancePct@integrated": 51.754831,
+    "compliancePct@desiccant": 49.174212,
+    "compliancePct@hybridDesiccant": 47.69686,
+    "compliancePct": 47.555595,
+    "cost@pad": 8105.052661,
+    "cost@dehu": 9669.680189,
+    "cost@dx": 14521.78095,
+    "cost@integrated": 16736.558279,
+    "cost@desiccant": 11531.199392,
+    "cost@hybridDesiccant": 15604.856142,
+    "cost": 12694.854602,
+    "electricKWh@pad": 18148.227569,
+    "electricKWh@dehu": 34808.36976,
+    "electricKWh@dx": 68325.515539,
+    "electricKWh@integrated": 81849.622709,
+    "electricKWh@desiccant": 18491.494278,
+    "electricKWh@hybridDesiccant": 74635.815514,
+    "electricKWh": 49376.507561
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s8",
+   "changedKey": "solarTransmission",
+   "metrics": {
+    "compliancePct@pad": 27.377415,
+    "compliancePct@dehu": 41.865942,
+    "compliancePct@dx": 63.009175,
+    "compliancePct@integrated": 50.192633,
+    "compliancePct@desiccant": 48.121454,
+    "compliancePct@hybridDesiccant": 46.526017,
+    "compliancePct": 46.182106,
+    "cost@pad": 8011.718444,
+    "cost@dehu": 9466.088459,
+    "cost@dx": 14316.429956,
+    "cost@integrated": 16582.619964,
+    "cost@desiccant": 11222.086199,
+    "cost@hybridDesiccant": 15151.511811,
+    "cost": 12458.409139,
+    "electricKWh@pad": 18386.540278,
+    "electricKWh@dehu": 34380.175732,
+    "electricKWh@dx": 68350.155006,
+    "electricKWh@integrated": 82205.888757,
+    "electricKWh@desiccant": 18711.629097,
+    "electricKWh@hybridDesiccant": 72445.233889,
+    "electricKWh": 49079.937127
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s9",
+   "changedKey": "thermalMassKJm2K",
+   "metrics": {
+    "compliancePct@pad": 27.024629,
+    "compliancePct@dehu": 41.835145,
+    "compliancePct@dx": 67.770735,
+    "compliancePct@integrated": 53.472826,
+    "compliancePct@desiccant": 47.409755,
+    "compliancePct@hybridDesiccant": 47.210552,
+    "compliancePct": 47.45394,
+    "cost@pad": 7982.77323,
+    "cost@dehu": 9506.67598,
+    "cost@dx": 13951.635325,
+    "cost@integrated": 16372.160225,
+    "cost@desiccant": 11337.960749,
+    "cost@hybridDesiccant": 15132.99556,
+    "cost": 12380.700178,
+    "electricKWh@pad": 18222.650194,
+    "electricKWh@dehu": 34925.342528,
+    "electricKWh@dx": 66153.510125,
+    "electricKWh@integrated": 81277.634179,
+    "electricKWh@desiccant": 19018.452319,
+    "electricKWh@hybridDesiccant": 72612.336708,
+    "electricKWh": 48701.654342
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s10",
+   "changedKey": "lai",
+   "metrics": {
+    "compliancePct@pad": 28.40157,
+    "compliancePct@dehu": 49.943257,
+    "compliancePct@dx": 70.297597,
+    "compliancePct@integrated": 65.626585,
+    "compliancePct@desiccant": 50.479295,
+    "compliancePct@hybridDesiccant": 54.251479,
+    "compliancePct": 53.166631,
+    "cost@pad": 7272.175355,
+    "cost@dehu": 8332.293725,
+    "cost@dx": 10931.614457,
+    "cost@integrated": 13408.291667,
+    "cost@desiccant": 9496.41301,
+    "cost@hybridDesiccant": 12296.04232,
+    "cost": 10289.471755,
+    "electricKWh@pad": 18337.443125,
+    "electricKWh@dehu": 31116.432861,
+    "electricKWh@dx": 53644.621862,
+    "electricKWh@integrated": 67404.178054,
+    "electricKWh@desiccant": 19161.045125,
+    "electricKWh@hybridDesiccant": 57908.181375,
+    "electricKWh": 41261.983734
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s11",
+   "changedKey": "coolingSHR",
+   "metrics": {
+    "compliancePct@pad": 28.40157,
+    "compliancePct@dehu": 49.943257,
+    "compliancePct@dx": 72.649402,
+    "compliancePct@integrated": 52.677536,
+    "compliancePct@desiccant": 50.479295,
+    "compliancePct@hybridDesiccant": 54.251479,
+    "compliancePct": 51.400423,
+    "cost@pad": 7272.175355,
+    "cost@dehu": 8332.293725,
+    "cost@dx": 11174.26882,
+    "cost@integrated": 15677.673171,
+    "cost@desiccant": 9496.41301,
+    "cost@hybridDesiccant": 12296.04232,
+    "cost": 10708.1444,
+    "electricKWh@pad": 18337.443125,
+    "electricKWh@dehu": 31116.432861,
+    "electricKWh@dx": 55929.709037,
+    "electricKWh@integrated": 83906.259596,
+    "electricKWh@desiccant": 19161.045125,
+    "electricKWh@hybridDesiccant": 57908.181375,
+    "electricKWh": 44393.17852
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t3s12",
+   "changedKey": "coolingCOP",
+   "metrics": {
+    "compliancePct@pad": 28.40157,
+    "compliancePct@dehu": 49.943257,
+    "compliancePct@dx": 72.649402,
+    "compliancePct@integrated": 52.138889,
+    "compliancePct@desiccant": 50.479295,
+    "compliancePct@hybridDesiccant": 54.251479,
+    "compliancePct": 51.310649,
+    "cost@pad": 7272.175355,
+    "cost@dehu": 8332.293725,
+    "cost@dx": 10411.678925,
+    "cost@integrated": 13955.807646,
+    "cost@desiccant": 9496.41301,
+    "cost@hybridDesiccant": 12296.04232,
+    "cost": 10294.068497,
+    "electricKWh@pad": 18337.443125,
+    "electricKWh@dehu": 31116.432861,
+    "electricKWh@dx": 49059.084202,
+    "electricKWh@integrated": 67784.799454,
+    "electricKWh@desiccant": 19161.045125,
+    "electricKWh@hybridDesiccant": 57908.181375,
+    "electricKWh": 40561.164357
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s0",
+   "changedKey": null,
+   "metrics": {
+    "compliancePct@pad": 33.176329,
+    "compliancePct@dehu": 49.80314,
+    "compliancePct@dx": 64.423913,
+    "compliancePct@integrated": 54.197464,
+    "compliancePct@desiccant": 52.605676,
+    "compliancePct@hybridDesiccant": 54.830375,
+    "compliancePct": 51.50615,
+    "cost@pad": 8088.440892,
+    "cost@dehu": 10502.801063,
+    "cost@dx": 14897.155202,
+    "cost@integrated": 16103.732396,
+    "cost@desiccant": 11246.828923,
+    "cost@hybridDesiccant": 15290.654498,
+    "cost": 12688.268829,
+    "electricKWh@pad": 19931.98821,
+    "electricKWh@dehu": 46593.904212,
+    "electricKWh@dx": 76981.683188,
+    "electricKWh@integrated": 79099.74032,
+    "electricKWh@desiccant": 20072.84471,
+    "electricKWh@hybridDesiccant": 77072.805793,
+    "electricKWh": 53292.161072
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s1",
+   "changedKey": "coolingSHR",
+   "metrics": {
+    "compliancePct@pad": 33.176329,
+    "compliancePct@dehu": 49.80314,
+    "compliancePct@dx": 62.657609,
+    "compliancePct@integrated": 48.934783,
+    "compliancePct@desiccant": 52.605676,
+    "compliancePct@hybridDesiccant": 54.830375,
+    "compliancePct": 50.334652,
+    "cost@pad": 8088.440892,
+    "cost@dehu": 10502.801063,
+    "cost@dx": 15653.339662,
+    "cost@integrated": 18728.413586,
+    "cost@desiccant": 11246.828923,
+    "cost@hybridDesiccant": 15290.654498,
+    "cost": 13251.746437,
+    "electricKWh@pad": 19931.98821,
+    "electricKWh@dehu": 46593.904212,
+    "electricKWh@dx": 81600.93534,
+    "electricKWh@integrated": 98051.744031,
+    "electricKWh@desiccant": 20072.84471,
+    "electricKWh@hybridDesiccant": 77072.805793,
+    "electricKWh": 57220.703716
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s2",
+   "changedKey": "uValue",
+   "metrics": {
+    "compliancePct@pad": 28.566425,
+    "compliancePct@dehu": 46.362923,
+    "compliancePct@dx": 55.801932,
+    "compliancePct@integrated": 47.155193,
+    "compliancePct@desiccant": 47.95471,
+    "compliancePct@hybridDesiccant": 48.073162,
+    "compliancePct": 45.652391,
+    "cost@pad": 8560.585459,
+    "cost@dehu": 11389.631967,
+    "cost@dx": 17433.440738,
+    "cost@integrated": 20154.432608,
+    "cost@desiccant": 12362.541158,
+    "cost@hybridDesiccant": 16746.891681,
+    "cost": 14441.253935,
+    "electricKWh@pad": 19855.510793,
+    "electricKWh@dehu": 48972.500077,
+    "electricKWh@dx": 89242.2825,
+    "electricKWh@integrated": 104388.00895,
+    "electricKWh@desiccant": 20063.034918,
+    "electricKWh@hybridDesiccant": 82330.974751,
+    "electricKWh": 60808.718665
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s3",
+   "changedKey": "lai",
+   "metrics": {
+    "compliancePct@pad": 34.66244,
+    "compliancePct@dehu": 46.916667,
+    "compliancePct@dx": 71.429434,
+    "compliancePct@integrated": 56.721618,
+    "compliancePct@desiccant": 55.283714,
+    "compliancePct@hybridDesiccant": 58.024267,
+    "compliancePct": 53.83969,
+    "cost@pad": 7747.244648,
+    "cost@dehu": 9740.992311,
+    "cost@dx": 14137.832494,
+    "cost@integrated": 16683.73789,
+    "cost@desiccant": 10310.88999,
+    "cost@hybridDesiccant": 13682.218021,
+    "cost": 12050.485892,
+    "electricKWh@pad": 19802.209126,
+    "electricKWh@dehu": 41539.604835,
+    "electricKWh@dx": 73354.094123,
+    "electricKWh@integrated": 86010.636339,
+    "electricKWh@desiccant": 20034.100835,
+    "electricKWh@hybridDesiccant": 66836.829001,
+    "electricKWh": 51262.912377
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s4",
+   "changedKey": "thermalMassKJm2K",
+   "metrics": {
+    "compliancePct@pad": 33.378623,
+    "compliancePct@dehu": 47.137681,
+    "compliancePct@dx": 68.006761,
+    "compliancePct@integrated": 54.726449,
+    "compliancePct@desiccant": 56.481951,
+    "compliancePct@hybridDesiccant": 57.835325,
+    "compliancePct": 52.927798,
+    "cost@pad": 7787.50111,
+    "cost@dehu": 9716.055906,
+    "cost@dx": 14574.921411,
+    "cost@integrated": 16846.240983,
+    "cost@desiccant": 10332.380454,
+    "cost@hybridDesiccant": 13782.631695,
+    "cost": 12173.288593,
+    "electricKWh@pad": 19896.735835,
+    "electricKWh@dehu": 41213.301638,
+    "electricKWh@dx": 75814.956467,
+    "electricKWh@integrated": 86448.333035,
+    "electricKWh@desiccant": 19843.104001,
+    "electricKWh@hybridDesiccant": 67123.794918,
+    "electricKWh": 51723.370982
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s5",
+   "changedKey": "padEffectiveness",
+   "metrics": {
+    "compliancePct@pad": 32.588164,
+    "compliancePct@dehu": 46.204106,
+    "compliancePct@dx": 67.605336,
+    "compliancePct@integrated": 53.987923,
+    "compliancePct@desiccant": 55.905469,
+    "compliancePct@hybridDesiccant": 57.835325,
+    "compliancePct": 52.354387,
+    "cost@pad": 7793.250589,
+    "cost@dehu": 9690.688612,
+    "cost@dx": 14584.403156,
+    "cost@integrated": 16899.303376,
+    "cost@desiccant": 10286.71109,
+    "cost@hybridDesiccant": 13782.631695,
+    "cost": 12172.83142,
+    "electricKWh@pad": 19950.937918,
+    "electricKWh@dehu": 41024.635263,
+    "electricKWh@dx": 75926.202925,
+    "electricKWh@integrated": 86930.725032,
+    "electricKWh@desiccant": 19891.707126,
+    "electricKWh@hybridDesiccant": 67123.794918,
+    "electricKWh": 51808.00053
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s6",
+   "changedKey": "infiltrationACH",
+   "metrics": {
+    "compliancePct@pad": 32.482488,
+    "compliancePct@dehu": 46.347942,
+    "compliancePct@dx": 66.413739,
+    "compliancePct@integrated": 51.240338,
+    "compliancePct@desiccant": 54.704817,
+    "compliancePct@hybridDesiccant": 56.232042,
+    "compliancePct": 51.236894,
+    "cost@pad": 7921.466458,
+    "cost@dehu": 9828.226174,
+    "cost@dx": 14535.596285,
+    "cost@integrated": 17228.804215,
+    "cost@desiccant": 10388.220396,
+    "cost@hybridDesiccant": 13841.000615,
+    "cost": 12290.552357,
+    "electricKWh@pad": 19901.744543,
+    "electricKWh@dehu": 41248.715543,
+    "electricKWh@dx": 75562.941586,
+    "electricKWh@integrated": 89170.428479,
+    "electricKWh@desiccant": 19897.16571,
+    "electricKWh@hybridDesiccant": 67083.795585,
+    "electricKWh": 52144.131908
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s7",
+   "changedKey": "shadeFraction",
+   "metrics": {
+    "compliancePct@pad": 31.071256,
+    "compliancePct@dehu": 44.977061,
+    "compliancePct@dx": 63.520464,
+    "compliancePct@integrated": 50.187198,
+    "compliancePct@desiccant": 52.411566,
+    "compliancePct@hybridDesiccant": 54.271399,
+    "compliancePct": 49.406491,
+    "cost@pad": 7348.93023,
+    "cost@dehu": 8996.589324,
+    "cost@dx": 13725.911856,
+    "cost@integrated": 16304.72786,
+    "cost@desiccant": 9472.665273,
+    "cost@hybridDesiccant": 12682.740367,
+    "cost": 11421.927485,
+    "electricKWh@pad": 16331.045212,
+    "electricKWh@dehu": 35808.877957,
+    "electricKWh@dx": 71546.813067,
+    "electricKWh@integrated": 85396.310805,
+    "electricKWh@desiccant": 16309.075254,
+    "electricKWh@hybridDesiccant": 59993.744587,
+    "electricKWh": 47564.311147
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s8",
+   "changedKey": "dehuLPerKWh",
+   "metrics": {
+    "compliancePct@pad": 31.071256,
+    "compliancePct@dehu": 45.29639,
+    "compliancePct@dx": 62.988651,
+    "compliancePct@integrated": 50.187198,
+    "compliancePct@desiccant": 52.411566,
+    "compliancePct@hybridDesiccant": 54.271399,
+    "compliancePct": 49.371077,
+    "cost@pad": 7348.93023,
+    "cost@dehu": 8446.581812,
+    "cost@dx": 13179.004078,
+    "cost@integrated": 16304.72786,
+    "cost@desiccant": 9472.665273,
+    "cost@hybridDesiccant": 12682.740367,
+    "cost": 11239.10827,
+    "electricKWh@pad": 16331.045212,
+    "electricKWh@dehu": 30513.951778,
+    "electricKWh@dx": 65945.067928,
+    "electricKWh@integrated": 85396.310805,
+    "electricKWh@desiccant": 16309.075254,
+    "electricKWh@hybridDesiccant": 59993.744587,
+    "electricKWh": 45748.199261
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s9",
+   "changedKey": "solarTransmission",
+   "metrics": {
+    "compliancePct@pad": 29.925725,
+    "compliancePct@dehu": 44.381263,
+    "compliancePct@dx": 60.665822,
+    "compliancePct@integrated": 48.649155,
+    "compliancePct@desiccant": 50.831824,
+    "compliancePct@hybridDesiccant": 52.765906,
+    "compliancePct": 47.869949,
+    "cost@pad": 7230.425131,
+    "cost@dehu": 8264.565456,
+    "cost@dx": 12997.874372,
+    "cost@integrated": 16174.147421,
+    "cost@desiccant": 9217.392293,
+    "cost@hybridDesiccant": 12257.449442,
+    "cost": 11023.642353,
+    "electricKWh@pad": 16494.823629,
+    "electricKWh@dehu": 29951.439886,
+    "electricKWh@dx": 66199.106973,
+    "electricKWh@integrated": 86257.813693,
+    "electricKWh@desiccant": 16470.584504,
+    "electricKWh@hybridDesiccant": 57648.225004,
+    "electricKWh": 45503.665615
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s10",
+   "changedKey": "solarHeatFraction",
+   "metrics": {
+    "compliancePct@pad": 28.963768,
+    "compliancePct@dehu": 43.472776,
+    "compliancePct@dx": 59.204395,
+    "compliancePct@integrated": 47.469203,
+    "compliancePct@desiccant": 49.597972,
+    "compliancePct@hybridDesiccant": 51.44694,
+    "compliancePct": 46.692509,
+    "cost@pad": 7118.950037,
+    "cost@dehu": 8113.292978,
+    "cost@dx": 12873.818157,
+    "cost@integrated": 16113.130362,
+    "cost@desiccant": 9028.369451,
+    "cost@hybridDesiccant": 11977.973063,
+    "cost": 10870.922341,
+    "electricKWh@pad": 16628.511379,
+    "electricKWh@dehu": 29662.175473,
+    "electricKWh@dx": 66294.763777,
+    "electricKWh@integrated": 87233.308984,
+    "electricKWh@desiccant": 16593.603754,
+    "electricKWh@hybridDesiccant": 56354.333045,
+    "electricKWh": 45461.116069
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s11",
+   "changedKey": "coolingCOP",
+   "metrics": {
+    "compliancePct@pad": 28.963768,
+    "compliancePct@dehu": 43.472776,
+    "compliancePct@dx": 59.204395,
+    "compliancePct@integrated": 46.96256,
+    "compliancePct@desiccant": 49.597972,
+    "compliancePct@hybridDesiccant": 51.44694,
+    "compliancePct": 46.608068,
+    "cost@pad": 7118.950037,
+    "cost@dehu": 8113.292978,
+    "cost@dx": 11828.061481,
+    "cost@integrated": 14267.605014,
+    "cost@desiccant": 9028.369451,
+    "cost@hybridDesiccant": 11977.973063,
+    "cost": 10389.042004,
+    "electricKWh@pad": 16628.511379,
+    "electricKWh@dehu": 29662.175473,
+    "electricKWh@dx": 57130.740883,
+    "electricKWh@integrated": 70099.062472,
+    "electricKWh@desiccant": 16593.603754,
+    "electricKWh@hybridDesiccant": 56354.333045,
+    "electricKWh": 41078.071168
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t4s12",
+   "changedKey": "maxVentACH",
+   "metrics": {
+    "compliancePct@pad": 25.346618,
+    "compliancePct@dehu": 40.988772,
+    "compliancePct@dx": 60.585537,
+    "compliancePct@integrated": 46.60628,
+    "compliancePct@desiccant": 51.171073,
+    "compliancePct@hybridDesiccant": 53.442593,
+    "compliancePct": 46.356812,
+    "cost@pad": 6976.95561,
+    "cost@dehu": 8279.763403,
+    "cost@dx": 12023.757554,
+    "cost@integrated": 14701.892607,
+    "cost@desiccant": 9370.924174,
+    "cost@hybridDesiccant": 12775.187212,
+    "cost": 10688.080093,
+    "electricKWh@pad": 18163.565059,
+    "electricKWh@dehu": 33019.654566,
+    "electricKWh@dx": 58799.257165,
+    "electricKWh@integrated": 72665.983947,
+    "electricKWh@desiccant": 18354.678865,
+    "electricKWh@hybridDesiccant": 62427.509337,
+    "electricKWh": 43905.108157
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s0",
+   "changedKey": null,
+   "metrics": {
+    "compliancePct@pad": 25.35628,
+    "compliancePct@dehu": 43.324879,
+    "compliancePct@dx": 66.507908,
+    "compliancePct@integrated": 62.100688,
+    "compliancePct@desiccant": 57.076542,
+    "compliancePct@hybridDesiccant": 60.730412,
+    "compliancePct": 52.516118,
+    "cost@pad": 6460.26903,
+    "cost@dehu": 8301.543168,
+    "cost@dx": 11616.378541,
+    "cost@integrated": 13212.48979,
+    "cost@desiccant": 9334.527942,
+    "cost@hybridDesiccant": 13225.468022,
+    "cost": 10358.446082,
+    "electricKWh@pad": 17903.100004,
+    "electricKWh@dehu": 37259.70114,
+    "electricKWh@dx": 62035.44876,
+    "electricKWh@integrated": 68572.903573,
+    "electricKWh@desiccant": 18200.795879,
+    "electricKWh@hybridDesiccant": 67991.961712,
+    "electricKWh": 45327.318511
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s1",
+   "changedKey": "padEffectiveness",
+   "metrics": {
+    "compliancePct@pad": 26.697464,
+    "compliancePct@dehu": 44.535024,
+    "compliancePct@dx": 67.194253,
+    "compliancePct@integrated": 62.757455,
+    "compliancePct@desiccant": 57.907159,
+    "compliancePct@hybridDesiccant": 60.730412,
+    "compliancePct": 53.303628,
+    "cost@pad": 6440.987575,
+    "cost@dehu": 8293.169578,
+    "cost@dx": 11563.462156,
+    "cost@integrated": 13120.012215,
+    "cost@desiccant": 9326.268296,
+    "cost@hybridDesiccant": 13225.468022,
+    "cost": 10328.227974,
+    "electricKWh@pad": 17740.173587,
+    "electricKWh@dehu": 37256.376857,
+    "electricKWh@dx": 61258.582891,
+    "electricKWh@integrated": 67160.652081,
+    "electricKWh@desiccant": 18054.498462,
+    "electricKWh@hybridDesiccant": 67991.961712,
+    "electricKWh": 44910.374265
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s2",
+   "changedKey": "infiltrationACH",
+   "metrics": {
+    "compliancePct@pad": 28.235507,
+    "compliancePct@dehu": 46.717391,
+    "compliancePct@dx": 66.213329,
+    "compliancePct@integrated": 62.38742,
+    "compliancePct@desiccant": 55.781118,
+    "compliancePct@hybridDesiccant": 58.065314,
+    "compliancePct": 52.900013,
+    "cost@pad": 6638.924725,
+    "cost@dehu": 8486.363662,
+    "cost@dx": 11604.84348,
+    "cost@integrated": 13328.728995,
+    "cost@desiccant": 9456.886781,
+    "cost@hybridDesiccant": 13273.227235,
+    "cost": 10464.829146,
+    "electricKWh@pad": 17702.25717,
+    "electricKWh@dehu": 37353.870692,
+    "electricKWh@dx": 61343.153083,
+    "electricKWh@integrated": 67634.264076,
+    "electricKWh@desiccant": 18092.720837,
+    "electricKWh@hybridDesiccant": 67465.320462,
+    "electricKWh": 44931.931053
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s3",
+   "changedKey": "coolingCOP",
+   "metrics": {
+    "compliancePct@pad": 28.235507,
+    "compliancePct@dehu": 46.717391,
+    "compliancePct@dx": 66.213329,
+    "compliancePct@integrated": 62.344561,
+    "compliancePct@desiccant": 55.781118,
+    "compliancePct@hybridDesiccant": 58.065314,
+    "compliancePct": 52.89287,
+    "cost@pad": 6638.924725,
+    "cost@dehu": 8486.363662,
+    "cost@dx": 10788.367802,
+    "cost@integrated": 11922.677494,
+    "cost@desiccant": 9456.886781,
+    "cost@hybridDesiccant": 13273.227235,
+    "cost": 10094.40795,
+    "electricKWh@pad": 17702.25717,
+    "electricKWh@dehu": 37353.870692,
+    "electricKWh@dx": 54049.959627,
+    "electricKWh@integrated": 54999.241896,
+    "electricKWh@desiccant": 18092.720837,
+    "electricKWh@hybridDesiccant": 67465.320462,
+    "electricKWh": 41610.561781
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s4",
+   "changedKey": "shadeFraction",
+   "metrics": {
+    "compliancePct@pad": 29.094807,
+    "compliancePct@dehu": 49.468188,
+    "compliancePct@dx": 70.390559,
+    "compliancePct@integrated": 65.744296,
+    "compliancePct@desiccant": 59.285887,
+    "compliancePct@hybridDesiccant": 61.442714,
+    "compliancePct": 55.904408,
+    "cost@pad": 7115.268966,
+    "cost@dehu": 9220.920355,
+    "cost@dx": 11472.378438,
+    "cost@integrated": 12704.517372,
+    "cost@desiccant": 10311.490525,
+    "cost@hybridDesiccant": 14404.461412,
+    "cost": 10871.506178,
+    "electricKWh@pad": 21007.574668,
+    "electricKWh@dehu": 42614.508732,
+    "electricKWh@dx": 58367.04819,
+    "electricKWh@integrated": 59214.013073,
+    "electricKWh@desiccant": 21416.002835,
+    "electricKWh@hybridDesiccant": 74852.789585,
+    "electricKWh": 46245.322847
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s5",
+   "changedKey": "coolingSHR",
+   "metrics": {
+    "compliancePct@pad": 29.094807,
+    "compliancePct@dehu": 49.468188,
+    "compliancePct@dx": 73.775806,
+    "compliancePct@integrated": 57.554348,
+    "compliancePct@desiccant": 59.285887,
+    "compliancePct@hybridDesiccant": 61.442714,
+    "compliancePct": 55.103625,
+    "cost@pad": 7115.268966,
+    "cost@dehu": 9220.920355,
+    "cost@dx": 11972.042715,
+    "cost@integrated": 14751.424881,
+    "cost@desiccant": 10311.490525,
+    "cost@hybridDesiccant": 14404.461412,
+    "cost": 11295.934809,
+    "electricKWh@pad": 21007.574668,
+    "electricKWh@dehu": 42614.508732,
+    "electricKWh@dx": 61940.796674,
+    "electricKWh@integrated": 72126.736522,
+    "electricKWh@desiccant": 21416.002835,
+    "electricKWh@hybridDesiccant": 74852.789585,
+    "electricKWh": 48993.068169
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s6",
+   "changedKey": "maxVentACH",
+   "metrics": {
+    "compliancePct@pad": 33.716787,
+    "compliancePct@dehu": 52.270313,
+    "compliancePct@dx": 74.619099,
+    "compliancePct@integrated": 58.543478,
+    "compliancePct@desiccant": 58.265121,
+    "compliancePct@hybridDesiccant": 60.79138,
+    "compliancePct": 56.367697,
+    "cost@pad": 7474.813739,
+    "cost@dehu": 9238.498377,
+    "cost@dx": 11973.391182,
+    "cost@integrated": 14077.54753,
+    "cost@desiccant": 10177.064373,
+    "cost@hybridDesiccant": 13645.627002,
+    "cost": 11097.8237,
+    "electricKWh@pad": 20249.215112,
+    "electricKWh@dehu": 39196.980622,
+    "electricKWh@dx": 59870.03898,
+    "electricKWh@integrated": 66368.278974,
+    "electricKWh@desiccant": 20392.526918,
+    "electricKWh@hybridDesiccant": 67963.916862,
+    "electricKWh": 45673.492911
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s7",
+   "changedKey": "solarTransmission",
+   "metrics": {
+    "compliancePct@pad": 32.448068,
+    "compliancePct@dehu": 50.740674,
+    "compliancePct@dx": 71.87915,
+    "compliancePct@integrated": 56.816425,
+    "compliancePct@desiccant": 56.603284,
+    "compliancePct@hybridDesiccant": 59.051068,
+    "compliancePct": 54.589778,
+    "cost@pad": 7374.106389,
+    "cost@dehu": 9022.121559,
+    "cost@dx": 11816.712759,
+    "cost@integrated": 13865.903246,
+    "cost@desiccant": 9890.249584,
+    "cost@hybridDesiccant": 13261.141517,
+    "cost": 10871.705842,
+    "electricKWh@pad": 20510.101599,
+    "electricKWh@dehu": 38456.217308,
+    "electricKWh@dx": 59899.704047,
+    "electricKWh@integrated": 66592.384911,
+    "electricKWh@desiccant": 20647.546251,
+    "electricKWh@hybridDesiccant": 66245.31039,
+    "electricKWh": 45391.877418
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s8",
+   "changedKey": "solarHeatFraction",
+   "metrics": {
+    "compliancePct@pad": 31.179348,
+    "compliancePct@dehu": 49.384885,
+    "compliancePct@dx": 69.527949,
+    "compliancePct@integrated": 55.238527,
+    "compliancePct@desiccant": 55.169021,
+    "compliancePct@hybridDesiccant": 57.557648,
+    "compliancePct": 53.009563,
+    "cost@pad": 7283.241498,
+    "cost@dehu": 8849.358205,
+    "cost@dx": 11663.948988,
+    "cost@integrated": 13764.685175,
+    "cost@desiccant": 9679.623622,
+    "cost@hybridDesiccant": 12979.109377,
+    "cost": 10703.327811,
+    "electricKWh@pad": 20733.515751,
+    "electricKWh@dehu": 38101.097501,
+    "electricKWh@dx": 59801.776377,
+    "electricKWh@integrated": 67051.232669,
+    "electricKWh@desiccant": 20844.663918,
+    "electricKWh@hybridDesiccant": 65027.51271,
+    "electricKWh": 45259.966488
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s9",
+   "changedKey": "uValue",
+   "metrics": {
+    "compliancePct@pad": 28.565821,
+    "compliancePct@dehu": 45.703851,
+    "compliancePct@dx": 67.312568,
+    "compliancePct@integrated": 50.368357,
+    "compliancePct@desiccant": 51.816975,
+    "compliancePct@hybridDesiccant": 51.862248,
+    "compliancePct": 49.271637,
+    "cost@pad": 8139.063264,
+    "cost@dehu": 9880.376477,
+    "cost@dx": 12921.572069,
+    "cost@integrated": 15160.400598,
+    "cost@desiccant": 10838.173245,
+    "cost@hybridDesiccant": 14481.06885,
+    "cost": 11903.442417,
+    "electricKWh@pad": 20677.239501,
+    "electricKWh@dehu": 39599.423548,
+    "electricKWh@dx": 62102.006003,
+    "electricKWh@integrated": 70766.981721,
+    "electricKWh@desiccant": 20852.312779,
+    "electricKWh@hybridDesiccant": 69853.798501,
+    "electricKWh": 47308.627009
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s10",
+   "changedKey": "lai",
+   "metrics": {
+    "compliancePct@pad": 26.492754,
+    "compliancePct@dehu": 42.530797,
+    "compliancePct@dx": 49.274155,
+    "compliancePct@integrated": 45.493782,
+    "compliancePct@desiccant": 44.214372,
+    "compliancePct@hybridDesiccant": 43.463164,
+    "compliancePct": 41.911504,
+    "cost@pad": 8761.645445,
+    "cost@dehu": 11109.472185,
+    "cost@dx": 16418.244516,
+    "cost@integrated": 17138.86173,
+    "cost@desiccant": 12607.31769,
+    "cost@hybridDesiccant": 17047.441041,
+    "cost": 13847.163768,
+    "electricKWh@pad": 20528.708904,
+    "electricKWh@dehu": 44267.74456,
+    "electricKWh@dx": 77594.253968,
+    "electricKWh@integrated": 79473.575658,
+    "electricKWh@desiccant": 20769.355307,
+    "electricKWh@hybridDesiccant": 83132.062946,
+    "electricKWh": 54294.283557
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s11",
+   "changedKey": "thermalMassKJm2K",
+   "metrics": {
+    "compliancePct@pad": 26.417965,
+    "compliancePct@dehu": 41.957126,
+    "compliancePct@dx": 52.195652,
+    "compliancePct@integrated": 47.054207,
+    "compliancePct@desiccant": 43.343599,
+    "compliancePct@hybridDesiccant": 43.297705,
+    "compliancePct": 42.377709,
+    "cost@pad": 8733.627998,
+    "cost@dehu": 11128.189827,
+    "cost@dx": 16154.16471,
+    "cost@integrated": 17098.709269,
+    "cost@desiccant": 12634.7646,
+    "cost@hybridDesiccant": 16990.06997,
+    "cost": 13789.921062,
+    "electricKWh@pad": 20379.218612,
+    "electricKWh@dehu": 44542.131254,
+    "electricKWh@dx": 76434.937395,
+    "electricKWh@integrated": 79851.249854,
+    "electricKWh@desiccant": 21003.08464,
+    "electricKWh@hybridDesiccant": 82908.054029,
+    "electricKWh": 54186.445964
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t5s12",
+   "changedKey": "dehuLPerKWh",
+   "metrics": {
+    "compliancePct@pad": 26.417965,
+    "compliancePct@dehu": 42.077295,
+    "compliancePct@dx": 51.795894,
+    "compliancePct@integrated": 47.054207,
+    "compliancePct@desiccant": 43.343599,
+    "compliancePct@hybridDesiccant": 43.297705,
+    "compliancePct": 42.331111,
+    "cost@pad": 8733.627998,
+    "cost@dehu": 10561.366529,
+    "cost@dx": 15601.692826,
+    "cost@integrated": 17098.709269,
+    "cost@desiccant": 12634.7646,
+    "cost@hybridDesiccant": 16990.06997,
+    "cost": 13603.371865,
+    "electricKWh@pad": 20379.218612,
+    "electricKWh@dehu": 38942.76932,
+    "electricKWh@dx": 70896.715082,
+    "electricKWh@integrated": 79851.249854,
+    "electricKWh@desiccant": 21003.08464,
+    "electricKWh@hybridDesiccant": 82908.054029,
+    "electricKWh": 52330.181923
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s0",
+   "changedKey": null,
+   "metrics": {
+    "compliancePct@pad": 29.663647,
+    "compliancePct@dehu": 51.323192,
+    "compliancePct@dx": 66.329832,
+    "compliancePct@integrated": 53.26331,
+    "compliancePct@desiccant": 54.159121,
+    "compliancePct@hybridDesiccant": 56.585778,
+    "compliancePct": 51.88748,
+    "cost@pad": 6414.626287,
+    "cost@dehu": 7185.418139,
+    "cost@dx": 10384.718764,
+    "cost@integrated": 14442.886858,
+    "cost@desiccant": 8104.292607,
+    "cost@hybridDesiccant": 10724.711962,
+    "cost": 9542.775769,
+    "electricKWh@pad": 18708.657792,
+    "electricKWh@dehu": 29331.472722,
+    "electricKWh@dx": 56347.58346,
+    "electricKWh@integrated": 81377.956466,
+    "electricKWh@desiccant": 18789.27075,
+    "electricKWh@hybridDesiccant": 53075.646847,
+    "electricKWh": 42938.431339
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s1",
+   "changedKey": "solarHeatFraction",
+   "metrics": {
+    "compliancePct@pad": 31.036836,
+    "compliancePct@dehu": 52.80635,
+    "compliancePct@dx": 69.172401,
+    "compliancePct@integrated": 54.943841,
+    "compliancePct@desiccant": 55.954968,
+    "compliancePct@hybridDesiccant": 58.762526,
+    "compliancePct": 53.779487,
+    "cost@pad": 6480.207803,
+    "cost@dehu": 7288.363959,
+    "cost@dx": 10392.587298,
+    "cost@integrated": 14504.272293,
+    "cost@desiccant": 8252.502853,
+    "cost@hybridDesiccant": 10957.945739,
+    "cost": 9645.979991,
+    "electricKWh@pad": 18502.637833,
+    "electricKWh@dehu": 29526.502111,
+    "electricKWh@dx": 55712.295876,
+    "electricKWh@integrated": 80841.291583,
+    "electricKWh@desiccant": 18600.331889,
+    "electricKWh@hybridDesiccant": 54216.311542,
+    "electricKWh": 42899.895139
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s2",
+   "changedKey": "shadeFraction",
+   "metrics": {
+    "compliancePct@pad": 33.404589,
+    "compliancePct@dehu": 55.63081,
+    "compliancePct@dx": 74.203791,
+    "compliancePct@integrated": 56.759662,
+    "compliancePct@desiccant": 58.735362,
+    "compliancePct@hybridDesiccant": 62.253411,
+    "compliancePct": 56.831271,
+    "cost@pad": 7157.251465,
+    "cost@dehu": 8070.152199,
+    "cost@dx": 11050.6678,
+    "cost@integrated": 15357.04129,
+    "cost@desiccant": 9140.668048,
+    "cost@hybridDesiccant": 12018.255125,
+    "cost": 10465.672655,
+    "electricKWh@pad": 23214.999912,
+    "electricKWh@dehu": 35294.424399,
+    "electricKWh@dx": 59583.446153,
+    "electricKWh@integrated": 84880.890527,
+    "electricKWh@desiccant": 23344.159537,
+    "electricKWh@hybridDesiccant": 61782.283051,
+    "electricKWh": 48016.700597
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s3",
+   "changedKey": "coolingCOP",
+   "metrics": {
+    "compliancePct@pad": 33.404589,
+    "compliancePct@dehu": 55.63081,
+    "compliancePct@dx": 74.203791,
+    "compliancePct@integrated": 56.493961,
+    "compliancePct@desiccant": 58.735362,
+    "compliancePct@hybridDesiccant": 62.253411,
+    "compliancePct": 56.786987,
+    "cost@pad": 7157.251465,
+    "cost@dehu": 8070.152199,
+    "cost@dx": 10315.332619,
+    "cost@integrated": 13718.205203,
+    "cost@desiccant": 9140.668048,
+    "cost@hybridDesiccant": 12018.255125,
+    "cost": 10069.977443,
+    "electricKWh@pad": 23214.999912,
+    "electricKWh@dehu": 35294.424399,
+    "electricKWh@dx": 53226.684577,
+    "electricKWh@integrated": 69467.566684,
+    "electricKWh@desiccant": 23344.159537,
+    "electricKWh@hybridDesiccant": 61782.283051,
+    "electricKWh": 44388.353027
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s4",
+   "changedKey": "padEffectiveness",
+   "metrics": {
+    "compliancePct@pad": 32.199275,
+    "compliancePct@dehu": 54.709646,
+    "compliancePct@dx": 73.317639,
+    "compliancePct@integrated": 55.228261,
+    "compliancePct@desiccant": 57.858264,
+    "compliancePct@hybridDesiccant": 62.253411,
+    "compliancePct": 55.927749,
+    "cost@pad": 7167.569599,
+    "cost@dehu": 8064.120311,
+    "cost@dx": 10332.902253,
+    "cost@integrated": 13757.660391,
+    "cost@desiccant": 9117.725925,
+    "cost@hybridDesiccant": 12018.255125,
+    "cost": 10076.372267,
+    "electricKWh@pad": 23312.689135,
+    "electricKWh@dehu": 35236.937079,
+    "electricKWh@dx": 53383.880209,
+    "electricKWh@integrated": 70190.088789,
+    "electricKWh@desiccant": 23430.564621,
+    "electricKWh@hybridDesiccant": 61782.283051,
+    "electricKWh": 44556.073814
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s5",
+   "changedKey": "maxVentACH",
+   "metrics": {
+    "compliancePct@pad": 26.569444,
+    "compliancePct@dehu": 55.216709,
+    "compliancePct@dx": 72.847398,
+    "compliancePct@integrated": 51.105072,
+    "compliancePct@desiccant": 58.095497,
+    "compliancePct@hybridDesiccant": 62.383194,
+    "compliancePct": 54.369553,
+    "cost@pad": 6921.945142,
+    "cost@dehu": 8098.313301,
+    "cost@dx": 10155.571112,
+    "cost@integrated": 14599.430347,
+    "cost@desiccant": 9354.133675,
+    "cost@hybridDesiccant": 12816.198324,
+    "cost": 10324.265317,
+    "electricKWh@pad": 24347.471857,
+    "electricKWh@dehu": 38518.838515,
+    "electricKWh@dx": 54961.339011,
+    "electricKWh@integrated": 76291.992237,
+    "electricKWh@desiccant": 24657.610315,
+    "electricKWh@hybridDesiccant": 68554.703107,
+    "electricKWh": 47888.659174
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s6",
+   "changedKey": "dehuLPerKWh",
+   "metrics": {
+    "compliancePct@pad": 26.569444,
+    "compliancePct@dehu": 54.929373,
+    "compliancePct@dx": 72.477363,
+    "compliancePct@integrated": 51.105072,
+    "compliancePct@desiccant": 58.095497,
+    "compliancePct@hybridDesiccant": 62.383194,
+    "compliancePct": 54.259991,
+    "cost@pad": 6921.945142,
+    "cost@dehu": 8534.549514,
+    "cost@dx": 10593.369258,
+    "cost@integrated": 14599.430347,
+    "cost@desiccant": 9354.133675,
+    "cost@hybridDesiccant": 12816.198324,
+    "cost": 10469.93771,
+    "electricKWh@pad": 24347.471857,
+    "electricKWh@dehu": 42833.158095,
+    "electricKWh@dx": 59395.664863,
+    "electricKWh@integrated": 76291.992237,
+    "electricKWh@desiccant": 24657.610315,
+    "electricKWh@hybridDesiccant": 68554.703107,
+    "electricKWh": 49346.766746
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s7",
+   "changedKey": "coolingSHR",
+   "metrics": {
+    "compliancePct@pad": 26.569444,
+    "compliancePct@dehu": 54.929373,
+    "compliancePct@dx": 70.215502,
+    "compliancePct@integrated": 65.557769,
+    "compliancePct@desiccant": 58.095497,
+    "compliancePct@hybridDesiccant": 62.383194,
+    "compliancePct": 56.291797,
+    "cost@pad": 6921.945142,
+    "cost@dehu": 8534.549514,
+    "cost@dx": 10304.67893,
+    "cost@integrated": 12214.478304,
+    "cost@desiccant": 9354.133675,
+    "cost@hybridDesiccant": 12816.198324,
+    "cost": 10024.330648,
+    "electricKWh@pad": 24347.471857,
+    "electricKWh@dehu": 42833.158095,
+    "electricKWh@dx": 57034.151435,
+    "electricKWh@integrated": 61212.640466,
+    "electricKWh@desiccant": 24657.610315,
+    "electricKWh@hybridDesiccant": 68554.703107,
+    "electricKWh": 46439.955879
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s8",
+   "changedKey": "thermalMassKJm2K",
+   "metrics": {
+    "compliancePct@pad": 26.999396,
+    "compliancePct@dehu": 53.851262,
+    "compliancePct@dx": 73.569359,
+    "compliancePct@integrated": 68.51322,
+    "compliancePct@desiccant": 55.466618,
+    "compliancePct@hybridDesiccant": 61.674514,
+    "compliancePct": 56.679061,
+    "cost@pad": 6824.245775,
+    "cost@dehu": 8525.030935,
+    "cost@dx": 10010.905973,
+    "cost@integrated": 11961.928322,
+    "cost@desiccant": 9344.131364,
+    "cost@hybridDesiccant": 12715.421388,
+    "cost": 9896.94396,
+    "electricKWh@pad": 24103.665149,
+    "electricKWh@dehu": 43311.592798,
+    "electricKWh@dx": 55533.807529,
+    "electricKWh@integrated": 60419.406773,
+    "electricKWh@desiccant": 25051.860149,
+    "electricKWh@hybridDesiccant": 68213.01894,
+    "electricKWh": 46105.558556
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s9",
+   "changedKey": "lai",
+   "metrics": {
+    "compliancePct@pad": 27.240338,
+    "compliancePct@dehu": 41.788043,
+    "compliancePct@dx": 74.534589,
+    "compliancePct@integrated": 53.13587,
+    "compliancePct@desiccant": 52.737535,
+    "compliancePct@hybridDesiccant": 54.681275,
+    "compliancePct": 50.686275,
+    "cost@pad": 7411.322807,
+    "cost@dehu": 9863.123999,
+    "cost@dx": 13649.301626,
+    "cost@integrated": 15020.780601,
+    "cost@desiccant": 11365.432854,
+    "cost@hybridDesiccant": 15791.977947,
+    "cost": 12183.656639,
+    "electricKWh@pad": 23724.540899,
+    "electricKWh@dehu": 47506.730918,
+    "electricKWh@dx": 69626.684305,
+    "electricKWh@integrated": 73939.571536,
+    "electricKWh@desiccant": 24731.39019,
+    "electricKWh@hybridDesiccant": 83988.061815,
+    "electricKWh": 53919.496611
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s10",
+   "changedKey": "solarTransmission",
+   "metrics": {
+    "compliancePct@pad": 28.133454,
+    "compliancePct@dehu": 42.634058,
+    "compliancePct@dx": 76.69202,
+    "compliancePct@integrated": 55.096014,
+    "compliancePct@desiccant": 53.668961,
+    "compliancePct@hybridDesiccant": 55.823373,
+    "compliancePct": 52.00798,
+    "cost@pad": 7484.859088,
+    "cost@dehu": 10050.785212,
+    "cost@dx": 13913.224529,
+    "cost@integrated": 15225.294344,
+    "cost@desiccant": 11619.11829,
+    "cost@hybridDesiccant": 16115.723524,
+    "cost": 12401.500831,
+    "electricKWh@pad": 23400.214315,
+    "electricKWh@dehu": 48174.825236,
+    "electricKWh@dx": 70066.631384,
+    "electricKWh@integrated": 73962.275818,
+    "electricKWh@desiccant": 24405.329524,
+    "electricKWh@hybridDesiccant": 85262.038315,
+    "electricKWh": 54211.885765
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s11",
+   "changedKey": "uValue",
+   "metrics": {
+    "compliancePct@pad": 24.899155,
+    "compliancePct@dehu": 40.363527,
+    "compliancePct@dx": 71.270675,
+    "compliancePct@integrated": 51.230676,
+    "compliancePct@desiccant": 48.225281,
+    "compliancePct@hybridDesiccant": 47.195461,
+    "compliancePct": 47.197462,
+    "cost@pad": 8433.275693,
+    "cost@dehu": 11046.15536,
+    "cost@dx": 15395.206173,
+    "cost@integrated": 16557.487104,
+    "cost@desiccant": 12794.453767,
+    "cost@hybridDesiccant": 17692.603604,
+    "cost": 13653.19695,
+    "electricKWh@pad": 23368.83719,
+    "electricKWh@dehu": 49923.755535,
+    "electricKWh@dx": 74240.910059,
+    "electricKWh@integrated": 77995.922671,
+    "electricKWh@desiccant": 24425.645565,
+    "electricKWh@hybridDesiccant": 90530.73469,
+    "electricKWh": 56747.634285
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t6s12",
+   "changedKey": "infiltrationACH",
+   "metrics": {
+    "compliancePct@pad": 25.006039,
+    "compliancePct@dehu": 39.97343,
+    "compliancePct@dx": 69.622118,
+    "compliancePct@integrated": 53.905193,
+    "compliancePct@desiccant": 53.486056,
+    "compliancePct@hybridDesiccant": 52.820234,
+    "compliancePct": 49.135512,
+    "cost@pad": 8657.768084,
+    "cost@dehu": 11241.774732,
+    "cost@dx": 15394.125933,
+    "cost@integrated": 16716.175022,
+    "cost@desiccant": 13017.439076,
+    "cost@hybridDesiccant": 17879.483522,
+    "cost": 13817.794395,
+    "electricKWh@pad": 23297.920274,
+    "electricKWh@dehu": 49949.533302,
+    "electricKWh@dx": 73823.896748,
+    "electricKWh@integrated": 78595.536027,
+    "electricKWh@desiccant": 24515.948649,
+    "electricKWh@hybridDesiccant": 91066.452815,
+    "electricKWh": 56874.881302
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s0",
+   "changedKey": null,
+   "metrics": {
+    "compliancePct@pad": 23.333333,
+    "compliancePct@dehu": 52.736931,
+    "compliancePct@dx": 63.004346,
+    "compliancePct@integrated": 62.089219,
+    "compliancePct@desiccant": 56.181335,
+    "compliancePct@hybridDesiccant": 59.118073,
+    "compliancePct": 52.743873,
+    "cost@pad": 6517.85825,
+    "cost@dehu": 7813.39712,
+    "cost@dx": 11048.022512,
+    "cost@integrated": 13478.953787,
+    "cost@desiccant": 8822.182882,
+    "cost@hybridDesiccant": 12229.472308,
+    "cost": 9984.981143,
+    "electricKWh@pad": 18333.427754,
+    "electricKWh@dehu": 33453.78131,
+    "electricKWh@dx": 60375.008728,
+    "electricKWh@integrated": 72721.424038,
+    "electricKWh@desiccant": 18574.082629,
+    "electricKWh@hybridDesiccant": 60999.356629,
+    "electricKWh": 44076.180181
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s1",
+   "changedKey": "dehuLPerKWh",
+   "metrics": {
+    "compliancePct@pad": 23.333333,
+    "compliancePct@dehu": 52.576361,
+    "compliancePct@dx": 62.752022,
+    "compliancePct@integrated": 62.089219,
+    "compliancePct@desiccant": 56.181335,
+    "compliancePct@hybridDesiccant": 59.118073,
+    "compliancePct": 52.675057,
+    "cost@pad": 6517.85825,
+    "cost@dehu": 8375.082092,
+    "cost@dx": 11533.638216,
+    "cost@integrated": 13478.953787,
+    "cost@desiccant": 8822.182882,
+    "cost@hybridDesiccant": 12229.472308,
+    "cost": 10159.531256,
+    "electricKWh@pad": 18333.427754,
+    "electricKWh@dehu": 39065.531755,
+    "electricKWh@dx": 65039.245144,
+    "electricKWh@integrated": 72721.424038,
+    "electricKWh@desiccant": 18574.082629,
+    "electricKWh@hybridDesiccant": 60999.356629,
+    "electricKWh": 45788.844658
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s2",
+   "changedKey": "solarTransmission",
+   "metrics": {
+    "compliancePct@pad": 22.502415,
+    "compliancePct@dehu": 50.737655,
+    "compliancePct@dx": 59.555717,
+    "compliancePct@integrated": 59.185078,
+    "compliancePct@desiccant": 54.01485,
+    "compliancePct@hybridDesiccant": 56.727031,
+    "compliancePct": 50.453791,
+    "cost@pad": 6425.380843,
+    "cost@dehu": 8219.929979,
+    "cost@dx": 11581.425132,
+    "cost@integrated": 13580.645187,
+    "cost@desiccant": 8634.366059,
+    "cost@hybridDesiccant": 11931.768572,
+    "cost": 10062.252629,
+    "electricKWh@pad": 18737.192462,
+    "electricKWh@dehu": 38466.484659,
+    "electricKWh@dx": 65982.369492,
+    "electricKWh@integrated": 74821.240505,
+    "electricKWh@desiccant": 18966.45442,
+    "electricKWh@hybridDesiccant": 59591.040629,
+    "electricKWh": 46094.130361
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s3",
+   "changedKey": "coolingCOP",
+   "metrics": {
+    "compliancePct@pad": 22.502415,
+    "compliancePct@dehu": 50.737655,
+    "compliancePct@dx": 59.555717,
+    "compliancePct@integrated": 58.949052,
+    "compliancePct@desiccant": 54.01485,
+    "compliancePct@hybridDesiccant": 56.727031,
+    "compliancePct": 50.414453,
+    "cost@pad": 6425.380843,
+    "cost@dehu": 8219.929979,
+    "cost@dx": 10495.777781,
+    "cost@integrated": 11775.68933,
+    "cost@desiccant": 8634.366059,
+    "cost@hybridDesiccant": 11931.768572,
+    "cost": 9580.485427,
+    "electricKWh@pad": 18737.192462,
+    "electricKWh@dehu": 38466.484659,
+    "electricKWh@dx": 56515.077083,
+    "electricKWh@integrated": 58669.203455,
+    "electricKWh@desiccant": 18966.45442,
+    "electricKWh@hybridDesiccant": 59591.040629,
+    "electricKWh": 41824.242118
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s4",
+   "changedKey": "solarHeatFraction",
+   "metrics": {
+    "compliancePct@pad": 21.829651,
+    "compliancePct@dehu": 49.424725,
+    "compliancePct@dx": 57.327659,
+    "compliancePct@integrated": 57.224436,
+    "compliancePct@desiccant": 52.515997,
+    "compliancePct@hybridDesiccant": 55.017506,
+    "compliancePct": 48.889996,
+    "cost@pad": 6375.910317,
+    "cost@dehu": 8128.849501,
+    "cost@dx": 10510.524831,
+    "cost@integrated": 11828.839537,
+    "cost@desiccant": 8517.351062,
+    "cost@hybridDesiccant": 11737.919656,
+    "cost": 9516.565817,
+    "electricKWh@pad": 19008.263587,
+    "electricKWh@dehu": 38203.243046,
+    "electricKWh@dx": 57139.387579,
+    "electricKWh@integrated": 59575.700132,
+    "electricKWh@desiccant": 19212.11842,
+    "electricKWh@hybridDesiccant": 58693.767379,
+    "electricKWh": 41972.080024
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s5",
+   "changedKey": "uValue",
+   "metrics": {
+    "compliancePct@pad": 23.985875,
+    "compliancePct@dehu": 49.444042,
+    "compliancePct@dx": 58.21683,
+    "compliancePct@integrated": 58.446819,
+    "compliancePct@desiccant": 54.089098,
+    "compliancePct@hybridDesiccant": 57.1689,
+    "compliancePct": 50.225261,
+    "cost@pad": 5523.107596,
+    "cost@dehu": 7097.612491,
+    "cost@dx": 9436.058923,
+    "cost@integrated": 10651.565956,
+    "cost@desiccant": 7421.356376,
+    "cost@hybridDesiccant": 10441.817237,
+    "cost": 8428.58643,
+    "electricKWh@pad": 19074.79092,
+    "electricKWh@dehu": 36625.673559,
+    "electricKWh@dx": 55378.959629,
+    "electricKWh@integrated": 57859.764716,
+    "electricKWh@desiccant": 19219.730504,
+    "electricKWh@hybridDesiccant": 55939.98517,
+    "electricKWh": 40683.15075
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s6",
+   "changedKey": "maxVentACH",
+   "metrics": {
+    "compliancePct@pad": 29.306159,
+    "compliancePct@dehu": 49.302185,
+    "compliancePct@dx": 58.239165,
+    "compliancePct@integrated": 58.964747,
+    "compliancePct@desiccant": 53.435953,
+    "compliancePct@hybridDesiccant": 56.245925,
+    "compliancePct": 50.915689,
+    "cost@pad": 5623.605436,
+    "cost@dehu": 6871.456007,
+    "cost@dx": 9492.227195,
+    "cost@integrated": 10479.451428,
+    "cost@desiccant": 7128.932946,
+    "cost@hybridDesiccant": 9575.809724,
+    "cost": 8195.247123,
+    "electricKWh@pad": 17554.463615,
+    "electricKWh@dehu": 32243.863786,
+    "electricKWh@dx": 53861.137807,
+    "electricKWh@integrated": 55926.675319,
+    "electricKWh@desiccant": 17557.586837,
+    "electricKWh@hybridDesiccant": 48688.605781,
+    "electricKWh": 37638.722191
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s7",
+   "changedKey": "infiltrationACH",
+   "metrics": {
+    "compliancePct@pad": 30.441265,
+    "compliancePct@dehu": 46.332247,
+    "compliancePct@dx": 57.189424,
+    "compliancePct@integrated": 56.553785,
+    "compliancePct@desiccant": 49.972836,
+    "compliancePct@hybridDesiccant": 53.686466,
+    "compliancePct": 49.029337,
+    "cost@pad": 5740.609788,
+    "cost@dehu": 6998.06763,
+    "cost@dx": 9665.223919,
+    "cost@integrated": 10659.786063,
+    "cost@desiccant": 7244.93101,
+    "cost@hybridDesiccant": 9656.181837,
+    "cost": 8327.466708,
+    "electricKWh@pad": 17519.558268,
+    "electricKWh@dehu": 32189.761059,
+    "electricKWh@dx": 54348.315581,
+    "electricKWh@integrated": 56873.539741,
+    "electricKWh@desiccant": 17587.256906,
+    "electricKWh@hybridDesiccant": 48672.756837,
+    "electricKWh": 37865.198065
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "hybridDesiccant",
+    "dx",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s8",
+   "changedKey": "shadeFraction",
+   "metrics": {
+    "compliancePct@pad": 32.173126,
+    "compliancePct@dehu": 50.147893,
+    "compliancePct@dx": 62.493662,
+    "compliancePct@integrated": 61.125196,
+    "compliancePct@desiccant": 53.913437,
+    "compliancePct@hybridDesiccant": 57.765906,
+    "compliancePct": 52.936537,
+    "cost@pad": 6250.305825,
+    "cost@dehu": 7644.632542,
+    "cost@dx": 10134.906986,
+    "cost@integrated": 11075.161654,
+    "cost@desiccant": 7932.126697,
+    "cost@hybridDesiccant": 10557.823478,
+    "cost": 8932.492864,
+    "electricKWh@pad": 21019.214946,
+    "electricKWh@dehu": 36979.404266,
+    "electricKWh@dx": 57059.367022,
+    "electricKWh@integrated": 57930.917066,
+    "electricKWh@desiccant": 21102.184626,
+    "electricKWh@hybridDesiccant": 55041.179571,
+    "electricKWh": 41522.044583
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s9",
+   "changedKey": "padEffectiveness",
+   "metrics": {
+    "compliancePct@pad": 32.806763,
+    "compliancePct@dehu": 50.646505,
+    "compliancePct@dx": 63.009779,
+    "compliancePct@integrated": 61.839913,
+    "compliancePct@desiccant": 54.567789,
+    "compliancePct@hybridDesiccant": 57.765906,
+    "compliancePct": 53.439443,
+    "cost@pad": 6243.442258,
+    "cost@dehu": 7655.865601,
+    "cost@dx": 10083.427251,
+    "cost@integrated": 10997.616189,
+    "cost@desiccant": 7948.831632,
+    "cost@hybridDesiccant": 10557.823478,
+    "cost": 8914.501068,
+    "electricKWh@pad": 20943.639168,
+    "electricKWh@dehu": 37049.002238,
+    "electricKWh@dx": 56612.010722,
+    "electricKWh@integrated": 56865.184544,
+    "electricKWh@desiccant": 21039.59946,
+    "electricKWh@hybridDesiccant": 55041.179571,
+    "electricKWh": 41258.43595
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s10",
+   "changedKey": "thermalMassKJm2K",
+   "metrics": {
+    "compliancePct@pad": 33.914251,
+    "compliancePct@dehu": 50.222745,
+    "compliancePct@dx": 66.967886,
+    "compliancePct@integrated": 65.874079,
+    "compliancePct@desiccant": 52.727273,
+    "compliancePct@hybridDesiccant": 57.334299,
+    "compliancePct": 54.506756,
+    "cost@pad": 6142.517138,
+    "cost@dehu": 7627.368547,
+    "cost@dx": 9696.055056,
+    "cost@integrated": 10653.586876,
+    "cost@desiccant": 7908.941761,
+    "cost@hybridDesiccant": 10335.720074,
+    "cost": 8727.364909,
+    "electricKWh@pad": 20811.217835,
+    "electricKWh@dehu": 37297.672317,
+    "electricKWh@dx": 54398.431266,
+    "electricKWh@integrated": 55269.559511,
+    "electricKWh@desiccant": 21233.814112,
+    "electricKWh@hybridDesiccant": 54182.916585,
+    "electricKWh": 40532.268604
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s11",
+   "changedKey": "lai",
+   "metrics": {
+    "compliancePct@pad": 33.024155,
+    "compliancePct@dehu": 45.142512,
+    "compliancePct@dx": 70.035011,
+    "compliancePct@integrated": 59.741546,
+    "compliancePct@desiccant": 54.267777,
+    "compliancePct@hybridDesiccant": 58.473983,
+    "compliancePct": 53.447497,
+    "cost@pad": 7121.610713,
+    "cost@dehu": 9248.173843,
+    "cost@dx": 12334.84797,
+    "cost@integrated": 13278.801479,
+    "cost@desiccant": 9938.56809,
+    "cost@hybridDesiccant": 13399.626638,
+    "cost": 10886.938122,
+    "electricKWh@pad": 20631.861946,
+    "electricKWh@dehu": 43152.261654,
+    "electricKWh@dx": 65130.487939,
+    "electricKWh@integrated": 65530.157176,
+    "electricKWh@desiccant": 21135.190057,
+    "electricKWh@hybridDesiccant": 68893.645279,
+    "electricKWh": 47412.267342
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "integrated",
+    "hybridDesiccant"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  },
+  {
+   "id": "t7s12",
+   "changedKey": "coolingSHR",
+   "metrics": {
+    "compliancePct@pad": 33.024155,
+    "compliancePct@dehu": 45.142512,
+    "compliancePct@dx": 65.868647,
+    "compliancePct@integrated": 55.187198,
+    "compliancePct@desiccant": 54.267777,
+    "compliancePct@hybridDesiccant": 58.473983,
+    "compliancePct": 51.994045,
+    "cost@pad": 7121.610713,
+    "cost@dehu": 9248.173843,
+    "cost@dx": 13119.415746,
+    "cost@integrated": 14694.747175,
+    "cost@desiccant": 9938.56809,
+    "cost@hybridDesiccant": 13399.626638,
+    "cost": 11253.690368,
+    "electricKWh@pad": 20631.861946,
+    "electricKWh@dehu": 43152.261654,
+    "electricKWh@dx": 69728.884826,
+    "electricKWh@integrated": 75007.362531,
+    "electricKWh@desiccant": 21135.190057,
+    "electricKWh@hybridDesiccant": 68893.645279,
+    "electricKWh": 49758.201049
+   },
+   "ranking": [
+    "pad",
+    "dehu",
+    "desiccant",
+    "dx",
+    "hybridDesiccant",
+    "integrated"
+   ],
+   "best": "pad",
+   "numericalFailureHours": 0
+  }
+ ],
+ "effects": {
+  "uValue": {
+   "compliancePct@pad": {
+    "mu": -5.023425,
+    "muStar": 5.023425,
+    "sigma": 1.258725,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": -3.724612,
+    "muStar": 3.724612,
+    "sigma": 1.683457,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -6.527004,
+    "muStar": 6.527004,
+    "sigma": 3.411236,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -5.198362,
+    "muStar": 5.198362,
+    "sigma": 1.937708,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": -5.64096,
+    "muStar": 5.64096,
+    "sigma": 2.060584,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": -9.252695,
+    "muStar": 9.252695,
+    "sigma": 3.398175,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": -5.89451,
+    "muStar": 5.89451,
+    "sigma": 1.857044,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": 1140.729539,
+    "muStar": 1140.729539,
+    "sigma": 213.242021,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": 1458.442803,
+    "muStar": 1458.442803,
+    "sigma": 103.721022,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": 2124.220777,
+    "muStar": 2124.220777,
+    "sigma": 348.138157,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": 2031.72073,
+    "muStar": 2031.72073,
+    "sigma": 215.942826,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 1711.726194,
+    "muStar": 1711.726194,
+    "sigma": 62.42447,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 2195.145443,
+    "muStar": 2195.145443,
+    "sigma": 191.816423,
+    "n": 8
+   },
+   "cost": {
+    "mu": 1776.997581,
+    "muStar": 1776.997581,
+    "sigma": 122.605416,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": -85.731305,
+    "muStar": 85.731305,
+    "sigma": 25.50111,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": 2490.953535,
+    "muStar": 2490.953535,
+    "sigma": 537.157554,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 6289.546174,
+    "muStar": 6289.546174,
+    "sigma": 3133.649927,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 6169.266245,
+    "muStar": 6169.266245,
+    "sigma": 2278.667081,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": -13.830985,
+    "muStar": 25.978844,
+    "sigma": 39.34909,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 6922.488338,
+    "muStar": 6922.488338,
+    "sigma": 1445.222441,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": 3628.782,
+    "muStar": 3628.782,
+    "sigma": 1116.674944,
+    "n": 8
+   }
+  },
+  "infiltrationACH": {
+   "compliancePct@pad": {
+    "mu": 0.506025,
+    "muStar": 0.600227,
+    "sigma": 0.948381,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": -0.4409,
+    "muStar": 1.586777,
+    "sigma": 2.198196,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -0.906737,
+    "muStar": 1.891388,
+    "sigma": 1.885153,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -0.08211,
+    "muStar": 3.436761,
+    "sigma": 4.357739,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": 1.84189,
+    "muStar": 4.625075,
+    "sigma": 5.48815,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": 2.040022,
+    "muStar": 4.987776,
+    "sigma": 5.679301,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": 0.493031,
+    "muStar": 1.770829,
+    "sigma": 2.126256,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": 282.201991,
+    "muStar": 282.201991,
+    "sigma": 64.032547,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": 257.48347,
+    "muStar": 257.48347,
+    "sigma": 42.372783,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": 132.647753,
+    "muStar": 151.35542,
+    "sigma": 150.194448,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": 311.829795,
+    "muStar": 311.829795,
+    "sigma": 94.1648,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 249.296191,
+    "muStar": 249.296191,
+    "sigma": 74.500591,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 184.40634,
+    "muStar": 184.40634,
+    "sigma": 126.036618,
+    "n": 8
+   },
+   "cost": {
+    "mu": 236.310923,
+    "muStar": 236.310923,
+    "sigma": 48.87593,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": -73.955279,
+    "muStar": 73.955279,
+    "sigma": 17.022693,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": 87.248264,
+    "muStar": 193.308108,
+    "sigma": 225.273245,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 115.618488,
+    "muStar": 504.962347,
+    "sigma": 727.836096,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 1261.048231,
+    "muStar": 1261.048231,
+    "sigma": 1019.231454,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": 76.735636,
+    "muStar": 76.735636,
+    "sigma": 47.511537,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 154.088229,
+    "muStar": 752.349338,
+    "sigma": 931.048531,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": 270.130595,
+    "muStar": 292.540566,
+    "sigma": 274.706984,
+    "n": 8
+   }
+  },
+  "lai": {
+   "compliancePct@pad": {
+    "mu": -2.204001,
+    "muStar": 2.320723,
+    "sigma": 3.075761,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": -9.078242,
+    "muStar": 9.332771,
+    "sigma": 7.15836,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -12.806003,
+    "muStar": 15.289704,
+    "sigma": 15.639703,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -11.620265,
+    "muStar": 11.620265,
+    "sigma": 7.142816,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": -7.679673,
+    "muStar": 8.257362,
+    "sigma": 6.285351,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": -11.183883,
+    "muStar": 11.611264,
+    "sigma": 6.583418,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": -9.095345,
+    "muStar": 9.095345,
+    "sigma": 3.887344,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": 1066.069867,
+    "muStar": 1066.069867,
+    "sigma": 209.874266,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": 2038.975243,
+    "muStar": 2038.975243,
+    "sigma": 294.770822,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": 5151.969342,
+    "muStar": 5151.969342,
+    "sigma": 956.316113,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": 4075.013822,
+    "muStar": 4075.013822,
+    "sigma": 764.457873,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 2860.924462,
+    "muStar": 2860.924462,
+    "sigma": 184.011218,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 4297.142426,
+    "muStar": 4297.142426,
+    "sigma": 340.268886,
+    "n": 8
+   },
+   "cost": {
+    "mu": 3248.349194,
+    "muStar": 3248.349194,
+    "sigma": 246.258868,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": -298.548927,
+    "muStar": 318.537052,
+    "sigma": 223.422071,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": 7217.498992,
+    "muStar": 7217.498992,
+    "sigma": 2004.936453,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 21336.025346,
+    "muStar": 21336.025346,
+    "sigma": 3471.655639,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 18495.877922,
+    "muStar": 18495.877922,
+    "sigma": 5061.235228,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": -249.280498,
+    "muStar": 260.130779,
+    "sigma": 207.464898,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 21448.401253,
+    "muStar": 21448.401253,
+    "sigma": 2071.289453,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": 11324.995681,
+    "muStar": 11324.995681,
+    "sigma": 1490.952147,
+    "n": 8
+   }
+  },
+  "padEffectiveness": {
+   "compliancePct@pad": {
+    "mu": 1.412696,
+    "muStar": 1.412696,
+    "sigma": 0.429368,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": 1.417137,
+    "muStar": 1.417137,
+    "sigma": 0.43343,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": 0.861346,
+    "muStar": 0.861346,
+    "sigma": 0.370032,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": 1.117242,
+    "muStar": 1.246318,
+    "sigma": 0.971482,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": 0.980586,
+    "muStar": 0.980586,
+    "sigma": 0.458387,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": 0.964834,
+    "muStar": 0.964834,
+    "sigma": 0.343609,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": -19.177556,
+    "muStar": 19.177556,
+    "sigma": 9.21569,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": -6.127835,
+    "muStar": 22.515196,
+    "sigma": 28.014508,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": -40.559641,
+    "muStar": 41.069826,
+    "sigma": 35.102693,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": -79.774254,
+    "muStar": 85.826341,
+    "sigma": 55.281108,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 5.428879,
+    "muStar": 26.618911,
+    "sigma": 34.210579,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost": {
+    "mu": -23.368401,
+    "muStar": 23.539841,
+    "sigma": 16.314128,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": -170.006558,
+    "muStar": 170.006558,
+    "sigma": 65.697312,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": -6.920064,
+    "muStar": 136.339159,
+    "sigma": 180.80473,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": -567.774978,
+    "muStar": 567.774978,
+    "sigma": 415.701444,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": -1013.204357,
+    "muStar": 1042.942748,
+    "sigma": 685.862231,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": -157.116875,
+    "muStar": 157.116875,
+    "sigma": 63.304352,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": -319.170472,
+    "muStar": 319.170472,
+    "sigma": 167.443011,
+    "n": 8
+   }
+  },
+  "coolingSHR": {
+   "compliancePct@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -1.230958,
+    "muStar": 7.00536,
+    "sigma": 10.219444,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -12.829461,
+    "muStar": 12.829461,
+    "sigma": 5.323688,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": -2.343403,
+    "muStar": 2.343403,
+    "sigma": 1.457057,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": 969.957725,
+    "muStar": 969.957725,
+    "sigma": 743.643284,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": 3102.937042,
+    "muStar": 3102.937042,
+    "sigma": 581.497514,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost": {
+    "mu": 678.815795,
+    "muStar": 678.815795,
+    "sigma": 156.238537,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 6312.778337,
+    "muStar": 6312.778337,
+    "sigma": 3991.648925,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 21252.801086,
+    "muStar": 21252.801086,
+    "sigma": 4781.471145,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": 4594.263238,
+    "muStar": 4594.263238,
+    "sigma": 1129.727794,
+    "n": 8
+   }
+  },
+  "coolingCOP": {
+   "compliancePct@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -0.409141,
+    "muStar": 0.409141,
+    "sigma": 0.263812,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": -0.068191,
+    "muStar": 0.068191,
+    "sigma": 0.043969,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": -1364.023605,
+    "muStar": 1364.023605,
+    "sigma": 294.195772,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": -2513.229907,
+    "muStar": 2513.229907,
+    "sigma": 345.051041,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost": {
+    "mu": -646.208919,
+    "muStar": 646.208919,
+    "sigma": 100.451784,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": -11845.842801,
+    "muStar": 11845.842801,
+    "sigma": 2443.918744,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": -23180.045532,
+    "muStar": 23180.045532,
+    "sigma": 3546.361215,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": -5837.648055,
+    "muStar": 5837.648055,
+    "sigma": 920.824128,
+    "n": 8
+   }
+  },
+  "solarTransmission": {
+   "compliancePct@pad": {
+    "mu": -1.451536,
+    "muStar": 1.451536,
+    "sigma": 0.32404,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": -1.769976,
+    "muStar": 1.769976,
+    "sigma": 0.535919,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -3.370559,
+    "muStar": 3.370559,
+    "sigma": 1.026205,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -2.440812,
+    "muStar": 2.440812,
+    "sigma": 0.918646,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": -2.232095,
+    "muStar": 2.232095,
+    "sigma": 0.634421,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": -2.277743,
+    "muStar": 2.277743,
+    "sigma": 0.74594,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": -2.257121,
+    "muStar": 2.257121,
+    "sigma": 0.581365,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": -131.938172,
+    "muStar": 131.938172,
+    "sigma": 26.425907,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": -298.465255,
+    "muStar": 298.465255,
+    "sigma": 40.578458,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": -258.404323,
+    "muStar": 276.324416,
+    "sigma": 146.569351,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": -221.728775,
+    "muStar": 259.86305,
+    "sigma": 169.772505,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": -403.793777,
+    "muStar": 403.793777,
+    "sigma": 58.218341,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": -563.972326,
+    "muStar": 563.972326,
+    "sigma": 83.599238,
+    "n": 8
+   },
+   "cost": {
+    "mu": -313.050438,
+    "muStar": 313.050438,
+    "sigma": 72.780676,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": 422.595969,
+    "muStar": 422.595969,
+    "sigma": 119.133901,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": -879.968704,
+    "muStar": 879.968704,
+    "sigma": 242.801226,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 119.589624,
+    "muStar": 448.047646,
+    "sigma": 659.834741,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 664.476897,
+    "muStar": 908.182009,
+    "sigma": 1185.80664,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": 407.10951,
+    "muStar": 407.10951,
+    "sigma": 114.686206,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": -2580.601865,
+    "muStar": 2580.601865,
+    "sigma": 660.998225,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": -307.799761,
+    "muStar": 422.2819,
+    "sigma": 376.667869,
+    "n": 8
+   }
+  },
+  "shadeFraction": {
+   "compliancePct@pad": {
+    "mu": 2.087992,
+    "muStar": 2.087992,
+    "sigma": 0.926525,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": 2.53697,
+    "muStar": 2.539687,
+    "sigma": 1.977832,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": 5.262315,
+    "muStar": 5.321712,
+    "sigma": 2.542331,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": 3.146717,
+    "muStar": 3.153149,
+    "sigma": 2.290874,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": 3.803853,
+    "muStar": 3.925004,
+    "sigma": 1.940987,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": 3.713312,
+    "muStar": 3.877009,
+    "sigma": 2.117785,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": 3.425194,
+    "muStar": 3.425194,
+    "sigma": 1.698537,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": 869.807139,
+    "muStar": 869.807139,
+    "sigma": 139.623299,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": 1169.72749,
+    "muStar": 1169.72749,
+    "sigma": 131.683398,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": 1238.12512,
+    "muStar": 1238.12512,
+    "sigma": 406.492733,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": 1250.233825,
+    "muStar": 1250.233825,
+    "sigma": 307.951259,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 1364.225361,
+    "muStar": 1364.225361,
+    "sigma": 185.774066,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 1709.005324,
+    "muStar": 1709.005324,
+    "sigma": 184.047692,
+    "n": 8
+   },
+   "cost": {
+    "mu": 1266.854043,
+    "muStar": 1266.854043,
+    "sigma": 201.460158,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": 5860.01692,
+    "muStar": 5860.01692,
+    "sigma": 1010.743946,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": 8065.12,
+    "muStar": 8065.12,
+    "sigma": 695.446851,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 6745.664691,
+    "muStar": 6745.664691,
+    "sigma": 2045.365986,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 5956.295807,
+    "muStar": 5956.295807,
+    "sigma": 2305.430737,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": 5901.307209,
+    "muStar": 5901.307209,
+    "sigma": 1010.765555,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 11264.313722,
+    "muStar": 11264.313722,
+    "sigma": 919.838794,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": 7298.786392,
+    "muStar": 7298.786392,
+    "sigma": 1140.811527,
+    "n": 8
+   }
+  },
+  "solarHeatFraction": {
+   "compliancePct@pad": {
+    "mu": -1.453477,
+    "muStar": 1.453477,
+    "sigma": 0.533339,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": -1.612928,
+    "muStar": 1.612928,
+    "sigma": 0.44396,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -3.07486,
+    "muStar": 3.07486,
+    "sigma": 0.680574,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -2.043788,
+    "muStar": 2.043788,
+    "sigma": 0.654329,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": -1.94254,
+    "muStar": 1.94254,
+    "sigma": 0.412951,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": -2.203538,
+    "muStar": 2.203538,
+    "sigma": 0.618793,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": -2.055188,
+    "muStar": 2.055188,
+    "sigma": 0.500961,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": -107.250704,
+    "muStar": 107.250704,
+    "sigma": 33.602485,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": -212.992518,
+    "muStar": 212.992518,
+    "sigma": 62.184363,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": -159.173539,
+    "muStar": 164.703683,
+    "sigma": 117.800252,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": -108.739001,
+    "muStar": 128.670328,
+    "sigma": 107.254713,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": -279.611205,
+    "muStar": 279.611205,
+    "sigma": 71.460335,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": -395.204126,
+    "muStar": 395.204126,
+    "sigma": 54.622906,
+    "n": 8
+   },
+   "cost": {
+    "mu": -210.495182,
+    "muStar": 210.495182,
+    "sigma": 65.929622,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": 305.981078,
+    "muStar": 305.981078,
+    "sigma": 65.547799,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": -443.326596,
+    "muStar": 443.326596,
+    "sigma": 155.178872,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 334.226686,
+    "muStar": 416.869698,
+    "sigma": 449.374483,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 927.378306,
+    "muStar": 927.378306,
+    "sigma": 526.320182,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": 279.667633,
+    "muStar": 279.667633,
+    "sigma": 58.677707,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": -1701.291573,
+    "muStar": 1701.291573,
+    "sigma": 318.842444,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": -49.560744,
+    "muStar": 139.228905,
+    "sigma": 163.36092,
+    "n": 8
+   }
+  },
+  "dehuLPerKWh": {
+   "compliancePct@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": 0.306739,
+    "muStar": 0.306739,
+    "sigma": 0.160341,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -0.062758,
+    "muStar": 0.472709,
+    "sigma": 0.548315,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": 0.040664,
+    "muStar": 0.081872,
+    "sigma": 0.091145,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": -867.238319,
+    "muStar": 867.238319,
+    "sigma": 154.642273,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": -767.488158,
+    "muStar": 767.488158,
+    "sigma": 93.762555,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "cost": {
+    "mu": -272.454413,
+    "muStar": 272.454413,
+    "sigma": 39.539443,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": -8500.271989,
+    "muStar": 8500.271989,
+    "sigma": 1562.912467,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": -8062.825359,
+    "muStar": 8062.825359,
+    "sigma": 1276.561307,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 0,
+    "muStar": 0,
+    "sigma": 0,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": -2760.516225,
+    "muStar": 2760.516225,
+    "sigma": 461.219598,
+    "n": 8
+   }
+  },
+  "maxVentACH": {
+   "compliancePct@pad": {
+    "mu": -6.456961,
+    "muStar": 6.456961,
+    "sigma": 2.458072,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": -3.05324,
+    "muStar": 3.296585,
+    "sigma": 2.51775,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -0.810888,
+    "muStar": 1.440189,
+    "sigma": 2.225144,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -2.026367,
+    "muStar": 2.821952,
+    "sigma": 3.119566,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": -0.636776,
+    "muStar": 2.415273,
+    "sigma": 3.098526,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": 0.038113,
+    "muStar": 2.294148,
+    "sigma": 3.126224,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": -2.157686,
+    "muStar": 2.157686,
+    "sigma": 2.160678,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": -536.326181,
+    "muStar": 536.326181,
+    "sigma": 322.85129,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": -61.897572,
+    "muStar": 228.325041,
+    "sigma": 291.839157,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": 321.142757,
+    "muStar": 409.210712,
+    "sigma": 544.774109,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": 660.497884,
+    "muStar": 676.461426,
+    "sigma": 457.908855,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": 213.236322,
+    "muStar": 280.541725,
+    "sigma": 258.984498,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 1002.81713,
+    "muStar": 1002.81713,
+    "sigma": 413.978891,
+    "n": 8
+   },
+   "cost": {
+    "mu": 266.57839,
+    "muStar": 325.4445,
+    "sigma": 210.235956,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": 1502.962047,
+    "muStar": 1502.962047,
+    "sigma": 619.026571,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": 4804.435142,
+    "muStar": 4804.435142,
+    "sigma": 1300.122896,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 4199.788663,
+    "muStar": 4199.788663,
+    "sigma": 3451.940582,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 6560.928387,
+    "muStar": 6560.928387,
+    "sigma": 3906.85595,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": 2025.429182,
+    "muStar": 2025.429182,
+    "sigma": 578.287195,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 9237.2138,
+    "muStar": 9237.2138,
+    "sigma": 3080.544306,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": 4721.79287,
+    "muStar": 4721.79287,
+    "sigma": 1501.790915,
+    "n": 8
+   }
+  },
+  "thermalMassKJm2K": {
+   "compliancePct@pad": {
+    "mu": -0.67132,
+    "muStar": 0.933074,
+    "sigma": 0.953437,
+    "n": 8
+   },
+   "compliancePct@dehu": {
+    "mu": 0.436832,
+    "muStar": 0.79915,
+    "sigma": 0.940049,
+    "n": 8
+   },
+   "compliancePct@dx": {
+    "mu": -5.991564,
+    "muStar": 5.991564,
+    "sigma": 1.659952,
+    "n": 8
+   },
+   "compliancePct@integrated": {
+    "mu": -4.225174,
+    "muStar": 4.225174,
+    "sigma": 1.479782,
+    "n": 8
+   },
+   "compliancePct@desiccant": {
+    "mu": 1.518828,
+    "muStar": 1.880407,
+    "sigma": 1.627472,
+    "n": 8
+   },
+   "compliancePct@hybridDesiccant": {
+    "mu": -0.063425,
+    "muStar": 0.895019,
+    "sigma": 1.173743,
+    "n": 8
+   },
+   "compliancePct": {
+    "mu": -1.499304,
+    "muStar": 1.499304,
+    "sigma": 1.066125,
+    "n": 8
+   },
+   "cost@pad": {
+    "mu": 72.919453,
+    "muStar": 72.919453,
+    "sigma": 48.65881,
+    "n": 8
+   },
+   "cost@dehu": {
+    "mu": -41.192801,
+    "muStar": 55.448663,
+    "sigma": 50.307797,
+    "n": 8
+   },
+   "cost@dx": {
+    "mu": 502.261719,
+    "muStar": 502.261719,
+    "sigma": 95.425083,
+    "n": 8
+   },
+   "cost@integrated": {
+    "mu": 285.306551,
+    "muStar": 285.306551,
+    "sigma": 150.465121,
+    "n": 8
+   },
+   "cost@desiccant": {
+    "mu": -47.473668,
+    "muStar": 75.779498,
+    "sigma": 102.857224,
+    "n": 8
+   },
+   "cost@hybridDesiccant": {
+    "mu": 117.206277,
+    "muStar": 117.206277,
+    "sigma": 97.983958,
+    "n": 8
+   },
+   "cost": {
+    "mu": 148.171255,
+    "muStar": 148.171255,
+    "sigma": 66.377828,
+    "n": 8
+   },
+   "electricKWh@pad": {
+    "mu": 238.439443,
+    "muStar": 238.439443,
+    "sigma": 64.293577,
+    "n": 8
+   },
+   "electricKWh@dehu": {
+    "mu": -556.97808,
+    "muStar": 556.97808,
+    "sigma": 166.626885,
+    "n": 8
+   },
+   "electricKWh@dx": {
+    "mu": 2975.941589,
+    "muStar": 2975.941589,
+    "sigma": 770.448266,
+    "n": 8
+   },
+   "electricKWh@integrated": {
+    "mu": 1070.179214,
+    "muStar": 1336.965474,
+    "sigma": 1154.38792,
+    "n": 8
+   },
+   "electricKWh@desiccant": {
+    "mu": -383.416357,
+    "muStar": 383.416357,
+    "sigma": 105.380321,
+    "n": 8
+   },
+   "electricKWh@hybridDesiccant": {
+    "mu": 357.81393,
+    "muStar": 462.717102,
+    "sigma": 493.951921,
+    "n": 8
+   },
+   "electricKWh": {
+    "mu": 616.996623,
+    "muStar": 616.996623,
+    "sigma": 358.435775,
+    "n": 8
+   }
+  }
+ },
+ "stability": {
+  "distinctOrders": 3,
+  "mostCommon": [
+   "pad",
+   "dehu",
+   "desiccant",
+   "dx",
+   "hybridDesiccant",
+   "integrated"
+  ],
+  "share": 0.6153846153846154,
+  "stable": false,
+  "points": 104,
+  "note": "3 distinct strategy orders over 104 screened points; the most common holds 61.5%, below the 90% threshold. Ranking unstable under the screened ranges.",
+  "bestStrategy": {
+   "distinctOrders": 1,
+   "mostCommon": [
+    "pad"
+   ],
+   "share": 1,
+   "stable": true,
+   "points": 104,
+   "note": "One strategy order holds in 104 of 104 screened points (100.0%); ranking stable under the screened ranges."
+  }
+ },
+ "provenance": {
+  "modelVersion": "0.2.0-screening",
+  "site": "Tulsa, OK (74103), bundled NASA POWER years",
+  "years": [
+   2023,
+   2024,
+   2025
+  ],
+  "days": 120,
+  "trajectories": 8,
+  "levels": 4,
+  "seed": 1,
+  "strategies": [
+   "pad",
+   "dehu",
+   "dx",
+   "integrated",
+   "desiccant",
+   "hybridDesiccant"
+  ],
+  "simulations": 1872,
+  "coverage": [
+   {
+    "year": "2023",
+    "days": 120,
+    "firstDay": "2023-01-02",
+    "lastDay": "2023-12-30",
+    "availableDays": 363,
+    "hours": 2881
+   },
+   {
+    "year": "2024",
+    "days": 120,
+    "firstDay": "2024-01-02",
+    "lastDay": "2024-12-30",
+    "availableDays": 364,
+    "hours": 2880
+   },
+   {
+    "year": "2025",
+    "days": 120,
+    "firstDay": "2025-01-02",
+    "lastDay": "2025-12-30",
+    "availableDays": 363,
+    "hours": 2881
+   }
+  ],
+  "generatedAt": "2026-09-14T02:21:21.248Z",
+  "runtimeSeconds": 289.9,
+  "metricUnits": {
+   "compliancePct": "% of eligible hours",
+   "cost": "$ over the screened period",
+   "electricKWh": "kWh over the screened period"
+  },
+  "method": "Morris elementary effects. Each effect is the metric change per full screened range of one parameter, measured one parameter at a time along random trajectories. mu* ranks influence; sigma indicates interaction or non-linearity. This is a screening method: it produces no probability distribution and no confidence interval.",
+  "subsampling": "Each weather year is subsampled to 120 evenly spaced whole local days; totals are for those days, not a calendar year, and each sampled day costs its first hour as controller warm-up.",
+  "headlineMetric": "Unweighted mean over the six strategies of each metric's median over weather years; per-strategy values are suffixed @technology."
+ }
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "sites": [
+    {
+      "key": "tulsa",
+      "label": "Tulsa, OK (OSF site)",
+      "zip": "74103",
+      "latitude": 36.15,
+      "longitude": -95.99,
+      "timezone": "America/Chicago",
+      "source": "NASA POWER",
+      "years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "files": {
+        "2016": "tulsa-2016.json",
+        "2017": "tulsa-2017.json",
+        "2018": "tulsa-2018.json",
+        "2019": "tulsa-2019.json",
+        "2020": "tulsa-2020.json",
+        "2021": "tulsa-2021.json",
+        "2022": "tulsa-2022.json",
+        "2023": "tulsa-2023.json",
+        "2024": "tulsa-2024.json",
+        "2025": "tulsa-2025.json"
+      }
+    }
+  ]
+}

@@ -1,0 +1,268 @@
+{
+  "exportedAt": "2026-09-11T21:55:34.695Z",
+  "modelVersion": "0.1.0-screening",
+  "weather": {
+    "source": "NASA POWER",
+    "startDate": "2025-01-01",
+    "endDate": "2025-12-31",
+    "hours": 8760
+  },
+  "results": [
+    {
+      "name": "Pad + vent baseline",
+      "zip": "74103",
+      "assumptions": {
+        "evidenceTier": "Assumption-based component screening",
+        "stepMinutes": 1,
+        "warmupHoursPerSegment": 1,
+        "lightSolarConversionUmolJ": 2.02,
+        "cpJkgK": 1006,
+        "latentHeatJkg": 2450000,
+        "psychrolibVersion": "2.5.0",
+        "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
+      },
+      "expectedHours": 8760,
+      "validHours": 8760,
+      "eligibleHours": 8759,
+      "warmupHours": 1,
+      "missingHours": 0,
+      "numericalFailureHours": 0,
+      "compliancePct": 33.54150017125244,
+      "electricKWh": 64842.545061005316,
+      "fuelKWh": 236493.08217382367,
+      "waterL": 430953.60096938553,
+      "cost": 19285.201307082072,
+      "annualOwnershipCost": 2044.4414593296897,
+      "maxEnergyResidualW": 9.033828973770141e-09,
+      "maxMoistureResidualKgS": 3.373458919616231e-16,
+      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+    },
+    {
+      "name": "Pads + condensing dehumidifier",
+      "zip": "74103",
+      "assumptions": {
+        "evidenceTier": "Assumption-based component screening",
+        "stepMinutes": 1,
+        "warmupHoursPerSegment": 1,
+        "lightSolarConversionUmolJ": 2.02,
+        "cpJkgK": 1006,
+        "latentHeatJkg": 2450000,
+        "psychrolibVersion": "2.5.0",
+        "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
+      },
+      "expectedHours": 8760,
+      "validHours": 8760,
+      "eligibleHours": 8759,
+      "warmupHours": 1,
+      "missingHours": 0,
+      "numericalFailureHours": 0,
+      "compliancePct": 45.74266468774975,
+      "electricKWh": 106276.11071388013,
+      "fuelKWh": 121701.45462752682,
+      "waterL": 454549.00833294046,
+      "cost": 19138.79676057035,
+      "annualOwnershipCost": 4103.696738435943,
+      "maxEnergyResidualW": 9.12696123123169e-09,
+      "maxMoistureResidualKgS": 3.3237301799715623e-16,
+      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+    },
+    {
+      "name": "DX / mini-split + dehumidifier",
+      "zip": "74103",
+      "assumptions": {
+        "evidenceTier": "Assumption-based component screening",
+        "stepMinutes": 1,
+        "warmupHoursPerSegment": 1,
+        "lightSolarConversionUmolJ": 2.02,
+        "cpJkgK": 1006,
+        "latentHeatJkg": 2450000,
+        "psychrolibVersion": "2.5.0",
+        "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
+      },
+      "expectedHours": 8760,
+      "validHours": 8760,
+      "eligibleHours": 8759,
+      "warmupHours": 1,
+      "missingHours": 0,
+      "numericalFailureHours": 0,
+      "compliancePct": 74.67538151234916,
+      "electricKWh": 167775.77626417694,
+      "fuelKWh": 127068.42575168618,
+      "waterL": 451505.55237337516,
+      "cost": 26754.18341527372,
+      "annualOwnershipCost": 9251.834936201574,
+      "maxEnergyResidualW": 7.74549941221873e-09,
+      "maxMoistureResidualKgS": 3.518019209280965e-16,
+      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+    },
+    {
+      "name": "Integrated HVAC + reheat",
+      "zip": "74103",
+      "assumptions": {
+        "evidenceTier": "Assumption-based component screening",
+        "stepMinutes": 1,
+        "warmupHoursPerSegment": 1,
+        "lightSolarConversionUmolJ": 2.02,
+        "cpJkgK": 1006,
+        "latentHeatJkg": 2450000,
+        "psychrolibVersion": "2.5.0",
+        "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
+      },
+      "expectedHours": 8760,
+      "validHours": 8760,
+      "eligibleHours": 8759,
+      "warmupHours": 1,
+      "missingHours": 0,
+      "numericalFailureHours": 0,
+      "compliancePct": 75.64524108535988,
+      "electricKWh": 212231.79255725534,
+      "fuelKWh": 210890.8024693235,
+      "waterL": 397840.2843535465,
+      "cost": 35753.58178669742,
+      "annualOwnershipCost": 11825.904035084392,
+      "maxEnergyResidualW": 7.376850893100103e-09,
+      "maxMoistureResidualKgS": 2.98835030794938e-16,
+      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+    },
+    {
+      "name": "Desiccant + evaporative cooling",
+      "zip": "74103",
+      "assumptions": {
+        "evidenceTier": "Assumption-based component screening",
+        "stepMinutes": 1,
+        "warmupHoursPerSegment": 1,
+        "lightSolarConversionUmolJ": 2.02,
+        "cpJkgK": 1006,
+        "latentHeatJkg": 2450000,
+        "psychrolibVersion": "2.5.0",
+        "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
+      },
+      "expectedHours": 8760,
+      "validHours": 8760,
+      "eligibleHours": 8759,
+      "warmupHours": 1,
+      "missingHours": 0,
+      "numericalFailureHours": 0,
+      "compliancePct": 47.17071964075049,
+      "electricKWh": 57557.015394338145,
+      "fuelKWh": 315258.81000350456,
+      "waterL": 460837.3991403694,
+      "cost": 22015.16309575895,
+      "annualOwnershipCost": 9766.648755978138,
+      "maxEnergyResidualW": 9.111439188321431e-09,
+      "maxMoistureResidualKgS": 3.515706244646329e-16,
+      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+    },
+    {
+      "name": "Liquid-desiccant hybrid (generic)",
+      "zip": "74103",
+      "assumptions": {
+        "evidenceTier": "Assumption-based component screening",
+        "stepMinutes": 1,
+        "warmupHoursPerSegment": 1,
+        "lightSolarConversionUmolJ": 2.02,
+        "cpJkgK": 1006,
+        "latentHeatJkg": 2450000,
+        "psychrolibVersion": "2.5.0",
+        "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
+      },
+      "expectedHours": 8760,
+      "validHours": 8760,
+      "eligibleHours": 8759,
+      "warmupHours": 1,
+      "missingHours": 0,
+      "numericalFailureHours": 0,
+      "compliancePct": 51.57342923469194,
+      "electricKWh": 172680.9413555372,
+      "fuelKWh": 166602.2304058137,
+      "waterL": 481148.5914475469,
+      "cost": 29181.11051382125,
+      "annualOwnershipCost": 13370.345494414081,
+      "maxEnergyResidualW": 9.12696123123169e-09,
+      "maxMoistureResidualKgS": 3.867276869110962e-16,
+      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+    }
+  ],
+  "exports": [
+    {
+      "name": "control-window-hourly.csv",
+      "bytes": 29059399,
+      "sha256": "306da05e93d84c2ea8256f51dad09f34f66cea6321cc54ca18d652045e84bc45"
+    },
+    {
+      "name": "control-window-report.html",
+      "bytes": 143575,
+      "sha256": "ced0227048a220c8a7adbedb5811242a1c137d00ef67ca1c30a35e442bb2f29c"
+    },
+    {
+      "name": "control-window-run.json",
+      "bytes": 113692669,
+      "sha256": "0e35db9b15bbea3739784309abb8f1cd60bca236a07816e7a4600e0d89da1e36"
+    }
+  ],
+  "retainedReport": {
+    "path": "example-comparison.html",
+    "bytes": 148893,
+    "sha256": "9389475fba6437a3ff7755cfe45fb3e7a9bee74eb396f80a9753dcfc596a9b34",
+    "note": "Regenerated 2026-09-12 after the audit fixes (cadence-invariant unmet loads, unsaturable-candidate guard) and the equipment-runtime rows. Comparison cost/attainment figures unchanged from the 09-11 run."
+  },
+  "audit_2026_09_12": {
+    "padRuntime": {
+      "Pad + vent baseline": {
+        "hours": 2772,
+        "equivalentHours": 1830.0999999999951,
+        "days": 296
+      },
+      "Pads + condensing dehumidifier": {
+        "hours": 4708,
+        "equivalentHours": 2452.9833333333436,
+        "days": 347
+      },
+      "DX / mini-split + dehumidifier": {
+        "hours": 3951,
+        "equivalentHours": 2160.1333333333396,
+        "days": 347
+      },
+      "Integrated HVAC + reheat": {
+        "hours": 4012,
+        "equivalentHours": 2164.166666666674,
+        "days": 342
+      },
+      "Desiccant + evaporative cooling": {
+        "hours": 5396,
+        "equivalentHours": 2906.033333333349,
+        "days": 349
+      },
+      "Liquid-desiccant hybrid (generic)": {
+        "hours": 4193,
+        "equivalentHours": 2153.300000000016,
+        "days": 349
+      }
+    },
+    "padViabilityWeatherOnly": {
+      "effectiveHours": 244,
+      "marginalHours": 18,
+      "ineffectiveHours": 2680,
+      "effectiveDays": {
+        "atLeast1": 65,
+        "atLeast4": 30,
+        "atLeast8": 6
+      },
+      "marginalDays": {
+        "atLeast1": 7,
+        "atLeast4": 2,
+        "atLeast8": 0
+      },
+      "ineffectiveDays": {
+        "atLeast1": 171,
+        "atLeast4": 161,
+        "atLeast8": 138
+      },
+      "coolingDemandHours": 2942,
+      "failureCauses": {
+        "temperature": 2952,
+        "moisture": 3851
+      }
+    }
+  }
+}
