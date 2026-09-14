@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {makeScenario,validateScenario,applyTechnology,DEFAULT_SCENARIO,SYSTEMS} from '../src/config.js';
+import {makeScenario,validateScenario,applyTechnology,DEFAULT_SCENARIO,SYSTEMS,FACILITIES,FACILITY_TEMPLATES,OPAQUE_FACILITIES} from '../src/config.js';
 import {simulateScenario} from '../src/simulate.js';
 import {compareScenarios} from '../src/metrics.js';
 import {weatherState,padState,humidityRatio,enthalpy,stanghelliniTranspiration,saturationPressure,saturationHumidityRatio,dryAirDensity} from '../src/physics.js';
@@ -227,4 +227,54 @@ test('a schemaVersion 1 scenario simulates without a prior validate call',()=>{
  assert.equal(result.summary.numericalFailureHours,0);
  assert.equal(result.summary.validHours,24);
  assert.equal(Object.hasOwn(legacy,'lai'),false,'the caller object must not be mutated');
+});
+const V03_KEYS=['heatSource','heatPumpCopAt8C','heatPumpCopAtMinus8C','heatPumpCopAtMinus15C','heatPumpCutoffC','heatPumpCapacityDerate','shadeScreen','thermalScreen'];
+test('scenario JSON written before the component keys existed validates and simulates unchanged',()=>{
+ const legacy={...makeScenario('greenhouse')};
+ for(const key of V03_KEYS)delete legacy[key];
+ const fixture=diurnal();
+ const before=simulateScenario(legacy,fixture);
+ assert.equal(Object.hasOwn(legacy,'shadeScreen'),false,'the caller object must not be mutated');
+ assert.deepEqual(validateScenario(legacy),[]);
+ assert.equal(legacy.heatSource,'fuel');
+ assert.equal(legacy.shadeScreen.installed,false);
+ assert.equal(legacy.thermalScreen.installed,false);
+ assert.equal(legacy.heatPumpCopAt8C,null,'an unsourced rating point must stay null rather than acquire a default');
+ const after=simulateScenario(legacy,fixture);
+ for(const key of ['electricKWh','fuelKWh','heatingKWh','coolingKWh','compliancePct'])assert.equal(after.summary[key],before.summary[key],`${key} changed for a scenario that declares no components`);
+ assert.equal(after.summary.screens.shadeHours,0);
+ assert.equal(after.summary.screens.dliCostMol,0);
+ assert.equal(after.summary.screens.heatingSavedKWh,0);
+ // Two scenarios must never share one screen object, or editing one would edit the other.
+ const a=makeScenario('greenhouse'),b=makeScenario('greenhouse');
+ a.shadeScreen.installed=true;
+ assert.equal(b.shadeScreen.installed,false);
+ assert.equal(DEFAULT_SCENARIO.shadeScreen.installed,false);
+});
+test('every facility template carries a sourced envelope, and the original keys keep their published values',()=>{
+ for(const key of Object.keys(FACILITIES)){
+  const s=makeScenario(key);
+  assert.deepEqual(validateScenario(s),[],`${key} must validate`);
+  const template=FACILITY_TEMPLATES[key];
+  assert.ok(template&&typeof template.source==='string'&&template.source.length>20,`${key} must state where its envelope came from`);
+  assert.equal(s.uValue,template.uValue,`${key} must load its template U-value`);
+  if(OPAQUE_FACILITIES.has(key)){
+   assert.equal(s.parTransmission,0);assert.equal(s.solarTransmission,0);
+   assert.ok(validateScenario({...s,parTransmission:.5}).length>0,`${key} must refuse a transparent envelope`);
+  }
+ }
+ // The three keys that shipped before the ladder keep the exact numbers older saved scenarios were run with.
+ const legacy=makeScenario('greenhouse');
+ assert.equal(legacy.uValue,4);assert.equal(legacy.envelopeRatio,1.8);assert.equal(legacy.infiltrationACH,.3);
+ assert.equal(legacy.parTransmission,.65);assert.equal(legacy.solarTransmission,.65);assert.equal(legacy.maxVentACH,40);
+ const indoor=makeScenario('indoor');
+ assert.equal(indoor.uValue,.3);assert.equal(indoor.maxVentACH,2);assert.equal(indoor.padEnabled,false);
+ const hybrid=makeScenario('hybrid');
+ assert.equal(hybrid.uValue,4);assert.equal(hybrid.maxVentACH,15);assert.equal(hybrid.integratedHVAC,true);
+ // The ladder must actually be a ladder: insulation improves from single film to SIP panel.
+ const order=['greenhouseBasic','greenhouseGlass','greenhouseDouble','greenhousePoly','warehouse','warehouseSip'].map(k=>FACILITY_TEMPLATES[k].uValue);
+ assert.deepEqual(order,[6.84,6.24,3.97,3.3,4.54,.27]);
+ // A warehouse ratio is geometry, not an archetype guess: the flat-roof identity on its own dimensions.
+ const warehouse=makeScenario('warehouse');
+ assert.ok(Math.abs(warehouse.envelopeRatio-(1+4*warehouse.heightM/Math.sqrt(warehouse.areaM2)))<5e-4);
 });

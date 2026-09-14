@@ -1,4 +1,4 @@
-import {CROPS, FACILITIES, SYSTEMS, TECHNOLOGIES, FIELDS, DEFAULT_SCENARIO, makeScenario, applyTechnology, validateScenario, MODEL_VERSION} from './config.js';
+import {CROPS, FACILITIES, SYSTEMS, TECHNOLOGIES, FIELDS, DEFAULT_SCENARIO, OPAQUE_FACILITIES, makeScenario, applyTechnology, validateScenario, MODEL_VERSION} from './config.js';
 import {fetchWeather, loadExample, normalizeWeather, loadBundledIndex, loadBundledYear} from './weather.js';
 import {loadEnergyCatalog, lookupZip, getEnergyContext} from './energy.js';
 import {loadScenarios, saveScenarios, loadWeather, saveWeather, listWeather, loadCachedWeather, weatherKey} from './storage.js';
@@ -122,7 +122,7 @@ const SENSITIVITY = {
 function sensitivity() {
   const s = current(), choice = $('sensitivity-select').value, cases = SENSITIVITY[choice](s);
   if (state.scenarios.length + cases.length > 20) throw new Error('Remove scenarios first. The sensitivity set would exceed 20 scenarios.');
-  if (choice === 'solar' && s.facility === 'indoor') throw new Error('The indoor template has no direct solar transmission. Choose an envelope or crop sensitivity instead.');
+  if (choice === 'solar' && OPAQUE_FACILITIES.has(s.facility)) throw new Error(`The ${FACILITIES[s.facility]} template is opaque, so it has no direct solar transmission to vary. Choose an envelope or crop sensitivity instead.`);
   const variants = cases.map(([suffix, patch]) => {
     for (const [key, value] of Object.entries(patch)) {const field = fieldByKey.get(key); if (field && (value < field.min || value > field.max)) throw new Error(`${field.label} sensitivity (${format(value, 2)} ${field.unit}) exceeds the allowed ${field.min}–${field.max} range. Adjust the base assumption first.`);}
     return {...s, ...patch, id: uid(), name: `${s.name.slice(0, 75)} · ${suffix}`};
@@ -484,6 +484,8 @@ function renderRuntime(r) {
     row('Indirect evaporative stage', 'indirect', 'Hybrid secondary wet stream'),
     row('DX cooling', 'dx', `Peak ${format(s.peakCoolingKW, 1)} kW total cooling`),
     row('Condensing dehumidifier', 'dehu', `${format(s.condensateKg)} kg condensate`),
+    row('Shade screen', 'shadeScreen', finite(s.screens?.dliCostMol) ? `${format(s.screens.dliCostMol)} mol/m² of crop light given up while deployed` : 'Deployed hours; light cost not attributed'),
+    row('Thermal curtain', 'thermalScreen', finite(s.screens?.heatingSavedKWh) ? `${format(s.screens.heatingSavedKWh)} kWh of delivered heat saved against the same run with it open` : 'Deployed hours; heating saving not attributed'),
     row('Desiccant', 'desiccant', `${format(s.desiccantRemovedKg)} kg removed; ${format(s.regenerationKWh)} kWh regeneration`),
     row('Dry-neutral DOAS', 'doas', `${format(s.doasRemovedKg)} kg removed; ${format(s.doasKWh)} kWh`),
     row('Heating', 'heating', `${format(s.heatingKWh)} kWh delivered heat`),

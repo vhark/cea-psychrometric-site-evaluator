@@ -1,4 +1,5 @@
 import psychrolib from '../vendor/psychrolib.js';
+import {heatSourceState} from './screens.js';
 
 export const CP_DRY_AIR = 1006;
 export const LATENT_HEAT = 2450000; // Constant J/kg for the coarse zone energy convention.
@@ -150,6 +151,9 @@ export function classifyWeather(hour, scenario) {
 
 // Outdoor air as the dehumidifier for one hour: removal potential at maximum ventilation and the fan plus
 // ventilation-air heating energy per kg of water, at scenario prices. Weather-side screen, not a dispatch.
+// The heating leg follows the scenario's heating source: fuel at its combustion efficiency, or a heat pump
+// at the COP interpolated for this hour's outdoor temperature. Below a declared compressor cutoff a
+// heat-pump plant cannot temper the incoming air at all, so the hour is not an outdoor-drying opportunity.
 export function outdoorDryingHour(hour, scenario, classification = classifyWeather(hour, scenario)) {
   const outside = weatherState(hour);
   if (!outside || !classification.valid || classification.dryingMarginKgKg < (scenario.dryingMarginKgKg ?? .0005)) return null;
@@ -158,7 +162,10 @@ export function outdoorDryingHour(hour, scenario, classification = classifyWeath
   const potentialKgH = flow * classification.dryingMarginKgKg * 3600;
   const heatW = outside.tempC < classification.heatingThresholdC ? flow * CP_DRY_AIR * (classification.targetC - outside.tempC) : 0;
   const fanW = scenario.fanWPerM3s * m3s;
-  const energyKWh = fanW / 1000 + heatW / 1000 / scenario.heaterEfficiency;
-  const cost = fanW / 1000 * scenario.electricityPrice + heatW / 1000 / scenario.heaterEfficiency * scenario.fuelPrice;
+  const heat = heatSourceState(scenario, outside.tempC);
+  if (heatW > 0 && heat.capacityW <= 0) return null;
+  const heatingKWh = heatW / 1000 / (heat.cop ?? scenario.heaterEfficiency);
+  const energyKWh = fanW / 1000 + heatingKWh;
+  const cost = fanW / 1000 * scenario.electricityPrice + heatingKWh * (heat.cop === null ? scenario.fuelPrice : scenario.electricityPrice);
   return {potentialKgH, energyKWh, cost, bucket: heatW > 0 ? 'coldDry' : outside.tempC > classification.maxTempC ? 'hotDry' : 'coolDry'};
 }

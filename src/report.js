@@ -84,7 +84,8 @@ const figure = (spec, caption) => `<figure>${chartSVG(spec)}<figcaption>${escape
   spec.empty ? '' : `${legendList(spec.legend)}${table(spec.table.head, spec.table.rows)}`}</figure>`;
 
 const RUNTIME_LABELS = [['pad', 'Evaporative pad'], ['indirect', 'Indirect evaporative'], ['dx', 'DX cooling'], ['dehu', 'Condensing dehumidifier'],
-  ['desiccant', 'Desiccant'], ['doas', 'Dry-neutral DOAS'], ['heating', 'Heating'], ['humidifier', 'Humidification'], ['light', 'Supplemental light']];
+  ['desiccant', 'Desiccant'], ['doas', 'Dry-neutral DOAS'], ['heating', 'Heating'], ['humidifier', 'Humidification'], ['light', 'Supplemental light'],
+  ['shadeScreen', 'Shade screen'], ['thermalScreen', 'Thermal curtain']];
 function runtimeRows(result) {
   const runtime = result.summary?.runtime || {};
   return RUNTIME_LABELS.filter(([key]) => runtime[key]?.hours > 0).map(([key, label]) => {

@@ -8,6 +8,8 @@
       "latitude": 36.15,
       "longitude": -95.99,
       "timezone": "America/Chicago",
+      "climate": "humid subtropical, the worked example",
+      "sourceElevationM": 249.54,
       "source": "NASA POWER",
       "years": [
         2016,
@@ -32,6 +34,90 @@
         "2023": "tulsa-2023.json",
         "2024": "tulsa-2024.json",
         "2025": "tulsa-2025.json"
+      }
+    },
+    {
+      "key": "phoenix",
+      "label": "Phoenix, AZ",
+      "zip": "85004",
+      "latitude": 33.4484,
+      "longitude": -112.074,
+      "timezone": "America/Phoenix",
+      "climate": "hot-dry",
+      "sourceElevationM": 494.49,
+      "source": "NASA POWER",
+      "years": [
+        2023,
+        2024,
+        2025
+      ],
+      "files": {
+        "2023": "phoenix-2023.json",
+        "2024": "phoenix-2024.json",
+        "2025": "phoenix-2025.json"
+      }
+    },
+    {
+      "key": "miami",
+      "label": "Miami, FL",
+      "zip": "33101",
+      "latitude": 25.7743,
+      "longitude": -80.1937,
+      "timezone": "America/New_York",
+      "climate": "hot-humid",
+      "sourceElevationM": 2.81,
+      "source": "NASA POWER",
+      "years": [
+        2023,
+        2024,
+        2025
+      ],
+      "files": {
+        "2023": "miami-2023.json",
+        "2024": "miami-2024.json",
+        "2025": "miami-2025.json"
+      }
+    },
+    {
+      "key": "denver",
+      "label": "Denver, CO",
+      "zip": "80202",
+      "latitude": 39.7392,
+      "longitude": -104.9903,
+      "timezone": "America/Denver",
+      "climate": "cold-dry at altitude",
+      "sourceElevationM": 2094.96,
+      "source": "NASA POWER",
+      "years": [
+        2023,
+        2024,
+        2025
+      ],
+      "files": {
+        "2023": "denver-2023.json",
+        "2024": "denver-2024.json",
+        "2025": "denver-2025.json"
+      }
+    },
+    {
+      "key": "seattle",
+      "label": "Seattle, WA",
+      "zip": "98104",
+      "latitude": 47.6062,
+      "longitude": -122.3321,
+      "timezone": "America/Los_Angeles",
+      "climate": "cool-marine",
+      "sourceElevationM": 110.01,
+      "source": "NASA POWER",
+      "years": [
+        2023,
+        2024,
+        2025
+      ],
+      "files": {
+        "2023": "seattle-2023.json",
+        "2024": "seattle-2024.json",
+        "2025": "seattle-2025.json"
       }
     }
   ]

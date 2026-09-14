@@ -1,11 +1,13 @@
-import {MODEL_VERSION,backfillScenario} from './config.js';
+import {MODEL_VERSION,backfillScenario,FACILITY_TEMPLATES} from './config.js';
 import {CP_DRY_AIR as CP,LATENT_HEAT as L,clamp,humidityRatio,saturationHumidityRatio,saturationPressure,
   vaporPressure,relativeHumidity,dewPoint,airVPD,dryAirDensity,padState,weatherState,schedule,moistureBounds,classifyWeather,outdoorDryingHour,
-  stanghelliniTranspiration,canopyAbsorbedWm2} from './physics.js';
+  stanghelliniTranspiration,canopyAbsorbedWm2,localClock} from './physics.js';
+import {resolveShadeScreen,resolveThermalScreen,shadeDeployed,thermalDeployed,heatSourceState,heatPumpConfigured,
+  componentWarnings,componentAssumptions} from './screens.js';
 import {summarizeHours,weatherSummary} from './metrics.js';
 
 const HOUR=3600000,KWH=3600000;
-const TOTALS=['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','solarDLI','lightDLI','heatingKWh','coolingKWh',
+const TOTALS=['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','solarDLI','lightDLI','heatingKWh','heatPumpElectricKWh','coolingKWh',
   'dehuKWh','dehuHeatKWh','unmetSensibleKWh','unmetMoistureKg','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh',
   'desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg',
   'cropWaterL','padWaterL','humidifierWaterL','tempDegreeHours','vpdKPaHours','doasKWh','doasRemovedKg'];
@@ -17,13 +19,17 @@ const SHR_GAINS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','
 // latent heat are constants, so the reduced energy inventory is C*T + L*M*W.
 // This is NOT a detailed psychrometric total-enthalpy zone model. Liquid sensible
 // heat, vapor heat capacity, crop heat storage and envelope wetting are omitted.
-function coefficients(state,outside,s,air,dt) {
+// The envelope conductance, the leakage rate and the ventilation ceiling come from the substep context, not
+// straight from the scenario: a closed thermal curtain multiplies the envelope loss and, where the user has
+// declared a closed-state exchange, caps the outside-air path that carries moisture out of the zone.
+function coefficients(ctx,air) {
+  const {state,outside,s,dt}=ctx;
   const volume=s.areaM2*s.heightM;
-  const leak=dryAirDensity(outside.tempC,outside.w,outside.pressurePa)*volume*s.infiltrationACH/3600;
+  const leak=dryAirDensity(outside.tempC,outside.w,outside.pressurePa)*volume*ctx.infiltrationACH/3600;
   const flow=dryAirDensity(air.tempC,air.w,outside.pressurePa)*volume*air.ach/3600;
   const doasFlow=air.doasDuty>0?dryAirDensity(air.doasTempC,air.doasW,outside.pressurePa)*s.doasM3s*air.doasDuty:0;
   const massFlow=leak+flow+doasFlow;
-  const ua=s.areaM2*s.envelopeRatio*s.uValue;
+  const ua=ctx.ua;
   const conductance=ua+CP*massFlow;
   const massDecay=Math.exp(-massFlow*dt/state.mass);
   const massGain=massFlow>0?-Math.expm1(-massFlow*dt/state.mass)/massFlow:dt/state.mass;
@@ -55,19 +61,30 @@ function duties(available,estimated) {
   return [...new Set([0,clamp(estimated,0,1),.5,1].map(x=>Math.round(x*1000000)/1000000))];
 }
 
-// Per-hour outdoor-dependent quantities shared by both controllers.
-function hourContext(outside,s) {
+// Per-hour outdoor-dependent quantities shared by both controllers, including this hour's heating source:
+// a fuel heater delivers its full rating, a heat pump delivers a derated capacity at an interpolated COP,
+// and a locked-out heat pump delivers nothing at all.
+function hourContext(outside,s,shade,thermal) {
   const pad=outside.tempC>2?padState(outside.tempC,outside.w,outside.pressurePa,s.padEffectiveness):null;
-  return {outside,s,pad,indirectTempC:pad?outside.tempC-s.hybridEvapEffectiveness*(outside.tempC-pad.wetBulbC):null,
+  const heat=heatSourceState(s,outside.tempC);
+  return {outside,s,pad,shade,thermal,indirectTempC:pad?outside.tempC-s.hybridEvapEffectiveness*(outside.tempC-pad.wetBulbC):null,
     dryFloor:humidityRatio(0,.05,outside.pressurePa),coilFloorW:saturationHumidityRatio(7,outside.pressurePa),
     dxOutdoorOK:outside.tempC>=s.coolingMinOutdoorC&&outside.tempC<=s.coolingMaxOutdoorC,
+    heatCapacityW:heat.capacityW,heatCOP:heat.cop,heatMode:heat.mode,uaOpen:s.areaM2*s.envelopeRatio*s.uValue,
     doasTempC:s.doasSupplyTempC,doasW:Math.min(outside.w,saturationHumidityRatio(s.doasSupplyDewPointC,outside.pressurePa))};
 }
-// Per-substep context: indoor-state-dependent device availability.
-function substepContext(hour,state,forcing,target,dt) {
+// Per-substep context: indoor-state-dependent device availability, plus the envelope and outside-air path
+// implied by the thermal curtain's position in this substep.
+function substepContext(hour,state,forcing,target,dt,thermalClosed) {
   const s=hour.s;
   const dxAvailable=hour.dxOutdoorOK&&state.tempC>=10?s.coolingKW*1000:0;
+  // A declared closed-state exchange caps the whole outside-air path: uncontrolled leakage first, then
+  // whatever ventilation the cap still allows. With no declared value nothing is restricted.
+  const cap=thermalClosed?hour.thermal.closedExchangeACH:null;
+  const infiltrationACH=cap===null?s.infiltrationACH:Math.min(s.infiltrationACH,cap);
   return {...hour,state,forcing,target,dt,dxAvailable,dxMoisture:dxAvailable*(1-s.coolingSHR)/L,dxSense:dxAvailable*s.coolingSHR,
+    thermalClosed,ua:thermalClosed?hour.uaOpen*hour.thermal.uValueFactor:hour.uaOpen,
+    infiltrationACH,ventCapACH:cap===null?null:Math.max(0,cap-infiltrationACH),
     dehuAvailable:state.tempC>=10&&state.tempC<=40?s.dehuKgH/3600:0,desiccantAvailable:state.tempC>=2&&state.tempC<=50?s.desiccantKgH/3600:0};
 }
 function airOption(ctx,ach,kind,doasDuty) {
@@ -75,6 +92,8 @@ function airOption(ctx,ach,kind,doasDuty) {
   const tempC=kind==='pad'?pad.tempC:kind==='indirect'?ctx.indirectTempC:outside.tempC;
   return {ach,tempC,w:kind==='pad'?pad.w:outside.w,pad:kind==='pad',indirect:kind==='indirect',doasDuty,doasTempC:ctx.doasTempC,doasW:ctx.doasW};
 }
+// A shut curtain with a declared gap exchange cannot pass the airflow the ladder asked for.
+const cappedAir=(ctx,air)=>ctx.ventCapACH===null||air.ach<=ctx.ventCapACH?air:{...air,ach:ctx.ventCapACH};
 function airOptions(ctx) {
   const {s,pad}=ctx;
   const levels=[...new Set([s.minVentACH,(s.minVentACH+s.maxVentACH)/2,s.maxVentACH])];
@@ -91,9 +110,10 @@ function airOptions(ctx) {
 // One fully specified control action integrated over a substep. `plan.humidifier` and `plan.heat`
 // decide the humidifier rate and heating demand (the ideal dispatcher anticipates the end state,
 // the staged controller acts on the measured state). Returns null for an unsaturable candidate.
-function evaluate(ctx,air,dxDuty,dehuDuty,desiccantDuty,plan) {
+function evaluate(ctx,rawAir,dxDuty,dehuDuty,desiccantDuty,plan) {
   const {state,outside,s,forcing,target,dt}=ctx;
-  const k=coefficients(state,outside,s,air,dt);
+  const air=cappedAir(ctx,rawAir);
+  const k=coefficients(ctx,air);
   const fanW=s.fanWPerM3s*(s.areaM2*s.heightM*air.ach/3600+s.doasM3s*air.doasDuty);
   const pumpW=(air.pad||air.indirect)?s.padPumpW:0;
   const qBase=forcing.solarW+forcing.lightW+s.cropSensibleWm2*s.canopyM2-L*forcing.cropKgS+fanW;
@@ -124,7 +144,9 @@ function evaluate(ctx,air,dxDuty,dehuDuty,desiccantDuty,plan) {
   const humidifier=plan.humidifier(unheated,unhumidifiedW,k,recoverable);
   const heatNeed=Math.max(0,plan.heat(unheated-k.heatGain*L*humidifier,k,recoverable));
   const reheatW=Math.min(recoverable,heatNeed);
-  const heaterW=Math.min(s.heaterKW*1000,heatNeed-reheatW);
+  // Finite delivered heat: the fuel heater's rating, or the heat pump's derated capacity at this outdoor
+  // temperature, which is zero below its declared cutoff. Nothing backfills a locked-out heat pump.
+  const heaterW=Math.min(ctx.heatCapacityW,heatNeed-reheatW);
   const q=qBase+equipmentQ-L*humidifier+reheatW+heaterW;
   const rawT=k.heatDecay*state.tempC+k.heatGain*(k.heatSource+q);
   const rawW=baselineW+k.massGain*(humidifier-removal);
@@ -143,8 +165,11 @@ function evaluate(ctx,air,dxDuty,dehuDuty,desiccantDuty,plan) {
   // declared kWh per kg removed from that outdoor air. Supply tempering is assumed inside that figure.
   const doasKgS=k.doasFlow*Math.max(0,outside.w-air.doasW);
   const doasW=doasKgS*s.doasKWhPerKg*KWH;
-  const electricW=forcing.lightW+fanW+pumpW+dxW+dehuW+regenElectricW+doasW;
-  const fuelW=heaterW/s.heaterEfficiency+regenFuelW;
+  // A heat pump buys delivered heat as electricity at the interpolated COP; a fuel heater books it to fuel
+  // at its combustion efficiency. Exactly one branch is charged for the same delivered heaterW.
+  const heaterElectricW=ctx.heatCOP!==null?heaterW/ctx.heatCOP:0;
+  const electricW=forcing.lightW+fanW+pumpW+dxW+dehuW+regenElectricW+doasW+heaterElectricW;
+  const fuelW=(ctx.heatCOP!==null?0:heaterW/s.heaterEfficiency)+regenFuelW;
   const waterKgS=forcing.cropKgS+humidifier+padKgS+indirectKgS;
   const costRate=electricW/1000*s.electricityPrice+fuelW/1000*s.fuelPrice+waterKgS*3600*s.waterPrice;
   // Unmet load = extra steady capacity (W, kg/s) needed to hold the violated bound
@@ -156,7 +181,7 @@ function evaluate(ctx,air,dxDuty,dehuDuty,desiccantDuty,plan) {
   const unmetMoistureKgS=final.w>b.maxW?Math.max(0,moistureRate-b.maxW*holdW):final.w<b.minW?Math.max(0,b.minW*holdW-moistureRate):0;
   return {...final,k,air,rawT,rawW,q,moistureSource:forcing.cropKgS+humidifier-removal,violation,costRate,temperatureMiss,moistureMiss,
     fanW,pumpW,dxDuty,dehuDuty,desiccantDuty,dxKgS,dehuKgS,desiccantKgS,dxSensibleW,dxTotalW,dxW,dehuW,dehuHeatW,sorptionW,
-    regenW,regenElectricW,regenFuelW,reheatW,heaterW,electricW,fuelW,waterKgS,padKgS:padKgS+indirectKgS,humidifier,doasKgS,doasW,
+    regenW,regenElectricW,regenFuelW,reheatW,heaterW,heaterElectricW,electricW,fuelW,waterKgS,padKgS:padKgS+indirectKgS,humidifier,doasKgS,doasW,
     rejectedW:dxTotalW+dxW-reheatW,desiccantExportedW:L*desiccantKgS*(1-s.desiccantHeatFraction)+regenW,
     unmetSensibleW,unmetMoistureKgS};
 }
@@ -168,8 +193,9 @@ function chooseIdeal(ctx,options) {
   let best=null;
   const noHumidifier=()=>0;
   const heat=(unheatedT,k)=>(target.minTempC+.03-unheatedT)/k.heatGain;
-  for(const air of options){
-    const k=coefficients(state,outside,s,air,ctx.dt);
+  for(const option of options){
+    const air=cappedAir(ctx,option);
+    const k=coefficients(ctx,air);
     const baselineW=k.massDecay*state.w+k.massGain*(k.wetSource+ctx.forcing.cropKgS);
     const qBase=ctx.forcing.solarW+ctx.forcing.lightW+s.cropSensibleWm2*s.canopyM2-L*ctx.forcing.cropKgS+s.fanWPerM3s*(s.areaM2*s.heightM*air.ach/3600+s.doasM3s*air.doasDuty);
     const baselineT=k.heatDecay*state.tempC+k.heatGain*(k.heatSource+qBase);
@@ -184,7 +210,7 @@ function chooseIdeal(ctx,options) {
     const dehuDuties=duties(ctx.dehuAvailable,removalDemand/ctx.dehuAvailable);
     const desiccantDuties=duties(ctx.desiccantAvailable,removalDemand/ctx.desiccantAvailable);
     const anticipating=(unheatedT,unhumidifiedW,k,recoverable)=>{
-      const anticipatedT=Math.max(unheatedT,Math.min(target.minTempC+.03,unheatedT+k.heatGain*(s.heaterKW*1000+recoverable)));
+      const anticipatedT=Math.max(unheatedT,Math.min(target.minTempC+.03,unheatedT+k.heatGain*(ctx.heatCapacityW+recoverable)));
       const b=moistureBounds(anticipatedT,outside.pressurePa,s);
       return Math.min(s.humidifierKgH/3600,Math.max(0,(b.minW-unhumidifiedW)/k.massGain));
     };
@@ -256,13 +282,14 @@ function chooseStaged(ctx,c) {
   stepLadder(c.cool,e,helpsCool,ctx.dt);
   let coolVent=0,indirect=false,padOn=false,dxCool=0;
   for(const r of c.cool.rungs)if(r.on){if(r.device==='vent')coolVent=r.stage;else if(r.device==='indirect')indirect=true;else if(r.device==='pad')padOn=true;else dxCool=r.stage;}
-  // Heating-limited moisture ventilation: a stage is usable only if the heater plus current gains can
-  // carry the envelope and ventilation loss to the heating setpoint at that airflow.
-  const heatCapW=s.heaterKW*1000+forcing.solarW+forcing.lightW,ua=s.areaM2*s.envelopeRatio*s.uValue;
+  // Heating-limited moisture ventilation: a stage is usable only if the heating source plus current gains
+  // can carry the envelope and ventilation loss to the heating setpoint at that airflow. Both terms follow
+  // the current curtain position and the heat pump's derated capacity at this outdoor temperature.
+  const heatCapW=ctx.heatCapacityW+forcing.solarW+forcing.lightW,ua=ctx.ua;
   const helpsMoist=r=>{
     if(r.device==='vent'){
       if(r.stage<=coolVent||!drier(outside.w,r))return false;
-      const flow=dryAirDensity(outside.tempC,outside.w,outside.pressurePa)*s.areaM2*s.heightM*(ventLevel(r.stage)+s.infiltrationACH)/3600;
+      const flow=dryAirDensity(outside.tempC,outside.w,outside.pressurePa)*s.areaM2*s.heightM*(ventLevel(r.stage)+ctx.infiltrationACH)/3600;
       return (ua+CP*flow)*Math.max(0,heatSetC-outside.tempC)<=heatCapW;
     }
     return r.device==='doas'?drier(ctx.doasW,r):r.device==='dehu'?ctx.dehuAvailable>0:r.device==='desiccant'?ctx.desiccantAvailable>0:ctx.dxAvailable>0&&ctx.dxMoisture>0;
@@ -279,7 +306,7 @@ function chooseStaged(ctx,c) {
   const air=airOption(ctx,evap?s.maxVentACH:ventLevel(Math.max(coolVent,moistVent)),indirect?'indirect':padOn?'pad':'outside',doas/2);
   const plan={
     humidifier:(unheatedT,unhumidifiedW,k)=>c.humidifierOn?Math.min(s.humidifierKgH/3600,Math.max(0,(wMid+.5*half-state.w)/k.massGain)):0,
-    heat:(unheatedT,k,recoverable)=>clamp((heatSetC-state.tempC)/heatBand,0,1)*(s.heaterKW*1000+recoverable)};
+    heat:(unheatedT,k,recoverable)=>clamp((heatSetC-state.tempC)/heatBand,0,1)*(ctx.heatCapacityW+recoverable)};
   return evaluate(ctx,air,Math.max(dxCool,dxMoist)/2,dehu/2,desiccant/2,plan);
 }
 
@@ -326,12 +353,15 @@ function finishLoads(loads) {
   loads.shr=gains+latentKWh>0?gains/(gains+latentKWh):null;
 }
 
-export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress}={}) {
+// screenBaseline: run the paired screen-open reference runs that make summary.screens attributable. It is
+// set false inside those reference runs themselves, which is the only reason the option exists.
+export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,screenBaseline=true}={}) {
   if(!Number.isFinite(stepMinutes)||stepMinutes<=0||stepMinutes>5||Math.abs(60/stepMinutes-Math.round(60/stepMinutes))>1e-9)
     throw Error('Integration step must divide one hour and be at most five minutes.');
-  // Back-fill v0.2 keys here too: simulateScenario is the physics entry point and must not
+  // Back-fill v0.2 and 0.3 keys here too: simulateScenario is the physics entry point and must not
   // depend on the caller having validated first. Copy, then fill; never mutate the input.
   const s=backfillScenario({...scenario});
+  const shade=resolveShadeScreen(s.shadeScreen),thermal=resolveThermalScreen(s.thermalScreen);
   for(const t of [s.dayTargetC,s.nightTargetC])if(!moistureBounds(t,101325,s).feasible)throw Error('Temperature, VPD and dew-point targets have no joint moisture band.');
   const controlMode=s.controlMode==='ideal'?'ideal':'staged';
   const transpirationModel=s.transpirationModel==='schedule'?'schedule':'stanghellini';
@@ -358,6 +388,16 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress}={}
   ];
   if(s.desiccantKgH>0)warnings.push('Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.');
   if(s.doasM3s>0)warnings.push('Generic dry-neutral DOAS: outdoor air delivered at the declared supply temperature and the lower of outdoor or supply dew-point moisture; purchased electricity is the declared kWh per kg removed from outdoor air plus fan power, with supply tempering assumed inside that figure. DOAS air is outdoor air and counts against CO2 enrichment. Brand-agnostic assumption, not product data.');
+  warnings.push(...componentWarnings(s,shade,thermal,s.heatSource==='heatpump'&&!heatPumpConfigured(s)?'incomplete':'ok'));
+  // Envelope provenance follows the template the scenario still matches. Two of the ladder entries have no
+  // sourced PAR or total-shortwave transmission at all, so a run that keeps their placeholder optics says so.
+  const template=FACILITY_TEMPLATES[s.facility]||null;
+  const envelope={facility:s.facility,uValue:s.uValue,envelopeRatio:s.envelopeRatio,infiltrationACH:s.infiltrationACH,
+    parTransmission:s.parTransmission,solarTransmission:s.solarTransmission,
+    templateSource:template?.source??null,opticalBasis:template?.opticalBasis??'user-declared',
+    matchesTemplate:template?['uValue','parTransmission','solarTransmission','infiltrationACH'].every(key=>s[key]===template[key]):false};
+  if(template?.opticalBasis==='placeholder'&&s.parTransmission===template.parTransmission&&s.solarTransmission===template.solarTransmission)
+    warnings.push(`PAR and total-shortwave transmission for the ${s.facility} envelope are UNSOURCED in the component evidence: this run carries the tool's generic 0.65 placeholder, which is not a property of that glazing. Vendor luminous transmission and SHGC are different quantities and were not substituted. Replace both with measured values before reading any light or solar-gain figure as a glazing result.`);
   let state=null,controller=null,lightDate=null,accumulatedDLI=0,gapCount=0;
   for(let index=0;index<input.length;index++) {
     const weather=input[index],outside=weatherState(weather,needsSolar),classification=classifyWeather(weather,s);
@@ -378,16 +418,24 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress}={}
       controller=controlMode==='staged'?stagedController(s):null;
     }
     let compliant=0,maxEnergyResidual=0,maxMoistureResidual=0,failed=false;
-    const modeCounts={},controls={ventACH:0,padFraction:0,indirectFraction:0,dxDuty:0,dehuDuty:0,desiccantDuty:0,doasDuty:0,heaterDuty:0,humidifierFraction:0,lightFraction:0,enrichmentFraction:0};
+    const modeCounts={},controls={ventACH:0,padFraction:0,indirectFraction:0,dxDuty:0,dehuDuty:0,desiccantDuty:0,doasDuty:0,heaterDuty:0,humidifierFraction:0,lightFraction:0,enrichmentFraction:0,shadeFraction:0,thermalScreenFraction:0};
     const loads=emptyLoads(),startTempC=state.tempC,startW=state.w;
     const dayContributions=new Map();
-    const hour=hourContext(outside,s);
+    const hour=hourContext(outside,s,shade,thermal);
     const options=controlMode==='ideal'?airOptions(hour):null;
     for(let sub=0;sub<nSteps;sub++) {
       const target=schedule(weather.time+(sub+.5)*dt*1000,s);
       if(lightDate!==target.date){lightDate=target.date;accumulatedDLI=0;}
       const irradiance=needsSolar?weather.ghiWm2:0;
-      const solarPPFD=irradiance*2.02*s.parTransmission*(1-s.shadeFraction)*canopySunShare;
+      // Screen positions are decided on the measured hour and the causal accumulated-DLI state, before any
+      // of this substep's own photons are counted. A shut shade screen multiplies crop photons and sensible
+      // solar gain by its own two multipliers, which are equal unless the user supplied product spectra.
+      const shadeOn=shadeDeployed(shade,irradiance,outside.tempC,Math.max(0,s.dliTarget-accumulatedDLI));
+      const thermalOn=thermalDeployed(thermal,outside.tempC,target.isDay);
+      const parMultiplier=(shadeOn?shade.parMultiplier:1)*(thermalOn?thermal.parMultiplier:1);
+      const solarMultiplier=(shadeOn?shade.solarMultiplier:1)*(thermalOn?thermal.solarMultiplier:1);
+      const transmittedWm2=irradiance*s.solarTransmission*(1-s.shadeFraction)*solarMultiplier;
+      const solarPPFD=irradiance*2.02*s.parTransmission*(1-s.shadeFraction)*parMultiplier*canopySunShare;
       const solarDLI=solarPPFD*dt/1e6;
       // Use only remaining time in this civil day, including crossing-midnight programs.
       const remaining=target.isDay?Math.max(dt/3600,Math.min(target.remainingLitHours,24-target.hour)+dt/7200):0;
@@ -399,10 +447,10 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress}={}
       // canopy (solar through the envelope plus delivered fixture power, Beer-Lambert), or the declared schedule.
       const cropKgS=transpirationModel==='stanghellini'?
         s.canopyM2*stanghelliniTranspiration(state.tempC,state.w,outside.pressurePa,
-          canopyAbsorbedWm2(irradiance*s.solarTransmission*(1-s.shadeFraction)*canopySunShare+(s.canopyM2>0?lightW/s.canopyM2:0)*s.lightDelivery,s.lai),s.lai):
+          canopyAbsorbedWm2(transmittedWm2*canopySunShare+(s.canopyM2>0?lightW/s.canopyM2:0)*s.lightDelivery,s.lai),s.lai):
         target.cropKgS;
-      const forcing={solarW:irradiance*s.areaM2*s.solarTransmission*(1-s.shadeFraction)*s.solarHeatFraction,lightW,cropKgS};
-      const ctx=substepContext(hour,state,forcing,target,dt);
+      const forcing={solarW:transmittedWm2*s.areaM2*s.solarHeatFraction,lightW,cropKgS};
+      const ctx=substepContext(hour,state,forcing,target,dt,thermalOn);
       const picked=controller?chooseStaged(ctx,controller):chooseIdeal(ctx,options);
       if(!picked){failed=true;break;}
       const k=picked.k;
@@ -420,7 +468,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress}={}
       const scale=dt/KWH;
       row.electricKWh+=picked.electricW*scale;row.fuelKWh+=picked.fuelW*scale;row.waterL+=picked.waterKgS*dt;
       row.lightKWh+=lightW*scale;row.solarDLI+=solarDLI;row.lightDLI+=lightDLI;
-      row.heatingKWh+=picked.heaterW*scale;row.coolingKWh+=picked.dxTotalW*scale;
+      row.heatingKWh+=picked.heaterW*scale;row.heatPumpElectricKWh+=picked.heaterElectricW*scale;row.coolingKWh+=picked.dxTotalW*scale;
       row.dehuKWh+=picked.dehuW*scale;row.dehuHeatKWh+=picked.dehuHeatW*scale;
       row.regenerationKWh+=picked.regenW*scale;row.regenerationElectricKWh+=picked.regenElectricW*scale;row.regenerationFuelKWh+=picked.regenFuelW*scale;
       row.desiccantRemovedKg+=picked.desiccantKgS*dt;row.desiccantHeatKWh+=picked.sorptionW*scale;
@@ -436,6 +484,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress}={}
       controls.dxDuty+=picked.dxDuty/nSteps;controls.dehuDuty+=picked.dehuDuty/nSteps;controls.desiccantDuty+=picked.desiccantDuty/nSteps;controls.doasDuty+=picked.air.doasDuty/nSteps;
       controls.heaterDuty+=(s.heaterKW>0?picked.heaterW/(s.heaterKW*1000):0)/nSteps;controls.humidifierFraction+=(picked.humidifier>0?1:0)/nSteps;controls.lightFraction+=(forcing.lightW>0?1:0)/nSteps;
       controls.enrichmentFraction+=(picked.air.ach<=s.minVentACH+1e-9&&!picked.air.pad&&!picked.air.indirect&&picked.air.doasDuty===0?1:0)/nSteps;
+      controls.shadeFraction+=(shadeOn?1:0)/nSteps;controls.thermalScreenFraction+=(thermalOn?1:0)/nSteps;
       const mode=picked.dxTotalW>0?'DX_COOL_DEHUMIDIFY':picked.desiccantKgS>0?'DESICCANT_REGENERATION':picked.dehuKgS>0?'CONDENSING_DEHUMIDIFY':picked.doasKgS>0?'DOAS_DEHUMIDIFY':
         picked.heaterW>0?'HEATING':picked.air.indirect?'INDIRECT_EVAP_COOL':picked.air.pad?'PAD_COOLING':picked.humidifier>0?'HUMIDIFY':picked.air.ach>s.minVentACH?'VENTILATION':'MINIMUM_AIR';
       modeCounts[mode]=(modeCounts[mode]||0)+1;
@@ -468,12 +517,43 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress}={}
   if(gapCount)warnings.push(`${gapCount} missing/invalid weather hours break continuous operation. Each subsequent segment restarts with an excluded warm-up hour. Incomplete local days do not enter DLI deficit-day counts.`);
   const summary=summarizeHours(hours,s);
   summary.controlModeUsed=controlMode;summary.transpirationModelUsed=transpirationModel;
+  // metrics.js aggregates a fixed field list, so the component totals are accumulated here from the same rows.
+  const total=field=>hours.reduce((sum,h)=>sum+(h.valid&&Number.isFinite(h[field])?h[field]:0),0);
+  const runtimeOf=field=>{
+    const days=new Set();let runHours=0,equivalentHours=0;
+    for(const h of hours){const duty=h.valid&&h.controls?h.controls[field]||0:0;
+      if(duty>1e-9){runHours++;equivalentHours+=duty;days.add(localClock(h.time,s.timezone).date);}}
+    return {hours:runHours,equivalentHours,days:days.size};
+  };
+  summary.heatPumpElectricKWh=total('heatPumpElectricKWh');
+  summary.runtime.shadeScreen=runtimeOf('shadeFraction');
+  summary.runtime.thermalScreen=runtimeOf('thermalScreenFraction');
+  // Attribution by differencing against the same weather, controller and crop with that one screen forced
+  // open. It is the only honest way to separate "light the shade cost" from "light the weather did not give"
+  // and "heat the curtain saved" from "heat this winter did not need", because both screens change the whole
+  // trajectory. The reference runs are skipped when a caller opts out, and the figures are then null.
+  const screens={shadeHours:summary.runtime.shadeScreen.hours,shadeDays:summary.runtime.shadeScreen.days,
+    thermalHours:summary.runtime.thermalScreen.hours,thermalDays:summary.runtime.thermalScreen.days,
+    dliCostMol:shade.installed?null:0,heatingSavedKWh:thermal.installed?null:0,
+    basis:'Differenced against an otherwise identical run with that screen forced open.'};
+  if(screenBaseline&&shade.installed){
+    const open=simulateScenario({...s,shadeScreen:{...s.shadeScreen,installed:false}},snapshot,{stepMinutes,screenBaseline:false});
+    screens.dliCostMol=open.hours.reduce((sum,h)=>sum+(h.valid?h.solarDLI:0),0)-total('solarDLI');
+  }
+  if(screenBaseline&&thermal.installed){
+    const open=simulateScenario({...s,thermalScreen:{...s.thermalScreen,installed:false}},snapshot,{stepMinutes,screenBaseline:false});
+    screens.heatingSavedKWh=open.summary.heatingKWh-summary.heatingKWh;
+  }
+  if(!screenBaseline&&(shade.installed||thermal.installed))screens.basis='Screen-open reference runs were not executed for this run, so the attributed light cost and heating saving are null.';
+  summary.screens=screens;
   if(summary.numericalFailureHours)warnings.push(`${summary.numericalFailureHours} numerical/physical domain failures: favorable economic ranking is prohibited.`);
   return {scenario:s,hours,summary,weatherSummary:weatherSummary(hours,s),warnings,modelVersion:MODEL_VERSION,controlModeUsed:controlMode,transpirationModelUsed:transpirationModel,
     assumptions:{evidenceTier:'Assumption-based component screening',stepMinutes,warmupHoursPerSegment:1,lightSolarConversionUmolJ:2.02,
       controlModeUsed:controlMode,transpirationModelUsed:transpirationModel,
       canopyTemperature:transpirationModel==='stanghellini'?'Equal to zone air temperature (declared simplification, no leaf energy balance).':null,
       leafAreaIndex:transpirationModel==='stanghellini'?s.lai:null,
+      ...componentAssumptions(s,shade,thermal),envelope,
+      screenAttribution:screens.basis,
       cpJkgK:CP,latentHeatJkg:L,psychrolibVersion:'2.5.0',psychrolibCommit:'a42717d24ed08534642d6caf7dcbbf72b9510bea'}};
 }
 

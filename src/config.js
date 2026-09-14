@@ -1,3 +1,5 @@
+import {SHADE_SCREEN_DEFAULT,THERMAL_SCREEN_DEFAULT,HEAT_PUMP_DEFAULTS,HEAT_PUMP_RATING_FIELDS,
+  backfillShadeScreen,backfillThermalScreen,shadeScreenErrors,thermalScreenErrors,heatSourceErrors} from './screens.js';
 export const MODEL_VERSION = '0.2.0-screening';
 // lai: leaf area index (m² leaf / m² canopy) for the Stanghellini transpiration model; screening assumptions, not measured canopies.
 export const CROPS = {
@@ -13,7 +15,47 @@ export const CROPS = {
 };
 export const CONTROL_MODES = {staged:'Staged causal controller (deadband, minimum on/off, ordered stages)',ideal:'Ideal modulation upper bound (enumerating dispatcher)'};
 export const TRANSPIRATION_MODELS = {stanghellini:'Stanghellini (Vanthoor 2011 §8.9), state-coupled',schedule:'Declared L/m²/day schedule'};
-export const FACILITIES = {greenhouse:'Vented greenhouse',hybrid:'Hybrid greenhouse',indoor:'Indoor farm'};
+// Facility templates. The ladder keys carry envelope values from docs/COMPONENT-PARAMETERS.md, each with the
+// source string in FACILITY_TEMPLATES. The three original keys keep the exact numbers they shipped with, so
+// every saved scenario and every example file still resolves and still reproduces its published result.
+export const FACILITIES = {
+ greenhouse:'Vented greenhouse (generic)',
+ greenhouseBasic:'Greenhouse, single polyethylene',
+ greenhouseDouble:'Greenhouse, double inflated polyethylene',
+ greenhousePoly:'Greenhouse, 8 mm twin-wall polycarbonate',
+ greenhouseGlass:'Greenhouse, single glass',
+ hybrid:'Hybrid greenhouse',
+ warehouse:'Warehouse, uninsulated',
+ warehouseSip:'Warehouse, EPS SIP',
+ indoor:'Indoor farm'
+};
+// Opaque templates define zero direct crop transmission. That is a scenario definition, not a measured wall
+// absorptance: roof and wall solar absorption with inward conduction is not modeled, so outdoor solar loading
+// on an opaque envelope is absent from these runs.
+export const OPAQUE_FACILITIES = new Set(['indoor','warehouse','warehouseSip']);
+const GENERIC_ENVELOPE_SOURCE='Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.';
+const UNSOURCED_OPTICS='PAR and total-shortwave transmission are UNSOURCED for this glazing, so the tool\'s generic 0.65 screening value is carried as an explicit placeholder. Vendor luminous transmission and SHGC are not substituted for either quantity.';
+// envelopeRatio 1.685 is UGA's published single-house worked example, 500.8 m2 envelope over 297.3 m2 floor
+// [S2, S4]. It is a stand-alone gable house, not a typical gutter-connected ratio. Warehouse entries instead
+// derive the ratio from the template's own dimensions with the flat-roof identity in section 3.4.
+export const FACILITY_TEMPLATES = {
+ greenhouse:{uValue:4,parTransmission:.65,solarTransmission:.65,infiltrationACH:.3,envelopeRatio:1.8,opticalBasis:'generic screening default, retained',source:GENERIC_ENVELOPE_SOURCE},
+ greenhouseBasic:{uValue:6.84,parTransmission:.88,solarTransmission:.88,infiltrationACH:1,envelopeRatio:1.685,opticalBasis:'sourced PAR, shortwave set equal to it',
+  source:'U 6.84 W/m2K from UGA overall customary R 0.83 [S2, S4]. PAR 0.88 is the low end of the 0.88 to 0.91 UV-stabilized film range [S13]. Total-shortwave transmission is UNSOURCED and is set equal to the sourced PAR fraction as a declared screening assumption. Single-film ACH is UNSOURCED; 1.0 is the upper end of the new double-film range [S2] used as an explicit proxy.'},
+ greenhouseDouble:{uValue:3.97,parTransmission:.77,solarTransmission:.77,infiltrationACH:.5,envelopeRatio:1.685,opticalBasis:'derived two-layer assumption',
+  source:'U 3.97 W/m2K from UGA overall customary R 1.43 [S2, S4]. ACH 0.5 is the low end of the 0.5 to 1.0 new double-film range [S2]. Matched-pair optical values are UNSOURCED: 0.77 is two 0.88 UV-stabilized films squared [S13], a declared two-layer assumption and not a measured assembly.'},
+ greenhousePoly:{uValue:3.3,parTransmission:.65,solarTransmission:.65,infiltrationACH:.5,envelopeRatio:1.685,opticalBasis:'placeholder',
+  source:`U 3.3 W/m2K for clear 8 mm twin-wall polycarbonate, Palram SUNLITE vendor data with no stated tolerance [S14]. ${UNSOURCED_OPTICS} Polycarbonate-specific ACH is UNSOURCED; 0.5 is transferred from the new double-film range [S2].`},
+ greenhouseGlass:{uValue:6.24,parTransmission:.65,solarTransmission:.65,infiltrationACH:.75,envelopeRatio:1.685,opticalBasis:'placeholder',
+  source:`U 6.24 W/m2K from UGA single-glass overall customary R 0.91 [S2, S4], a generic assembly rather than a rated product. ACH 0.75 is the low end of the 0.75 to 1.0 new glass construction range [S2]. ${UNSOURCED_OPTICS}`},
+ warehouse:{uValue:4.54,parTransmission:0,solarTransmission:0,infiltrationACH:1.7,maxVentACH:2,envelopeFromGeometry:true,opticalBasis:'opaque by definition',
+  source:'Whole metal-envelope U is UNSOURCED: 4.54 W/m2K is UGA\'s 152.4 mm poured concrete wall, customary R 1.25, used as an explicit uninsulated tilt-up proxy [S2, S4] and not a whole-building value. ACH 1.7 is NYSERDA\'s leakiest no-air-barrier small commercial example converted with its own N-factor of 18 [S18], adjacent-building evidence rather than a warehouse class value.'},
+ warehouseSip:{uValue:.27,parTransmission:0,solarTransmission:0,infiltrationACH:.4,maxVentACH:2,envelopeFromGeometry:true,opticalBasis:'opaque by definition',
+  source:'Panel U 0.270 W/m2K from the SIPA nominal 165.1 mm EPS panel at customary R 21, R 3.70 m2K/W [S19, S4]. That is an industry-association calculated panel rating: connections, doors, roof, framing, penetrations and slab can worsen the assembly. Installed warehouse natural infiltration is UNSOURCED; 0.4 is NYSERDA\'s median converted natural rate for 26 mostly small commercial buildings [S18].'},
+ hybrid:{uValue:4,parTransmission:.65,solarTransmission:.65,infiltrationACH:.3,envelopeRatio:1.8,opticalBasis:'generic screening default, retained',source:GENERIC_ENVELOPE_SOURCE},
+ indoor:{uValue:.3,parTransmission:0,solarTransmission:0,infiltrationACH:.3,envelopeRatio:1.8,maxVentACH:2,opticalBasis:'opaque by definition',source:GENERIC_ENVELOPE_SOURCE}
+};
+const ENVELOPE_KEYS=['uValue','parTransmission','solarTransmission','infiltrationACH','envelopeRatio','maxVentACH'];
 // Cultivation systems propose a default canopy area from the floor area. Racks stack trays, so their
 // canopy exceeds the footprint; the factors are stated in makeScenario and every value stays editable.
 // Harvest walls are not offered: their canopy-per-floor factor came from one proprietary fixture layout
@@ -33,6 +75,10 @@ export const DEFAULT_SCENARIO = {
  vpdMin:.6,vpdMax:1,maxDewPointC:19,dliTarget:14,transpirationLDayM2:1.3*9/7,darkTranspirationFraction:.15,cropSensibleWm2:0,
  controlMode:'staged',transpirationModel:'stanghellini',lai:3,doasM3s:0,doasSupplyDewPointC:8,doasSupplyTempC:21,doasKWhPerKg:.5,
  electricityPrice:.12,fuelPrice:.045,waterPrice:.002,installedCost:15000,maintenanceYear:500,lifeYears:15,discountRate:.06,
+ // Screens are not installed and heating is fuel-fired by default, so a scenario that omits every key added
+ // after schemaVersion 1 reproduces the earlier numbers exactly. The two nested objects are frozen: every
+ // consumer clones them through backfillScenario rather than sharing one mutable default.
+ ...HEAT_PUMP_DEFAULTS,shadeScreen:SHADE_SCREEN_DEFAULT,thermalScreen:THERMAL_SCREEN_DEFAULT,
  latitude:36.15,longitude:-95.99,timezone:'America/Chicago',zip:'74103',priceMode:'manual',sector:'commercial'
 };
 const f=(key,label,unit,min,max,step)=>({key,label,unit,min,max,step});
@@ -48,7 +94,15 @@ export const FIELDS = [
 export function makeScenario(facility='greenhouse',system='bench',crop='lettuce'){
  const s={...DEFAULT_SCENARIO,...(CROPS[crop]||CROPS.lettuce),id:globalThis.crypto?.randomUUID?.()||`scenario-${Date.now()}`,facility,system,crop};
  delete s.label;delete s.source;
- if(facility==='indoor')Object.assign(s,{solarTransmission:0,parTransmission:0,uValue:.3,maxVentACH:2,padEnabled:false,coolingKW:90,dehuKgH:40,technology:'dx',installedCost:80000,name:'Indoor DX + dehu'});
+ s.shadeScreen={...SHADE_SCREEN_DEFAULT};s.thermalScreen={...THERMAL_SCREEN_DEFAULT};
+ const envelope=FACILITY_TEMPLATES[facility];
+ if(envelope){
+  for(const key of ENVELOPE_KEYS)if(envelope[key]!==undefined)s[key]=envelope[key];
+  // Flat-roof rectangular identity from section 3.4 on the template's own square footprint. A universal
+  // typical envelope-to-floor ratio is UNSOURCED, so the geometry is computed rather than guessed.
+  if(envelope.envelopeFromGeometry)s.envelopeRatio=Math.round((1+4*s.heightM/Math.sqrt(s.areaM2))*1000)/1000;
+ }
+ if(OPAQUE_FACILITIES.has(facility))Object.assign(s,{padEnabled:false,coolingKW:90,dehuKgH:40,technology:'dx',installedCost:80000,name:`${FACILITIES[facility]} DX + dehu`});
  if(facility==='hybrid')Object.assign(s,{maxVentACH:15,coolingKW:80,dehuKgH:30,integratedHVAC:true,technology:'integrated',installedCost:90000,name:'Hybrid controlled greenhouse'});
  // Rack canopy from floor area: a 0.35 m² tray on a 0.7432 m² floor module, 2.4 tiers of usable height.
  // Mushroom rooms are dark, respiration-heated and ventilation-driven, so they also move the light,
@@ -71,10 +125,17 @@ export function applyTechnology(s,technology){
 // Keys added after schemaVersion 1 was first published. Missing ones are back-filled so older saved
 // scenarios keep importing; keys that existed in the first schema are never invented.
 const V02_KEYS=['controlMode','transpirationModel','lai','doasM3s','doasSupplyDewPointC','doasSupplyTempC','doasKWhPerKg'];
+// 0.3 component keys. Their defaults are inert: fuel heating and two uninstalled screens, so a scenario
+// written before they existed simulates exactly as it did. The nested screens are always rebuilt as fresh
+// objects, both to fill partially declared screens and to keep the frozen defaults unshared.
+const V03_KEYS=['heatSource',...HEAT_PUMP_RATING_FIELDS,'heatPumpCutoffC','heatPumpCapacityDerate'];
 export function backfillScenario(s){
  if(!s||typeof s!=='object')return s;
  const crop=CROPS[s.crop];
  for(const key of V02_KEYS)if(!Object.hasOwn(s,key))s[key]=(key==='lai'||key==='transpirationModel')&&crop&&Object.hasOwn(crop,key)?crop[key]:DEFAULT_SCENARIO[key];
+ for(const key of V03_KEYS)if(!Object.hasOwn(s,key))s[key]=DEFAULT_SCENARIO[key];
+ s.shadeScreen=backfillShadeScreen(s.shadeScreen);
+ s.thermalScreen=backfillThermalScreen(s.thermalScreen);
  return s;
 }
 export function validateScenario(s){
@@ -96,7 +157,8 @@ export function validateScenario(s){
  if(s.vpdMin>=s.vpdMax)errors.push('Minimum VPD must be below maximum VPD.');
  if(s.minVentACH>s.maxVentACH)errors.push('Minimum airflow exceeds installed maximum.');
  if(s.coolingMinOutdoorC>=s.coolingMaxOutdoorC)errors.push('DX outdoor operating range is inverted.');
- if(s.facility==='indoor'&&(s.parTransmission!==0||s.solarTransmission!==0))errors.push('Opaque indoor template requires zero direct solar/light transmission.');
+ if(OPAQUE_FACILITIES.has(s.facility)&&(s.parTransmission!==0||s.solarTransmission!==0))errors.push(`The ${FACILITIES[s.facility]} template is opaque by definition: direct solar and light transmission must be zero.`);
+ errors.push(...heatSourceErrors(s),...shadeScreenErrors(s.shadeScreen),...thermalScreenErrors(s.thermalScreen));
  if(!Number.isFinite(s.latitude)||Math.abs(s.latitude)>90||!Number.isFinite(s.longitude)||Math.abs(s.longitude)>180)errors.push('Invalid location coordinates.');
  try{if(typeof s.timezone!=='string'||!s.timezone.trim())throw new Error();new Intl.DateTimeFormat('en',{timeZone:s.timezone});}catch{errors.push('Invalid IANA time zone.');}
  if(typeof s.name!=='string'||!s.name.trim()||s.name.length>120)errors.push('Scenario name must contain 1 to 120 characters.');
