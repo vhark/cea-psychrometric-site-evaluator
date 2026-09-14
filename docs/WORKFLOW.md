@@ -39,7 +39,7 @@ Retrieval failures never generate substitute weather. A partially observed perio
 
 Choose facility (greenhouse, hybrid, indoor), cultivation system (greenhouse benches) and crop, then edit floor and canopy geometry, envelope, moisture, light and DLI, target bands, capacities, efficiencies and costs. Every default is a labeled assumption with a stated source. Inputs are SI, with live °F, ft and ft² equivalents shown on the corresponding fields.
 
-Terms used on these fields are defined in [GLOSSARY.md](GLOSSARY.md).
+Terms used on these fields are defined in [GLOSSARY.md](GLOSSARY.md). To start from a worked comparison instead of the defaults, import one of the sets in [examples/](examples/README.md).
 
 ## 5. Add strategies and sensitivity cases
 

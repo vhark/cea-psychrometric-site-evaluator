@@ -12,6 +12,7 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 |---|---|
 | Use the tool | [WORKFLOW.md](WORKFLOW.md) |
 | Know what a number on the screen means | [GLOSSARY.md](GLOSSARY.md) |
+| Start from a worked comparison | [examples/](examples/README.md) |
 | Know how far to trust a result | [EVALUATION.md](EVALUATION.md), then [VERIFICATION.md](VERIFICATION.md) |
 | Know which assumption to measure first | [SENSITIVITY.md](SENSITIVITY.md) |
 | Change the code | [ARCHITECTURE.md](ARCHITECTURE.md), then [IMPLEMENTATION.md](IMPLEMENTATION.md), then [../CONTRIBUTING.md](../CONTRIBUTING.md) |
@@ -23,6 +24,7 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | Document | Purpose | Reader |
 |---|---|---|
 | [WORKFLOW.md](WORKFLOW.md) | Step-by-step procedure, import schemas, exports and their limits | Anyone running the tool, or reading its output |
+| [examples/](examples/README.md) | Importable comparison sets, one per design question, with what each showed on Tulsa 2025 | Anyone starting a real comparison |
 | [GLOSSARY.md](GLOSSARY.md) | Every domain term with unit, location in the interface, and how it is computed here | Anyone reading a result, report or brief |
 | [PRD.md](PRD.md) | Product requirements and approved scope, including the v0.2 site-evaluator contract in §10 | Product owner, implementer |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Deployment decision, module boundaries, canonical data contracts, controller design | Implementer, reviewer |

@@ -100,6 +100,10 @@ Everything below is measured output from this repository, not illustration. Sour
 
 Not claimed: no independent model benchmark, no site calibration, no equipment performance maps.
 
+## Example scenarios
+
+Load a weather record, then **Import JSON / CSV** and pick a set from [docs/examples/](docs/examples/README.md). Each set is a comparison that answers one design question: coupled reheat against decoupled latent removal, an opaque indoor rack farm, a near-saturated mushroom room, a moisture-bound propagation nursery, and a semi-closed hybrid with a tall crop. The canonical six-strategy comparison stays in [docs/example-scenarios.json](docs/example-scenarios.json).
+
 ## Documentation
 
 | Document | Purpose |
