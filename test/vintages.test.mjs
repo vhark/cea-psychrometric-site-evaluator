@@ -57,20 +57,20 @@ test('each dataset is judged against its own cadence, so equal ages give differe
   ['egrid-grid-mix','2023',32,'aging'],
   ['epa-zip-subregions','2025-06',14,'current'],
   ['geonames-zip-inventory','2026-09-11',0,'current'],
-  ['tulsa-weather-years','2025',8,'current'],
+  ['bundled-weather-years','2025',8,'current'],
   ['noaa-reference-daily','2026-09-08',0,'current'],
  ]);
  assert.equal(statusFor(29,budget('oedi-utility-mapping')),'current');
  assert.equal(statusFor(30,budget('oedi-utility-mapping')),'aging');
  assert.equal(statusFor(48,budget('oedi-utility-mapping')),'stale');
  // The newest value wins when a manifest carries many: the catalog is as new as its latest month.
- assert.equal(assess({},2026,9,14).get('tulsa-weather-years').vintage,'2025');
+ assert.equal(assess({},2026,9,14).get('bundled-weather-years').vintage,'2025');
 });
 test('an unreadable vintage is unknown, never current, and never invents a date',()=>{
  const missing=assess({'data/energy/coverage.json':null,'data/reference/noaa-provenance.json':{},
   'data/energy/manifest.json':{sources:{oedi2021:{vintage:'eGRID2023_rev1 associations, published 2025-06'},egrid2023:{vintage:'annual'},epaZip2023:{published:null}},acquisition:[{file:'geonames-US.zip',retrievedAt:'not a date'}]},
   'data/weather/index.json':{sites:[{years:[]}]}},2026,9,14);
- for(const id of ['eia861m-prices','oedi-utility-mapping','egrid-grid-mix','epa-zip-subregions','geonames-zip-inventory','tulsa-weather-years','noaa-reference-daily']){
+ for(const id of ['eia861m-prices','oedi-utility-mapping','egrid-grid-mix','epa-zip-subregions','geonames-zip-inventory','bundled-weather-years','noaa-reference-daily']){
   const item=missing.get(id);
   assert.equal(item.status,'unknown',id);
   assert.equal(item.vintage,null,id);

@@ -118,7 +118,7 @@ so the concept and its evidence are never separated. Modules are linkable: `#lea
 The closing section is generated, not written. [docs/regional-study.json](docs/regional-study.json) is produced by
 `node scripts/regional-study.mjs` (300 full-year simulations: 5 sites x 10 years x 6 strategies) and
 [docs/REGIONS.md](docs/REGIONS.md) states the recommendation rule, including when the evidence does not resolve a
-region and what measurement would. Two regions currently return no recommendation, by rule.
+region and what measurement would. Three of the five regions currently return no recommendation, by rule: Phoenix, Denver and Seattle.
 
 ## Documentation
 

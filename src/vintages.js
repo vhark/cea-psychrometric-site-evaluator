@@ -91,9 +91,9 @@ export const DATASETS = [
     remote: {manifest: 'data/energy/manifest.json', urlField: 'acquisition[file~geonames-].url', lastModifiedField: 'acquisition[file~geonames-].lastModified'},
   },
   {
-    id: 'tulsa-weather-years',
-    label: 'Bundled Tulsa NASA POWER years',
-    use: 'Offline example runs and the multi-year stability check.',
+    id: 'bundled-weather-years',
+    label: 'Bundled NASA POWER weather years',
+    use: 'Offline example runs, the multi-year stability check and the regional study.',
     manifest: 'data/weather/index.json',
     field: 'sites.*.years.*',
     vintageMeans: 'newest bundled calendar year of hourly weather',

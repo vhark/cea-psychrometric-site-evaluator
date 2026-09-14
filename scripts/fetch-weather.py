@@ -78,7 +78,10 @@ def main(year=DEFAULT_YEAR, site=DEFAULT_SITE):
     end = dt.datetime(year + 1, 1, 1, tzinfo=zone).astimezone(UTC)
     cursor = start.date() - dt.timedelta(days=1)
     last = end.date()
-    raw, records = [], {}
+    # Response bytes are retained in their own file per request; the snapshot keeps the URL, retrieval
+    # time, SHA-256 and file name, and promotes the source header into sourceVersions. It does not
+    # embed a second copy of the response, which would double every snapshot the browser downloads.
+    raw, headers, records = [], [], {}
     while cursor <= last:
         stop = min(last, dt.date(cursor.year, 12, 31))
         params = dict(parameters=','.join(FIELDS), community='RE', longitude=place['longitude'],
@@ -98,7 +101,8 @@ def main(year=DEFAULT_YEAR, site=DEFAULT_SITE):
         name = f'nasa-power-{place["rawPrefix"]}{cursor:%Y%m%d}-{stop:%Y%m%d}.json'
         (OUT / name).write_bytes(body)
         raw.append(dict(url=url, retrievedAt=dt.datetime.now(UTC).isoformat(),
-                        sha256=hashlib.sha256(body).hexdigest(), file=name, payload=payload))
+                        sha256=hashlib.sha256(body).hexdigest(), file=name))
+        headers.append(payload['header'])
         fill = payload['header']['fill_value']
         for parameter, (field, _, factor) in FIELDS.items():
             for stamp, value in payload['properties']['parameter'][parameter].items():
@@ -129,7 +133,7 @@ def main(year=DEFAULT_YEAR, site=DEFAULT_SITE):
                     units=dict(time='UTC epoch milliseconds', tempC='C', dewPointC='C', rh='fraction',
                                pressurePa='Pa', ghiWm2='W/m2', windMs='m/s'),
                     interval='UTC hour start; hourly mean meteorology; Wh/m² over one hour divided by 1 hour = W/m²',
-                    sourceVersions=[item['payload']['header'] for item in raw],
+                    sourceVersions=headers,
                     coordinateNotes=f'Requested {place["latitude"]},{place["longitude"]} is not an airport station. '
                                     'POWER returns source-native grids: MERRA-2 meteorology 0.5° latitude × 0.625° '
                                     'longitude; SYN1deg solar 1° × 1°. Returned point coordinates do not identify '
