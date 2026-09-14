@@ -125,6 +125,46 @@ export function classifyWeather(hour, scenario) {
   if (outsideEnthalpy >= targetEnthalpy) flags.push('OUTDOOR_ENTHALPY_HIGH');
   if (pad.tempC > maxTempC-margin) flags.push('PAD_TEMPERATURE_LIMIT');
   if (pad.w > padMaxW) flags.push('PAD_MOISTURE_LIMIT');
+  // Independent capability screens. The primary mode below is mutually exclusive, so it can only ever answer
+  // one question per hour: a hot hour becomes a PAD_* mode and is never asked whether plain outside air would
+  // have done the job, and a mild hour becomes a PASSIVE_VENT_* mode and is never asked about the pad. These
+  // two assessments are computed for every valid hour instead, so pad usefulness and outside-air usefulness
+  // can be counted separately and together. Both are weather-side capability, not a dispatch decision and not
+  // a measured load: neither knows the zone's actual state or whether cooling was wanted this hour.
+  const warmEnough=outside.tempC>heatingThreshold;
+  // The pad does two different useful jobs. It cools, but only while its leaving air clears the ceiling by the
+  // margin and stays under the moisture limit. It also humidifies, which is useful only when outside air is
+  // drier than the band's floor and the pad does not overshoot the ceiling.
+  // Both pad jobs require the pad to exist. The flags are the transport the metrics layer recounts from, so
+  // the installed check belongs here rather than only on the resolved object, otherwise an uninstalled pad
+  // still gets credited with hours.
+  const padInstalled=scenario.padEnabled!==false;
+  const padCooling=padInstalled&&Boolean(pad)&&outside.tempC>target.targetC&&pad.tempC<=maxTempC-margin&&pad.w<=padMaxW;
+  const padHumidifying=padInstalled&&Boolean(pad)&&warmEnough&&dryEnough&&pad.w<=bounds.maxW;
+  // Outside air alone, no water added. It cools when it is below the target by the ventilation margin without
+  // importing moisture past the ceiling, and it dries whenever it sits below the ceiling by the drying margin.
+  const ventCooling=cooling&&outside.w<=bounds.maxW;
+  const ventDrying=drying;
+  const padUseful=padCooling||padHumidifying;
+  const ventUseful=ventCooling||ventDrying;
+  // What the pad adds that an open vent cannot. Outside air can only cool the zone toward its own dry bulb, so
+  // once outside air is above the ceiling the vent has nothing left to give, while the pad can still deliver
+  // air a wet-bulb depression below it. These are the hours a pad earns its capital, as distinct from the much
+  // larger set of hours where a pad merely also works. Both tests are against the ceiling rather than the
+  // target, so this stays independent of how wide a tolerance the scenario declares.
+  const ventHoldsCeiling=outside.tempC<=maxTempC;
+  const padHoldsCeiling=Boolean(pad)&&pad.tempC<=maxTempC-margin&&pad.w<=padMaxW;
+  const padDeeper=padInstalled&&!ventHoldsCeiling&&padHoldsCeiling;
+  const utility={
+    pad:{useful:padUseful,cooling:padCooling,humidifying:padHumidifying,deeperThanVent:padDeeper,installed:padInstalled},
+    vent:{useful:ventUseful,cooling:ventCooling,drying:ventDrying,holdsCeiling:ventHoldsCeiling},
+    both:padUseful&&ventUseful,either:padUseful||ventUseful,neither:!padUseful&&!ventUseful};
+  if(padCooling)flags.push('PAD_COOLING_USEFUL');
+  if(padHumidifying)flags.push('PAD_HUMIDIFICATION_USEFUL');
+  if(padDeeper)flags.push('PAD_DEEPER_THAN_VENT');
+  if(ventCooling)flags.push('VENT_COOLING_USEFUL');
+  if(ventDrying)flags.push('VENT_DRYING_USEFUL');
+  if(utility.both)flags.push('PAD_AND_VENT_BOTH_USEFUL');
   let mode, reason;
   if (outside.tempC < heatingThreshold) {
     if (strongDrying && scenario.purgeRequested) {mode='HEAT_MAJOR_VENT_DRY';reason='Cold outside air offers strong drying during an explicitly requested purge; heating is required.';}
@@ -146,7 +186,7 @@ export function classifyWeather(hour, scenario) {
   return {mode,weatherMode:mode,valid:true,reason,flags,isDay:target.isDay,humidityRatio:outside.w,
     targetC:target.targetC,maxTempC,heatingThresholdC:heatingThreshold,maxDewPointC,minHumidityRatio:bounds.minW,maxHumidityRatio:bounds.maxW,
     dryingMarginKgKg:dryingMargin,enthalpyJkg:outsideEnthalpy,targetEnthalpyJkg:targetEnthalpy,enthalpyDifferenceJkg:outsideEnthalpy-targetEnthalpy,
-    wetBulbC:pad.wetBulbC,padTempC:pad.tempC,padDewPointC:pad.dewPointC,padHumidityRatio:pad.w,padRH:pad.rh};
+    wetBulbC:pad.wetBulbC,padTempC:pad.tempC,padDewPointC:pad.dewPointC,padHumidityRatio:pad.w,padRH:pad.rh,utility};
 }
 
 // Outdoor air as the dehumidifier for one hour: removal potential at maximum ventilation and the fan plus

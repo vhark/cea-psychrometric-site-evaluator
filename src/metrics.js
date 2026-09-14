@@ -156,7 +156,12 @@ export function compareScenarios(results) {
 
 export function weatherSummary(hours,scenario) {
   const out={expectedHours:hours.length,validHours:0,missingHours:0,modeCounts:{},monthly:[],dayNight:{day:{hours:0,modeCounts:{}},night:{hours:0,modeCounts:{}}},
-    modeExposureDays:{},episodes:{},padFailureCauses:{temperature:0,moisture:0},extremes:{minTempC:null,maxTempC:null,maxWetBulbC:null}};
+    modeExposureDays:{},episodes:{},padFailureCauses:{temperature:0,moisture:0},extremes:{minTempC:null,maxTempC:null,maxWetBulbC:null},
+    // Pad and outside-air usefulness are independent questions, so they are counted independently and jointly
+    // rather than inferred from the mutually exclusive primary mode. Read from the hour's flags, which both the
+    // live classifier and a stored result hour carry.
+    utility:{padUsefulHours:0,padCoolingHours:0,padHumidifyingHours:0,padDeeperThanVentHours:0,ventUsefulHours:0,ventCoolingHours:0,ventDryingHours:0,
+      bothHours:0,eitherHours:0,neitherHours:0,padOnlyHours:0,ventOnlyHours:0}};
   const months=new Map(),days=new Map(),episodeLists=new Map();let previous=null,lastMode=null,run=0;
   const close=()=>{if(run){if(!episodeLists.has(lastMode))episodeLists.set(lastMode,[]);episodeLists.get(lastMode).push(run);}run=0;lastMode=null;};
   for(const h of hours){
@@ -173,6 +178,21 @@ export function weatherSummary(hours,scenario) {
     if(lastMode!==mode){close();lastMode=mode;}run++;
     if(classification.flags.includes('PAD_TEMPERATURE_LIMIT'))out.padFailureCauses.temperature++;
     if(classification.flags.includes('PAD_MOISTURE_LIMIT'))out.padFailureCauses.moisture++;
+    const flags=classification.flags;
+    const padCool=flags.includes('PAD_COOLING_USEFUL'),padHumid=flags.includes('PAD_HUMIDIFICATION_USEFUL');
+    const ventCool=flags.includes('VENT_COOLING_USEFUL'),ventDry=flags.includes('VENT_DRYING_USEFUL');
+    const padUseful=padCool||padHumid,ventUseful=ventCool||ventDry,u=out.utility;
+    if(flags.includes('PAD_DEEPER_THAN_VENT'))u.padDeeperThanVentHours++;
+    if(padCool)u.padCoolingHours++;
+    if(padHumid)u.padHumidifyingHours++;
+    if(ventCool)u.ventCoolingHours++;
+    if(ventDry)u.ventDryingHours++;
+    if(padUseful)u.padUsefulHours++;
+    if(ventUseful)u.ventUsefulHours++;
+    if(padUseful&&ventUseful)u.bothHours++;
+    if(padUseful||ventUseful)u.eitherHours++;else u.neitherHours++;
+    if(padUseful&&!ventUseful)u.padOnlyHours++;
+    if(ventUseful&&!padUseful)u.ventOnlyHours++;
     const t=h.outdoorTempC??h.tempC,wb=classification.wetBulbC;
     if(Number.isFinite(t)){out.extremes.minTempC=out.extremes.minTempC===null?t:Math.min(out.extremes.minTempC,t);out.extremes.maxTempC=out.extremes.maxTempC===null?t:Math.max(out.extremes.maxTempC,t);}
     if(Number.isFinite(wb))out.extremes.maxWetBulbC=out.extremes.maxWetBulbC===null?wb:Math.max(out.extremes.maxWetBulbC,wb);

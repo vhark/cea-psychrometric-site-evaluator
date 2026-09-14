@@ -118,7 +118,8 @@ function evaluateYear(site,year,scenarios){
   for(const key of Object.keys(counts))
     candidates[key]=states.filter(s=>finite(s[key])).sort((a,b)=>b[key]-a[key]||a.time-b.time).slice(0,DESIGN_CANDIDATES);
   return {site:site.key,year,strategies,
-    weather:{modeCounts:first.modeCounts,padFailureCauses:first.padFailureCauses,
+    // Only these weather fields cross the worker boundary, so anything the study reports must be listed here.
+    weather:{modeCounts:first.modeCounts,padFailureCauses:first.padFailureCauses,utility:first.utility,
       validHours:first.validHours,expectedHours:first.expectedHours},
     design:{candidates,counts,summerWetBulbSum:round(summerWetBulbSum,6),summerWetBulbHours}};
 }
@@ -209,6 +210,10 @@ function regionWeather(yearRows){
     return {year:row.year,
       padEffectiveHours:count(row,['PAD_EFFECTIVE']),
       freeCoolingHours:count(row,FREE_COOLING_MODES),
+      // Pad and outside-air usefulness are independent questions; the mutually exclusive primary mode can only
+      // answer one of them per hour. padDeeperThanVent is the set that matters for buying a pad: outside air
+      // above the ceiling, so a vent cannot hold the band, while pad leaving air still can.
+      ...Object.fromEntries(Object.entries(row.weather.utility||{}).map(([k,v])=>[k,v])),
       heatingHours:round(constraint.hours.heating,3),
       moistureLimitedHours:round(constraint.hours.moisture,3),
       temperatureLimitedHours:round(constraint.hours.temperature,3)};
@@ -228,6 +233,15 @@ function regionWeather(yearRows){
   return {weather:{
       padEffectiveHoursMedian:round(median(perYear.map(y=>y.padEffectiveHours))),
       freeCoolingHoursMedian:round(median(perYear.map(y=>y.freeCoolingHours))),
+      padUsefulHoursMedian:round(median(perYear.map(y=>y.padUsefulHours))),
+      padCoolingHoursMedian:round(median(perYear.map(y=>y.padCoolingHours))),
+      padHumidifyingHoursMedian:round(median(perYear.map(y=>y.padHumidifyingHours))),
+      padDeeperThanVentHoursMedian:round(median(perYear.map(y=>y.padDeeperThanVentHours))),
+      ventUsefulHoursMedian:round(median(perYear.map(y=>y.ventUsefulHours))),
+      ventCoolingHoursMedian:round(median(perYear.map(y=>y.ventCoolingHours))),
+      ventDryingHoursMedian:round(median(perYear.map(y=>y.ventDryingHours))),
+      bothUsefulHoursMedian:round(median(perYear.map(y=>y.bothHours))),
+      neitherUsefulHoursMedian:round(median(perYear.map(y=>y.neitherHours))),
       heatingHoursMedian:round(median(perYear.map(y=>y.heatingHours))),
       moistureLimitedHoursMedian:round(median(perYear.map(y=>y.moistureLimitedHours))),
       temperatureLimitedHoursMedian:round(median(perYear.map(y=>y.temperatureLimitedHours))),

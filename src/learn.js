@@ -1,10 +1,18 @@
-/* Learn view: a taught curriculum over the tool's own evidence, plus the regional findings study.
+/* Learn view: a plain-language one-pager first, then the technical curriculum, then the regional study.
 
-   Copy discipline, enforced by review rather than by code: every figure quoted in MODULES below is
-   already published in this repository (docs/VERIFICATION.md, docs/AUDIT.md, docs/SENSITIVITY.md,
-   docs/CLIMATES.md, docs/GLOSSARY.md, docs/examples/README.md) and carries its source on screen.
-   Every figure in the regional section comes from docs/regional-study.json at runtime. Nothing here
-   is computed by this module, and nothing is invented: an absent study renders as an absent study.
+   The view opens on PRIMER, an explainer written for a reader with no heating-and-cooling background:
+   what the tool does, the buying mistake it exists to prevent, the two weather-side tools it scores
+   separately, the band-against-budget trade, the ladder of equipment classes, which class suits which
+   climate, and what none of it can promise. MODULES, the ten technical sections, sit below it inside a
+   collapsed "Go deeper" disclosure, with every key and every #learn/<key> route unchanged.
+
+   Copy discipline, enforced by review rather than by code: every figure quoted in PRIMER and MODULES is
+   already published in this repository (docs/CLASSES.md, docs/CLIMATES.md, docs/VERIFICATION.md,
+   docs/AUDIT.md, docs/SENSITIVITY.md, docs/GLOSSARY.md, docs/examples/README.md) and carries its source
+   on screen. Every figure that describes a climate, including every count of pad hours and vent hours,
+   is read from docs/regional-study.json at runtime through a `study` slot, so this page cannot drift
+   from the study and cannot be more specific than the study is. Nothing here is computed by this
+   module, and nothing is invented: an absent study renders as an absent study.
 
    The spotlight is the guided tour's, imported rather than duplicated. */
 
@@ -34,6 +42,580 @@ function node(tag, content, className) {
   if (content !== undefined && content !== null) element.textContent = content;
   if (className) element.className = className;
   return element;
+}
+
+/* ---------- The one-pager, in plain language ---------- */
+
+/** The ladder of equipment classes, summarised from docs/CLASSES.md. One line on what a class can do,
+    one line on what defeats it, and the class code so a reader can find the full row in that document. */
+const LADDER = [
+  {
+    code: 'C0, without the pad',
+    name: 'Fans and vents only',
+    can: 'Push warm air out and pull outside air in. It is the cheapest thing you can do, and on a mild day it is all you need.',
+    defeat: 'Any hour when the outside air is already as warm, or as wet, as the air you wanted inside. Then opening up makes the problem worse.'
+  },
+  {
+    code: 'C0',
+    name: 'Add a wet wall',
+    can: 'Cool the incoming air below the outside temperature, as far as evaporating water into it can take you.',
+    defeat: 'Humid air, which has no room left to soak up more water. Also the first cold night, because there is no heater in this package at all.'
+  },
+  {
+    code: 'C1',
+    name: 'Add heating',
+    can: 'Hold a temperature band all year, at every one of the six climates in the study.',
+    defeat: 'Water. Nothing in this package takes moisture out except swapping air with outside, so a humid site still sits above its humidity limit for thousands of hours.'
+  },
+  {
+    code: 'C2',
+    name: 'Add a dehumidifier',
+    can: 'Hold temperature and humidity at the same time. This is the biggest single jump in the whole ladder: in Miami it moved hours inside the band from about 18 in 100 to about 93 in 100, and it lowered the running bill at all six sites (docs/CLASSES.md).',
+    defeat: 'Its own limit on how dry it can get the air, and the bill for reheating the air it just dried.'
+  },
+  {
+    code: 'C3',
+    name: 'Add curtains and shade screens you schedule',
+    can: 'Keep heat in at night and sun out at midday with no new machine. It is the cheapest step in the ladder and the only one that pays for itself in fuel (docs/CLASSES.md).',
+    defeat: 'Light. A closed curtain and a drawn screen both block light the crop wanted, and neither one adds any back.'
+  },
+  {
+    code: 'C4',
+    name: 'A hybrid house: grow lights, real cooling, fewer open vents',
+    can: 'Hold the band and also hit the daily amount of light the crop needs, which nothing lower in the ladder can do.',
+    defeat: 'The building itself. Heat still pours through the glass in both directions, so you keep paying to remove a load the roof keeps letting in.'
+  },
+  {
+    code: 'C5',
+    name: 'A sealed insulated room, all light electric',
+    can: 'Near total control with a small heater, because very little leaks. It wins where sunlight through a roof causes more cooling work than the free light is worth.',
+    defeat: 'Its own moisture. No sun means no free drying, and a sealed shell cannot breathe in dry outside air the way a greenhouse can.'
+  }
+];
+
+/** Which class suits which climate, in plain words. Characterisations and figures from docs/CLASSES.md
+    and docs/CLIMATES.md; what the ten-year study actually picked is rendered from the study file itself,
+    in the `verdicts` slot below, so no recommendation is asserted here that the study does not carry. */
+const CLIMATE_LINES = [
+  {
+    place: 'Hot and dry',
+    site: 'Phoenix, AZ',
+    says: 'The wet wall earns its keep, for thousands of hours a year. This is the one site in the set that can reasonably stop at pads plus heating, because it spends only about half as many hours limited by moisture as by temperature (docs/CLASSES.md).'
+  },
+  {
+    place: 'Hot and humid',
+    site: 'Miami, FL',
+    says: 'Forget the wet wall. Here a dehumidifier is not an upgrade, it is the difference between a controlled house and a shed with a thermostat (docs/CLASSES.md). Glass is the other problem: the hybrid greenhouse needed 370 kW of cooling where the sealed room needed 109 kW.'
+  },
+  {
+    place: 'Cold and dry, and high up',
+    site: 'Denver, CO',
+    says: 'Heating is almost the whole job, and moisture barely registers. Summer air is dry, so the wet wall has plenty to work with. Thin mountain air also changes the arithmetic of humidity, which is why this site is in the set (docs/CLIMATES.md).'
+  },
+  {
+    place: 'Mild and cloudy',
+    site: 'Seattle, WA',
+    says: 'Neither heavy heating nor heavy cooling, and free cooling or a pad looks plausible for most of the summer (docs/CLIMATES.md). The shortage is light: 134 days a year finish under the amount of daily light the crop asked for (docs/CLASSES.md).'
+  },
+  {
+    place: 'Far north',
+    site: 'Fairbanks, AK',
+    says: 'The cold is not the hard part. A heated greenhouse there holds the temperature and humidity band almost perfectly. What it cannot hold is daylight: the sky gives 0.4 units of daily light in December against 41.2 in June, a factor of 106, and 189 days a year finish short of the crop target (docs/CLASSES.md). The answer in that document is an insulated box under electric light, with a way to pull in dry outside air.'
+  },
+  {
+    place: 'Hot summer, freezing winter',
+    site: 'Tulsa, OK',
+    says: 'Both problems inside one year, so both have to be paid for: heat in winter, moisture in summer. This is the worked example the rest of the tool uses.'
+  }
+];
+
+/** The explainer a first-time visitor reads, as data rather than as hand-built DOM, exactly as MODULES
+    below is data. Block kinds: `p` a paragraph, `note` a smaller caution, `list` firm bullets, `ladder`
+    the class ladder, `climates` the climate lines, `study` a slot filled from docs/regional-study.json
+    at runtime, `actions` buttons, `links` a source line. */
+export const PRIMER = [
+  {
+    id: 'primer-what',
+    eyebrow: 'In three sentences',
+    title: 'What this tool does',
+    blocks: [
+      {p: 'This tool replays real weather. It takes the hour by hour record of what the sky actually did at your location over the past ten years, and it walks through it one hour at a time.'},
+      {p: 'At every hour it asks one question: what could each kind of greenhouse or indoor farm equipment have done in this weather? Would a fan have been enough? Would you have needed a cooling machine, or a machine that pulls water out of the air?'},
+      {p: 'The point is to tell you what to buy before you buy it. This is screening, which means narrowing the field down to the few options worth paying an engineer to check.'}
+    ]
+  },
+  {
+    id: 'primer-problem',
+    eyebrow: 'The reason it exists',
+    title: 'The mistake this is here to prevent',
+    blocks: [
+      {p: 'Equipment that works beautifully in one climate can be close to useless in another. A brochure will not tell you that, because the brochure is the same in every state.'},
+      {p: 'The clearest case is a wet wall, also called an evaporative pad. It is a wet mat of stiff cardboard or plastic across one end of the greenhouse. Fans pull outside air through the wet mat, water evaporates off it, and evaporating water takes heat out of the air. You get cooler air, and you pay for it in water and in humidity.'},
+      {p: 'Here is the catch. Air can only hold so much water at a given temperature. If the air outside is already close to full, almost nothing evaporates off the mat, so almost nothing gets cooled. A wet wall does not fight humidity. It feeds it.'},
+      {p: 'So in a hot dry place a wet wall buys real cooling that nothing cheaper can buy. In a hot humid place it barely cools at all, and it adds water to a house that already has too much of it.'},
+      {study: 'padVent'},
+      {p: 'Same machine, same ten years, two American cities. The row that matters is the last one: the hours when the outside air was too hot to help you, and the wall could still hand you air cool enough to hold your band. One of these cities has thousands of those hours a year. The other has almost none. That gap is the climate, not the product, and it is the thing the brochure leaves out.'}
+    ]
+  },
+  {
+    id: 'primer-two-tools',
+    eyebrow: 'Two tools, two questions',
+    title: 'A wet wall and an open window are not the same thing',
+    blocks: [
+      {p: 'Using the weather to hold your climate is really two separate offers, and they should not be judged as one.'},
+      {p: 'Opening the vents helps when the outside air is already better than the air inside: cooler, or drier, or both. In those hours a fan is the cheapest machine on the property.'},
+      {p: 'A wet wall works on that same outside air, and it does one extra thing. It hands you air colder than the weather is, because evaporating water into dry air chills it. How much colder depends entirely on how dry the air already is.'},
+      {p: 'Measuring the two separately across all six sites turned up something sharper than the usual advice. There was no hour anywhere in the record where the wall was useful and opening up was not. Wherever the wall worked, a vent worked too.'},
+      {p: 'So a wet wall is not an alternative to a vent. It is a way to push vent air colder than the weather allows. The only hours it genuinely buys you are the hours when the outside air is too hot for a vent on its own to hold your band, and it can still be pushed cold enough to hold it. Everywhere else it is doing a job a fan was already doing.'},
+      {p: 'The wall also has a second job that has nothing to do with cooling. When the outside air is drier than the crop can stand, the water the wall puts into the air is the point rather than a side effect. At a desert site that is a large part of the wall\u2019s working year, and the study counts those hours separately too.'},
+      {p: 'So the tool scores the two tools apart: hours only the wall helps, hours only opening up helps, hours both help, and hours neither one is any use. Rolling them into a single number hides every one of those cases.'},
+      {study: 'toolSplit'}
+    ]
+  },
+  {
+    id: 'primer-tradeoff',
+    eyebrow: 'The trade',
+    title: 'The choice you actually have to make',
+    blocks: [
+      {p: 'Plants live in a range, not at a point. Lettuce does not need exactly 22 degrees. It needs to be somewhere inside a band, most of the time.'},
+      {p: 'How wide you draw that band is your decision, and it is the expensive one. The narrower the band you insist on holding, the more equipment you have to buy, and the more it costs to run every hour of the year. Tight bands are bought, not wished for.'},
+      {p: 'Widening what you are willing to live with is a real way to save money, and a legitimate one. A wider band means fewer machines, a smaller bill, and some hours where the crop is warmer or damper than ideal. Only you know which of those your crop and your buyer will accept.'},
+      {p: 'That trade is the whole reason this tool exists. It cannot make the choice for you. It can tell you what each choice would have cost in weather that really happened.'},
+      {note: 'One thing to watch when you compare numbers. The share of hours inside the band is only comparable between two machines judged on the same band. Widen the band and every machine looks better, without a single screw being turned.'}
+    ]
+  },
+  {
+    id: 'primer-ladder',
+    eyebrow: 'The equipment',
+    title: 'Seven steps, from cheap and limited to expensive and capable',
+    blocks: [
+      {p: 'Equipment arrives in packages, not as loose parts, so the study groups it into classes. Each step up can hold conditions the step below cannot, and each step costs more to buy and usually more to run.'},
+      {study: 'installed'},
+      {ladder: LADDER},
+      {note: 'One option the study rejects outright: the same sealed room with no insulation. In all six climates it pays the insulated room\u2019s electricity bill and a greenhouse\u2019s heating bill at the same time (docs/CLASSES.md). It is also the most commonly available building, which is why it is worth saying out loud.'},
+      {links: [{href: 'docs/CLASSES.md', label: 'docs/CLASSES.md \u2197', note: 'Every class in full, what each one achieved at all six sites, and the rule that promotes you to the next step:'}]}
+    ]
+  },
+  {
+    id: 'primer-climates',
+    eyebrow: 'Matching the two',
+    title: 'Which class suits which climate',
+    blocks: [
+      {p: 'The study runs the same six equipment packages at six real sites, ten years of weather each. In plain terms, this is what the climates ask for.'},
+      {climates: CLIMATE_LINES},
+      {p: 'And this is what the study itself picked, read from the study file as this page loaded:'},
+      {study: 'verdicts'},
+      {p: 'Where the study does not pick a winner, that is the answer, not a missing feature. Two packages within a few percent of each other on running cost are a tie at this level of evidence. The way to break a tie is to measure your own crop and your own building, not to run the model again.'}
+    ]
+  },
+  {
+    id: 'primer-limits',
+    eyebrow: 'Honesty',
+    title: 'What this is not',
+    blocks: [
+      {list: [
+        'Not a forecast. Past weather is a sample of what a place does, not a promise about what next year does.',
+        'Not a prediction about your building. Every run stands on assumptions about the crop, the walls and the machines. Change one assumption and the answer moves.',
+        'Not equipment sizing. Nothing here tells you which model to order or how many kilowatts to install.',
+        'Not a substitute for a mechanical engineer. It is for narrowing the field before you hire one, so their time goes on the question that matters.',
+        'Not a yield claim, not a price quote, and not a comparison between manufacturers.'
+      ]},
+      {note: 'The evidence tier here is assumption-based screening on historical weather. Ten observed years are ten years that happened, not a sample drawn from a settled distribution: the gap between the best and the worst of them is a range that occurred, not a confidence interval and not a design year.'}
+    ]
+  },
+  {
+    id: 'primer-next',
+    eyebrow: 'Next',
+    title: 'Where to go from here',
+    blocks: [
+      {p: 'Run your own location. The Analyze view does exactly what this page describes, on the weather for the place you care about, and it shows its working at every step.'},
+      {actions: [
+        {label: 'Open the Analyze view', go: 'analyze'},
+        {label: 'Read how each number is computed', go: 'deeper'}
+      ]},
+      {links: [
+        {href: 'docs/CLASSES.md', label: 'docs/CLASSES.md \u2197', note: 'The equipment classes, measured at six sites:'},
+        {href: 'docs/REGIONS.md', label: 'docs/REGIONS.md \u2197', note: 'The ten-year, six-region study region by region, with the reasoning and the limits:'}
+      ]}
+    ]
+  }
+];
+
+/* ---------- One-pager rendering ---------- */
+
+/** Figures that describe a climate are never written into PRIMER. A `study` block renders an empty host
+    here, and the host is filled when docs/regional-study.json arrives, or filled with a plain sentence
+    saying why it is empty when it does not. */
+const primerSlots = [];
+
+/* The exact field names the engine writes per region, each with its predecessor as a fallback, because
+   the study file is regenerated independently of this page. A row appears only when the study carries a
+   field for it, so nothing is ever invented and nothing is ever stale. `brief` rows also appear in the
+   all-sites table. The "only the wall" row is last, because the copy above points at the last row. */
+const DEEPER_KEYS = ['padDeeperThanVentHoursMedian', 'padEffectiveHoursMedian'];
+const HOUR_ROWS = [
+  {keys: ['padUsefulHoursMedian'], label: 'Hours a wet wall would have helped in some way', brief: true},
+  {keys: ['padCoolingHoursMedian'], label: 'Of those, hours it helped by cooling'},
+  {keys: ['padHumidifyingHoursMedian'], label: 'Of those, hours it helped by adding water to air too dry for the crop'},
+  {keys: ['ventUsefulHoursMedian'], label: 'Hours opening up would have helped in some way', brief: true},
+  {keys: ['ventCoolingHoursMedian'], label: 'Of those, hours the outside air was cooler than the band'},
+  {keys: ['ventDryingHoursMedian'], label: 'Of those, hours the outside air was drier than the ceiling'},
+  {keys: ['bothUsefulHoursMedian', 'padAndVentHoursMedian'], label: 'Hours both tools would have helped', brief: true},
+  {keys: ['neitherUsefulHoursMedian'], label: 'Hours neither tool was any use', brief: true},
+  {keys: ['freeCoolingHoursMedian'], label: 'Hours the weather alone could hold the whole band, with nothing but fans'},
+  {keys: DEEPER_KEYS, label: 'Hours only the wall could hold the band, because the outside air was too hot for a vent to help', brief: true}
+];
+
+function pickField(weather, keys) {
+  for (const key of keys) if (finite(weather?.[key])) return {key, value: weather[key]};
+  return null;
+}
+
+const regionName = region => text(region?.label) || text(region?.key) || 'Unnamed site';
+const regionClimate = region => text(region?.climate) || 'climate not stated';
+const liveRows = (regions, rows = HOUR_ROWS) => rows.filter(row => regions.some(region => pickField(region.weather, row.keys)));
+const briefRows = regions => liveRows(regions, HOUR_ROWS.filter(row => row.brief));
+
+function fieldsRead(regions, rows) {
+  const keys = [];
+  for (const row of rows) for (const region of regions) {
+    const found = pickField(region.weather, row.keys);
+    if (found && !keys.includes(found.key)) keys.push(found.key);
+  }
+  return keys;
+}
+
+function hourTable(columns, rows, regions) {
+  const wrap = node('div', undefined, 'table-wrap');
+  const table = document.createElement('table');
+  const head = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  const first = node('th', 'In a middle year of the ten');
+  first.scope = 'col';
+  headRow.append(first);
+  for (const region of columns) {
+    const th = node('th', `${regionName(region)} (${regionClimate(region)})`);
+    th.scope = 'col';
+    headRow.append(th);
+  }
+  head.append(headRow);
+  const body = document.createElement('tbody');
+  for (const row of rows) {
+    const tr = document.createElement('tr');
+    tr.append(node('td', row.label, 'row-name'));
+    for (const region of columns) {
+      const found = pickField(region.weather, row.keys);
+      tr.append(node('td', found ? hours(found.value) : 'Not in the study', 'mono'));
+    }
+    body.append(tr);
+  }
+  table.append(head, body);
+  wrap.append(table);
+  const keys = fieldsRead(regions, rows);
+  wrap.append(node('p', `Read from ${STUDY_URL} when this page loaded${keys.length ? `: ${keys.join(', ')}` : ''}. A middle year of the ten is the median: half the years are higher, half lower.`, 'source-line'));
+  return wrap;
+}
+
+/** The headline pair, ranked on the hours the wall is genuinely necessary rather than merely also
+    working, which is the measurement that separates a dry climate from a humid one. Phoenix against
+    Miami when the study carries both, because that pair is the point; otherwise the widest pair the
+    study actually has, so the page is never wrong about its own example. */
+function padVentSlot(study, regions) {
+  const wrap = document.createElement('div');
+  const rated = regions.map(region => ({region, deeper: pickField(region.weather, DEEPER_KEYS)})).filter(entry => entry.deeper);
+  if (rated.length < 2) {
+    wrap.append(node('p', `${STUDY_URL} carries no wet-wall hour counts, so no site pair is quoted here. The physical point above stands on its own: a wet wall needs dry air.`, 'help'));
+    return wrap;
+  }
+  const byKey = key => rated.find(entry => entry.region.key === key);
+  const sorted = [...rated].sort((a, b) => b.deeper.value - a.deeper.value);
+  const dry = byKey('phoenix') || sorted[0];
+  const humid = byKey('miami') || sorted[sorted.length - 1];
+  const columns = [dry.region, humid.region];
+  wrap.append(hourTable(columns, liveRows(columns), regions));
+  // The ratio is taken from the rounded hours on screen, so a reader who divides the two rows gets the
+  // same answer this sentence gives.
+  const dryHours = Math.round(dry.deeper.value), humidHours = Math.round(humid.deeper.value);
+  const ratio = humidHours > 0 ? Math.round(dryHours / humidHours) : null;
+  if (ratio && ratio > 1) {
+    wrap.append(node('p', `That is about ${num(ratio)} times as many hours at ${regionName(dry.region)} as at ${regionName(humid.region)}, for the same crop and the same band.`, 'learn-say'));
+  }
+  const moist = pickField(dry.region.weather, ['padHumidifyingHoursMedian']);
+  const cool = pickField(dry.region.weather, ['padCoolingHoursMedian']);
+  if (moist && cool) {
+    const more = moist.value > cool.value;
+    wrap.append(node('p', `Notice the other thing the dry site shows. At ${regionName(dry.region)} the wall is useful for adding water in ${hours(moist.value)} of a median year and for cooling in ${hours(cool.value)}, so it spends ${more ? 'more' : 'less'} of its working year putting moisture into air that was too dry for the crop than it spends taking heat out.`, 'learn-say'));
+  }
+  return wrap;
+}
+
+/** Every bundled site, on whichever of the summary counts the study reports. The per-site table carries
+    the headline rows only; the two-site table above carries the full breakdown. */
+function toolSplitSlot(study, regions) {
+  const wrap = document.createElement('div');
+  const rows = briefRows(regions);
+  if (!rows.length) {
+    wrap.append(node('p', `${STUDY_URL} carries none of these hour counts, so nothing is tabulated here.`, 'help'));
+    return wrap;
+  }
+  const table = node('div', undefined, 'table-wrap');
+  const element = document.createElement('table');
+  const head = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  for (const label of ['Site', 'Climate', ...rows.map(row => row.label)]) {
+    const th = node('th', label);
+    th.scope = 'col';
+    headRow.append(th);
+  }
+  head.append(headRow);
+  const body = document.createElement('tbody');
+  for (const region of regions) {
+    const tr = document.createElement('tr');
+    tr.append(node('td', regionName(region), 'row-name'), node('td', regionClimate(region)));
+    for (const row of rows) {
+      const found = pickField(region.weather, row.keys);
+      tr.append(node('td', found ? hours(found.value) : 'Not in the study', 'mono'));
+    }
+    body.append(tr);
+  }
+  element.append(head, body);
+  table.append(element);
+  wrap.append(table);
+  const subset = subsetNote(regions);
+  if (subset) wrap.append(subset);
+  const keys = fieldsRead(regions, rows);
+  wrap.append(node('p', `Read from ${STUDY_URL}${keys.length ? `: ${keys.join(', ')}` : ''}. Where a column says it is not in the study, the study does not measure it yet and this page will not guess it.`, 'source-line'));
+  return wrap;
+}
+
+/** The subset result, checked against the file rather than asserted: the hours a wall helps are the same
+    hours a vent helps at every site, which is why the wall is a way of pushing vent air colder and not
+    an alternative to a vent. Printed only while the two columns really do match. */
+function subsetNote(regions) {
+  const pairs = regions.map(region => ({
+    pad: pickField(region.weather, ['padUsefulHoursMedian']),
+    both: pickField(region.weather, ['bothUsefulHoursMedian', 'padAndVentHoursMedian'])
+  })).filter(pair => pair.pad && pair.both);
+  if (pairs.length < regions.length || !pairs.length) return null;
+  if (!pairs.every(pair => Math.round(pair.pad.value) === Math.round(pair.both.value))) return null;
+  return node('p', 'Compare the wet-wall column with the column for both tools. At every site they are the same number. There is no hour in the whole record where the wall would have helped and opening a vent would not, which is the measured version of the point above.', 'learn-say');
+}
+
+/** The cost spread of the packages, from the study\u2019s own declared installed costs. */
+function installedSlot(study) {
+  const wrap = document.createElement('div');
+  const priced = (Array.isArray(study?.method?.scenarios) ? study.method.scenarios : [])
+    .filter(entry => entry && finite(entry.installedCostUsd))
+    .sort((a, b) => a.installedCostUsd - b.installedCostUsd);
+  if (priced.length < 2) {
+    wrap.append(node('p', `${STUDY_URL} declares no installed costs, so no price range is quoted here.`, 'help'));
+    return wrap;
+  }
+  const low = priced[0], high = priced[priced.length - 1];
+  const ratio = low.installedCostUsd > 0 ? Math.round(high.installedCostUsd / low.installedCostUsd) : null;
+  wrap.append(node('p', `The packages compared in the study declare installed costs from ${usd(low.installedCostUsd)} for ${text(low.label) || low.id} up to ${usd(high.installedCostUsd)} for ${text(high.label) || high.id}${ratio ? `, about ${ratio} times as much` : ''}. Those are the numbers the study was given to compare, not quotes, and they cover equipment only.`, 'learn-say'));
+  wrap.append(node('p', `Read from ${STUDY_URL} when this page loaded.`, 'source-line'));
+  return wrap;
+}
+
+/** What the study picked per region, and how many regions it declined to decide. Both are read from the
+    file: this page never asserts a recommendation the study does not carry. */
+function verdictsSlot(study, regions) {
+  const wrap = document.createElement('div');
+  const named = id => {
+    for (const region of regions) {
+      const match = (region.strategies || []).find(row => row?.id === id);
+      if (match) return text(match.label) || text(id) || 'an unnamed package';
+    }
+    const scenario = (study?.method?.scenarios || []).find(entry => entry?.id === id);
+    return text(scenario?.label) || text(id) || 'an unnamed package';
+  };
+  const undecided = regions.filter(region => region.verdict && region.verdict.recommended == null);
+  wrap.append(node('p', `In ${num(undecided.length)} of the ${num(regions.length)} bundled regions the evidence does not pick a winner. That is an honest result, not a missing feature: those packages are too close together for this evidence to separate.`, 'learn-say'));
+  const list = document.createElement('dl');
+  list.className = 'learn-pairs';
+  for (const region of regions) {
+    const verdict = region.verdict;
+    const cell = document.createElement('div');
+    let line;
+    if (!verdict) line = 'The study file carries no verdict for this region, so none is shown.';
+    else if (verdict.recommended != null) line = `The study picks ${named(verdict.recommended)}.`;
+    else {
+      const candidates = (verdict.candidates || []).map(named);
+      const gap = finite(verdict.marginPct) ? ` They differ by ${pct(verdict.marginPct)} in running cost, which is inside the band where this evidence cannot tell them apart.` : '';
+      line = candidates.length
+        ? `No winner. ${candidates.join(' and ')} are left unseparated.${gap}`
+        : `No winner. The study leaves this region undecided.${gap}`;
+    }
+    cell.append(node('dt', `${regionName(region)} (${regionClimate(region)})`), node('dd', line));
+    list.append(cell);
+  }
+  wrap.append(list);
+  wrap.append(node('p', `Read from ${STUDY_URL} when this page loaded. The reasoning behind each line, and the caveats it carries, are in the regional section under Go deeper and in docs/REGIONS.md.`, 'source-line'));
+  return wrap;
+}
+
+const SLOTS = {
+  padVent: {build: padVentSlot, loading: 'Reading the wet-wall hour counts from the study\u2026'},
+  toolSplit: {build: toolSplitSlot, loading: 'Reading the hour counts for both tools from the study\u2026'},
+  installed: {build: installedSlot, loading: 'Reading the declared installed costs from the study\u2026'},
+  verdicts: {build: verdictsSlot, loading: 'Reading the regional verdicts from the study\u2026'}
+};
+
+function slotHost(kind) {
+  const host = node('div', undefined, 'learn-figures');
+  host.dataset.learnSlot = kind;
+  host.append(node('p', SLOTS[kind]?.loading || `Reading ${STUDY_URL}\u2026`, 'help'));
+  primerSlots.push({kind, host});
+  return host;
+}
+
+/** Fills every slot from one study object. A slot that throws says so rather than showing half a table. */
+function fillPrimerStudy(study, regions) {
+  for (const slot of primerSlots) {
+    const build = SLOTS[slot.kind]?.build;
+    if (!build) continue;
+    try {
+      slot.host.replaceChildren(build(study, regions));
+    } catch (error) {
+      slot.host.replaceChildren(node('p', `This figure could not be read from ${STUDY_URL}: ${error.message}. Nothing is shown in its place.`, 'help'));
+    }
+  }
+}
+
+/** Empties every slot with the reason, so a missing study is visible as a missing study here too. */
+function clearPrimerStudy(reason) {
+  for (const slot of primerSlots) {
+    slot.host.replaceChildren(node('p', `No figures are shown here because the study was not read. ${reason}`, 'help'));
+  }
+}
+
+function ladderList(rungs) {
+  const list = document.createElement('ol');
+  list.className = 'learn-ladder';
+  rungs.forEach((rung, index) => {
+    const item = document.createElement('li');
+    const head = node('p', undefined, 'learn-rung-head');
+    head.append(node('span', String(index + 1).padStart(2, '0'), 'learn-num mono'),
+      node('span', rung.name, 'learn-rung-name'),
+      node('span', rung.code, 'summary-meta'));
+    item.append(head, node('p', rung.can, 'learn-rung-can'), node('p', `What defeats it: ${rung.defeat}`, 'learn-rung-defeat'));
+    list.append(item);
+  });
+  return list;
+}
+
+function pairsList(lines) {
+  const list = document.createElement('dl');
+  list.className = 'learn-pairs';
+  for (const line of lines) {
+    const cell = document.createElement('div');
+    cell.append(node('dt', `${line.place} (${line.site})`), node('dd', line.says));
+    list.append(cell);
+  }
+  return list;
+}
+
+function bulletList(items) {
+  const list = document.createElement('ul');
+  list.className = 'learn-points';
+  for (const item of items) list.append(node('li', item));
+  return list;
+}
+
+function actionRow(actions) {
+  const row = node('div', undefined, 'learn-actions');
+  for (const action of actions) {
+    const button = node('button', action.label);
+    button.type = 'button';
+    button.dataset.learnGo = action.go;
+    button.addEventListener('click', () => {
+      if (action.go === 'analyze') showView('analyze', {hash: true, restore: false});
+      else openDeeper({scroll: true});
+    });
+    row.append(button);
+  }
+  return row;
+}
+
+function linkLine(links) {
+  const wrap = document.createElement('div');
+  for (const entry of links) {
+    const line = node('p', undefined, 'source-line');
+    const anchor = node('a', entry.label);
+    anchor.href = entry.href;
+    line.append(document.createTextNode(`${entry.note} `), anchor);
+    wrap.append(line);
+  }
+  return wrap;
+}
+
+function primerBlock(block) {
+  if (block.p) return node('p', block.p, 'learn-say');
+  if (block.note) return node('p', block.note, 'help');
+  if (block.list) return bulletList(block.list);
+  if (block.ladder) return ladderList(block.ladder);
+  if (block.climates) return pairsList(block.climates);
+  if (block.study) return slotHost(block.study);
+  if (block.actions) return actionRow(block.actions);
+  if (block.links) return linkLine(block.links);
+  return null;
+}
+
+function primerSection(section) {
+  const element = node('section', undefined, 'learn-part');
+  element.id = section.id;
+  const heading = node('div', undefined, 'learn-part-head');
+  heading.append(node('p', section.eyebrow, 'eyebrow'), node('h3', section.title));
+  element.append(heading);
+  for (const block of section.blocks) {
+    const built = primerBlock(block);
+    if (built) element.append(built);
+  }
+  return element;
+}
+
+function primerNode() {
+  const wrap = node('div', undefined, 'learn-primer');
+  for (const section of PRIMER) wrap.append(primerSection(section));
+  return wrap;
+}
+
+/* ---------- The "Go deeper" disclosure ---------- */
+
+const DEEPER_ID = 'learn-deeper';
+const DEEPER_TITLE = 'Go deeper: how each number is computed';
+const DEEPER_META = 'Ten technical sections. The concept, the arithmetic, a figure measured in this repository, and the caveat that travels with it.';
+let deeper = null;
+
+/** Opens the technical area, and optionally scrolls to it. A module route opens this first, because a
+    <details> inside a closed <details> has no box on screen to scroll to. */
+function openDeeper({scroll = false} = {}) {
+  if (!deeper) return false;
+  deeper.open = true;
+  if (scroll) deeper.scrollIntoView({block: 'start', behavior: still() ? 'auto' : 'smooth'});
+  return true;
+}
+
+/** index.html belongs to another owner, so the three lines of static copy in it that announced a ten
+    module curriculum are rewritten here, at init, to announce the page this view now opens on. Text
+    only: no element is added, removed or restyled. */
+const INTRO_COPY = [
+  ['#learn-view .learn-intro .subtitle', 'One page, in plain words: what this tool does, what it stops you buying by mistake, and what it cannot promise. The technical sections are underneath, for whoever wants them.'],
+  ['#learn-view .intro-note', 'Plain words first. Then the detail, if you want it. Always what it cannot prove.'],
+  ['#learn-curriculum-title', 'Start here'],
+  ['#learn-view .learn-shell > .help', 'Read straight down. Nothing on this page needs a background in heating and cooling. Figures that describe a climate are read from docs/regional-study.json when the page loads, and figures quoted from a document name that document beside them.']
+];
+
+function patchIntro() {
+  let patched = 0;
+  for (const [selector, copy] of INTRO_COPY) {
+    const element = document.querySelector(selector);
+    if (!element) continue;
+    element.textContent = copy;
+    patched += 1;
+  }
+  return patched;
 }
 
 /** The curriculum. Nine modules, in teaching order. Each one states the concept in plain language, then
@@ -505,21 +1087,29 @@ function regionNode(region) {
 
 const describeVersion = value => value == null ? 'nothing' : String(value);
 
+/** A failure reason belongs in both places at once: the regional section and every figure slot in the
+    one-pager read the same file, so neither of them shows a number when that file is not there. */
+function failStudy(reason) {
+  clearPrimerStudy(reason);
+  return emptyStudy(reason);
+}
+
 function renderStudy(study) {
   if (!regionsBody) return;
   if (study.schemaVersion !== STUDY_SCHEMA) {
-    regionsBody.replaceChildren(emptyStudy(`${STUDY_URL} was read, but it declares schemaVersion ${describeVersion(study.schemaVersion)} and this view reads schemaVersion ${STUDY_SCHEMA}. Nothing is rendered from an unrecognised shape.`));
+    regionsBody.replaceChildren(failStudy(`${STUDY_URL} was read, but it declares schemaVersion ${describeVersion(study.schemaVersion)} and this view reads schemaVersion ${STUDY_SCHEMA}. Nothing is rendered from an unrecognised shape.`));
     return;
   }
   const regions = Array.isArray(study.regions) ? study.regions.filter(region => region && typeof region === 'object') : [];
   if (!regions.length) {
-    regionsBody.replaceChildren(emptyStudy(`${STUDY_URL} was read and parsed, but it carries no regions.`));
+    regionsBody.replaceChildren(failStudy(`${STUDY_URL} was read and parsed, but it carries no regions.`));
     return;
   }
   const fragment = document.createDocumentFragment();
   fragment.append(methodBlock(study.method, study));
   for (const region of regions) fragment.append(regionNode(region));
   regionsBody.replaceChildren(fragment);
+  fillPrimerStudy(study, regions);
 }
 
 async function loadStudy() {
@@ -530,12 +1120,12 @@ async function loadStudy() {
     response = await fetch(STUDY_URL, {cache: 'no-store'});
   } catch (error) {
     studyState = {status: 'error', reason: error.message};
-    regionsBody.replaceChildren(emptyStudy(`${STUDY_URL} could not be requested: ${error.message}. Serve this folder over HTTP rather than opening the file directly.`));
+    regionsBody.replaceChildren(failStudy(`${STUDY_URL} could not be requested: ${error.message}. Serve this folder over HTTP rather than opening the file directly.`));
     return studyState;
   }
   if (!response.ok) {
     studyState = {status: 'missing', reason: `${response.status} ${response.statusText}`};
-    regionsBody.replaceChildren(emptyStudy(`${STUDY_URL} returned ${response.status} ${response.statusText}, so the study has not been generated in this copy of the repository.`));
+    regionsBody.replaceChildren(failStudy(`${STUDY_URL} returned ${response.status} ${response.statusText}, so the study has not been generated in this copy of the repository.`));
     return studyState;
   }
   let study;
@@ -543,12 +1133,12 @@ async function loadStudy() {
     study = JSON.parse(await response.text());
   } catch (error) {
     studyState = {status: 'invalid', reason: error.message};
-    regionsBody.replaceChildren(emptyStudy(`${STUDY_URL} was found but could not be parsed as JSON: ${error.message}.`));
+    regionsBody.replaceChildren(failStudy(`${STUDY_URL} was found but could not be parsed as JSON: ${error.message}.`));
     return studyState;
   }
   if (!study || typeof study !== 'object') {
     studyState = {status: 'invalid', reason: 'not an object'};
-    regionsBody.replaceChildren(emptyStudy(`${STUDY_URL} parsed, but it is not a JSON object, so it carries no study.`));
+    regionsBody.replaceChildren(failStudy(`${STUDY_URL} parsed, but it is not a JSON object, so it carries no study.`));
     return studyState;
   }
   try {
@@ -556,7 +1146,7 @@ async function loadStudy() {
     studyState = {status: 'loaded', regions: Array.isArray(study.regions) ? study.regions.length : 0};
   } catch (error) {
     studyState = {status: 'invalid', reason: error.message};
-    regionsBody.replaceChildren(emptyStudy(`${STUDY_URL} parsed, but a region in it could not be rendered: ${error.message}. Nothing partial is shown.`));
+    regionsBody.replaceChildren(failStudy(`${STUDY_URL} parsed, but a region in it could not be rendered: ${error.message}. Nothing partial is shown.`));
   }
   return studyState;
 }
@@ -616,17 +1206,20 @@ export function showView(name, {focus = false, remember = true, restore = true, 
   const skip = $('skip-link');
   if (skip) {
     skip.setAttribute('href', name === 'learn' ? '#learn-curriculum-title' : '#workspace');
-    skip.textContent = name === 'learn' ? 'Skip to the curriculum' : 'Skip to analysis';
+    skip.textContent = name === 'learn' ? 'Skip to the explainer' : 'Skip to analysis';
   }
   if (restore) window.scrollTo({top: scrollAt[name] || 0, behavior: 'auto'});
   if (focus) $(PANELS[name].panel)?.focus();
   return view;
 }
 
-/** Opens a module by key, in the Learn view, and returns false for an unknown key. */
+/** Opens a module by key, in the Learn view, and returns false for an unknown key. Every module lives
+    inside the collapsed "Go deeper" disclosure, so that is opened first and the module is scrolled to
+    on the frame after it has a box. */
 export function openModule(key, {scroll = true} = {}) {
   const details = $(moduleId(key));
   if (!details) return false;
+  openDeeper();
   details.open = true;
   if (scroll) details.scrollIntoView({block: 'start', behavior: still() ? 'auto' : 'smooth'});
   return true;
@@ -643,10 +1236,30 @@ export function parseRoute(hash) {
   return null;
 }
 
+let routedModule = null;
+
 function applyRoute(route, {focus = false} = {}) {
   if (!route) return false;
   showView(route.view, {focus, hash: false});
-  if (route.view === 'learn' && route.module) openModule(route.module);
+  if (route.view === 'learn' && route.module) {
+    routedModule = route.module;
+    openModule(route.module);
+  }
+  return true;
+}
+
+/** The regional study lands after a route has been applied and adds a long section above the module the
+    reader asked for, which leaves the routed module off screen. So the scroll is taken once more when
+    the study has rendered, and only if the module is not already in view. */
+function settleRoutedScroll() {
+  const key = routedModule;
+  routedModule = null;
+  if (!key) return false;
+  const details = $(moduleId(key));
+  if (!details) return false;
+  const box = details.getBoundingClientRect();
+  if (box.top >= -40 && box.top <= window.innerHeight * 0.5) return false;
+  details.scrollIntoView({block: 'start', behavior: 'auto'});
   return true;
 }
 
@@ -665,13 +1278,24 @@ function onTabKey(event) {
   $(next)?.focus();
 }
 
-/** Builds the curriculum, binds the switch, applies the hash or the remembered view, and loads the study.
-    Returns what it wired, for the caller to log or ignore. */
+/** Builds the one-pager, nests the technical modules inside the collapsed "Go deeper" disclosure, binds
+    the switch, applies the hash or the remembered view, and loads the study. Returns what it wired, for
+    the caller to log or ignore. */
 export function initLearn() {
   const host = $('learn-modules');
   if (host) {
     const fragment = document.createDocumentFragment();
-    MODULES.forEach((mod, index) => fragment.append(moduleNode(mod, index)));
+    fragment.append(primerNode());
+    deeper = document.createElement('details');
+    deeper.id = DEEPER_ID;
+    deeper.className = 'learn-deeper';
+    const deepSummary = document.createElement('summary');
+    deepSummary.append(node('span', 'DEEPER', 'learn-num mono'),
+      node('span', DEEPER_TITLE, 'learn-module-title'),
+      node('span', DEEPER_META, 'summary-meta'));
+    deeper.append(deepSummary);
+    const deepBody = node('div', undefined, 'learn-modules learn-deeper-body');
+    MODULES.forEach((mod, index) => deepBody.append(moduleNode(mod, index)));
     const regions = document.createElement('details');
     regions.id = moduleId(REGION_MODULE.key);
     regions.className = 'learn-module learn-module-regions';
@@ -688,9 +1312,12 @@ export function initLearn() {
       if (view !== 'learn') return;
       writeHash(regions.open ? `learn/${REGION_MODULE.key}` : 'learn');
     });
-    fragment.append(regions);
+    deepBody.append(regions);
+    deeper.append(deepBody);
+    fragment.append(deeper);
     host.replaceChildren(fragment);
   }
+  const patched = patchIntro();
   for (const [name, ids] of Object.entries(PANELS)) {
     const tab = $(ids.tab);
     if (!tab) continue;
@@ -710,5 +1337,6 @@ export function initLearn() {
     if (!intoAnalysis && readView() === 'learn') showView('learn', {hash: false, restore: false});
   }
   const loading = loadStudy();
-  return {modules: MODULES.length, sections: MODULES.length + 1, view, persists, study: loading};
+  loading.then(settleRoutedScroll, () => {routedModule = null;});
+  return {primer: PRIMER.length, patched, modules: MODULES.length, sections: MODULES.length + 1, view, persists, study: loading};
 }

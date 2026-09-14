@@ -357,6 +357,33 @@ footer { position: relative; z-index: 1; max-width: 1440px; margin: auto; paddin
 .learn-intro h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); }
 .learn-shell { padding-bottom: 40px; }
 .learn-shell > .help { margin-bottom: 8px; }
+/* Learn, the one-pager: the plain-language explainer the view opens on, above the technical modules. */
+/* minmax(0, 1fr) rather than the default 1fr: a wide table inside .table-wrap must scroll inside its
+   own box, not widen the track and with it the document. */
+.learn-primer, .learn-part, .learn-part-head, .learn-figures { display: grid; grid-template-columns: minmax(0, 1fr); }
+.learn-primer { gap: 34px; padding: 26px 0 10px; }
+.learn-part { gap: 14px; }
+.learn-part-head { gap: 8px; }
+.learn-part h3 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; max-width: 40ch; }
+.learn-say { font-size: 15px; line-height: 1.7; color: var(--text-2); max-width: 72ch; }
+.learn-points { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 14px; line-height: 1.65; color: var(--text-2); max-width: 72ch; }
+.learn-points li::marker { color: var(--green); }
+.learn-figures { display: grid; gap: 12px; }
+.learn-ladder { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--hairline); }
+.learn-ladder > li { display: grid; gap: 6px; padding: 16px 0; border-bottom: 1px solid var(--hairline); }
+.learn-rung-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.learn-rung-name { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -.015em; color: var(--text); margin-right: auto; }
+.learn-rung-can { font-size: 14px; line-height: 1.65; color: var(--text-2); max-width: 74ch; }
+.learn-rung-defeat { font-size: 13px; line-height: 1.65; color: var(--text-3); max-width: 74ch; }
+.learn-pairs { margin: 0; border-top: 1px solid var(--hairline); }
+.learn-pairs > div { padding: 14px 0; border-bottom: 1px solid var(--hairline); }
+.learn-pairs dt { font: var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); }
+.learn-pairs dd { margin: 6px 0 0; font-size: 14px; line-height: 1.65; color: var(--text-2); max-width: 74ch; }
+.learn-actions { display: flex; flex-wrap: wrap; gap: 10px 12px; }
+.learn-deeper { border-top: 1px solid var(--hairline-strong); }
+.learn-deeper > summary { display: flex; align-items: baseline; gap: 16px; padding: 20px 0; cursor: pointer; list-style: none; }
+.learn-deeper > summary::-webkit-details-marker { display: none; }
+.learn-deeper > summary .summary-meta { max-width: 52ch; }
 .learn-modules { margin-top: 12px; border-top: 1px solid var(--hairline); }
 .learn-module { border-bottom: 1px solid var(--hairline); }
 .learn-module > summary { display: flex; align-items: baseline; gap: 16px; padding: 18px 0; cursor: pointer; list-style: none; }
@@ -365,7 +392,9 @@ footer { position: relative; z-index: 1; max-width: 1440px; margin: auto; paddin
 .learn-module-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -.015em; color: var(--text); margin-right: auto; }
 .learn-module[open] > summary .learn-module-title { color: var(--text); }
 .learn-module > summary .summary-meta { max-width: 42ch; }
-.learn-body { padding: 0 0 28px; display: grid; gap: 18px; max-width: 96ch; }
+/* Same minmax(0, 1fr) reason as the one-pager above: an opened module carries wide evidence tables, and
+   they must scroll inside .table-wrap rather than widen the document on a phone. */
+.learn-body { padding: 0 0 28px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; max-width: 96ch; }
 .learn-body > .eyebrow { margin-bottom: -8px; }
 .learn-lede { font-size: 14px; line-height: 1.7; color: var(--text-2); max-width: 78ch; }
 .learn-relation, .learn-caveat { padding: 14px 16px; background: var(--canvas-2); border: 1px solid var(--hairline); border-radius: var(--r-sm); display: grid; gap: 8px; }
@@ -423,6 +452,9 @@ code { font: 400 12px/1.5 var(--font-mono); color: var(--text); overflow-wrap: a
   /* The global .segmented stretch below is for the results tier control; the header switch stays compact. */
   .viewswitch { align-self: center; } .viewswitch button { flex: 0 0 auto; padding: 6px 10px; }
   .learn-module > summary { flex-direction: column; gap: 6px; } .learn-module > summary .summary-meta { text-align: left; max-width: none; }
+  .learn-deeper > summary { flex-direction: column; gap: 6px; } .learn-deeper > summary .summary-meta { text-align: left; max-width: none; }
+  .learn-primer { gap: 28px; } .learn-part h3 { font-size: 18px; } .learn-say { font-size: 14px; }
+  .learn-actions button, .learn-show button { flex: 1 1 100%; text-align: center; white-space: normal; }
   .learn-source-cell { white-space: normal; }
   .intro { padding: 36px 0 32px; }
   .section-heading { align-items: flex-start; flex-direction: column; gap: 10px; }

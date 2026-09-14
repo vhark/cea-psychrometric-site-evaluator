@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {aggregateYears,compareSites,designHours,loadDecomposition,co2Window,LATENT_KWH_PER_KG} from '../src/metrics.js';
 import {designBasisHTML} from '../src/export.js';
 import {wetBulb,dewPoint,humidityRatio} from '../src/physics.js';
+import {weatherSummary} from '../src/metrics.js';
+import {makeScenario} from '../src/config.js';
 
 const scenario=(id,name,over={})=>({id,name,crop:'lettuce',facility:'greenhouse',timezone:'UTC',areaM2:1000,heightM:4,dayTargetC:22,nightTargetC:18,tempToleranceC:2,vpdMin:.6,vpdMax:1.2,maxDewPointC:18,dliTarget:14,photoperiod:16,dayStart:6,installedCost:50000,...over});
 const summary=over=>({compliancePct:90,compliantHours:7800,cost:1000,electricKWh:5000,fuelKWh:100,eligibleHours:8700,runtime:{pad:{hours:400,days:60}},...over});
@@ -135,4 +137,51 @@ test('design-basis brief escapes scenario text and reports missing load terms as
   assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
   assert.ok(html.includes('No load terms'));
   assert.ok(!html.includes('\u2014'),'no em dashes in copy');
+});
+
+// Pad and vent usefulness must be independent measurements. The primary weather mode is mutually exclusive,
+// so it can only answer one question per hour: a hot hour is classified as a pad mode and never asked whether
+// an open vent would have done the job, and a mild hour is classified as a vent mode and never asked about the
+// pad. These assertions pin the independence and the one relationship that decides whether a pad is worth
+// buying: the pad only earns its capital in hours a vent cannot hold the ceiling at all.
+const utilityHour=(i,tempC,rh)=>({time:Date.UTC(2025,6,1,i),tempC,rh,pressurePa:101325,ghiWm2:0});
+const padScenario=over=>({...makeScenario('greenhouse','bench','lettuce'),timezone:'UTC',padEnabled:true,
+  dayTargetC:24,nightTargetC:24,tempToleranceC:3,vpdMin:.4,vpdMax:1.4,maxDewPointC:20,padEffectiveness:.8,...over});
+
+test('pad and vent usefulness are measured independently, and both can be true in the same hour',()=>{
+  // 34 C at 20% RH: far above the ceiling so a vent cannot hold it, but dry enough that the pad can.
+  const hot=weatherSummary([utilityHour(12,34,.2)],padScenario()).utility;
+  assert.equal(hot.padCoolingHours,1,'a hot dry hour must credit the pad with useful cooling');
+  assert.equal(hot.padDeeperThanVentHours,1,'outside air above the ceiling means only the pad can reach the band');
+  assert.equal(hot.ventCoolingHours,0,'34 C outside cannot cool a 24 C zone');
+  // 18 C at 40% RH: the vent both cools and dries, and the pad is not needed for either.
+  const mild=weatherSummary([utilityHour(12,18,.4)],padScenario()).utility;
+  assert.equal(mild.ventCoolingHours,1,'cool dry outside air must be credited as useful ventilation');
+  assert.equal(mild.ventDryingHours,1);
+  assert.equal(mild.padDeeperThanVentHours,0,'a vent that holds the ceiling leaves the pad nothing exclusive');
+  // Independence in the other direction: the hot hour is a pad mode, yet the vent's drying capability is still
+  // reported. The mutually exclusive mode alone would have hidden it.
+  assert.equal(hot.ventDryingHours,1,'a pad hour must still report whether outside air could dry the zone');
+  assert.equal(hot.bothHours,1,'pad-useful and vent-useful can be true in the same hour');
+});
+
+test('the pad only earns its capital where a vent cannot hold the ceiling, and that is a climate property',()=>{
+  const hours=[];
+  // A dry day that climbs past the ceiling, then a cool night: a vent covers part of it, the pad covers the rest.
+  for(let i=0;i<12;i++)hours.push(utilityHour(i,16+2*i,.25));
+  for(let i=12;i<24;i++)hours.push(utilityHour(i,18,.5));
+  const dry=weatherSummary(hours,padScenario()).utility;
+  // Every pad-exclusive hour must also be an hour the pad can cool at all: the deeper set is a strict subset.
+  assert.ok(dry.padDeeperThanVentHours<=dry.padCoolingHours,
+    `pad-exclusive ${dry.padDeeperThanVentHours} must not exceed pad-cooling ${dry.padCoolingHours}`);
+  assert.ok(dry.padDeeperThanVentHours>0,'a day that climbs above the ceiling must give the pad exclusive hours');
+  // The same hours in saturated air: the pad can no longer reach the band, so its exclusive contribution goes.
+  const humid=weatherSummary(hours.map(h=>({...h,rh:.92})),padScenario()).utility;
+  assert.equal(humid.padDeeperThanVentHours,0,'near-saturated air leaves the pad no exclusive hours');
+  assert.ok(humid.ventDryingHours<dry.ventDryingHours,'humid air also removes the vent drying opportunity');
+  // A pad that is not installed is never credited, while the vent assessment is unaffected by it.
+  const off=weatherSummary(hours,padScenario({padEnabled:false})).utility;
+  assert.equal(off.padUsefulHours,0);
+  assert.equal(off.padDeeperThanVentHours,0);
+  assert.equal(off.ventCoolingHours,dry.ventCoolingHours,'removing the pad must not change the vent answer');
 });

@@ -17,6 +17,19 @@ Versions are model versions: the string the engine stamps into every result and 
 - **Air-source heat-pump heating** with a temperature-dependent COP, a cold-hour capacity derate and a hard cutoff that reports unmet heat instead of silently falling back to fuel.
 - **Envelope ladder** of glazing and infiltration presets, and `docs/COMPONENT-PARAMETERS.md`: 23 sources behind every movable-shade, screen, envelope and heat-pump number, separating what is measured from what is plausible mechanism. Unsourced inputs ship as nulls that block the run with a named error rather than as plausible-looking defaults.
 - `scripts/check-vintages.mjs` and `src/vintages.js`: per-dataset staleness budgets with rationale, an offline age report that exits non-zero past budget, and a CI step that reports without failing.
+- **Evaporative pad and outside-air ventilation are now scored independently.** The weather-side classifier
+  assigns one mutually exclusive primary mode per hour, so it could only ever answer one question: a hot hour
+  became a pad mode and was never asked whether an open vent would have done the job, and a mild hour became a
+  vent mode and was never asked about the pad. Every valid hour now carries both assessments, split into pad
+  cooling, pad humidification, vent cooling and vent drying, with the joint and neither counts reported beside
+  them. The decisive new figure is pad-only hours, where outside air is above the ceiling so ventilation cannot
+  hold the band while pad leaving air still can: Phoenix 2,274 h against Miami 21 h in a median year, a factor
+  of about 108 at the same crop and band. That figure reproduces the previous pad-effective count exactly, so
+  the old number was always this narrower quantity and is now correctly labelled. Two results fall out of the
+  decoupling: at a dry site the pad spends more of its year usefully adding moisture than removing heat
+  (Phoenix 3,766 h against 2,778 h), and across all six bundled sites there is no hour where the pad is useful
+  and the vent is not, so a pad is not an alternative to a vent but a way to push vent air colder than the
+  weather allows.
 - **Insect screen ventilation penalty**, the one gap the evidence review named in the model itself. `insectScreen` derates the achievable maximum outside-air exchange by a measured ratio: 1.000, 0.641 and 0.502 for nominal 40, 52 and 78 mesh, from the floor-normalized ventilation rates of one instrumented Thai rainy-season campaign. The reference is the 40-mesh house and NOT an unscreened one, because that campaign had no unscreened control, so the cost of the first screen stays UNSOURCED and an installed screen with no declared factor blocks the run. The declared minimum ventilation is a requirement rather than a capability and is not derated; a derate that would fall below it clamps there and says so.
 - `docs/EVIDENCE-HOT-HUMID.md`: a graded review of what measured research establishes for hot-humid CEA. No Grade A evidence was found in any of six domains: no peer-reviewed study measured two or more strategies in a real hot-humid facility against a shared band with separated metering. The document records what is proven (the evaporative wet-bulb floor, one measured dehumidifier band of 2.0 to 3.1 kg/kWh, one measured tropical end-use split where air conditioning exceeded lighting at 50.5 against 36.0 percent), what is not (any measured winner, any safe humidity-relaxation value, any tropical kWh per saleable kg), and which of this tool's figures the evidence can carry. 52 cited DOIs machine-checked.
 - `docs/examples/`: an importable scenario library, one set per design question, each exercised by `test/examples.test.mjs` on a real weather year.

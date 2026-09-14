@@ -22,6 +22,31 @@ A note on precedence: where a general industry definition and the computation be
 
 Throughout these documents, "control window" means only this: the count of hours inside the joint band. It never means a controller setting, a dispatch interval or a time-of-day schedule.
 
+### Pad usefulness, vent usefulness, and pad-only hours
+
+Unit: hours per record, plus a share of valid hours. Where: the weather-only screen table, and the study's
+per-region `weather` block as `padCoolingHoursMedian`, `padHumidifyingHoursMedian`,
+`padDeeperThanVentHoursMedian`, `ventCoolingHoursMedian`, `ventDryingHoursMedian`, `bothUsefulHoursMedian`
+and `neitherUsefulHoursMedian`. How computed here: an evaporative pad and an open vent are different tools, so
+each hour is scored for both independently rather than receiving one mutually exclusive label.
+
+- **Pad could cool usefully**: pad leaving air clears the ceiling by the pad margin and stays under the
+  moisture limit, in an hour where outside air is above the target.
+- **Pad could usefully humidify**: outside air is drier than the band's moisture floor and the pad does not
+  overshoot the ceiling, so the water the pad adds is the point rather than a side effect.
+- **Pad only, vent cannot hold the ceiling**: outside air is above the ceiling, so ventilation alone cannot
+  hold the band, while pad leaving air still can. **This is the only set of hours a pad is necessary rather
+  than merely also working**, and it reproduces the older mutually exclusive pad-effective count exactly.
+- **Vent could cool usefully**: outside air is below the target by the ventilation margin without importing
+  moisture past the ceiling. **Vent could dry usefully**: outside air sits below the zone moisture ceiling by
+  the drying margin.
+- **Both useful** is an overlap and not a sum. Measured across all six bundled sites there is no hour where the
+  pad is useful and the vent is not, so a pad is a way to push vent air colder than the weather allows rather
+  than an alternative to a vent.
+
+All of these are weather-side capability at the declared band. None of them knows the zone's actual state,
+whether cooling was wanted in that hour, or what the controller dispatched.
+
 ## Attainment
 
 **What it is.** The share of comparable hours in which the zone held the joint target band.

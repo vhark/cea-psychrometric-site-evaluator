@@ -468,20 +468,28 @@ function renderRuntime(r) {
   const share = n => hours ? units(n / hours * 100, '% of valid h', 1) : 'Not available';
   const row = (label, key, note) => rt[key] ? [label, format(rt[key].hours), format(rt[key].equivalentHours, 1), format(rt[key].days), share(rt[key].hours), note] : null;
   if (state.weatherOnly) {
-    $('runtime-title').textContent = 'Pad viability from weather alone'; $('runtime-help').textContent = 'Hours outdoor air needed cooling, split by whether pad leaving air would clear the temperature margin and moisture ceiling. Air-side capability, not equipment runtime or installed capacity.';
+    const u = r.weatherSummary?.utility;
+    $('runtime-title').textContent = 'What the weather makes useful: pad and vent, measured separately';
+    $('runtime-help').textContent = 'A wet pad and an open vent are different tools, so they are scored independently and jointly rather than by one mutually exclusive label per hour. The row that decides whether a pad is worth buying is the pad-only one: hours outside air is above the ceiling, so ventilation cannot hold the band, while pad leaving air still can. Air-side capability, not equipment runtime or installed capacity.';
     const days = d => `${format(d?.atLeast1)} / ${format(d?.atLeast4)} / ${format(d?.atLeast8)}`;
-    table($('runtime-table'), ['Pad screen', 'Hours', 'Days with ≥1 / ≥4 / ≥8 h', 'Share of cooling-demand hours'], pv ? [
-      ['Pad effective', format(pv.effectiveHours), days(pv.effectiveDays), units(pv.coolingDemandHours ? pv.effectiveHours / pv.coolingDemandHours * 100 : null, '%', 1)],
-      ['Pad marginal', format(pv.marginalHours), days(pv.marginalDays), units(pv.coolingDemandHours ? pv.marginalHours / pv.coolingDemandHours * 100 : null, '%', 1)],
-      ['Pad ineffective, dehumidification needed', format(pv.ineffectiveHours), days(pv.ineffectiveDays), units(pv.coolingDemandHours ? pv.ineffectiveHours / pv.coolingDemandHours * 100 : null, '%', 1)],
-      ['Limit hit: temperature margin', format(pv.failureCauses?.temperature), 'Hours where pad leaving air stays too warm', ''],
-      ['Limit hit: moisture ceiling', format(pv.failureCauses?.moisture), 'Hours where pad leaving air is too humid', '']] : []);
+    const pct = n => units(hours ? n / hours * 100 : null, '% of valid h', 1);
+    table($('runtime-table'), ['Weather-side capability', 'Hours', 'Share of valid hours', 'Reading'], u ? [
+      ['Pad could cool usefully', format(u.padCoolingHours), pct(u.padCoolingHours), 'Pad leaving air clears the ceiling by the margin and stays under the moisture limit'],
+      ['Pad could usefully humidify', format(u.padHumidifyingHours), pct(u.padHumidifyingHours), 'Outside air is drier than the band floor, so the water the pad adds is the point'],
+      ['Pad only: vent cannot hold the ceiling', format(u.padDeeperThanVentHours), pct(u.padDeeperThanVentHours), 'The hours a pad earns its capital rather than merely also working'],
+      ['Vent could cool usefully', format(u.ventCoolingHours), pct(u.ventCoolingHours), 'Outside air below the target by the ventilation margin without importing moisture'],
+      ['Vent could dry usefully', format(u.ventDryingHours), pct(u.ventDryingHours), 'Outside air below the zone moisture ceiling by the drying margin'],
+      ['Both useful in the same hour', format(u.bothHours), pct(u.bothHours), 'Overlap, not a sum: these hours are counted in both tools above'],
+      ['Neither useful', format(u.neitherHours), pct(u.neitherHours), 'Hours no outside-air path helps, so mechanical equipment is the only option'],
+      ['Limit hit: temperature margin', format(pv?.failureCauses?.temperature), '', 'Hours pad leaving air stays too warm'],
+      ['Limit hit: moisture ceiling', format(pv?.failureCauses?.moisture), '', 'Hours pad leaving air is too humid'],
+      ['Legacy pad screen: effective / marginal / ineffective', `${format(pv?.effectiveHours)} / ${format(pv?.marginalHours)} / ${format(pv?.ineffectiveHours)}`, '', `Mutually exclusive primary-mode counts, retained for continuity. Effective days ≥1 / ≥4 / ≥8: ${days(pv?.effectiveDays)}`]] : []);
     return;
   }
   const controller = (s.controlModeUsed || r.scenario.controlMode) === 'ideal' ? 'assumed ideal per-minute modulation (upper bound)' : 'the staged deadband controller';
   $('runtime-title').textContent = 'Equipment runtime'; $('runtime-help').textContent = `Hours with any use, duty-weighted equivalent full-load hours, and local days with any use, under ${controller}. Pad rows also show the weather-only viability screen for the same record.`;
   table($('runtime-table'), ['Component', 'Hours used', 'Equivalent full-load h', 'Days used', 'Share', 'Note'], [
-    row('Evaporative pad', 'pad', r.scenario.padEnabled ? `${format(s.padWaterL)} L water. Weather screen: ${format(pv?.effectiveHours)} h effective on ${format(pv?.effectiveDays?.atLeast1)} days; ${format(pv?.ineffectiveHours)} h too warm or humid for pad alone.` : 'Not installed in this scenario'),
+    row('Evaporative pad', 'pad', r.scenario.padEnabled ? `${format(s.padWaterL)} L water. Weather screen: the pad could cool usefully in ${format(r.weatherSummary?.utility?.padCoolingHours)} h and was the only path to the ceiling in ${format(r.weatherSummary?.utility?.padDeeperThanVentHours)} h, against ${format(r.weatherSummary?.utility?.ventCoolingHours)} h a vent alone could cool.` : 'Not installed in this scenario'),
     row('Indirect evaporative stage', 'indirect', 'Hybrid secondary wet stream'),
     row('DX cooling', 'dx', `Peak ${format(s.peakCoolingKW, 1)} kW total cooling`),
     row('Condensing dehumidifier', 'dehu', `${format(s.condensateKg)} kg condensate`),
