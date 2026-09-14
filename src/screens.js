@@ -35,7 +35,37 @@ export const THERMAL_SCREEN_DEFAULT = Object.freeze({
   deployAboveC: null, nightDeploy: true, closedExchangeACH: null
 });
 
-export const SCREEN_DEFAULTS = Object.freeze({shadeScreen: SHADE_SCREEN_DEFAULT, thermalScreen: THERMAL_SCREEN_DEFAULT});
+// Insect screens restrict the outside-air path, which in a humid house removes its cheapest moisture sink.
+// `ventilationFactor` multiplies the achievable maximum outside-air exchange. It is measured RELATIVE TO A
+// 40-MESH SCREENED HOUSE, not to an unscreened one: Harmanto, Tantau and Salokhe measured three screened
+// houses side by side in the Thai rainy season and there was no unscreened control, so the cost of adding a
+// first screen to an open house is UNSOURCED and this model cannot supply it. A run that declares 1.0 is
+// therefore claiming a 40-mesh house, not an unrestricted one.
+export const INSECT_SCREEN_DEFAULT = Object.freeze({installed: false, grade: null, ventilationFactor: null});
+
+// Measured ventilation rates, floor-normalized, from the same rainy-season campaign: 0.0719, 0.0461 and
+// 0.0361 m3 m-2 s-1 with standard errors 0.0025, 0.0019 and 0.0022 [S24]. The factors below are those rates
+// divided by the 40-mesh rate. Aperture, porosity and the authors' discharge coefficients are carried so a
+// user can check that a product resembles the screen that was measured rather than matching a nominal mesh.
+export const INSECT_SCREEN_GRADES = Object.freeze({
+  mesh40: Object.freeze({label: 'Nominal 40 mesh (40 x 38, 0.44 x 0.39 mm, porosity 0.41)', ventilationFactor: 1,
+    measuredM3M2S: .0719, standardError: .0025, dischargeCoefficient: .31}),
+  mesh52: Object.freeze({label: 'Nominal 52 mesh (52 x 22, 0.80 x 0.25 mm, porosity 0.38)', ventilationFactor: .641,
+    measuredM3M2S: .0461, standardError: .0019, dischargeCoefficient: .28}),
+  mesh78: Object.freeze({label: 'Nominal 78 mesh (78 x 52, 0.29 x 0.18 mm, porosity 0.30)', ventilationFactor: .502,
+    measuredM3M2S: .0361, standardError: .0022, dischargeCoefficient: .21})
+});
+
+export const INSECT_SCREEN_EVIDENCE = Object.freeze({
+  measured: 'Ventilation factors are measured ratios from one instrumented rainy-season experiment at the Asian Institute of Technology, Pathum Thani, Thailand: three 10 x 20 m houses, 300 tomato plants each, fans off, ventilation inferred from an irrigation-minus-drainage water balance cross-checked against an energy balance [S24]. One house per treatment at one site, so this is a measured direction and magnitude, not a validated universal mesh penalty.',
+  referenceIsScreened: 'The reference is the 40-mesh house, NOT an unscreened house. The same campaign measured no unscreened control, so the ventilation cost of the first screen is UNSOURCED. Declaring ventilationFactor 1.0 claims a house like the measured 40-mesh one.',
+  notACH: 'The source reports floor-normalized volumetric flow, not air changes per hour, so the ratio is transferred and the absolute rates are not.',
+  coupledEffects: 'The same measurement recorded finer mesh raising mean air temperature from 30.8 to 31.9 C and indoor-minus-outdoor absolute humidity from 1.05 to 2.21 g m-3. Only the ventilation restriction is modeled here; the temperature and moisture consequences follow from the run rather than being imposed.',
+  optics: 'Mesh also changes light transmission [S24]. No optical effect is applied: screen-specific PAR transmission is UNSOURCED. Use the shade-screen fields for a declared optical loss.'
+});
+
+export const SCREEN_DEFAULTS = Object.freeze({shadeScreen: SHADE_SCREEN_DEFAULT, thermalScreen: THERMAL_SCREEN_DEFAULT,
+  insectScreen: INSECT_SCREEN_DEFAULT});
 
 // Heating source. Fuel keeps the existing combustion branch; 'heatpump' replaces it with electricity at an
 // interpolated COP. No generic curve is shipped: COP by outdoor temperature, low-ambient derate, defrost
@@ -121,6 +151,23 @@ export function resolveThermalScreen(raw) {
     deployAboveC: finite(s.deployAboveC) ? s.deployAboveC : null,
     nightDeploy: s.nightDeploy !== false,
     closedExchangeACH: finite(s.closedExchangeACH) && s.closedExchangeACH >= 0 ? s.closedExchangeACH : null
+  };
+}
+export const backfillInsectScreen = raw => backfillScreen(raw, INSECT_SCREEN_DEFAULT);
+
+// A catalogued grade supplies the measured factor. An explicit ventilationFactor overrides it, so a user with
+// a real product test is never forced onto one of three Thai screens. Neither present resolves to factor null,
+// which validation rejects rather than letting an installed screen quietly cost nothing.
+export function resolveInsectScreen(raw) {
+  const s = backfillInsectScreen(raw);
+  const grade = typeof s.grade === 'string' && Object.hasOwn(INSECT_SCREEN_GRADES, s.grade) ? INSECT_SCREEN_GRADES[s.grade] : null;
+  const declared = finite(s.ventilationFactor) && s.ventilationFactor > 0 && s.ventilationFactor <= 1 ? s.ventilationFactor : null;
+  const factor = declared ?? grade?.ventilationFactor ?? null;
+  return {
+    installed: s.installed === true,
+    grade: grade ? s.grade : null, gradeLabel: grade ? grade.label : null,
+    ventilationFactor: s.installed === true ? factor : 1,
+    declaredFactor: declared, basis: declared ? 'declared product measurement' : grade ? 'measured Thai rainy-season ratio against a 40-mesh house' : null
   };
 }
 
@@ -209,6 +256,21 @@ export function shadeScreenErrors(raw) {
       if (!finite(s.deployAboveWm2) && !finite(s.deployAboveC)) errors.push('Shade screen: declare an irradiance threshold in W/m2 and/or an outdoor temperature threshold. Universal thresholds are unsourced, so the screen has no default trigger.');
       if (finite(s.deployAboveWm2) && s.deployAboveWm2 < 0) errors.push('Shade screen: the irradiance threshold cannot be negative.');
       if (finite(s.maxDeployDliDeficit) && s.maxDeployDliDeficit < 0) errors.push('Shade screen: the light-deficit guard cannot be negative.');
+      return errors;
+    }
+  });
+}
+export function insectScreenErrors(raw) {
+  return screenErrorsFor(raw, INSECT_SCREEN_DEFAULT, 'Insect screen', {
+    fractions: [['ventilationFactor', 1]], numbers: [], booleans: ['installed'],
+    installed: s => {
+      const errors = [];
+      const known = typeof s.grade === 'string' && Object.hasOwn(INSECT_SCREEN_GRADES, s.grade);
+      if (s.grade !== null && typeof s.grade !== 'string') errors.push('Insect screen: grade must be a catalogued key or null.');
+      else if (typeof s.grade === 'string' && !known) errors.push(`Insect screen: unknown grade "${s.grade}". Catalogued: ${Object.keys(INSECT_SCREEN_GRADES).join(', ')}, or declare a ventilationFactor.`);
+      if (!known && !(finite(s.ventilationFactor) && s.ventilationFactor > 0)) {
+        errors.push('Insect screen: declare a ventilationFactor above 0, or pick a catalogued grade. An installed screen that costs no ventilation is not a defensible default, and the factor is relative to a 40-mesh screened house rather than to an unscreened one.');
+      }
       return errors;
     }
   });

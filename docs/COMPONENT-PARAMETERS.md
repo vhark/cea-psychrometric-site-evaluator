@@ -199,6 +199,50 @@ These are derived geometric identities, not empirical fits. The final greenhouse
 
 UGA's published single-house worked example has **500.8 m²** envelope over **297.3 m²** floor, giving a derived ratio of approximately **1.685** [S2, S4]. The underlying source areas are 5390.6 and 3200 ft². This is a stand-alone gable example, **not** a typical gutter-connected ratio. More shared bays reduce perimeter exposure per floor area; tall warehouse boxes can reverse the expected comparison. Numerical uncertainty comes from actual dimensions and area definition, not a universal percentage band.
 
+## 3A. Insect screens: the ventilation penalty
+
+### 3A.1 What is established
+
+One instrumented rainy-season campaign measured three side-by-side screened greenhouses in the humid tropics
+with the fans off, and reported floor-normalized ventilation, screen geometry and microclimate together [S24].
+That is the whole measured basis for this component.
+
+| Nominal mesh | Geometry and porosity | Discharge coefficient | Measured ventilation, m3 m-2 s-1 | Ratio to 40 mesh |
+| --- | --- | ---: | ---: | ---: |
+| 40 | 40 x 38, aperture 0.44 x 0.39 mm, porosity 0.41 | 0.31 | 0.0719 ± 0.0025 | 1.000 |
+| 52 | 52 x 22, aperture 0.80 x 0.25 mm, porosity 0.38 | 0.28 | 0.0461 ± 0.0019 | **0.641** |
+| 78 | 78 x 52, aperture 0.29 x 0.18 mm, porosity 0.30 | 0.21 | 0.0361 ± 0.0022 | **0.502** |
+
+The same campaign measured the consequences: mean air temperature 30.8, 31.1 and 31.9 °C, and mean
+indoor-minus-outdoor absolute humidity 1.05, 1.63 and 2.21 g m-3 across the same three treatments [S24]. So
+finer mesh measurably keeps both the crop's heat and the crop's water inside the house.
+
+### 3A.2 What the model does with it
+
+`insectScreen.ventilationFactor` multiplies the achievable maximum outside-air exchange. A catalogued grade
+(`mesh40`, `mesh52`, `mesh78`) supplies the measured ratio; an explicit factor overrides it for a user with
+real product data. The declared minimum ventilation is a requirement rather than a capability, so it is not
+derated; if the derate would fall below it, the maximum clamps there and the run says so.
+
+### 3A.3 The limits, which are severe
+
+- **The reference is the 40-mesh house, NOT an unscreened house.** The campaign had no unscreened control, so
+  **the ventilation cost of the first screen is UNSOURCED** and this model cannot supply it. Declaring
+  `ventilationFactor: 1` claims a house like the measured 40-mesh one, not an unrestricted one.
+- **Ratios transfer, absolute rates do not.** The source reports floor-normalized volumetric flow, not air
+  changes per hour, so only the ratio is carried.
+- **One house per treatment at one site, one season, fans off, young crop, unstable rainy weather.** Ventilation
+  was inferred from an irrigation-minus-drainage water balance cross-checked against an energy balance, not from
+  tracer gas. This is a measured direction and magnitude, not a validated universal mesh penalty.
+- **Nominal mesh is not a specification.** Note that the 52-mesh sample has a *larger* aperture than the
+  40-mesh one in one axis and a lower porosity overall. Match a product on porosity and aperture, not on the
+  mesh number.
+- **No optical or thermal effect of the mesh is modeled.** Mesh also changes light transmission [S24], and
+  screen-specific PAR transmission is UNSOURCED. Use the shade-screen fields to declare an optical loss.
+- **The measured direction is not universal across strategies.** It was measured in a house whose only moisture
+  sink was the outside-air path. Where a mechanical sink exists the sign can reverse, which this repository
+  measured and documented in [CLASSES.md](CLASSES.md).
+
 ## 4. Air-source heat-pump heating
 
 ### 4.1 What is established
@@ -297,6 +341,7 @@ All sources below were accessed directly during this research. **23 distinct sou
 - **[S21]** NEEP, *Cold Climate Air Source Heat Pump Specification, Version 4.0*, effective January 2023: https://neep.org/sites/default/files/media-files/cold_climate_air_source_heat_pump_specification_-_version_4.0_final.pdf . Full specification read; eligibility and reporting requirements, not unit performance.
 - **[S22]** ENERGY STAR, *Heat Pump Equipment Key Product Criteria*: https://www.energystar.gov/products/air_source_heat_pumps/key-product-criteria . Government requirements and COP/HSPF2 definitions.
 - **[S23]** NEEP, *ccASHP Specification & Product List*: https://neep.org/heating-electrification/ccashp-specification-product-list . Read together with linked https://ashp.neep.org/ . Access page, not evidence for any particular unit's performance.
+- **[S24]** Harmanto, Tantau, H.J., and Salokhe, V.M. (2006). *Influence of Insect Screens with Different Mesh Sizes on Ventilation Rate and Microclimate of Greenhouses in the Humid Tropics.* Agricultural Engineering International: CIGR Journal, Vol. VIII. Open full text read: https://hdl.handle.net/1813/10512 . Related journal article: *Microclimate and Air Exchange Rates in Greenhouses covered with Different Nets in the Humid Tropics*, DOI 10.1016/j.biosystemseng.2006.02.016; treat as one research program, not independent replication. Asian Institute of Technology, Pathum Thani, Thailand, rainy season June to October 2004; three 10 x 20 m houses, 300 tomato plants each, fans off. Screen geometry, discharge coefficients, ventilation with standard errors, and microclimate read from Methods and Table 2. No unscreened control.
 
 Access limitations: the assigned web-search service returned a signup response. Direct URLs supplied by the coordinating researcher and discovered from primary-site links were then read. Publisher ScienceDirect links returned access errors, and the HTFF conference paper returned a server refusal on both attempted host forms. Their numerical results are not used. Vendor and extension access was not treated as independent laboratory verification.
 

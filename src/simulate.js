@@ -2,7 +2,7 @@ import {MODEL_VERSION,backfillScenario,FACILITY_TEMPLATES} from './config.js';
 import {CP_DRY_AIR as CP,LATENT_HEAT as L,clamp,humidityRatio,saturationHumidityRatio,saturationPressure,
   vaporPressure,relativeHumidity,dewPoint,airVPD,dryAirDensity,padState,weatherState,schedule,moistureBounds,classifyWeather,outdoorDryingHour,
   stanghelliniTranspiration,canopyAbsorbedWm2,localClock} from './physics.js';
-import {resolveShadeScreen,resolveThermalScreen,shadeDeployed,thermalDeployed,heatSourceState,heatPumpConfigured,
+import {resolveShadeScreen,resolveThermalScreen,resolveInsectScreen,shadeDeployed,thermalDeployed,heatSourceState,heatPumpConfigured,
   componentWarnings,componentAssumptions} from './screens.js';
 import {summarizeHours,weatherSummary} from './metrics.js';
 
@@ -362,6 +362,16 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
   // depend on the caller having validated first. Copy, then fill; never mutate the input.
   const s=backfillScenario({...scenario});
   const shade=resolveShadeScreen(s.shadeScreen),thermal=resolveThermalScreen(s.thermalScreen);
+  // An insect screen restricts the outside-air path, so it lowers the achievable maximum exchange before any
+  // control decision is taken. The declared minimum is a requirement rather than a capability and is left
+  // alone; if the derate would fall below it, the maximum clamps to the minimum and the run says so.
+  const insect=resolveInsectScreen(s.insectScreen);
+  if(insect.installed&&insect.ventilationFactor<1){
+    const derated=s.maxVentACH*insect.ventilationFactor;
+    s.maxVentACH=Math.max(s.minVentACH,derated);
+    insect.appliedACH=s.maxVentACH;
+    insect.clampedToMinimum=derated<s.minVentACH-1e-9;
+  }
   for(const t of [s.dayTargetC,s.nightTargetC])if(!moistureBounds(t,101325,s).feasible)throw Error('Temperature, VPD and dew-point targets have no joint moisture band.');
   const controlMode=s.controlMode==='ideal'?'ideal':'staged';
   const transpirationModel=s.transpirationModel==='schedule'?'schedule':'stanghellini';
@@ -387,6 +397,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     'Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.'
   ];
   if(s.desiccantKgH>0)warnings.push('Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.');
+  if(insect.installed)warnings.push(`Insect screen derates the maximum outside-air exchange by a factor of ${insect.ventilationFactor} to ${s.maxVentACH.toFixed(2)} ACH${insect.clampedToMinimum?', clamped up to the declared minimum, so the screened capacity is below the ventilation the scenario requires':''}. The factor is ${insect.basis}, measured relative to a 40-mesh screened house and NOT to an unscreened one, so it cannot price the first screen. No optical or thermal effect of the mesh is modeled.`);
   if(s.doasM3s>0)warnings.push('Generic dry-neutral DOAS: outdoor air delivered at the declared supply temperature and the lower of outdoor or supply dew-point moisture; purchased electricity is the declared kWh per kg removed from outdoor air plus fan power, with supply tempering assumed inside that figure. DOAS air is outdoor air and counts against CO2 enrichment. Brand-agnostic assumption, not product data.');
   warnings.push(...componentWarnings(s,shade,thermal,s.heatSource==='heatpump'&&!heatPumpConfigured(s)?'incomplete':'ok'));
   // Envelope provenance follows the template the scenario still matches. Two of the ladder entries have no

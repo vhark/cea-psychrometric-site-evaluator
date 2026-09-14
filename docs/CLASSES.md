@@ -185,6 +185,101 @@ than fuel at these prices at every site, but in Fairbanks attainment falls from 
 -15 C cutoff, the 1,112 hours a year below -20 C are hours it will not run at all. The unmet heat is reported
 rather than silently burned. Below a subarctic cutoff you still need the burner, so you have bought both plants.
 
+## Four hot-humid design questions, measured
+
+All four were run on the bundled Miami 2025 year, 500 m2 greenhouse, ideal controller, 5-minute steps, at
+0.12 USD/kWh electricity and 0.045 USD/kWh fuel. They test claims that are widely held and half right.
+
+### Is a clear roof "air conditioning the sun"?
+
+**Not per photon. Badly, per installed ton.** Per mol of PAR delivered to the crop, the roof admits 138 Wh of
+shortwave and an LED at 2.5 umol/J burns 131 Wh of electricity, using the engine's own 2.02 umol/J solar
+conversion. Those are within 5 percent, so sunlight is not thermally worse than lamplight for the same light.
+
+Three other things are true and they are what the intuition is actually detecting:
+
+| | Clear roof, 0.65 transmission | LED to the 14 mol target |
+| --- | ---: | ---: |
+| Heat admitted or released, annual | **604 MWh** | 234 MWh |
+| Peak | **325 kW** | 40 kW steady over 16 h |
+| Light delivered against the crop's need | **1.71x the target** | 1.00x |
+
+So the roof brings 2.6 times the heat, because it insists on delivering 1.71 times the light the crop asked
+for, and it does it at an **8-fold higher peak** that sizes the cooling plant. Our own ladder shows the
+consequence: the hybrid greenhouse needed 370 kW of cooling in Miami against 109 kW for the insulated box.
+That is the real penalty of glazing in a hot-humid climate, and it is a controllability and peak-load penalty
+rather than a thermodynamic one. It also explains why the shade screen helps here: removing the excess light
+moves the roof back toward parity instead of throwing away photons the crop wanted.
+
+At a modern 3.0 to 3.5 umol/J fixture the LED figure falls to 109 and 94 Wh/mol, so LEDs become genuinely
+better than sunlight per delivered photon, and the gap widens with every fixture generation.
+
+### Do standalone dehumidifiers just fight the air conditioning?
+
+**They do fight it, and it is still worth roughly half the bill.** Miami, DX fixed at 300 kW, sweeping a
+standalone condensing dehumidifier:
+
+| Dehumidifier | Attainment | Its own heat into the zone | Cooling | Total electricity | Operating cost |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 kg/h | 67.6% | 0 | 1,300 MWh | 464 MWh | 81,483 |
+| 30 kg/h | 96.9% | 153 MWh | 826 MWh | 363 MWh | 50,422 |
+| 60 kg/h | **97.0%** | 184 MWh | 680 MWh | **327 MWh** | **40,453** |
+| 90 kg/h | 97.0% | 191 MWh | 667 MWh | 326 MWh | 40,030 |
+| 120 kg/h | 97.1% | 189 MWh | 669 MWh | 326 MWh | 40,045 |
+
+The fight is real and quantified: at 60 kg/h the dehumidifier dumps **184 MWh of its own heat** into a house
+that then spends 680 MWh cooling, so about **27 percent of the remaining cooling load is the dehumidifier's own
+waste heat**. And it is still the right move by a wide margin: **+29.4 points of attainment and half the
+electricity**, because forcing a DX coil to do the latent work means overcooling the entire airstream and
+throwing sensible capacity away. Returns stop at about 60 kg/h for this house, which is also where the
+measured crop moisture peaks.
+
+### Do you always want integrated reheat?
+
+**Only when the coil is your dehumidifier, and then it is not optional, it is decisive.** Same Miami house
+with the standalone dehumidifier removed, so the DX coil has to handle latent:
+
+| | Attainment | Reheat recovered | Purchased heat | Operating cost |
+| --- | ---: | ---: | ---: | ---: |
+| DX, no reheat | 67.6% | 0 | **498 MWh** | 81,483 |
+| Integrated, 50 percent recovery | 97.2% | 520 MWh | 47.6 MWh | 59,547 |
+| Integrated, 100 percent recovery | **98.4%** | 557 MWh | 12.9 MWh | **57,814** |
+
+Without reheat the house overcools to reach the dew point and then **buys 498 MWh of heat in Miami**, which is
+the absurdity the intuition is reaching for, and it still only holds the band 67.6 percent of the time.
+Integrated recovery is worth **up to 30.8 points and 23,669 dollars a year** here. So yes: a coil used as a
+dehumidifier needs hot-gas or condenser reheat.
+
+But the ordering is the opposite of the usual assumption. With a separate dehumidifier the reheat term nearly
+vanishes (7.8 MWh in Miami, 2.4 in Tulsa, 1.4 in Seattle) because the coil rarely has to overcool, and that
+path costs **40,453 dollars against 57,814** for coil-plus-full-reheat at the same attainment. **Decoupling the
+latent job beats coupling it and recovering the penalty**, by 17,361 dollars a year in this house. Reheat is
+the fix for a design choice, not a better design choice.
+
+### Does an insect screen cost you, or help?
+
+**It depends entirely on whether the outside-air path is doing work you cannot replace.** Using the measured
+Thai ventilation ratios (1.000, 0.641, 0.502 for nominal 40, 52 and 78 mesh, see
+[COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) section 3A):
+
+| Site, 2025 | Strategy | Reference 40 mesh | 78 mesh |
+| --- | --- | ---: | ---: |
+| Miami | pad and vent only | 7.4% | **4.6%** |
+| Miami | pads plus dehumidifier | 10.5% | **8.2%** |
+| Tulsa | pads plus dehumidifier | 38.9% | **44.2%** |
+| Fairbanks | pads plus dehumidifier | 40.4% | **49.8%** |
+
+In Miami the screen costs attainment, matching the measured Thai direction, because ventilation is still the
+only thing doing sensible work in a house with 3,495 temperature-limited hours. In Tulsa and Fairbanks the same
+screen **helps**, because there the outside-air path was importing more moisture and heat than it removed and a
+mechanical sink existed to take over. The effect survives the ideal controller, so it is not the staging
+artifact described above.
+
+Two cautions. The measured reference is a 40-mesh screened house, not an unscreened one, so none of this prices
+the first screen. And the measured Thai houses had fans off and no mechanical drying, which is the one
+configuration where the penalty can only be a penalty; the model reproduces exactly that direction in the
+pad-only rows.
+
 ## How this was measured
 
 - **Weather:** committed NASA POWER snapshots, calendar year 2025 per site, from `data/weather/`. Fairbanks is

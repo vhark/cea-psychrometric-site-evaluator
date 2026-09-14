@@ -1,5 +1,6 @@
-import {SHADE_SCREEN_DEFAULT,THERMAL_SCREEN_DEFAULT,HEAT_PUMP_DEFAULTS,HEAT_PUMP_RATING_FIELDS,
-  backfillShadeScreen,backfillThermalScreen,shadeScreenErrors,thermalScreenErrors,heatSourceErrors} from './screens.js';
+import {SHADE_SCREEN_DEFAULT,THERMAL_SCREEN_DEFAULT,INSECT_SCREEN_DEFAULT,HEAT_PUMP_DEFAULTS,HEAT_PUMP_RATING_FIELDS,
+  backfillShadeScreen,backfillThermalScreen,backfillInsectScreen,shadeScreenErrors,thermalScreenErrors,
+  insectScreenErrors,heatSourceErrors} from './screens.js';
 export const MODEL_VERSION = '0.2.0-screening';
 // lai: leaf area index (m² leaf / m² canopy) for the Stanghellini transpiration model; screening assumptions, not measured canopies.
 export const CROPS = {
@@ -78,7 +79,7 @@ export const DEFAULT_SCENARIO = {
  // Screens are not installed and heating is fuel-fired by default, so a scenario that omits every key added
  // after schemaVersion 1 reproduces the earlier numbers exactly. The two nested objects are frozen: every
  // consumer clones them through backfillScenario rather than sharing one mutable default.
- ...HEAT_PUMP_DEFAULTS,shadeScreen:SHADE_SCREEN_DEFAULT,thermalScreen:THERMAL_SCREEN_DEFAULT,
+ ...HEAT_PUMP_DEFAULTS,shadeScreen:SHADE_SCREEN_DEFAULT,thermalScreen:THERMAL_SCREEN_DEFAULT,insectScreen:INSECT_SCREEN_DEFAULT,
  latitude:36.15,longitude:-95.99,timezone:'America/Chicago',zip:'74103',priceMode:'manual',sector:'commercial'
 };
 const f=(key,label,unit,min,max,step)=>({key,label,unit,min,max,step});
@@ -136,6 +137,7 @@ export function backfillScenario(s){
  for(const key of V03_KEYS)if(!Object.hasOwn(s,key))s[key]=DEFAULT_SCENARIO[key];
  s.shadeScreen=backfillShadeScreen(s.shadeScreen);
  s.thermalScreen=backfillThermalScreen(s.thermalScreen);
+ s.insectScreen=backfillInsectScreen(s.insectScreen);
  return s;
 }
 export function validateScenario(s){
@@ -158,7 +160,7 @@ export function validateScenario(s){
  if(s.minVentACH>s.maxVentACH)errors.push('Minimum airflow exceeds installed maximum.');
  if(s.coolingMinOutdoorC>=s.coolingMaxOutdoorC)errors.push('DX outdoor operating range is inverted.');
  if(OPAQUE_FACILITIES.has(s.facility)&&(s.parTransmission!==0||s.solarTransmission!==0))errors.push(`The ${FACILITIES[s.facility]} template is opaque by definition: direct solar and light transmission must be zero.`);
- errors.push(...heatSourceErrors(s),...shadeScreenErrors(s.shadeScreen),...thermalScreenErrors(s.thermalScreen));
+ errors.push(...heatSourceErrors(s),...shadeScreenErrors(s.shadeScreen),...thermalScreenErrors(s.thermalScreen),...insectScreenErrors(s.insectScreen));
  if(!Number.isFinite(s.latitude)||Math.abs(s.latitude)>90||!Number.isFinite(s.longitude)||Math.abs(s.longitude)>180)errors.push('Invalid location coordinates.');
  try{if(typeof s.timezone!=='string'||!s.timezone.trim())throw new Error();new Intl.DateTimeFormat('en',{timeZone:s.timezone});}catch{errors.push('Invalid IANA time zone.');}
  if(typeof s.name!=='string'||!s.name.trim()||s.name.length>120)errors.push('Scenario name must contain 1 to 120 characters.');

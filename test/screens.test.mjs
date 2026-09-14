@@ -208,3 +208,45 @@ test('unsourced component parameters have no shipped default and block the run i
  assert.deepEqual(heatSource.copAtRatingPoints,[3.5,2.4,1.8]);
  assert.match(heatSource.defrost,/defrost/);
 });
+
+// A humid house whose only moisture sink is the outside-air path: no dehumidifier, no DX, no humidifier, and
+// outdoor air a little drier than the zone ceiling so ventilation is genuinely the thing removing crop water.
+// That is the configuration the Thai screen experiment ran, fans off and no mechanical drying, where indoor
+// minus outdoor absolute humidity rose from 1.05 to 2.21 g/m3 as mesh got finer. This model must reproduce
+// that direction: restrict the path and the house keeps both the crop's heat and the crop's water.
+const humid=(hours=48)=>({schemaVersion:1,source:'Synthetic warm-humid fixture',sourceKind:'test',latitude:25.77,longitude:-80.19,timezone:'UTC',startDate:'2025-07-01',endDate:'2025-07-02',
+  hours:Array.from({length:hours},(_,i)=>{const h=i%24,sun=Math.max(0,Math.sin(Math.PI*(h-6)/12));
+   return {time:Date.UTC(2025,6,1,i),tempC:21+3*Math.sin(Math.PI*(h-9)/12),rh:.78-.08*sun,pressurePa:101325,ghiWm2:Math.round(600*sun)};})});
+const ventLimited=(over={})=>({...makeScenario('greenhouseDouble'),timezone:'UTC',name:'Insect screen fixture',
+  dehuKgH:0,coolingKW:0,heaterKW:0,humidifierKgH:0,lightWm2:0,dliTarget:0,padEnabled:false,
+  minVentACH:.5,maxVentACH:30,dayTargetC:24,nightTargetC:22,tempToleranceC:2.5,vpdMin:.1,vpdMax:1.6,maxDewPointC:18,...over});
+
+test('an insect screen restricts the outside-air path and costs a vent-limited humid house both heat and moisture',()=>{
+  const open=simulateScenario(ventLimited(),humid()).summary;
+  const mid=simulateScenario(ventLimited({insectScreen:{installed:true,grade:'mesh52'}}),humid()).summary;
+  const fine=simulateScenario(ventLimited({insectScreen:{installed:true,grade:'mesh78'}}),humid()).summary;
+  // Attainment is the contract. The three state terms say why it moved: hotter, further outside the VPD band,
+  // and shedding less water. Ordered by the measured ventilation ratios 1.000, 0.641 and 0.502.
+  assert.ok(fine.compliancePct < mid.compliancePct && mid.compliancePct < open.compliancePct,
+    `attainment must fall with finer mesh: open ${open.compliancePct}, 52 ${mid.compliancePct}, 78 ${fine.compliancePct}`);
+  assert.ok(open.tempDegreeHours < mid.tempDegreeHours && mid.tempDegreeHours < fine.tempDegreeHours,'a restricted house must run hotter');
+  assert.ok(open.vpdKPaHours < mid.vpdKPaHours && mid.vpdKPaHours < fine.vpdKPaHours,'a restricted house must sit further outside its VPD band');
+  assert.ok(open.unmetMoistureKg < mid.unmetMoistureKg && mid.unmetMoistureKg < fine.unmetMoistureKg,'a restricted house must shed less crop water');
+  // An uninstalled screen must change nothing at all, so the derate cannot leak into an unscreened run.
+  const off=simulateScenario(ventLimited({insectScreen:{installed:false,grade:'mesh78'}}),humid()).summary;
+  assert.equal(off.compliancePct,open.compliancePct);
+});
+
+test('an installed insect screen must declare what it costs, and a derate never falls below the required minimum',()=>{
+  assert.deepEqual(validateScenario(ventLimited({insectScreen:{installed:true}})),
+    ['Insect screen: declare a ventilationFactor above 0, or pick a catalogued grade. An installed screen that costs no ventilation is not a defensible default, and the factor is relative to a 40-mesh screened house rather than to an unscreened one.']);
+  assert.deepEqual(validateScenario(ventLimited({insectScreen:{installed:true,grade:'mesh78'}})),[]);
+  assert.deepEqual(validateScenario(ventLimited({insectScreen:{installed:true,ventilationFactor:.4}})),[]);
+  assert.match(validateScenario(ventLimited({insectScreen:{installed:true,grade:'mesh1000'}}))[0],/unknown grade/);
+  // A factor that would cut capacity below the declared minimum clamps there and says so, rather than
+  // silently producing a maximum under the minimum the scenario requires.
+  const clamped=simulateScenario(ventLimited({minVentACH:20,maxVentACH:22,insectScreen:{installed:true,ventilationFactor:.1}}),humid());
+  assert.ok(clamped.warnings.some(w => /clamped up to the declared minimum/.test(w)),'the clamp must be reported');
+  // The reference basis must travel with the number: it is not an unscreened comparison.
+  assert.ok(clamped.warnings.some(w => /NOT to an unscreened one/.test(w)),'the screened reference must be stated');
+});
