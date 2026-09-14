@@ -101,7 +101,7 @@ Initial static implementation: six equipment strategies, editable facility/crop/
 
 ## License
 
-New application code: MIT, see LICENSE. PsychroLib 2.5.0: upstream MIT, pinned commit and license in vendor/. Public data retain their respective attribution/terms. Brand names and marks are not licensed as trademarks.
+Application code is MIT, see [LICENSE](LICENSE). Third-party software and dataset terms, including the vendored PsychroLib 2.5.0 and every public data source, are listed in [NOTICE](NOTICE). Brand names and marks are not licensed as trademarks.
 
 ## Repository scope
 

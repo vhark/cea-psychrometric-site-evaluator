@@ -1,0 +1,20 @@
+CEA Psychrometric Site Evaluator
+Copyright (c) 2026 Grownetics
+Licensed under the MIT License, see LICENSE.
+
+Third-party software and datasets retain their own licenses and terms.
+
+- PsychroLib 2.5.0 (psychrometric functions), MIT. Pinned source and upstream
+  license: vendor/psychrolib.js and vendor/PSYCHROLIB-LICENSE.txt.
+- NASA POWER hourly meteorology and solar: US government data. Provenance,
+  request URLs and SHA-256 values are recorded in the weather snapshots.
+- Iowa Environmental Mesonet station observations and NOAA NCEI daily
+  summaries: US government data, provenance recorded per snapshot.
+- US Energy Information Administration EIA-861M prices, EPA eGRID2023 and the
+  EPA Power Profiler ZIP mapping: US public domain. Coverage, vintages and
+  checksums are documented in docs/ENERGY-DATA.md.
+- GeoNames US postal-code dataset: see docs/ENERGY-DATA.md for the attribution
+  and license recorded with the download.
+
+Grownetics brand names, marks and the visual identity described in the
+documentation are not licensed as trademarks by the MIT license above.
