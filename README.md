@@ -3,7 +3,7 @@
 Screen a controlled-environment agriculture site against real historical weather: how many hours the climate gives you for free, what constraint binds, and which class of equipment closes the gap at what running cost.
 
 [![tests](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml/badge.svg)](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml)
-[![regression suite](https://img.shields.io/badge/regression%20suite-56%20tests-4DB405)](#testing)
+[![regression suite](https://img.shields.io/badge/regression%20suite-63%20tests-4DB405)](#testing)
 [![model](https://img.shields.io/badge/model-0.2.0--screening-4DB405)](docs/VERIFICATION.md)
 [![runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-none-4DB405)](#quick-start)
 [![licence](https://img.shields.io/badge/licence-MIT-4DB405)](LICENSE)
@@ -158,11 +158,11 @@ The observed study in [reference-study/](reference-study/) keeps the weather-onl
 ## Testing
 
 ```sh
-npm test                      # node --test test/*.test.mjs, 56 tests
+npm test                      # node --test test/*.test.mjs, 63 tests
 node --test test/model.test.mjs
 ```
 
-56 tests pass. They defend physical and data boundaries that a plausible bug would break: no photon creation on stacked canopy, finite control authority, dehumidifier and regeneration energy, cadence-invariant unmet loads, unsaturable-candidate exclusion, pad runtime attribution, missingness, DST and fractional-offset DLI days, bounded import ranges, temporal billing, manual versus historical pricing, six closed-form conservation identities, and Morris design reproducibility.
+63 tests pass. They defend physical and data boundaries that a plausible bug would break: no photon creation on stacked canopy, finite control authority, dehumidifier and regeneration energy, cadence-invariant unmet loads, unsaturable-candidate exclusion, pad runtime attribution, missingness, DST and fractional-offset DLI days, bounded import ranges, temporal billing, manual versus historical pricing, six closed-form conservation identities, and Morris design reproducibility.
 
 They are **not empirical greenhouse validation**. A passing suite says the code does what the model says, not that the model matches a real greenhouse.
 

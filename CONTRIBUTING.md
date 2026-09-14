@@ -8,7 +8,7 @@ Thanks for looking. This project has unusual rules, and they are the point: the 
 git clone https://github.com/vhark/cea-psychrometric-site-evaluator.git
 cd cea-psychrometric-site-evaluator
 python3 -m http.server 8150 --bind 127.0.0.1   # then open http://127.0.0.1:8150/
-npm test                                        # node --test test/*.test.mjs, 56 tests
+npm test                                        # node --test test/*.test.mjs, 63 tests
 ```
 
 There is nothing to install. Node 20 or newer runs the tests and the reproduction scripts. Python 3 serves the folder and rebuilds the energy catalogs (`build-energy.py` needs `openpyxl`, and only for a rebuild). Do not open `index.html` over `file://`: ES modules and Web Workers need HTTP.

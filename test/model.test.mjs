@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {makeScenario,validateScenario,applyTechnology,DEFAULT_SCENARIO} from '../src/config.js';
+import {makeScenario,validateScenario,applyTechnology,DEFAULT_SCENARIO,SYSTEMS} from '../src/config.js';
 import {simulateScenario} from '../src/simulate.js';
 import {compareScenarios} from '../src/metrics.js';
 import {weatherState,padState,humidityRatio,enthalpy,stanghelliniTranspiration,saturationPressure,saturationHumidityRatio,dryAirDensity} from '../src/physics.js';
@@ -201,14 +201,24 @@ test('older scenario JSON without v0.2 keys validates with crop-specific default
  assert.equal(lettuce.transpirationModel,'stanghellini');assert.equal(lettuce.lai,3);
  assert.ok(validateScenario({...makeScenario(),controlMode:'optimal'}).length>0);
 });
-test('a scenario carrying a retired cultivation system fails with a message that names it',()=>{
- for(const system of ['wall','microgreens','propagation','mushroom']){
-  const errors=validateScenario({...makeScenario(),system});
-  assert.equal(errors.length,1,`expected exactly one error for ${system}, got ${errors.join(' | ')}`);
-  assert.match(errors[0],new RegExp(`"${system}" was retired`));
-  assert.match(errors[0],/greenhouse benches/);
- }
- assert.deepEqual(validateScenario({...makeScenario(),system:'bench'}),[]);
+test('supported cultivation systems validate; a retired one fails with a message that names it',()=>{
+ for(const system of Object.keys(SYSTEMS))assert.deepEqual(validateScenario({...makeScenario('greenhouse',system)}),[],`${system} must validate`);
+ const errors=validateScenario({...makeScenario(),system:'wall'});
+ assert.equal(errors.length,1,`expected one error, got ${errors.join(' | ')}`);
+ assert.match(errors[0],/"wall" was retired/);
+ assert.match(errors[0],/greenhouse benches/);
+});
+test('rack systems stack canopy above the floor footprint while benches do not',()=>{
+ const floor=500,bench=makeScenario('greenhouse','bench'),racks=makeScenario('greenhouse','microgreens');
+ assert.equal(bench.areaM2,floor);
+ assert.ok(bench.canopyM2<=floor,`bench canopy ${bench.canopyM2} must not exceed its floor`);
+ assert.equal(racks.canopyM2,Math.round(floor*.35/.7432*2.4));
+ assert.ok(racks.canopyM2>floor,'stacked trays must give more canopy than floor');
+ // Mushroom rooms are dark and ventilation-driven, and must not silently keep the lit-crop defaults.
+ const mushroom=makeScenario('greenhouse','mushroom','mushroom');
+ assert.equal(mushroom.canopyM2,racks.canopyM2);
+ assert.ok(mushroom.lightWm2<bench.lightWm2&&mushroom.minVentACH>bench.minVentACH&&mushroom.humidifierKgH>0);
+ assert.deepEqual(validateScenario(mushroom),[]);
 });
 test('a schemaVersion 1 scenario simulates without a prior validate call',()=>{
  const legacy={...makeScenario('greenhouse')};

@@ -30,7 +30,7 @@ export function localStamp(time, timezone) {
 /* Screening evidence that belongs to the repository rather than to this run. Cited, not asserted:
    every figure here is reproducible from the named file with the named command. */
 const REPO_EVIDENCE = {
-  tests: 56,
+  tests: 63,
   cadence: 'Staged controller cadence check on the full Tulsa 2025 year, 1 minute against 0.5 minute dispatch: 0.004, 0.383 and 0.091 percentage points of attainment and at most 0.31 percent of electricity (docs/VERIFICATION.md). The older ideal optimizer does not converge, at 1.5 points and 1.95 percent, and remains selectable only as a labeled upper bound.',
   residuals: 'Hourly conservation identities close between 1e-16 and 5e-13 relative in the bundled checks (test/conservation.test.mjs).',
   morris: 'Morris elementary-effects screening of 12 assumptions, 104 points, 1,872 simulations (docs/SENSITIVITY.md, docs/morris-screening.json): crop leaf area and transpiration lead every metric at 9.10 points of attainment, envelope U-value follows at 5.89 and shade fraction at 3.43. The cost ranking as a whole is not stable, taking 3 distinct orders, while the three cheapest positions are identical in 104 of 104 screened points and the instability is confined to strategies whose median costs sit within 16 percent of each other.',

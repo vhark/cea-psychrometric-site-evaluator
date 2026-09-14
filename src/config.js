@@ -14,10 +14,12 @@ export const CROPS = {
 export const CONTROL_MODES = {staged:'Staged causal controller (deadband, minimum on/off, ordered stages)',ideal:'Ideal modulation upper bound (enumerating dispatcher)'};
 export const TRANSPIRATION_MODELS = {stanghellini:'Stanghellini (Vanthoor 2011 §8.9), state-coupled',schedule:'Declared L/m²/day schedule'};
 export const FACILITIES = {greenhouse:'Vented greenhouse',hybrid:'Hybrid greenhouse',indoor:'Indoor farm'};
-// One cultivation system for now. Rack and wall formats need canopy-area and tier-interception
-// evidence this screen does not have, so they are not offered rather than guessed.
-export const SYSTEMS = {bench:'Greenhouse benches'};
-const RETIRED_SYSTEMS = new Set(['wall', 'microgreens', 'propagation', 'mushroom']);
+// Cultivation systems propose a default canopy area from the floor area. Racks stack trays, so their
+// canopy exceeds the footprint; the factors are stated in makeScenario and every value stays editable.
+// Harvest walls are not offered: their canopy-per-floor factor came from one proprietary fixture layout
+// rather than a generic format, so it would be a guess here.
+export const SYSTEMS = {bench:'Greenhouse benches',microgreens:'Microgreen racks',propagation:'Propagation racks',mushroom:'Mushroom racks'};
+const RETIRED_SYSTEMS = new Set(['wall']);
 export const TECHNOLOGIES = {pad:'Pads + ventilation + heat',dehu:'Pads + condensing dehumidifier',dx:'DX / mini-split + dehumidifier',integrated:'Integrated HVAC + reheat',desiccant:'Desiccant + evaporative cooling',hybridDesiccant:'Liquid-desiccant hybrid (generic)',doas:'Dry-neutral DOAS + DX sensible'};
 export const DEFAULT_SCENARIO = {
  schemaVersion:1,id:'baseline',name:'Pad + vent baseline',facility:'greenhouse',system:'bench',crop:'lettuce',technology:'pad',
@@ -48,7 +50,11 @@ export function makeScenario(facility='greenhouse',system='bench',crop='lettuce'
  delete s.label;delete s.source;
  if(facility==='indoor')Object.assign(s,{solarTransmission:0,parTransmission:0,uValue:.3,maxVentACH:2,padEnabled:false,coolingKW:90,dehuKgH:40,technology:'dx',installedCost:80000,name:'Indoor DX + dehu'});
  if(facility==='hybrid')Object.assign(s,{maxVentACH:15,coolingKW:80,dehuKgH:30,integratedHVAC:true,technology:'integrated',installedCost:90000,name:'Hybrid controlled greenhouse'});
- // Canopy area stays an explicit editable input; no per-system geometry is inferred.
+ // Rack canopy from floor area: a 0.35 m² tray on a 0.7432 m² floor module, 2.4 tiers of usable height.
+ // Mushroom rooms are dark, respiration-heated and ventilation-driven, so they also move the light,
+ // sensible-gain, airflow and humidification defaults. Every one of these remains an editable input.
+ if(system==='microgreens'||system==='propagation')s.canopyM2=s.areaM2*.35/.7432*2.4;
+ if(system==='mushroom')Object.assign(s,{canopyM2:s.areaM2*.35/.7432*2.4,lightWm2:8,cropSensibleWm2:20,minVentACH:6,maxVentACH:15,humidifierKgH:20});
  s.canopyM2=Math.round(s.canopyM2);
  return s;
 }
