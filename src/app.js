@@ -1,4 +1,4 @@
-import {CROPS, FACILITIES, SYSTEMS, TECHNOLOGIES, FIELDS, DEFAULT_SCENARIO, OPAQUE_FACILITIES, AIRFLOW_BASIS, AIRFLOW_EVIDENCE, makeScenario, applyTechnology, validateScenario, airflowEvidenceWarnings, MODEL_VERSION} from './config.js';
+import {CROPS, FACILITIES, SYSTEMS, TECHNOLOGIES, FIELDS, DEFAULT_SCENARIO, OPAQUE_FACILITIES, AIRFLOW_BASIS, AIRFLOW_EVIDENCE, makeScenario, applyTechnology, migrateScenario, validateScenario, airflowEvidenceWarnings, MODEL_VERSION} from './config.js';
 import {airflowConversions, heatRecoveryErrors, backfillHeatRecovery} from './airflow.js';
 import {fetchWeather, loadExample, normalizeWeather, loadBundledIndex, loadBundledYear} from './weather.js';
 import {loadEnergyCatalog, lookupZip, getEnergyContext} from './energy.js';
@@ -861,7 +861,7 @@ function bindEvents() {
 }
 async function initialize() {
   buildFields(); bindEvents();
-  try {const saved = loadScenarios(); state.scenarios = saved.filter(s => !validateScenario(s).length).slice(0, 20); if (state.scenarios.length !== saved.length) message('Some saved scenarios failed the current schema validation and were not loaded. Your original storage remains unchanged until you save.', 'warning');}
+  try {const saved = loadScenarios(); state.scenarios = saved.filter(s => !validateScenario(s).length).slice(0, 20).map(migrateScenario); if (state.scenarios.length !== saved.length) message('Some saved scenarios failed the current schema validation and were not loaded. Your original storage remains unchanged until you save.', 'warning');}
   catch (error) {message(`Local scenarios could not be loaded: ${error.message}. A fresh baseline is available.`, 'warning');}
   if (!state.scenarios.length) state.scenarios = [makeScenario()]; state.selected = state.scenarios[0].id; $('sector').value = current().sector; renderScenario(); reflectLocation(current());
   const energyPromise = initializeEnergy();
