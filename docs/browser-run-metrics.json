@@ -1,7 +1,7 @@
 {
-  "exportedAt": "2026-09-15T21:17:50.233Z",
-  "verifiedAt": "2026-09-15T21:20:39.298Z",
-  "sourceCommit": "501076ab79c9dbaabd8179e64d3a0767356e942c",
+  "exportedAt": "2026-09-15T22:04:32.906Z",
+  "verifiedAt": "2026-09-15T22:06:06.495Z",
+  "sourceCommit": "1eee4cb911a879fe19d36b866dafa92ae68779a7",
   "modelVersion": "0.3.0-screening",
   "schemaVersion": 2,
   "method": "Actual Chromium UI loaded bundled Tulsa 2025, imported docs/example-scenarios.json, ran all six, and invoked Run JSON, Hourly CSV, Printable report and Design-basis brief. Metrics below read from that genuine downloaded Run JSON, never copied from previous artifacts.",
@@ -1007,7 +1007,7 @@
     {
       "name": "cea-psychrometric-site-evaluator-run.json",
       "bytes": 207706978,
-      "sha256": "9f4d84b660381e79141717b237af03dc9e02e678ade5d3ec3a8d295a5536e2cf",
+      "sha256": "2da88423a3dd2652f5c369723076266dd51e9a42db0f73be90ee4e4378efeb56",
       "retained": null
     },
     {
@@ -1018,14 +1018,14 @@
     },
     {
       "name": "cea-psychrometric-site-evaluator-report.html",
-      "bytes": 248881,
-      "sha256": "1278a721591b0a08ffdf3532b0967c55ec6fc104f427b5881eed5fef8f71149a",
+      "bytes": 248980,
+      "sha256": "46ee6bdcffbd895062db480f3df70db044df50eaee53d8c833f1ce21470e9580",
       "retained": "docs/example-comparison.html"
     },
     {
       "name": "cea-psychrometric-site-evaluator-design-basis.html",
       "bytes": 218456,
-      "sha256": "a5feca81be7e75a4b770effc3d54a2c59bcc376afef4d4de0656313b4869cd22",
+      "sha256": "0a3d62aa0382247317903a4843f9305ba1637dabfd1fff63f8d47cfec0425b6f",
       "retained": "docs/example-design-basis.html"
     }
   ],
@@ -1035,7 +1035,9 @@
     "originalExportedAt": "2026-09-15T21:17:50.233Z",
     "recomputedExportedAt": "2026-09-15T21:19:53.498Z",
     "sameSummaries": true,
-    "sameHourlyResults": true
+    "sameHourlyResults": true,
+    "sourceCommit": "501076ab79c9dbaabd8179e64d3a0767356e942c",
+    "retentionBasis": "Genuine reimport/recompute proof performed at this source commit. Retained for final prose-only source update at 1eee4cb; physics unchanged, current retained summary fields exactly equal and current full hourly CSV SHA256 equals the previously verified CSV. Not rerun after prose-only cleanup."
   },
   "airflowInspector": {
     "minimumAir": {
@@ -1661,7 +1663,9 @@
       "doasHotHumid": "FOLLOW THE ASSUMPTIONS\nHourly inspector\n3,209 / 8,760 H\n←\n→\n\nHour 1 of 8,760. Jan 1, 2025, 12:00 AM America/Chicago. Heating. Joint band: invalid, warm-up, ineligible or unavailable.\n\nMay 14, 2025, 5:00:00 PM CDT · 2025-05-14T22:00:00.000Z\n\nDoas dehumidify. Finite installed controls cannot meet the joint target in every sampled substep.\n\nOUTDOOR DRY BULB\n31.1 °C\nOUTDOOR DEW POINT\n23.5 °C\nOUTDOOR RELATIVE HUMIDITY\n64.3 %\nSTATION PRESSURE\n96,940 Pa\nSOLAR IRRADIANCE\n455 W/m²\nWIND SPEED\n3.7 m/s\nPAD LEAVING DRY BULB\n26.5 °C\nPAD LEAVING DEW POINT\n25 °C\nESTIMATED ZONE TEMPERATURE\n40.3 °C\nESTIMATED ZONE RH\n74.6 %\nESTIMATED AIR VPD\n1.9 kPa\nJOINT-TARGET FRACTION\n0 %\nELECTRICITY\n18.17 kWh\nPURCHASED FUEL\n0 kWh\nWATER\n128 L\nCONDENSATE\n43.37 kg\nDX COOLING DELIVERED\n0 kWh\nDEHU HEAT INDOORS\n0 kWh\nREGENERATION ENERGY\n0 kWh\nDESICCANT REMOVAL\n0 kg\nUNMET SENSIBLE LOAD\n47.4 kWh\nUNMET MOISTURE\n106.1 kg\nENERGY RESIDUAL\n0 W\nMOISTURE RESIDUAL\n0 kg/s\nSENSIBLE GAINS\n-37.24 kWh\nCROP LATENT\n128.04 kg\nSENSIBLE-HEAT RATIO\n0.56\nCONTROLLED OUTDOOR AIR\n1.8 ACH\nENRICHMENT-COMPATIBLE FRACTION\n100 %\nINSTALLED CONTROLLED MAXIMUM\n1.8 ACH\nTOTAL OUTDOOR AIR INCLUDING INFILTRATION\n2.1 ACH\nCONTROLLED / TOTAL OUTDOOR FLOW\n1 m³/s / 1.167 m³/s\nACTUAL CONTROLLED STAGES\n1.8 ACH: 1 h\nRECOVERY CORE VOLUME\n0 m³\nRECOVERY BYPASS VOLUME\n0 m³\nSENSIBLE RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nLATENT RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nRECOVERY AUXILIARY ELECTRICITY\n0 kWh\nRECOVERY FROST/DEFROST EXPOSURE\n0 h\nPREHEAT DELIVERED\n0 kWh\nPREHEAT PURCHASED ELECTRICITY\n0 kWh\nPREHEAT PURCHASED FUEL\n0 kWh\nPREHEAT INSUFFICIENT\n0 h\nDOAS CONDENSATE\n43.37 kg\nDOAS COOLING DELIVERED\n53.97 kWh\nDOAS COOLING ELECTRICITY\n17.99 kWh\nDOAS RECOVERED REHEAT\n12.09 kWh\nDOAS EXTERNAL HEAT\n0 kWh\nDOAS UNMET CONDITIONING\n0 kWh\n\nSelected targets: day 22 °C / night 18 °C ± 2 °C; air VPD 0.6–1 kPa; dew point ≤ 19 °C. Stanghellini transpiration at LAI 3, canopy temperature taken as air temperature.\n\nSource quality: No flags supplied for this hour. Source: NASA POWER."
     },
     "exportedAt": "2026-09-15T21:18:51.503Z",
-    "notesAudit": "Smoke scenarios rerun after replacing inherited canonical notes with exact ERV and DOAS declarations. Exported hourly physics unchanged, notes now correctly state configured recovery and fixed 1.8/1.8 ACH DOAS airflow."
+    "notesAudit": "Smoke scenarios rerun after replacing inherited canonical notes with exact ERV and DOAS declarations. Exported hourly physics unchanged, notes now correctly state configured recovery and fixed 1.8/1.8 ACH DOAS airflow.",
+    "sourceCommit": "501076ab79c9dbaabd8179e64d3a0767356e942c",
+    "retentionBasis": "Actual ERV/DOAS browser smoke and corrected declared inputs were rerun at this source commit. Retained without an unnecessary repeat for the final prose-only update; no conditioning-model changes reported."
   },
   "visual": {
     "desktop": {
@@ -1747,16 +1751,6 @@
     },
     "screenshots": [
       {
-        "path": "/tmp/osf-airflow-evidence/desktop-inspector.png",
-        "bytes": 142848,
-        "sha256": "0d139d164f4a193fff7b3c97a3ba2eea61d2cb327982ae25697368dc5b970759"
-      },
-      {
-        "path": "/tmp/osf-airflow-evidence/mobile-inspector.png",
-        "bytes": 60722,
-        "sha256": "78df0581bcf631c8f49268f6295f724ca8e582a7d940c4c8cf7e1b1d4731a28f"
-      },
-      {
         "path": "/tmp/osf-airflow-evidence/conditioned-doas-hot-humid.png",
         "bytes": 128637,
         "sha256": "2c4a6bcd70f2fe63b3a720011162bc91869fa88e3f7af039962d326ca096c3fa"
@@ -1767,27 +1761,37 @@
         "sha256": "733a95999f951f99a0fa3d5c7abe24723d155ada0cd4e76952d93e622894d84d"
       },
       {
-        "path": "/tmp/osf-airflow-evidence/final-brief-1440-field-os-dark.png",
+        "path": "/tmp/osf-airflow-evidence/release-ui-1440.png",
+        "bytes": 128279,
+        "sha256": "36799976d68162b01c5249d4e6594e6a5ee0b61cd41ae848db10cdf707905061"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/release-ui-390.png",
+        "bytes": 60209,
+        "sha256": "420e00dbd37170ae66c9ef8b0e604701d90c187d8122299d7ba43a86db4e8f8a"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/release-brief-1440-field-os-dark.png",
         "bytes": 167247,
         "sha256": "e5a8acb276fda6bc7a19a622457aa71fc8bcd6afe30d742fdbfa7f5560e495b7"
       },
       {
-        "path": "/tmp/osf-airflow-evidence/final-brief-390-field-os-dark.png",
+        "path": "/tmp/osf-airflow-evidence/release-brief-390-field-os-dark.png",
         "bytes": 82513,
         "sha256": "ff043d010b71640c8682d3b17c3c18228da9a4da30451101685c2fe1140ebe8e"
       },
       {
-        "path": "/tmp/osf-airflow-evidence/final-report-1440-field-os-dark.png",
-        "bytes": 169306,
-        "sha256": "300e90a529ed0a509f2f472f004f7c2b39971b24741dd1604952668d4460ea18"
+        "path": "/tmp/osf-airflow-evidence/release-report-1440-field-os-dark.png",
+        "bytes": 169551,
+        "sha256": "c7a22ccd62bba9952051afd59a908352ddf76dc9fe7b2337437d71646a0eb425"
       },
       {
-        "path": "/tmp/osf-airflow-evidence/final-report-390-field-os-dark.png",
-        "bytes": 79742,
-        "sha256": "a972311b8fff292c3a04fa661c234709d5940ca378c04782f74924d1758b73c9"
+        "path": "/tmp/osf-airflow-evidence/release-report-390-field-os-dark.png",
+        "bytes": 80092,
+        "sha256": "a580be4ce8bc078e6767466f5d320df40df7908025c9bf954846905ac7b29758"
       },
       {
-        "path": "/tmp/osf-airflow-evidence/final-cost-populations.png",
+        "path": "/tmp/osf-airflow-evidence/release-cost-populations.png",
         "bytes": 303790,
         "sha256": "ceab2810a05d93698cdc3c63cf4a701c5ae80b7fe85b5cd1a0b246122d406d1f"
       }
@@ -1882,6 +1886,46 @@
           }
         ]
       }
+    ],
+    "releaseUI": [
+      {
+        "viewport": 1440,
+        "scrollWidth": 1440,
+        "ground": "#10130D",
+        "fonts": [
+          {
+            "family": "Young Serif",
+            "loaded": true
+          },
+          {
+            "family": "Hanken Grotesk",
+            "loaded": true
+          },
+          {
+            "family": "Spline Sans Mono",
+            "loaded": true
+          }
+        ]
+      },
+      {
+        "viewport": 390,
+        "scrollWidth": 390,
+        "ground": "#10130D",
+        "fonts": [
+          {
+            "family": "Young Serif",
+            "loaded": true
+          },
+          {
+            "family": "Hanken Grotesk",
+            "loaded": true
+          },
+          {
+            "family": "Spline Sans Mono",
+            "loaded": true
+          }
+        ]
+      }
     ]
   },
   "releaseIdentity": {
@@ -1904,5 +1948,25 @@
       "Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record. This ranked-hour statistic uses the supplied valid weather spanning 1 local calendar year (2025), which may be partial records, not an assumed multi-year climate normal (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single-hour maxima and do not include a safety factor."
     ],
     "sourceCorrectionVerification": "Parent reported 19/19 focused analysis tests and syntax after presentation-source correction; six-file121-pass suite above was not repeated."
+  },
+  "finalParentVerification": {
+    "verificationCommit": "13782e3",
+    "productionSourceCommit": "1eee4cb911a879fe19d36b866dafa92ae68779a7",
+    "reportedBy": "Main",
+    "evidence": "artifact://2020",
+    "tests": 157,
+    "pass": 157,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 10852.7,
+    "requiredSyntaxChecksPassed": 10,
+    "note": "Parent ran the final full suite and required syntax checks. Verification commit removes stale metadata-pinning assertions only; production source remains 1eee4cb. The earlier focused 121-test record is retained separately."
+  },
+  "finalPresentationRefresh": {
+    "sourceCommit": "1eee4cb911a879fe19d36b866dafa92ae68779a7",
+    "method": "Uncached actual browser canonical six-scenario rerun and fresh JSON, CSV, report and brief downloads after final Morris/DOAS prose cleanup. No tests, builds, lint or full studies repeated.",
+    "retainedSummaryFieldsUnchanged": true,
+    "hourlyCSVUnchanged": true,
+    "previousHourlyCSVSHA256": "84975c427cd40b1f4dccb2be09c914878bee260d5c08f3d007aa19410d59ef04"
   }
 }
