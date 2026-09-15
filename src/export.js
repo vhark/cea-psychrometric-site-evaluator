@@ -1,6 +1,6 @@
 import {MODEL_VERSION,SCENARIO_SCHEMA_VERSION,migrateScenario,validateScenario} from './config.js';
-import {designHours,loadDecomposition,co2Window,aggregateYears,strategyFrontier,bindingConstraint} from './metrics.js';
-import {escapeHTML,reportHTML,shell,NOTICE,provenanceSection,localStamp} from './report.js';
+import {designHours,loadDecomposition,co2Window,compareScenarios,aggregateYears,strategyFrontier,bindingConstraint} from './metrics.js';
+import {escapeHTML,reportHTML,shell,NOTICE,provenanceSection,localStamp,costBasisText,capitalBasisText,conditioningRows,airflowRows,attainmentComparisonText} from './report.js';
 export {reportHTML};
 function csvValue(value){let text=String(value??'');if(typeof value==='string'&&/^[=+@\-\t\r]/.test(text))text=`'${text}`;return `"${text.replaceAll('"','""')}"`;}
 function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
@@ -19,9 +19,9 @@ export function parseImport(input){
  const ids=new Set();for(const s of scenarios){if(typeof s.id!=='string'||ids.has(s.id))s.id=crypto.randomUUID();ids.add(s.id);}
  return {scenarios,snapshot:data.snapshot||null};
 }
-const BRIEF_STYLE=`.brief table{font-size:12px}.brief th,.brief td{padding:5px 6px}.brief th{width:auto}.brief td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7);white-space:nowrap}.brief section{margin:24px 0;padding-top:16px}.brief h2{font-size:1.15rem;margin-bottom:10px}.brief p{font-size:13px}.verdict{border:1px solid rgba(43,44,46,.3);padding:12px 16px;font-size:13px;max-width:none}.appendix{break-before:page}@media print{.brief section{margin:14px 0;padding-top:10px}.brief table{font-size:10px}.brief p{font-size:11px}}`;
+const BRIEF_STYLE=`.brief table{font-size:12px}.brief th,.brief td{padding:5px 6px}.brief th{width:auto}.brief td.k{font:500 11px 'Hanken Grotesk',sans-serif;color:var(--ink-2);white-space:nowrap}.brief section{margin:24px 0;padding-top:16px}.brief h2{font-size:1.15rem;margin-bottom:10px}.brief p{font-size:13px}.verdict{border:1px solid var(--line-2);padding:12px 16px;font-size:13px;max-width:none}.appendix{break-before:page}@media print{.brief section{margin:14px 0;padding-top:10px}.brief table{font-size:10px}.brief p{font-size:11px}}`;
 // Design-basis brief: one printed page for the engineer of record, then an appendix with the reproducible assumptions.
-export function designBasisHTML(results,snapshot,{aggregate=null,sites=null}={}){
+export function designBasisHTML(results,snapshot,{aggregate=null,sites=null,siteRuns=[]}={}){
  const f=(value,digits=1)=>typeof value==='number'&&Number.isFinite(value)?value.toLocaleString('en-US',{maximumFractionDigits:digits}):'Not available';
  const tz=snapshot.timezone,first=results[0],s0=first.scenario;
  const state=o=>o?`${f(o.tempC)} C DB, ${f(o.wetBulbC)} C WB, ${f(o.dewPointC)} C DP`:'Not available';
@@ -47,18 +47,8 @@ export function designBasisHTML(results,snapshot,{aggregate=null,sites=null}={})
  const airflowText=(air,time=null,outdoor=null)=>air?
   `${f(air.ach,2)} ACH, ${f(air.m3s,3)} m³/s, ${f(air.cfm,0)} cfm, ${f(air.m3sPerM2,4)} m³/s/m², ${f(air.cfmPerFt2,3)} cfm/ft²${time===null?'':` at ${at(time,outdoor)}`}`:
   'Not available';
- const rateText=price=>{
-  if(Array.isArray(price?.rates)&&price.rates.length){
-   const rates=price.rates.map(rate=>`${rate.period}: ${f(rate.usdPerKWh,4)} USD/kWh`).join(', ');
-   return price.source?`${rates} (${price.source})`:rates;
-  }
-  return price?.usdPerKWh!==undefined?`${f(price.usdPerKWh,4)} USD/kWh`:price?.usdPerL!==undefined?`${f(price.usdPerL,4)} USD/L`:price?.source??'Not available';
- };
- const costBasisText=b=>b&&typeof b==='object'?
-  `${b.label}. Included: ${(b.included||[]).join(', ')}. Price basis: electricity ${rateText(b.priceBasis?.electricity)}, fuel ${rateText(b.priceBasis?.fuel)}, water ${rateText(b.priceBasis?.water)}. Excluded: ${(b.excluded||[]).join(', ')}. Quote: ${b.isQuote?'yes':'no'}. Guaranteed savings: ${b.isGuaranteedSavings?'yes':'no'}.`:
-  'Not available';
  const strategyRows=[
-  ['Joint attainment',...per.map(({r})=>attainment(r))],
+  ['Joint temperature-and-moisture target attainment',...per.map(({r})=>attainment(r))],
   ['Space sensible-heat ratio, period',...per.map(({loads})=>loads.hours?f(loads.total.shr,2):'No load terms')],
   ['Peak sensible hour',...per.map(({design:d})=>d.peakSensibleHour?`${f(d.peakSensibleHour.sensibleKWh)} kWh/h at ${at(d.peakSensibleHour.time,d.peakSensibleHour.outdoor)}`:'No load terms')],
   ['Peak latent hour',...per.map(({design:d})=>d.peakLatentHour?`${f(d.peakLatentHour.latentKg)} kg/h at ${at(d.peakLatentHour.time,d.peakLatentHour.outdoor)}`:'No load terms')],
@@ -74,19 +64,23 @@ export function designBasisHTML(results,snapshot,{aggregate=null,sites=null}={})
   ['Purchased electricity / fuel',...per.map(({r})=>`${f(r.summary?.electricKWh,0)} / ${f(r.summary?.fuelKWh,0)} kWh`)],
   ['Operating cost',...per.map(({r})=>{const e=entry(r),label=r.summary?.costBasis?.label||'Model-estimated operating cost';return aggregate&&e?`${label}: $${f(r.summary?.cost,0)}; median year $${f(e.median.cost,0)}`:`${label}: $${f(r.summary?.cost,0)}`;})],
   ['Operating cost basis',...per.map(({r})=>costBasisText(r.summary?.costBasis))],
-  ['Installed capital assumption',...per.map(({r})=>`$${f(r.scenario.installedCost,0)}`)]];
+  ['Installed capital assumption',...per.map(({r})=>capitalBasisText(r.scenario))]];
+ const compared=compareScenarios(results);
+ const detailTables=per.map(({r})=>`<h3>${escapeHTML(r.scenario.name)}</h3>${table(['Period quantity','Value'],[...airflowRows(r),...conditioningRows(r.summary)])}`).join('');
+ const comparisons=compared.slice(1).map(row=>`<p>${escapeHTML(attainmentComparisonText(compared[0],row))} ${escapeHTML(`${row.operatingCostReduction?.label||row.operatingCostDifference.label}: $${f(row.operatingCostReduction?.amount??row.operatingCostDifference.amount,2)} for ${row.name} versus ${compared[0].name}. ${costBasisText(row.costBasis)}`)}</p>`).join('');
  const constraintText=constraint.binding==='none'?'No weather-side constraint hours at this band: the climate alone holds the target in every valid hour.':`${constraint.binding} (mean per year: ${f(constraint.hours.moisture,0)} h moisture-limited, ${f(constraint.hours.temperature,0)} h temperature-limited, ${f(constraint.hours.heating,0)} h heating). ${constraint.basis}`;
  const verdict=frontier.best?`Cheapest non-dominated strategy by ${aggregate?'median-year':'period'} operating cost: ${frontier.best.name} at $${f(frontier.best.cost,0)} holding the band ${f(frontier.best.compliancePct)}% of eligible hours. Operating frontier: ${frontier.frontier.map(r=>`${r.name} ($${f(r.cost,0)}, ${f(r.compliancePct)}%)`).join('; ')}.${frontier.rows.some(r=>r.dominated)?` Operating-dominated: ${frontier.rows.filter(r=>r.dominated).map(r=>r.name).join(', ')}.`:''} Capital is separate and not ranked.`:'No priced strategy; operating-cost ranking is not available.';
  const siteTable=sites?.length?`<section><h2><span class="cat">§ 006</span>Site comparison</h2>${table(['Site','Free-cooling h, median year','Pad-effective h','Binding constraint','Best strategy','Median attainment','Worst-year attainment','Median operating cost','Ranking'],sites.map(row=>[`${row.site?.city??''}${row.site?.state?`, ${row.site.state}`:''} ${row.site?.zip??''}`.trim()||'Site',f(row.freeCoolingHours,0),f(row.padEffectiveHours,0),row.bindingConstraint,row.bestStrategy?.name??'None',`${f(row.bestStrategy?.compliancePct)}%`,`${f(row.worstYearCompliancePct)}%`,row.bestStrategy?`$${f(row.bestStrategy.cost,0)}`:'Unpriced',row.rankingStable?'stable':'year-dependent']))}<p>${escapeHTML(sites[0].basis||'')}</p></section>`:'';
  const site=sites?.find(row=>row.site?.latitude===snapshot.latitude&&row.site?.longitude===snapshot.longitude)?.site;
  const meta=`${site?`${site.city}, ${site.state} ${site.zip} · `:''}${f(snapshot.latitude,3)}, ${f(snapshot.longitude,3)} · ${tz} · ${snapshot.startDate} to ${snapshot.endDate}${aggregate?` · weather years ${agg.years.join(', ')}`:''} · ${snapshot.source} (${snapshot.sourceKind})`;
  const tier=first.assumptions?.evidenceTier||'Assumption-based component screening';
+ const allCostBases=siteRuns.length?`<section><h2>All site and year price bases</h2>${siteRuns.flatMap(siteRun=>siteRun.runs.flatMap(run=>run.results.map(r=>`<p>${escapeHTML(`${siteRun.site?.city||siteRun.site?.zip||'Site'}, ${run.label}, ${r.scenario.name}: ${costBasisText(r.summary.costBasis)}`)}</p>`))).join('')}</section>`:'';
  const brief=`<div class="brief"><p class="meta">${escapeHTML(meta)}</p><p class="notice"><strong>Evidence tier: ${escapeHTML(tier)}.</strong> ${escapeHTML(NOTICE)} Model ${escapeHTML(first.modelVersion||MODEL_VERSION)}, ${escapeHTML(String(first.assumptions?.stepMinutes??'n/a'))} minute dispatch step${first.summary?.controlModeUsed?`, ${escapeHTML(first.summary.controlModeUsed)} control`:''}${first.summary?.transpirationModelUsed?`, ${escapeHTML(first.summary.transpirationModelUsed)} transpiration`:''}.</p>
 <section><h2><span class="cat">§ 001</span>Climate design conditions</h2>${table(['Condition','0.4 %','1 %','2 %'],climateRows)}<p>${escapeHTML(`${f(climate.dryBulb.hours,0)} valid weather hours. ${climate.basis}`)}</p></section>
 <section><h2><span class="cat">§ 002</span>Crop band</h2><p>${bands.map(b=>escapeHTML(b)).join('<br>')}${bands.length>1?'<br>Strategies use different bands; attainment is not an equipment-only comparison.':''}</p></section>
-<section><h2><span class="cat">§ 003</span>Strategies</h2>${table(['Quantity',...results.map(r=>r.scenario.name)],strategyRows)}<p>${escapeHTML(per[0].design.basis)}</p></section>
+<section><h2><span class="cat">§ 003</span>Strategies</h2>${table(['Quantity',...results.map(r=>r.scenario.name)],strategyRows)}${comparisons}${detailTables}<p>${escapeHTML(per[0].design.basis)}</p></section>
 <section><h2><span class="cat">§ 004</span>Binding constraint</h2><p class="verdict">${escapeHTML(constraintText)}</p></section>
-<section><h2><span class="cat">§ 005</span>Strategy verdict</h2><p class="verdict">${escapeHTML(verdict)}</p><p>${escapeHTML(`Ranking across years: ${agg.ranking.note}`)}${aggregate?'':' Single weather period; run bundled years for a distribution.'}</p></section>${siteTable}</div>`;
+<section><h2><span class="cat">§ 005</span>Strategy verdict</h2><p class="verdict">${escapeHTML(verdict)}</p><p>${escapeHTML(`Ranking across years: ${agg.ranking.note}`)}${aggregate?'':' Single weather period; run bundled years for a distribution.'}</p></section>${siteTable}${allCostBases}</div>`;
  const appendix=`<div class="appendix"><h2><span class="cat">Appendix</span>Reproducible assumptions</h2>${results.map((r,i)=>`<section><h2><span class="cat">§ A${String(i+1).padStart(2,'0')}</span>${escapeHTML(r.scenario.name)}</h2><h3>Warnings & assumptions</h3><ul>${(r.warnings||[]).map(w=>`<li>${escapeHTML(w)}</li>`).join('')}</ul><details open><summary>Scenario JSON</summary><pre>${escapeHTML(JSON.stringify(r.scenario,null,2))}</pre></details><details open><summary>Model assumptions</summary><pre>${escapeHTML(JSON.stringify(r.assumptions||{},null,2))}</pre></details>${r.energyContext?`<details open><summary>Energy-source provenance</summary><pre>${escapeHTML(JSON.stringify(r.energyContext,null,2))}</pre></details>`:''}</section>`).join('')}${provenanceSection(`A${String(results.length+1).padStart(2,'0')}`,snapshot)}</div>`;
  return shell('design-basis brief','Design-basis brief',`${brief}${appendix}`,BRIEF_STYLE);
 }
@@ -104,11 +98,12 @@ export function downloadRun(results,snapshot,format='json',extras={}){
  const controlKeys=['controlledACH','controlledM3s','controlledACHMin','controlledACHMax','controlledACHStages',
   'totalOutdoorACH','totalOutdoorM3s','totalOutdoorACHMin','totalOutdoorACHMax','recoveryCoreFraction','recoveryBypassFraction',
   'recoveryDefrostFraction','preheatFraction','doasConditionedFraction','doasTreatmentM3s'];
- const columns=[...keys,...controlKeys];
+ const costColumns=['costBasis','installedCostBasis'];
+ const columns=[...keys,...controlKeys,...costColumns];
  const rows=[['scenario','source','sourceKind','timezone',...columns].map(csvValue).join(',')];
  for(const r of results)for(const h of r.hours)rows.push([r.scenario.name,snapshot.source,snapshot.sourceKind,snapshot.timezone,
   ...keys.map(k=>k==='time'?new Date(h.time).toISOString():h[k]),
-  ...controlKeys.map(k=>k==='controlledACHStages'?JSON.stringify(h.controls?.[k]||[]):h.controls?.[k])].map(csvValue).join(','));
+  ...controlKeys.map(k=>k==='controlledACHStages'?JSON.stringify(h.controls?.[k]||[]):h.controls?.[k]),JSON.stringify(r.summary.costBasis),r.scenario.installedCostBasis].map(csvValue).join(','));
  download('cea-psychrometric-site-evaluator-hourly.csv',rows.join('\r\n'),'text/csv');return;
  }
  if(format!=='json')throw new Error('Unsupported export format.');

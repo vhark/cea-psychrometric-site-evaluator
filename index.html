@@ -5,25 +5,40 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#1C1C1A">
   <meta name="description" content="Compare climate-control strategies against historical weather. An open, assumption-based screening tool for controlled-environment agriculture.">
-  <title>CEA Psychrometric Site Evaluator | Grownetics</title>
+  <title>CEA Psychrometric Site Evaluator | One Season Farmers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&family=Young+Serif&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="src/app.js"></script>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="pw" viewBox="0 0 100 100">
+    <g>
+      <path class="p" fill="var(--spring)" d="M50,50 C41,33 45,15 58,7 C63,21 60,37 50,50 Z"/>
+      <path class="p" fill="var(--summer)" d="M50,50 C67,41 85,45 93,58 C79,63 63,60 50,50 Z"/>
+      <path class="p" fill="var(--autumn)" d="M50,50 C59,67 55,85 42,93 C37,79 40,63 50,50 Z"/>
+      <path class="p" fill="var(--winter)" d="M50,50 C33,59 15,55 7,42 C21,37 37,40 50,50 Z"/>
+      <path class="p" fill="var(--spring)" opacity=".55" d="M50,50 C50,32 63,20 79,20 C77,36 66,48 50,50 Z"/>
+      <path class="p" fill="var(--summer)" opacity=".55" d="M50,50 C68,50 80,63 80,79 C64,77 52,66 50,50 Z"/>
+      <path class="p" fill="var(--autumn)" opacity=".55" d="M50,50 C50,68 37,80 21,80 C23,64 34,52 50,50 Z"/>
+      <path class="p" fill="var(--winter)" opacity=".55" d="M50,50 C32,50 20,37 20,21 C36,23 48,34 50,50 Z"/>
+      <circle cx="50" cy="50" r="5.4" fill="var(--paper)"/>
+      <circle cx="50" cy="50" r="2.6" fill="var(--pine)"/>
+    </g>
+  </symbol>
+</svg>
 <a id="skip-link" class="skip-link" href="#workspace">Skip to analysis</a>
 <div class="orbital" aria-hidden="true"><svg viewBox="0 0 800 800" fill="none"><circle cx="400" cy="400" r="380" stroke="#F5F5F0" stroke-width="1"/><circle cx="400" cy="400" r="280" stroke="#F5F5F0" stroke-width="0.5"/><circle cx="400" cy="120" r="4" fill="#4DB405"/></svg></div>
 <header class="topbar">
-  <a class="wordmark" href="./" aria-label="CEA Psychrometric Site Evaluator home">Grownetics<em>.</em></a>
+  <a class="wordmark" href="./" aria-label="CEA Psychrometric Site Evaluator home"><svg class="pinwheel" width="36" height="36" aria-hidden="true"><use href="#pw"/></svg><span>One Season Farmers<small>Climate screening</small></span></a>
   <div class="header-actions"><div id="view-switch" class="segmented viewswitch" role="tablist" aria-label="Workspace view"><button id="analyze-tab" type="button" role="tab" aria-selected="true" aria-controls="analyze-view" tabindex="0">Analyze</button><button id="learn-tab" type="button" role="tab" aria-selected="false" aria-controls="learn-view" tabindex="-1">Learn</button></div><button id="tour-button" type="button" class="tour-button">Take the tour</button><a href="#sources">Sources &amp; limits</a><span class="version">Screening 0.2</span></div>
 </header>
 <main>
 <div id="analyze-view" role="tabpanel" aria-labelledby="analyze-tab" tabindex="-1">
   <section class="intro" aria-labelledby="title">
-    <div><div class="eyebrow">Grownetics · historical-climate &amp; equipment screening</div><h1 id="title">CEA Psychrometric<br>Site Evaluator<span class="title-dot">.</span></h1><p class="subtitle">Climate capability. Clearer investments.</p></div>
+    <div><div class="eyebrow">One Season Farmers · historical-climate &amp; equipment screening</div><h1 id="title">CEA Psychrometric<br>Site Evaluator<span class="title-dot">.</span></h1><p class="subtitle">Climate capability. Clearer investments.</p></div>
     <p class="intro-note">Start with the weather.<br>Compare what your equipment can change.<br><strong>Keep the assumptions in view.</strong></p>
   </section>
   <section class="location-panel panel" aria-labelledby="location-title">
@@ -156,7 +171,7 @@
 </div>
 <div id="learn-view" role="tabpanel" aria-labelledby="learn-tab" tabindex="-1" hidden>
   <section class="intro learn-intro" aria-labelledby="learn-title">
-    <div><div class="eyebrow">Grownetics · how to read this screen</div><h1 id="learn-title">Learn the<br>model<span class="title-dot">.</span></h1><p class="subtitle">Ten sections, in order. Each one states the concept, the arithmetic behind it, a number measured in this repository, and the caveat that travels with it.</p></div>
+    <div><div class="eyebrow">One Season Farmers · how to read this screen</div><h1 id="learn-title">Learn the<br>model<span class="title-dot">.</span></h1><p class="subtitle">Ten sections, in order. Each one states the concept, the arithmetic behind it, a number measured in this repository, and the caveat that travels with it.</p></div>
     <p class="intro-note">Concept, then relationship.<br>Then a measured number.<br><strong>Then what it cannot prove.</strong></p>
   </section>
   <section class="panel learn-shell" aria-labelledby="learn-curriculum-title">
@@ -167,7 +182,7 @@
   </section>
 </div>
 </main>
-<footer><span>Grownetics <span class="footer-divider">/</span> CEA Psychrometric Site Evaluator</span><span>Static-first. Open source. Your scenarios stay in your browser.</span></footer>
+<footer><span>One Season Farmers <span class="footer-divider">/</span> CEA Psychrometric Site Evaluator</span><span>Static-first. Open source. Your scenarios stay in your browser.</span></footer>
 <noscript><p class="notice">JavaScript is required for local calculation and charts. Serve this folder with a static HTTP server, then enable JavaScript.</p></noscript>
 </body>
 </html>

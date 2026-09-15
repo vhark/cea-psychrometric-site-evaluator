@@ -16,6 +16,7 @@
 
    The spotlight is the guided tour's, imported rather than duplicated. */
 
+import {costBasisText, capitalBasisText} from './report.js';
 import {spotlight} from './tour.js';
 
 export const LEARN_VERSION = 1;
@@ -29,7 +30,7 @@ const still = () => window.matchMedia('(prefers-reduced-motion: reduce)').matche
 const finite = value => typeof value === 'number' && Number.isFinite(value);
 const num = (value, digits = 0) => finite(value) ? value.toLocaleString('en-US', {maximumFractionDigits: digits}) : 'Not available';
 const pct = (value, digits = 1) => finite(value) ? `${num(value, digits)}%` : 'Not available';
-const points = (value, digits = 1) => finite(value) ? `${num(value, digits)} pts` : 'Not available';
+const points = (value, digits = 1) => finite(value) ? `${num(value, digits)} pp` : 'Not available';
 const hours = value => finite(value) ? `${num(value)} h` : 'Not available';
 const kwh = value => finite(value) ? `${num(value)} kWh` : 'Not available';
 const degrees = (value, digits = 1) => finite(value) ? `${num(value, digits)} °C` : 'Not available';
@@ -70,13 +71,13 @@ const LADDER = [
   {
     code: 'C2',
     name: 'Add a dehumidifier',
-    can: 'Hold temperature and humidity at the same time. This is the biggest single jump in the whole ladder: in Miami it moved hours inside the band from about 18 in 100 to about 93 in 100, and it lowered the running bill at all six sites (docs/CLASSES.md).',
+    can: 'Hold temperature and humidity at the same time. This is the biggest single jump in the whole ladder: in Miami it moved hours inside the band from about 18 in 100 to about 93 in 100, and it lowered modeled operating cost against the named C1 baseline at all six sites, under that study’s assumptions (docs/CLASSES.md).',
     defeat: 'Its own limit on how dry it can get the air, and the bill for reheating the air it just dried.'
   },
   {
     code: 'C3',
     name: 'Add curtains and shade screens you schedule',
-    can: 'Keep heat in at night and sun out at midday with no new machine. It is the cheapest step in the ladder and the only one that pays for itself in fuel (docs/CLASSES.md).',
+    can: 'Keep heat in at night and sun out at midday with no new machine. It is the cheapest step in the ladder and one that reduced modeled fuel consumption against the C2 baseline (docs/CLASSES.md).',
     defeat: 'Light. A closed curtain and a drawn screen both block light the crop wanted, and neither one adds any back.'
   },
   {
@@ -413,7 +414,7 @@ function installedSlot(study) {
   }
   const low = priced[0], high = priced[priced.length - 1];
   const ratio = low.installedCostUsd > 0 ? Math.round(high.installedCostUsd / low.installedCostUsd) : null;
-  wrap.append(node('p', `The packages compared in the study declare installed costs from ${usd(low.installedCostUsd)} for ${text(low.label) || low.id} up to ${usd(high.installedCostUsd)} for ${text(high.label) || high.id}${ratio ? `, about ${ratio} times as much` : ''}. Those are the numbers the study was given to compare, not quotes, and they cover equipment only.`, 'learn-say'));
+  wrap.append(node('p', `The study packages span ${text(low.label) || low.id}: ${capitalBasisText({installedCost:low.installedCostUsd,installedCostBasis:low.installedCostBasis})} To ${text(high.label) || high.id}: ${capitalBasisText({installedCost:high.installedCostUsd,installedCostBasis:high.installedCostBasis})}${ratio ? ` The larger capital input is about ${ratio} times the smaller.` : ''}`, 'learn-say'));
   wrap.append(node('p', `Read from ${STUDY_URL} when this page loaded.`, 'source-line'));
   return wrap;
 }
@@ -652,8 +653,7 @@ export const MODULES = [
     formula: 'compliancePct = 100 * compliantHours / eligibleHours,   eligible = valid && eligible !== false && !warmup',
     formulaNote: 'summarizeHours in src/metrics.js. compliantHours accumulates compliantFraction, the share of an hour\u2019s sampled control substeps inside the band, so an hour that fails for ten minutes contributes a partial hour and not a zero. Cross-scenario comparisons intersect the eligible sets of every compared scenario, so two strategies are always scored over identical hours.',
     worked: [
-      {label: 'Pad-and-vent baseline across five Tulsa years, six strategies', value: 'median 28.9%, worst year 2025 at 27.1%, spread 2.7 pts', source: 'docs/VERIFICATION.md'},
-      {label: 'One greenhouse, one equipment set, four crop programs swapped (crop-bands.json, Tulsa 2025)', value: 'attainment moved 5.7 pts, 21.4% to 27.1%, while operating cost moved by a factor of 2.0, $16,208 to $32,737, and DLI deficit days by a factor of 4.9, 69 to 341', source: 'docs/examples/README.md'}
+      {label: 'Pad-and-vent baseline across five Tulsa years, six strategies', value: 'joint temperature-and-moisture target attainment: median 28.9% of eligible hours, worst year 2025 at 27.1%; compare the best and worst endpoints in the study for its percentage-point spread', source: 'docs/VERIFICATION.md'},
     ],
     caveat: 'A wider band raises attainment without changing the building. That makes attainment comparable between strategies on one band and not comparable between two different bands. Warm-up hours keep their energy and water in the individual totals, because that energy really was spent, but they carry no compliance at all.',
     show: {target: 'headline-metrics', label: 'Show me the four headline numbers', needsRun: true, first: 'In the Analyze view: press Load Tulsa 2025 example, then Run all scenarios. Attainment is shown as equivalent compliant hours over eligible hours, with valid hours beside it.'}
@@ -692,7 +692,7 @@ export const MODULES = [
       {label: 'Binding limit at Tulsa', value: 'the moisture ceiling binds 3,851 h against 2,952 h for the temperature margin', source: 'docs/AUDIT.md'},
       {label: 'Moisture-bound band with a moisture-adding stage (propagation-nursery.json)', value: 'decoupled latent removal reached 52.7% against 28.2% for pad and vent', source: 'docs/examples/README.md'}
     ],
-    caveat: 'The decoupling verdict is a price ratio, not a property of the equipment. Roughly 0.9 pts of attainment bought by moving about 50,000 kWh from electricity to fuel is a bargain at some prices and a loss at others, and the electricity-to-fuel ratio is an editable input here, not a measured quantity.',
+    caveat: 'The decoupling verdict is a price ratio, not a property of the equipment. Moving purchased energy between electricity and fuel can improve modeled operating cost at one price ratio and worsen it at another; any attainment difference needs both eligible-hour endpoints, and the electricity-to-fuel ratio is an editable input here, not a measured quantity.',
     show: {target: 'loads-panel', label: 'Show me the sensible and latent decomposition', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: run scenarios and stay on the Equipment estimate tier. The load decomposition is a model balance, so it is hidden in the Weather only view.'}
   },
   {
@@ -722,7 +722,6 @@ export const MODULES = [
     formula: 'dominated(a) if there exists b with cost_b <= cost_a and compliantHours_b >= compliantHours_a, at least one strict',
     formulaNote: 'compareScenarios in src/metrics.js, scored on the common eligible hour set; strategyFrontier applies the same rule to median cost and median attainment across weather years. A scenario with missing prices or numerical-failure hours is not comparable and is excluded rather than assumed.',
     worked: [
-      {label: 'Six classes at Tulsa, median over 104 screened design points (360 sampled days, so totals not annual figures)', value: 'pad $7,321 at 28.9%; pads with a condensing dehumidifier $9,205 at 45.5%; desiccant with evaporative cooling $10,232 at 53.6%; DX $13,006 at 66.4%; liquid-desiccant hybrid $13,732 at 56.2%; integrated reheat $15,058 at 55.1%', source: 'docs/SENSITIVITY.md'},
       {label: 'Cheapest non-dominated strategy', value: 'the pad baseline, in 100% of the 104 points', source: 'docs/SENSITIVITY.md'},
       {label: 'Highest attainment anywhere in the example library (indoor-microgreen-racks.json)', value: '93.0% for DX with a dehumidifier in an opaque rack farm, at 344,528 kWh, the most electricity-hungry set in the library', source: 'docs/examples/README.md'}
     ],
@@ -745,7 +744,7 @@ export const MODULES = [
       {label: 'Thermal curtain, 0.1 per hour declared gap', value: '22.24% attainment, fuel down 22% to 236,672 kWh, which is 59,917 kWh of delivered heat saved, over 1,179 curtain hours', source: 'docs/examples/README.md'},
       {label: 'The same shade screen with the light guard removed', value: 'closes for 1,867 h and pushes lighting energy up by 17,817 kWh to replace the photons it blocked', source: 'docs/examples/README.md'}
     ],
-    caveat: 'The curtain cut fuel by 22% and cost 4.9 pts of attainment in the same run, because restricting the outside-air path while the crop transpires traps moisture in the zone. Schedule a curtain by outdoor moisture, not by outdoor temperature alone. The 0.1 per hour closed-gap exchange is a user input and is recorded as UNSOURCED in docs/COMPONENT-PARAMETERS.md: leave it null and the run warns that the moisture case is optimistic.',
+    caveat: 'The curtain cut fuel by 22% and reduced joint temperature-and-moisture target attainment in the same run, because restricting the outside-air path while the crop transpires traps moisture in the zone. Schedule a curtain by outdoor moisture, not by outdoor temperature alone. The 0.1 per hour closed-gap exchange is a user input and is recorded as UNSOURCED in docs/COMPONENT-PARAMETERS.md: leave it null and the run warns that the moisture case is optimistic.',
     show: {target: 'advanced-fields', label: 'Show me the envelope and screen assumptions', needsRun: false, first: null}
   },
   {
@@ -759,7 +758,7 @@ export const MODULES = [
     formula: 'spreadPts = bestYearPct - worstYearPct,   rankingStable = one identical operating-cost order in every year',
     formulaNote: 'aggregateYears in src/metrics.js. A least-squares trend is reported only once five or more calendar years exist. The tolerant variant of the same rule, used for the Morris design points, calls a ranking stable when the most common order holds in at least 90% of points. Read a stable ranking narrowly: it says the cost order repeated across those weather years, not that the choice survives the assumptions behind it, which is the separate question § 09 asks. A ranking can be reproducible in every year and the decision still unresolved.',
     worked: [
-      {label: 'Baseline across five Tulsa years, six strategies', value: 'median 28.9%, worst year 2025 at 27.1%, spread 2.7 pts', source: 'docs/VERIFICATION.md'},
+      {label: 'Baseline across five Tulsa years, six strategies', value: 'joint temperature-and-moisture target attainment: median 28.9% of eligible hours, worst year 2025 at 27.1%; compare the best and worst endpoints in the study for its percentage-point spread', source: 'docs/VERIFICATION.md'},
       {label: 'Cost ranking across those same years', value: 'not stable: 2 distinct orders over 5 years', source: 'docs/VERIFICATION.md'},
       {label: 'Tulsa hours above 30 °C in 2023, 2024, 2025', value: '982, then 1,117, then 634: a 483-hour swing between two neighbouring years at one site', source: 'docs/CLIMATES.md'}
     ],
@@ -779,8 +778,6 @@ export const MODULES = [
     worked: [
       {label: 'Top of the attainment ranking, mu* in percentage points', value: 'crop leaf area and transpiration 9.10, envelope U-value 5.89, shade fraction 3.43, DX coil SHR 2.34, solar transmission 2.26', source: 'docs/SENSITIVITY.md'},
       {label: 'Bottom of the same ranking', value: 'pad effectiveness 0.96, dehumidifier L/kWh 0.08, cooling COP 0.07', source: 'docs/SENSITIVITY.md'},
-      {label: 'Cooling COP, the split that shows the method working', value: 'rank 12 of 12 on attainment at 0.07 pts, but rank 5 on operating cost at $646 and rank 3 on electricity at 5,838 kWh: COP changes what holding the band costs, not what the equipment can hold', source: 'docs/SENSITIVITY.md'},
-      {label: 'Ranking stability under the screened ranges', value: 'unstable: 3 distinct orders over 104 design points, the most common holding 61.5%. The three cheapest positions are identical in 104 of 104 points, and all the instability sits inside DX, the liquid-desiccant hybrid and integrated reheat, whose medians span 16%: $13,006, $13,732, $15,058', source: 'docs/SENSITIVITY.md'}
     ],
     caveat: 'Screening is not uncertainty quantification. There is no distribution here, no confidence interval and no probability that one strategy beats another: the ranges are engineering spans with stated reasons, and the design is space-filling rather than a Monte Carlo draw. The most influential parameter, crop transpiration, is a client assumption rather than a measurement. Only twelve continuous parameters are screened, so structural choices such as the single-zone assumption are not bounded by any of these effects, and the largest remaining errors are probably structural.',
     show: {target: 'sensitivity-controls', label: 'Show me the one-at-a-time sensitivity controls', needsRun: false, first: null}
@@ -892,7 +889,7 @@ function methodBlock(method, study) {
   const rows = [
     ['Weather years', finite(method?.years) ? num(method.years) : Array.isArray(method?.years) ? method.years.join(', ') : text(method?.years) || 'Not available'],
     ['Sites', Array.isArray(method?.sites) ? method.sites.join(', ') : text(method?.sites) || 'Not available'],
-    ['Scenarios', Array.isArray(method?.scenarios) ? method.scenarios.map(entry => typeof entry === 'string' ? entry : `${text(entry?.label) || text(entry?.id) || 'unnamed'}${finite(entry?.installedCostUsd) ? ` (${usd(entry.installedCostUsd)} installed)` : ''}`).join(', ') : finite(method?.scenarios) ? num(method.scenarios) : text(method?.scenarios) || 'Not available'],
+    ['Scenarios', Array.isArray(method?.scenarios) ? method.scenarios.map(entry => typeof entry === 'string' ? entry : `${text(entry?.label) || text(entry?.id) || 'unnamed'}${finite(entry?.installedCostUsd) ? ` (${capitalBasisText({installedCost:entry.installedCostUsd,installedCostBasis:entry.installedCostBasis})})` : ''}`).join(', ') : finite(method?.scenarios) ? num(method.scenarios) : text(method?.scenarios) || 'Not available'],
     ['Controller', text(method?.controller) || 'Not available'],
     ['Crop moisture model', text(method?.transpirationModel) || 'Not available'],
     ['Dispatch step', finite(method?.stepMinutes) ? `${num(method.stepMinutes, 2)} min` : 'Not available'],
@@ -958,7 +955,7 @@ function weatherTable(weather) {
   return wrap;
 }
 
-function strategyTable(strategies, yearCount) {
+function strategyTable(strategies, yearCount, basis) {
   const wrap = node('div', undefined, 'table-wrap');
   if (!Array.isArray(strategies) || !strategies.length) {
     wrap.append(node('p', 'This region carries no strategy rows in the study file, so nothing is ranked here.', 'help'));
@@ -984,8 +981,8 @@ function strategyTable(strategies, yearCount) {
       node('td', `${pct(row.attainmentWorstPct)}${text(row.attainmentWorstYear) ? ` (${row.attainmentWorstYear})` : ''}`),
       node('td', `${pct(row.attainmentBestPct)}${text(row.attainmentBestYear) ? ` (${row.attainmentBestYear})` : ''}`),
       node('td', points(row.attainmentSpreadPts)),
-      node('td', usd(row.costMedianUsd)),
-      node('td', finite(row.costSpreadUsd) ? usd(row.costSpreadUsd) : 'Not available'),
+      node('td', row.costBasis || basis ? `${usd(row.costMedianUsd)} modeled operating cost, median year. ${costBasisText(row.costBasis || basis)}` : 'Cost basis not supplied by this study; dollar comparison withheld'),
+      node('td', (row.costBasis || basis) && finite(row.costSpreadUsd) ? `${usd(row.costSpreadUsd)} modeled operating-cost spread over the study years` : 'Cost basis unavailable'),
       node('td', kwh(row.electricMedianKWh)),
       node('td', kwh(row.fuelMedianKWh)),
       node('td', frontier));
@@ -1022,7 +1019,7 @@ function verdictBlock(verdict, strategies) {
   const basis = text(verdict.recommendedBasis);
   wrap.append(node('p', basis || 'The study states no basis for this line, so it should not be quoted.', 'learn-verdict-basis'));
   const facts = [];
-  // marginPct is a difference in median operating cost, expressed as a percent, not attainment points.
+  // marginPct is a difference in median operating cost, expressed as a percent, not percentage points (pp) of joint temperature-and-moisture target attainment.
   if (unresolved) {
     if (verdict.runnerUp != null) facts.push(['Second candidate', nameOf(verdict.runnerUp)]);
     facts.push(['Operating-cost gap between the candidates', verdict.marginPct == null ? 'Not stated by the study' : pct(verdict.marginPct)]);
@@ -1081,7 +1078,7 @@ function regionNode(region) {
   heading.append(left);
   const years = Array.isArray(region.years) ? region.years : [];
   heading.append(node('span', `${text(region.zip) ? `ZIP ${region.zip} · ` : ''}${years.length ? `${years.length} years: ${years[0]} to ${years[years.length - 1]}` : 'Years not stated'}`, 'chart-unit'));
-  section.append(heading, weatherTable(region.weather), strategyTable(region.strategies, years.length), verdictBlock(region.verdict, region.strategies));
+  section.append(heading, weatherTable(region.weather), strategyTable(region.strategies, years.length, region.costBasis), verdictBlock(region.verdict, region.strategies));
   return section;
 }
 
@@ -1285,6 +1282,7 @@ export function initLearn() {
   const host = $('learn-modules');
   if (host) {
     const fragment = document.createDocumentFragment();
+    fragment.append(node('p', 'Joint temperature-and-moisture target attainment means the share of eligible hours meeting temperature, VPD and dew-point bounds together. Differences are percentage points (pp), not relative percentages; compare the named baseline and alternative endpoints. Historical studies are separate from your current run. Their dollars require the study period, included electricity, fuel and water, applied prices and exclusions. Capital is separate estimated or user-entered installed cost. No result is a quote or guaranteed savings.', 'notice'));
     fragment.append(primerNode());
     deeper = document.createElement('details');
     deeper.id = DEEPER_ID;

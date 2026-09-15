@@ -23,7 +23,7 @@ export const TOUR_STEPS = [
     body: 'Retrieve weather fetches the selected source for the chosen period and caches it in this browser. "Load Tulsa 2025 example" loads a bundled genuine 8,760-hour NASA POWER year for ZIP 74103, the fastest way to see a complete run. The badge beside the panel heading reports whether weather is loaded and what it covers.'},
   {id: 'years', target: 'year-chips', title: 'Run more than one year',
     body: 'Each chip is a calendar year available for these coordinates, from the bundled catalog, the browser cache or a retrieval. Ten Tulsa years, 2016 through 2025, ship with the tool, each complete at 8,760 or 8,784 hours. Every selected scenario runs against every selected year, which is what fills the across-years panel.',
-    why: 'In the bundled six-strategy example the baseline attained a median 28.9%, with the worst year (2025) at 27.1% and a 2.7-point spread. One year is an anecdote.'},
+    why: 'In the bundled six-strategy example the baseline attained a median 28.9%, with the worst year (2025) at 27.1% of eligible hours for joint temperature-and-moisture target attainment. Best-to-worst spreads require both endpoints, not median minus worst. One year is an anecdote.'},
   {id: 'retrieve-years', target: 'retrieve-years', title: 'Add years from the source',
     body: 'Set how many of the most recent complete calendar years to pull from the selected source, then retrieve. Years are fetched one at a time and cached locally, so a second run over the same years is immediate. A failed retrieval leaves that year absent rather than substituting a neighbouring year.'},
   {id: 'sites', target: 'sites-row', title: 'Compare climates',
@@ -41,9 +41,9 @@ export const TOUR_STEPS = [
     body: 'The cultivation system sets floor and canopy geometry, including stacked tiers. Available footprint photons are shared over stacked canopy rather than multiplied by tier area, so adding tiers does not create light. Check the canopy-area field below to see what the template assumed.'},
   {id: 'crop', target: 'crop', title: 'Crop program',
     body: 'The crop program sets target temperature and VPD bands, the dew-point guardrail, the light target and crop moisture assumptions. The line under the select names the source of those values, including where a figure is a client assumption rather than a published one. Attainment is judged against these bands, so a wider band raises attainment without changing the building.',
-    why: 'Morris screening ranked crop leaf area and transpiration first on all three metrics, at 9.10 percentage points of mean absolute effect on attainment against 5.89 for envelope U and 3.43 for shade fraction.'},
+    why: 'Morris screening ranked crop leaf area and transpiration first on all three metrics, at 9.10 percentage points (pp) of mean absolute effect on joint temperature-and-moisture target attainment against 5.89 for envelope U and 3.43 for shade fraction.'},
   {id: 'control-mode', target: 'control-mode', title: 'Control model',
-    body: 'The staged deadband controller is the default and converges with dispatch cadence: over a full Tulsa year, one-minute against half-minute steps moved attainment by 0.004, 0.383 and 0.091 percentage points and electricity by at most 0.31%. The older ideal per-minute modulation remains selectable as a labelled upper bound and does not converge, at 1.5 points and 1.95%. Read the ideal mode as a best case, never as a design figure.'},
+    body: 'The staged deadband controller is the default and converges with dispatch cadence: over a full Tulsa year, one-minute against half-minute steps moved joint temperature-and-moisture target attainment by 0.004, 0.383 and 0.091 percentage points and electricity by at most 0.31%. The older ideal per-minute modulation remains selectable as a labelled upper bound and does not converge, at 1.5 percentage points (pp) and 1.95%. Read the ideal mode as a best case, never as a design figure.'},
   {id: 'transpiration-model', target: 'transpiration-model', title: 'Crop moisture model',
     body: 'Stanghellini transpiration drives crop moisture from leaf area, absorbed radiation and zone VPD, so the latent load responds to weather and light. The fixed schedule applies a constant litres per square metre per day instead, useful when you want to test a single number you already trust. Whichever is active is recorded in the run manifest and in every export.'},
   {id: 'technology', target: 'technology', title: 'Technology assumption',
@@ -56,7 +56,7 @@ export const TOUR_STEPS = [
   {id: 'advanced-fields', target: 'advanced-fields', title: 'The rest of the assumptions',
     body: 'These grouped fields hold envelope and glazing, infiltration and ventilation, moisture, light and DLI, target bands, equipment capacities, efficiencies and costs. Every default is a labelled assumption, and the values you change travel with the run so a reviewer can see exactly what was assumed. Nothing is calibrated to your site until you calibrate it here.'},
   {id: 'add-strategy', target: 'add-upgrade-row', title: 'Add a strategy to compare',
-    body: 'Pick a technology and add it as a further scenario. New strategies copy the first scenario\u2019s non-equipment assumptions, so the comparison isolates the equipment change. The first scenario remains the baseline that added hours and added cost are measured against.'},
+    body: 'Pick a technology and add it as a further scenario. New strategies copy the first scenario\u2019s non-equipment assumptions, so the comparison isolates the equipment change. The first scenario remains the named baseline. Differences in joint temperature-and-moisture target attainment use percentage points (pp) with both eligible-hour endpoints, never relative percent. Modeled operating-cost reduction is shown only for a lower-cost named alternative, never as guaranteed savings.'},
   {id: 'sensitivity', target: 'sensitivity-controls', title: 'Vary one assumption at a time',
     body: 'This generates sibling scenarios that change a single assumption across a stated range, for example pad effectiveness at 70, 80, 85 and 90%, or envelope U at plus and minus 20%. The spread you get back is a sensitivity range, not a statistical confidence interval. Use it to find out whether a ranking survives the assumption you are least sure about.',
     why: 'Across the screened ranges the cost ranking was not stable: three distinct orders appeared, the most common in 61.5% of 104 points, though the three cheapest positions held in all 104.'},
@@ -67,7 +67,7 @@ export const TOUR_STEPS = [
   {id: 'evidence-note', target: 'evidence-note', title: 'The standing caveat',
     body: 'This note sits beside the results for a reason: the component models are coarse and the run is a screen. It is not a calibrated greenhouse digital twin and not a guarantee of indoor conditions. The disclosure under the metrics carries the per-run warnings, including missing hours, unpriced hours and any numerical failures.'},
   {id: 'headline-metrics', target: 'headline-metrics', title: 'The four numbers',
-    body: 'Joint target attainment is the share of eligible hours inside the temperature, VPD and dew-point bands together, shown as equivalent compliant hours over eligible hours. Period operating cost is electricity plus fuel for the selected period only, with a known subtotal when prices are missing. Longest target miss counts consecutive eligible intervals, and valid source and model hours reports how much of the record supported the answer. The first hour of every continuous weather segment is warm-up and excluded from comparative compliance.',
+    body: 'Joint target attainment is the share of eligible hours inside the temperature, VPD and dew-point bands together, shown as equivalent compliant hours over eligible hours. Modeled operating cost includes purchased electricity, heating fuel and modeled water for the named period, with actual applied rates and exclusions in the cost basis, with a known subtotal when prices are missing. Longest target miss counts consecutive eligible intervals, and valid source and model hours reports how much of the record supported the answer. The first hour of every continuous weather segment is warm-up and excluded from comparative compliance.',
     why: 'High attainment on a thin record is not a result. Check valid hours before quoting the other three.'},
   {id: 'tiers', target: 'tier-tabs', title: 'Two evidence tiers',
     body: 'Equipment estimate shows the coupled model with finite capacities, energy and cost. Weather only drops every equipment assumption and classifies the outdoor record alone, which is the strongest evidence in the tool. The explanation line under the tabs restates what the selected tier can and cannot support.',
@@ -309,6 +309,10 @@ function show(index, skipped) {
   $('tour-counter').textContent = `${index + 1} of ${tour.steps.length}`;
   $('tour-card-title').textContent = step.title;
   $('tour-card-body').textContent = step.body;
+  if (['headline-metrics', 'comparison', 'years-panel', 'energy'].includes(step.id)) {
+    const basis = document.querySelector('#headline-metrics .result-basis');
+    if (basis) $('tour-card-body').textContent += ` Saved result basis: ${basis.textContent}`;
+  }
   const why = $('tour-card-why');
   why.textContent = step.why ? `Why it matters: ${step.why}` : '';
   why.hidden = !step.why;

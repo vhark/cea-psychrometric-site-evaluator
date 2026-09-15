@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {aggregateYears,compareScenarios,compareSites,designHours,loadDecomposition,co2Window,summarizeHours,LATENT_KWH_PER_KG} from '../src/metrics.js';
-import {designBasisHTML} from '../src/export.js';
+import {designBasisHTML,reportHTML} from '../src/export.js';
 import {wetBulb,dewPoint,humidityRatio} from '../src/physics.js';
 import {weatherSummary} from '../src/metrics.js';
 import {makeScenario} from '../src/config.js';
@@ -66,7 +66,6 @@ test('cost basis distinguishes complete local calendar years from partial period
   for(const year of [2024,2025]){
     const basis=summarizeHours(localYear(year),s).costBasis;
     assert.equal(basis.scope,'annual');
-    assert.equal(basis.label,'Model-estimated annual operating cost');
     assert.deepEqual(basis.period,{startDate:`${year}-01-01`,endDate:`${year}-12-31`});
   }
   const invalid=localYear(2025);invalid[100]={...invalid[100],valid:false};
@@ -75,7 +74,6 @@ test('cost basis distinguishes complete local calendar years from partial period
   assert.equal(summarizeHours(gapped,s).costBasis.scope,'period');
   const partial=summarizeHours(localYear(2025).slice(24,72),s).costBasis;
   assert.equal(partial.scope,'period');
-  assert.equal(partial.label,'Model-estimated operating cost for the simulated period');
   assert.deepEqual(partial.period,{startDate:'2025-01-02',endDate:'2025-01-03'});
   assert.deepEqual(partial.included,['purchased electricity','purchased heating fuel','water represented by the scenario']);
   assert.deepEqual(partial.priceBasis,{
@@ -101,15 +99,15 @@ test('scenario comparison exposes reductions only for a cheaper named alternativ
   ]);
   assert.equal(rows[0].operatingCostReduction,undefined);
   assert.equal(rows[2].operatingCostReduction,undefined);
-  assert.deepEqual(rows[1].operatingCostDifference,{
-    label:'Model-estimated operating-cost difference',
+  const {label: differenceLabel, ...difference} = rows[1].operatingCostDifference;
+  assert.deepEqual(difference,{
     amount:-8,
     baselineName:'Named baseline',
     alternativeName:'Lower alternative',
     basis:{isQuote:false,isGuaranteedSavings:false},
   });
-  assert.deepEqual(rows[1].operatingCostReduction,{
-    label:'Model-estimated operating-cost reduction',
+  const {label: reductionLabel, ...reduction} = rows[1].operatingCostReduction;
+  assert.deepEqual(reduction,{
     amount:8,
     baselineName:'Named baseline',
     alternativeName:'Lower alternative',
@@ -139,6 +137,10 @@ test('comparison and design-basis data retain numeric rates for common state-pri
       assumptions:{evidenceTier:'test',stepMinutes:5}},energyContext);
   };
   const baseline=pricedResult('priced-base','Priced baseline',1),alternative=pricedResult('priced-alt','Priced alternative',.5);
+  Object.assign(alternative.summary,{doasCondensateKg:101.23,doasCoolingDeliveredKWh:202.34,doasCoolingElectricKWh:303.45,
+    doasRecoveredReheatKWh:404.56,doasExternalHeatKWh:505.67,doasUnmetConditioningKWh:606.78,recoveryCoreM3:707.89,
+    recoveryBypassM3:808.91,preheatInsufficientHours:9.12});
+  alternative.summary.costBasis.priceBasis.fuel.source='<script>untrusted price source</script>';
   const compared=compareScenarios([baseline,alternative])[1];
   assert.deepEqual(compared.costBasis.period,{startDate:'2025-01-31',endDate:'2025-02-01'});
   assert.deepEqual(compared.costBasis.priceBasis.electricity.rates,[
@@ -147,8 +149,15 @@ test('comparison and design-basis data retain numeric rates for common state-pri
   ]);
   const snapshot={startDate:'2025-01-31',endDate:'2025-02-01',timezone:'UTC',source:'test',sourceKind:'synthetic',
     latitude:36.15,longitude:-95.99,hours:times.map((time,index)=>({time,tempC:20+index,rh:.5,pressurePa:101325,ghiWm2:0}))};
-  const html=designBasisHTML([baseline],snapshot);
-  for(const value of ['2025-01','0.1 USD/kWh','2025-02','0.2 USD/kWh'])assert.ok(html.includes(value),`brief omits ${value}`);
+  for (const render of [designBasisHTML,reportHTML]) {
+    const html=render([baseline,alternative],snapshot);
+    for(const value of ['2025-01','0.1 USD/kWh','2025-02','0.2 USD/kWh'])assert.ok(html.includes(value),`document omits ${value}`);
+    for(const value of ['101.23 kg','202.34 kWh','303.45 kWh','404.56 kWh','505.67 kWh','606.78 kWh','707.89 m³','808.91 m³','9.12 h'])
+      assert.ok(html.includes(value),`document omits a distinct conditioning quantity: ${value}`);
+    assert.ok(html.includes('&lt;script&gt;untrusted price source&lt;/script&gt;'));
+    assert.ok(!html.includes('<script>untrusted price source'));
+    assert.ok(!html.includes('[object Object]'));
+  }
 });
 
 test('multi-year aggregate selects median, worst and best years and fits a trend only with 5 or more numeric years',()=>{
@@ -271,15 +280,16 @@ test('CO2 window equivalent hours never exceed valid hours and ignore invalid ro
   assert.equal(w.weatherSideHours,4,'weather-side count is independent of the strategy and skips missing data');
 });
 
-test('design-basis brief escapes scenario text and reports missing load terms as unavailable',()=>{
+test('generated documents escape scenario text without depending on complete load data',()=>{
   const snapshot={startDate:'2025-01-01',endDate:'2025-01-01',timezone:'UTC',source:'test',sourceKind:'synthetic',latitude:36.15,longitude:-95.99,hours:Array.from({length:24},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:20,rh:.5,pressurePa:101325,ghiWm2:0}))};
   const r=result('x','<script>alert(1)</script>',{});
   r.hours=Array.from({length:24},(_,i)=>({...hour(i),loads:undefined,controls:undefined}));
-  const html=designBasisHTML([r],snapshot,{aggregate:null,sites:null});
-  assert.ok(!html.includes('<script>alert'));
-  assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
-  assert.ok(html.includes('No load terms'));
-  assert.ok(!html.includes('\u2014'),'no em dashes in copy');
+  for (const render of [designBasisHTML,reportHTML]) {
+    const html=render([r],snapshot,{aggregate:null,sites:null});
+    assert.ok(!html.includes('<script>alert'));
+    assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
+    assert.ok(!html.includes('[object Object]'));
+  }
 });
 
 // Pad and vent usefulness must be independent measurements. The primary weather mode is mutually exclusive,

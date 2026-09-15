@@ -22,7 +22,7 @@ function makeSvg(container, width, height, label, desc) {
 }
 /* One chart is computed once as a spec: geometry primitives plus a legend and a text table. The browser
    renderer appends the primitives as DOM nodes with brand CSS variables; the exporter serializes the same
-   primitives as a static SVG string with explicit Archive-register colours. Colour lives in a role name
+   primitives as a static SVG string with explicit Field colours. Colour lives in a role name
    (chart-1, warn, text-2), never in the maths. */
 const roleVar = role => `var(--${role})`;
 function tickPrims({left, top, width, height, max, count = 4, unit = ''}) {
@@ -176,7 +176,7 @@ export function renderTimeline(container, hours, onSelect, weatherOnly = false, 
   });
   ctx.lineWidth = Math.min(1, Math.max(.5, cellHeight / 8));
   for (const bucket of buckets.values()) {ctx.fillStyle = color(bucket.color); ctx.strokeStyle = ctx.fillStyle; ctx.fill(bucket.fill); ctx.stroke(bucket.stroke);}
-  ctx.fillStyle = color('text-3'); ctx.font = '11px "IBM Plex Mono", monospace'; ctx.textAlign = 'right';
+  ctx.fillStyle = color('text-3'); ctx.font = '11px "Spline Sans Mono", monospace'; ctx.textAlign = 'right';
   for (const hour of [0, 6, 12, 18, 23]) ctx.fillText(String(hour).padStart(2, '0'), left - 7, top + (hour + .75) / 24 * plotHeight);
   ctx.textAlign = 'left'; ctx.fillText(new Date(start).toISOString().slice(0, 10), left, height - 8);
   ctx.textAlign = 'right'; ctx.fillText(new Date(start + (days - 1) * DAY).toISOString().slice(0, 10), width - right, height - 8);
@@ -355,13 +355,13 @@ export function yearsChartSpec(aggregate, scenarioId) {
   const years = (entry?.years || []).filter(y => Number.isFinite(y.compliancePct));
   if (!years.length) return {empty: true, message: 'No multi-year results for this scenario.'};
   const width = 420, height = 240, left = 42, top = 24, ph = 176, pw = 361, max = 100;
-  const label = `Joint climate-band attainment by weather year for ${entry.name}. Median ${number(entry.median.compliancePct, 1)} percent; worst year ${entry.worst?.label ?? 'not available'} at ${number(entry.worst?.compliancePct, 1)} percent. Values in the year table.`;
+  const label = `Joint temperature-and-moisture target attainment by weather year for ${entry.name}. Median ${number(entry.median.compliancePct, 1)} percent; worst year ${entry.worst?.label ?? 'not available'} at ${number(entry.worst?.compliancePct, 1)} percent. Values in the year table.`;
   const prims = tickPrims({left, top, width: pw, height: ph, max, unit: '% of eligible hours'});
   const step = pw / years.length;
   years.forEach((year, i) => {
     const h = year.compliancePct / max * ph, worst = entry.worst && year.label === entry.worst.label;
     prims.push({tag: 'rect', attrs: {x: left + i * step + step * .18, y: top + ph - h, width: step * .64, height: h}, fill: worst ? 'warn' : 'chart-1',
-      title: `${year.label}: ${number(year.compliancePct, 1)} percent joint attainment${worst ? ', worst year' : ''}; operating cost ${Number.isFinite(year.cost) ? `$${number(year.cost)}` : 'unpriced'}`});
+      title: `${year.label}: ${number(year.compliancePct, 1)} percent joint attainment${worst ? ', worst year' : ''}`});
     if (years.length <= 12 || i % Math.ceil(years.length / 12) === 0)
       prims.push({tag: 'text', attrs: {x: left + i * step + step / 2, y: top + ph + 20, 'text-anchor': 'middle'}, text: year.label});
   });
@@ -372,22 +372,18 @@ export function yearsChartSpec(aggregate, scenarioId) {
     desc: `One bar per weather year for ${entry.name}, ${years.length} years, scaled 0 to 100 percent of eligible hours. The dashed line is the median at ${number(entry.median.compliancePct, 1)} percent; the worst year is drawn in the warning colour and named in the table.`,
     legend: [{label: `Weather year attainment, ${years.length} years`, role: 'chart-1'}, {label: `Worst year: ${entry.worst?.label ?? 'not available'}`, role: 'warn'},
       {label: `Median ${number(entry.median.compliancePct, 1)} percent, dashed`, role: 'text-2'}],
-    table: {head: ['Weather year', 'Joint attainment · %', 'Operating cost · $', 'Eligible hours'],
+    table: {head: ['Weather year', 'Joint temperature-and-moisture target attainment · %', 'Eligible hours'],
       rows: years.map(year => [`${year.label}${entry.worst && year.label === entry.worst.label ? ' (worst)' : ''}`, number(year.compliancePct, 1),
-        Number.isFinite(year.cost) ? number(year.cost) : 'Unpriced', number(year.eligibleHours)])}};
+        number(year.eligibleHours)])}};
 }
 export function renderYears(container, aggregate, scenarioId) {
   renderSpec(container, null, yearsChartSpec(aggregate, scenarioId));
 }
 export const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
-/* Archive-register chart colours: the same brand categoricals, darkened where the Carbon-register tone would
-   disappear on parchment or in a grayscale print. Exported documents never carry the app's CSS variables. */
-export const ARCHIVE_PALETTE = {
-  'chart-1': '#4DB405', 'chart-2': '#A8730D', 'chart-3': '#6E8A74', 'chart-4': '#8A9B2E',
-  'chart-5': '#9A8860', 'chart-6': '#71806B', 'chart-7': '#C4654A', 'chart-8': '#5A5B5D',
-  warn: '#A8730D', green: '#4DB405', 'text-2': 'rgba(43,44,46,.72)', grid: 'rgba(43,44,46,.20)', ink: '#2B2C2E'};
+/* One Season Farmers Field chart categoricals for generated documents. */
+export const FIELD_PALETTE = {'chart-1':'#5E9643','chart-2':'#E3A237','chart-3':'#9B6FA8','chart-4':'#869A3A','chart-5':'#2E6B43','chart-6':'#5C6759','chart-7':'#838E80','chart-8':'#23271E',warn:'#B0721A',green:'#2E6B43','text-2':'#5C6759',grid:'#D2DACF',ink:'#23271E'};
 /** The same spec as a static SVG string: explicit colours, no CSS variables, no script, every text escaped. */
-export function chartSVG(spec, palette = ARCHIVE_PALETTE) {
+export function chartSVG(spec, palette = FIELD_PALETTE) {
   if (!spec || spec.empty) return `<p class="empty-chart">${escapeHTML(spec?.message || 'Chart data is not available.')}</p>`;
   const color = role => palette[role] || palette['chart-8'];
   const body = spec.prims.map(p => {
@@ -400,6 +396,6 @@ export function chartSVG(spec, palette = ARCHIVE_PALETTE) {
     const open = `<${p.tag} ${Object.entries(attrs).map(([k, v]) => `${k}="${escapeHTML(v)}"`).join(' ')}>`;
     return `${open}${p.title ? `<title>${escapeHTML(p.title)}</title>` : ''}${p.text !== undefined ? escapeHTML(p.text) : ''}</${p.tag}>`;
   }).join('');
-  return `<svg viewBox="0 0 ${spec.width} ${spec.height}" width="100%" role="img" aria-label="${escapeHTML(spec.label)}" font-family="'IBM Plex Mono', monospace" font-size="10" fill="${palette['text-2']}">`
+  return `<svg viewBox="0 0 ${spec.width} ${spec.height}" width="100%" role="img" aria-label="${escapeHTML(spec.label)}" font-family="'Spline Sans Mono', monospace" font-size="10" fill="${palette['text-2']}">`
     + `<title>${escapeHTML(spec.label)}</title><desc>${escapeHTML(spec.desc || spec.label)}</desc>${body}</svg>`;
 }

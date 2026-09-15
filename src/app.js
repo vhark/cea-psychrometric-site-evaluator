@@ -6,6 +6,7 @@ import {loadScenarios, saveScenarios, loadWeather, saveWeather, listWeather, loa
 import {downloadRun, downloadScenario} from './export.js';
 import {compareScenarios, aggregateYears, compareSites, loadDecomposition, co2Window} from './metrics.js';
 import {modeLabel, modeEntries, attainmentClass, attainmentText, renderMonthly, renderTimeline, renderTimelineTable, renderScatter, renderDLI, renderLoads, renderYears} from './charts.js';
+import {costBasisText, capitalBasisText, conditioningRows, airflowRows, attainmentComparisonText} from './report.js';
 import {initTour} from './tour.js';
 import {initLearn} from './learn.js';
 
@@ -214,6 +215,7 @@ function updateScenario(event) {
   }
   else if (fieldByKey.has(input.name)) {
     s[input.name] = input.value === '' ? null : Number(input.value); renderUnitReadout(fieldByKey.get(input.name),s[input.name]);
+    if (input.name === 'installedCost') s.installedCostBasis = 'userEntered';
     if (['minVentACH', 'maxVentACH'].includes(input.name)) {s.outsideAirBasis = 'projectInput'; s.outsideAirReviewed = false;}
     if (input.name === 'fanWPerM3s') s.outsideAirReviewed = false;
   }
@@ -587,7 +589,11 @@ function renderHeadlines(r) {
     const entries = modeEntries(r.hours, true), valid = entries.reduce((sum, [, hours]) => sum + hours, 0), pad = entries.filter(([mode]) => mode === 'PAD_EFFECTIVE').reduce((sum, [, hours]) => sum + hours, 0);
     target.append(metric('Classified weather', units(valid, 'h', 0), `${format(r.hours.length - valid)} h missing / unclassified`), metric('Pad-effective window', units(pad, 'h', 0), 'Air-side opportunity, not equipment runtime'), metric('Outdoor maximum', units(weather?.extremes?.maxTempC, '°C', 1), 'Not an indoor prediction'), metric('Weather coverage', r.hours.length ? `${format(valid / r.hours.length * 100, 1)}%` : 'Not available', `${format(valid)} of ${format(r.hours.length)} expected hours`));
   } else {
-    target.append(metric('Joint target attainment', finite(s.compliancePct) ? `${format(s.compliancePct, 1)}%` : 'Not available', `${format(s.compliantHours, 1)} equivalent h / ${format(s.eligibleHours ?? s.validHours)} eligible h`), metric('Period operating cost', money(s.cost), finite(s.cost) ? `${format(s.electricKWh)} kWh electric + ${format(s.fuelKWh)} kWh fuel` : `${money(s.knownCost)} known subtotal; ${format(s.priceMissingHours)} h unpriced`), metric('Longest target miss', units(s.longestFailureHours, 'h', 0), 'Consecutive eligible intervals; gaps break episodes'), metric('Valid source/model hours', s.expectedHours ? `${format(s.validHours / s.expectedHours * 100, 1)}%` : 'Not available', `${format(s.missingHours)} missing, ${format(s.warmupHours)} warm-up, ${format(s.numericalFailureHours)} numerical failures`));
+    target.append(metric('Joint temperature-and-moisture target attainment', finite(s.compliancePct) ? `${format(s.compliancePct, 1)}%` : 'Not available', `${format(s.compliantHours, 1)} equivalent h / ${format(s.eligibleHours ?? s.validHours)} eligible h`), metric(s.costBasis?.label || 'Modeled operating cost', money(s.cost), finite(s.cost) ? `${format(s.electricKWh)} kWh electric + ${format(s.fuelKWh)} kWh fuel` : `${money(s.knownCost)} known subtotal; ${format(s.priceMissingHours)} h unpriced`), metric('Longest target miss', units(s.longestFailureHours, 'h', 0), 'Consecutive eligible intervals; gaps break episodes'), metric('Valid source/model hours', s.expectedHours ? `${format(s.validHours / s.expectedHours * 100, 1)}%` : 'Not available', `${format(s.missingHours)} missing, ${format(s.warmupHours)} warm-up, ${format(s.numericalFailureHours)} numerical failures`));
+  }
+  if (!state.weatherOnly) {
+    target.append(node('p', costBasisText(s.costBasis), 'source-line result-basis'));
+    target.append(node('p', airflowRows(r).map(([k,v]) => `${k}: ${v}`).join('. '), 'source-line result-basis'));
   }
 }
 function renderModeTable(r) {
@@ -622,12 +628,16 @@ function renderRuntime(r) {
   table($('runtime-table'), ['Component', 'Hours used', 'Equivalent full-load h', 'Days used', 'Share', 'Note'], [
     row('Evaporative pad', 'pad', r.scenario.padEnabled ? `${format(s.padWaterL)} L water. Weather screen: the pad could cool usefully in ${format(r.weatherSummary?.utility?.padCoolingHours)} h and was the only path to the ceiling in ${format(r.weatherSummary?.utility?.padDeeperThanVentHours)} h, against ${format(r.weatherSummary?.utility?.ventCoolingHours)} h a vent alone could cool.` : 'Not installed in this scenario'),
     row('Indirect evaporative stage', 'indirect', 'Hybrid secondary wet stream'),
-    row('DX cooling', 'dx', `Peak ${format(s.peakCoolingKW, 1)} kW total cooling`),
-    row('Condensing dehumidifier', 'dehu', `${format(s.condensateKg)} kg condensate. ${finite(r.scenario.dehuHeatFraction) && r.scenario.dehuHeatFraction < 1 ? `${format(s.dehuRejectedHeatKWh)} kWh of its heat rejected outside the zone, ${format(s.dehuHeatKWh)} kWh returned to the air` : `${format(s.dehuHeatKWh)} kWh of its heat returned to the air, which the cooling plant has to remove again`}`),
+    row('DX cooling', 'dx', `Whole-run peak cooling, all modeled stages: ${format(s.peakCoolingKW, 1)} kW`),
+    row('Condensing dehumidifier', 'dehu', `${format(s.dehuKWh)} kWh purchased electricity; ${format(s.dehuRejectedHeatKWh)} kWh heat rejected outside; ${format(s.dehuHeatKWh)} kWh heat returned to zone air. Total condensate from all stages is reported in the hourly inspector; DOAS condensate is separate below.`),
     row('Shade screen', 'shadeScreen', finite(s.screens?.dliCostMol) ? `${format(s.screens.dliCostMol)} mol/m² of crop light given up while deployed` : 'Deployed hours; light cost not attributed'),
     row('Thermal curtain', 'thermalScreen', finite(s.screens?.heatingSavedKWh) ? `${format(s.screens.heatingSavedKWh)} kWh of delivered heat saved against the same run with it open` : 'Deployed hours; heating saving not attributed'),
     row('Desiccant', 'desiccant', `${format(s.desiccantRemovedKg)} kg removed; ${format(s.regenerationKWh)} kWh regeneration`),
-    row('Dry-neutral DOAS', 'doas', `${format(s.doasRemovedKg)} kg removed; ${format(s.doasKWh)} kWh`),
+    row('Dry-neutral DOAS', 'doas', conditioningRows(s).filter(([label]) => label.startsWith('DOAS')).map(([label, value]) => `${label}: ${value}`).join('; ')),
+    row('Recovery core', 'recoveryActive', `${format(s.recoveryCoreM3)} m³ through core; ${format(s.recoverySensibleKWh)} kWh sensible and ${format(s.recoveryLatentKWh)} kWh latent transfer, not purchased energy or savings`),
+    row('Recovery bypass', 'recoveryBypass', `${format(s.recoveryBypassM3)} m³ bypassed`),
+    row('Frost / defrost', 'recoveryDefrost', `${format(s.recoveryDefrostHours, 2)} equivalent h`),
+    row('Preheat', 'preheat', `${format(s.preheatDeliveredKWh)} kWh delivered; ${format(s.preheatElectricKWh)} kWh electricity; ${format(s.preheatFuelKWh)} kWh fuel; ${format(s.preheatInsufficientHours, 2)} h insufficient`),
     row('Heating', 'heating', `${format(s.heatingKWh)} kWh delivered heat`),
     row('Humidifier', 'humidifier', `${format(s.humidifierWaterL)} L water`),
     row('Supplemental light', 'light', `${format(s.lightKWh)} kWh; ${format(s.dliDeficitDays)} DLI deficit days`)].filter(Boolean));
@@ -636,21 +646,28 @@ function renderOutdoorDrying(r) {
   const d = r.weatherSummary?.outdoorDrying; if (!d) {table($('drying-table'), ['Outdoor-air dehumidification'], []); return;}
   const s = r.summary, dehuRef = finite(d.dehuKWhPerKg) ? `${format(d.dehuKWhPerKg, 2)} kWh/kg · $${format(d.dehuCostPerKg, 3)}/kg` : 'No dehumidifier efficiency set';
   const row = (label, b, note) => [label, format(b.hours), `${format(b.days.atLeast1)} / ${format(b.days.atLeast4)}`, units(b.meanPotentialKgH, 'kg/h', 1), finite(b.kWhPerKg) ? `${format(b.kWhPerKg, 2)} kWh/kg` : 'Not available', finite(b.costPerKg) ? `$${format(b.costPerKg, 3)}/kg` : 'Not available', note];
-  $('drying-help').textContent = `Hours when outside air is drier than the zone's moisture ceiling, so ventilation removes water. Removal potential is at the scenario's maximum ${format(d.maxVentACH, 1)} ACH; energy is fan power plus heating of ventilation air to the target. Condensing-dehumidifier reference: ${dehuRef}. Outside air beats the dehumidifier on cost per kg in ${format(d.cheaperThanDehuHours)} h and on energy per kg in ${format(d.lowerEnergyThanDehuHours)} h. Sensible heat imported in hot-dry hours is not costed here; the coupled run above decides the actual dispatch.`;
-  table($('drying-table'), ['Outside-air condition', 'Hours', 'Days ≥1 / ≥4 h', 'Mean removal potential', 'Energy per kg water', 'Cost per kg water', 'Reading'], [
+  const dryingBasis = {...s.costBasis, label:'Modeled outdoor-air drying operating cost per kg, not the full facility cost',
+    included:['fan electricity', 'heating fuel for outdoor-air conditioning'],
+    priceBasis:{electricity:{source:'manual scenario input, even when the coupled run uses historical prices',usdPerKWh:r.scenario.electricityPrice},
+      fuel:{source:'scenario input',usdPerKWh:r.scenario.fuelPrice},water:{source:'excluded from this marginal drying screen',usdPerL:0}},
+    excluded:[...(s.costBasis?.excluded || []),'water costs','hot-dry sensible cooling cost']};
+  $('drying-help').textContent = `Hours when outside air is drier than the zone's moisture ceiling. Removal potential is at the installed maximum ${format(d.maxVentACH, 1)} controlled ACH, not actual dispatched airflow. Condensing-dehumidifier reference: ${dehuRef}, electricity only at the manual scenario rate. Outdoor-air drying has lower modeled cost per kg than that reference in ${format(d.cheaperThanDehuHours)} h and lower energy per kg in ${format(d.lowerEnergyThanDehuHours)} h. ${costBasisText(dryingBasis)} The coupled run determines actual dispatch.`;
+  table($('drying-table'), ['Outside-air condition', 'Hours', 'Days ≥1 / ≥4 h', 'Mean removal potential', 'Energy per kg water', 'Modeled cost per kg water', 'Reading'], [
     row('Cool and dry (free latent economizer)', d.coolDry, 'No heating penalty; fan energy only'),
     row('Cold and dry (heat the ventilation air)', d.coldDry, 'Drying with a fuel penalty; compare cost per kg to the dehumidifier'),
     row('Hot and dry (latent relief, sensible import)', d.hotDry, 'Only useful with separate sensible cooling')]);
-  if (!state.weatherOnly && finite(s.reheatKWh) && s.reheatKWh > 0) $('drying-help').textContent += ` This strategy spent ${format(s.reheatKWh)} kWh on reheat after overcooling for latent control; decoupled moisture removal avoids that penalty.`;
+  if (!state.weatherOnly && finite(s.reheatKWh) && s.reheatKWh > 0) $('drying-help').textContent += ` Zone reheat after overcooling: ${format(s.reheatKWh)} kWh. DOAS cooling and reheat are separate conditioning quantities, not avoided-energy claims.`;
 }
-const LOAD_TERMS = [['solarKWh', 'Solar'], ['lightKWh', 'Light'], ['envelopeKWh', 'Envelope'], ['infiltrationSensibleKWh', 'Infiltration'], ['ventilationSensibleKWh', 'Ventilation'], ['fanKWh', 'Fans'], ['cropSensibleKWh', 'Crop sensible'], ['cropLatentKWh', 'Crop latent (evaporative cooling)']];
+const LOAD_TERMS = [['solarKWh', 'Solar'], ['lightKWh', 'Light'], ['envelopeKWh', 'Envelope'], ['infiltrationSensibleKWh', 'Infiltration'], ['controlledOutdoorAirSensibleKWh', 'Controlled outdoor air'], ['fanKWh', 'Fans'], ['cropSensibleKWh', 'Crop sensible'], ['cropLatentKWh', 'Crop latent (evaporative cooling)']];
 function renderLoadsPanel(r) {
   $('loads-panel').hidden = state.weatherOnly; if (state.weatherOnly) return;
   const d = loadDecomposition(r);
+  $('loads-panel').querySelector('.result-basis')?.remove();
+  $('loads-panel').append(node('p', [...airflowRows(r), ...conditioningRows(r.summary)].map(([k,v]) => `${k}: ${v}`).join('. '), 'source-line result-basis'));
   renderLoads($('loads-chart'), $('loads-legend'), d);
-  const latent = l => finite(l?.crop) ? `${format(l.crop)} crop / ${format(l?.ventilation)} vent / ${format(l?.infiltration)} infil` : 'Not available';
+  const latent = l => finite(l?.crop) ? `${format(l.crop)} crop / ${format(l?.controlledOutdoorAir)} controlled outdoor air / ${format(l?.infiltration)} infiltration` : 'Not available';
   const rowOf = (label, m) => [label, ...LOAD_TERMS.map(([key]) => format(m[key])), latent(m.latentKg), finite(m.shr) ? format(m.shr, 2) : 'No gains'];
-  table($('loads-table'), ['Month', ...LOAD_TERMS.map(([, label]) => `${label} · kWh`), 'Latent kg (crop / vent / infil)', 'Sensible-heat ratio'], [...(d.monthly || []).map(m => rowOf(m.month, m)), ...(d.total ? [rowOf('Period total', d.total)] : [])]);
+  table($('loads-table'), ['Month', ...LOAD_TERMS.map(([, label]) => `${label} · kWh`), 'Latent kg (crop / controlled outdoor air / infiltration)', 'Sensible-heat ratio'], [...(d.monthly || []).map(m => rowOf(m.month, m)), ...(d.total ? [rowOf('Period total', d.total)] : [])]);
   if (d.shrHistogram?.length) $('loads-table').append(node('p', `Hourly sensible-heat ratio distribution: ${d.shrHistogram.map(b => `${b.bin}: ${format(b.hours)} h`).join(' · ')}. Signed gains into zone air; latent shown as evaporation mass. Model balance terms under the stated assumptions.`, 'source-line'));
 }
 function renderCO2Panel(r) {
@@ -666,15 +683,16 @@ function renderYearsPanel() {
   const a = state.aggregate, panel = $('years-panel'); panel.hidden = !a || state.weatherOnly; if (panel.hidden) return;
   renderYears($('years-chart'), a, state.resultId);
   const yearOf = entry => entry?.label ? `${entry.label}: ${percent(entry.compliancePct)} · ${money(entry.cost)}` : 'Not available';
-  const trend = t => finite(t?.compliancePctPerYear) ? `${signed(t.compliancePctPerYear, 2)} pts/year` : 'Fewer than 5 numeric years';
-  table($('years-table'), ['Scenario', 'Median attainment', 'Median operating cost', 'Worst year', 'Best year', 'Spread (attainment / cost)', 'Trend'], Object.values(a.byScenario || {}).map(row => [row.name, percent(row.median?.compliancePct), money(row.median?.cost), yearOf(row.worst), yearOf(row.best), `${finite(row.spread?.compliancePct) ? `${format(row.spread.compliancePct, 1)} pts` : 'Not available'} / ${money(row.spread?.cost)}`, trend(row.trend)]));
+  const trend = t => finite(t?.compliancePctPerYear) ? `${signed(t.compliancePctPerYear, 2)} pp/year` : 'Fewer than 5 numeric years';
+  table($('years-table'), ['Scenario', 'Median attainment', 'Median operating cost', 'Worst year', 'Best year', 'Spread (attainment / cost)', 'Trend'], Object.values(a.byScenario || {}).map(row => [row.name, percent(row.median?.compliancePct), money(row.median?.cost), yearOf(row.worst), yearOf(row.best), `${finite(row.spread?.compliancePct) ? `${format(row.spread.compliancePct, 1)} pp` : 'Not available'} / ${money(row.spread?.cost)}`, trend(row.trend)]));
   const ranking = a.ranking || {};
-  $('years-ranking').textContent = `Years: ${(a.years || []).join(', ')}. Cost ranking across years is ${ranking.stable ? 'stable' : 'not stable'}. ${describe(ranking.note)} Median and spread are over the selected years; they are not a forecast of the next year.`;
+  $('years-ranking').textContent = `Joint temperature-and-moisture target attainment, percentage points (pp) for differences, not relative percent. ${state.runs.flatMap(run => run.results.map(r => `${r.scenario.name}: ${costBasisText(r.summary.costBasis)}`)).join(' ')} Years: ${(a.years || []).join(', ')}. Cost ranking across years is ${ranking.stable ? 'stable' : 'not stable'}. ${describe(ranking.note)} Median and spread are over the selected years; they are not a forecast of the next year.`;
 }
 function renderSitesPanel() {
   const rows = state.siteComparison, panel = $('sites-panel'); panel.hidden = !rows; if (panel.hidden) return;
   const siteName = site => `${site?.city || 'Site'}${site?.state ? `, ${site.state}` : ''}${site?.zip ? ` · ${site.zip}` : ''}`;
   table($('sites-table'), ['Site', 'Free-cooling hours (median)', 'Pad-effective hours', 'Binding constraint', 'Best strategy', 'Median attainment', 'Median operating cost', 'Worst-year attainment', 'Pricing'], rows.map((row, i) => [siteName(row.site), format(row.freeCoolingHours), format(row.padEffectiveHours), describe(row.bindingConstraint), describe(row.bestStrategy?.name), percent(row.bestStrategy?.compliancePct), money(row.bestStrategy?.cost), percent(row.worstYearCompliancePct), i ? 'Manual scenario prices' : state.energyContext && state.scenarios.some(s => s.priceMode !== 'manual') ? 'Historical state/sector proxy' : 'Manual scenario prices']));
+  for (const site of state.siteRuns) for (const run of site.runs) for (const r of run.results) $('sites-table').append(node('p', `${siteName(site.site)}, ${r.scenario.name}: ${costBasisText(r.summary.costBasis)}`, 'source-line'));
   $('sites-table').append(node('p', 'Free-cooling and pad-effective hours are weather-side classifications of outside air (median over the selected years). Best strategy is the cheapest scenario on the median-cost operating frontier. Additional sites are NASA POWER gridded weather at ZIP centroids and manual prices; they are not local tariffs or measured facility sites.', 'source-line'));
 }
 function renderCalendar() {
@@ -716,7 +734,8 @@ function renderInspector() {
   const grid = node('dl', undefined, 'inspection-grid');
   const rows = [['Outdoor dry bulb', units(w.tempC, '°C')], ['Outdoor dew point', units(w.dewPointC, '°C')], ['Outdoor relative humidity', units(finite(w.rh) ? w.rh * 100 : null, '%')], ['Station pressure', units(w.pressurePa, 'Pa', 0)], ['Solar irradiance', units(w.ghiWm2, 'W/m²', 0)], ['Wind speed', units(w.windMs, 'm/s')], ['Pad leaving dry bulb', units(h.padTempC, '°C')], ['Pad leaving dew point', units(h.padDewPointC, '°C')]];
   if (!state.weatherOnly) rows.push(['Estimated zone temperature', units(h.tempC, '°C')], ['Estimated zone RH', units(finite(h.rh) ? h.rh * 100 : null, '%')], ['Estimated air VPD', units(h.vpd, 'kPa', 2)], ['Joint-target fraction', units(finite(h.compliantFraction) ? h.compliantFraction * 100 : null, '%', 1)], ['Electricity', units(h.electricKWh, 'kWh', 2)], ['Purchased fuel', units(h.fuelKWh, 'kWh', 2)], ['Water', units(h.waterL, 'L', 1)], ['Condensate', units(h.condensateKg, 'kg', 2)], ['DX cooling delivered', units(h.coolingKWh, 'kWh', 2)], ['Dehu heat indoors', units(h.dehuHeatKWh, 'kWh', 2)], ['Regeneration energy', units(h.regenerationKWh, 'kWh', 2)], ['Desiccant removal', units(h.desiccantRemovedKg, 'kg', 2)], ['Unmet sensible load', units(h.unmetSensibleKWh, 'kWh', 2)], ['Unmet moisture', units(h.unmetMoistureKg, 'kg', 2)], ['Energy residual', units(h.energyResidualW, 'W', 1)], ['Moisture residual', units(h.moistureResidualKgS, 'kg/s', 6)],
-    ['Sensible gains', units(h.loads?.sensibleKWh, 'kWh', 2)], ['Crop latent', units(h.loads?.latentKg?.crop, 'kg', 2)], ['Sensible-heat ratio', finite(h.loads?.shr) ? format(h.loads.shr, 2) : 'No gains'], ['Ventilation', units(h.controls?.ventACH, 'ACH', 2)], ['Enrichment-compatible fraction', units(finite(h.controls?.enrichmentFraction) ? h.controls.enrichmentFraction * 100 : null, '%', 0)]);
+    ['Sensible gains', units(h.loads?.sensibleKWh, 'kWh', 2)], ['Crop latent', units(h.loads?.latentKg?.crop, 'kg', 2)], ['Sensible-heat ratio', finite(h.loads?.shr) ? format(h.loads.shr, 2) : 'No gains'], ['Controlled outdoor air', units(h.controls?.controlledACH, 'ACH', 2)], ['Enrichment-compatible fraction', units(finite(h.controls?.enrichmentFraction) ? h.controls.enrichmentFraction * 100 : null, '%', 0)]);
+  if (!state.weatherOnly) rows.push(['Installed controlled maximum', units(r.scenario.maxVentACH, 'ACH', 2)], ['Total outdoor air including infiltration', units(h.controls?.totalOutdoorACH, 'ACH', 2)], ['Controlled / total outdoor flow', `${units(h.controls?.controlledM3s, 'm³/s', 3)} / ${units(h.controls?.totalOutdoorM3s, 'm³/s', 3)}`], ['Actual controlled stages', h.controls?.controlledACHStages?.map(stage => `${format(stage.ach,2)} ACH: ${format(stage.hours,3)} h`).join('; ') || 'Not available'], ...conditioningRows(h));
   rows.forEach(([label, value]) => {const item = node('div'); item.append(node('dt', label), node('dd', value)); grid.append(item);}); box.append(grid);
   const s = r.scenario;
   const moisture = (r.summary.transpirationModelUsed || s.transpirationModel) === 'schedule' ? `Assumed crop evaporation ${format(s.transpirationLDayM2, 2)} L/m²/day (fixed schedule).` : `Stanghellini transpiration at LAI ${format(s.lai, 1)}, canopy temperature taken as air temperature.`;
@@ -728,10 +747,15 @@ function renderInspector() {
 }
 function renderComparison() {
   const rows = compareScenarios(state.results);
-  table($('comparison-table'), ['Scenario', 'Capex · USD', 'Annual ownership · USD/y', 'Period operating cost · USD', 'Joint hours · h', 'Added joint hours · h', 'Added operating cost · USD', 'Cost / added hour', 'Operating-cost frontier', 'Eligibility'], rows.map((row, index) => {
+  table($('comparison-table'), ['Scenario', 'Estimated / user-entered capital', 'Estimated annual ownership · USD/y', 'Modeled period operating cost · USD', 'Joint hours · h', 'Added joint hours · h', 'Modeled operating-cost difference · USD', 'Cost / added hour', 'Operating-cost frontier', 'Eligibility'], rows.map((row, index) => {
     const r = state.results.find(r => r.scenario.id === row.id) || state.results[index];
-    return [r.scenario.name, money(r.scenario.installedCost), money(r.summary.annualOwnershipCost), money(row.cost), format(row.compliantHours, 1), finite(row.addedHours) ? `${row.addedHours > 0 ? '+' : ''}${format(row.addedHours, 1)}` : 'Not comparable', finite(row.addedCost) ? `${row.addedCost > 0 ? '+' : ''}${money(row.addedCost)}` : 'Unpriced', finite(row.costPerAddedHour)?money(row.costPerAddedHour,true):'Not applicable', row.comparable?(row.dominated?'Operating-dominated':'Operating frontier'):'Not comparable', r.summary.numericalFailureHours ? 'Numerical failures: review' : `${format(row.matchedHours)} matched h`];
+    return [r.scenario.name, capitalBasisText(r.scenario), money(r.summary.annualOwnershipCost), money(row.cost), format(row.compliantHours, 1), finite(row.addedHours) ? `${row.addedHours > 0 ? '+' : ''}${format(row.addedHours, 1)}` : 'Not comparable', finite(row.addedCost) ? `${row.addedCost > 0 ? '+' : ''}${money(row.addedCost)}` : 'Unpriced', finite(row.costPerAddedHour)?money(row.costPerAddedHour,true):'Not applicable', row.comparable?(row.dominated?'Operating-dominated':'Operating frontier'):'Not comparable', r.summary.numericalFailureHours ? 'Numerical failures: review' : `${format(row.matchedHours)} matched h`];
   }));
+  for (const row of rows) {
+    const r = state.results.find(r => r.scenario.id === row.id);
+    $('comparison-table').append(node('p', `${attainmentComparisonText(rows[0], row)} ${costBasisText(row.costBasis)} ${row.operatingCostReduction ? `${row.operatingCostReduction.label}: ${money(row.operatingCostReduction.amount)} for ${row.name} versus ${rows[0].name}.` : ''}`, 'source-line'));
+    if (r) $('comparison-table').append(node('p', `${row.name}: ${[...airflowRows(r), ...conditioningRows(r.summary)].map(([k,v]) => `${k}: ${v}`).join('. ')}`, 'source-line'));
+  }
   $('comparison-table').append(node('p', 'Annual ownership = capital recovery at the stated discount/life assumptions plus annual maintenance. It is not added to partial-period operating cost. The operating-cost frontier excludes capital. Climate attainment is temperature + VPD + dew-point guardrail, not light sufficiency. Different crop or geometry assumptions are not an equipment-only comparison.', 'source-line'));
 }
 function renderResults() {
@@ -745,7 +769,7 @@ function renderResults() {
   document.querySelector('.comparison').hidden = state.weatherOnly;
   renderHeadlines(r);
   const warnings = [...(r.warnings || [])];
-  if (!state.weatherOnly) warnings.push(`Daily light: ${format(r.summary.dliDeficitDays)} deficit days; ${format(r.summary.incompleteDays)} incomplete days. ${describe(r.summary.costBasis)}`);
+  if (!state.weatherOnly) warnings.push(`Daily light: ${format(r.summary.dliDeficitDays)} deficit days; ${format(r.summary.incompleteDays)} incomplete days. ${costBasisText(r.summary.costBasis)}`);
   $('result-warnings').textContent = warnings.map(describe).join('\n'); $('result-warnings').hidden = !warnings.length;
   $('warning-disclosure').open=Boolean(r.summary.numericalFailureHours||r.summary.missingHours||r.summary.priceMissingHours);
   renderMonthly($('monthly-chart'), $('mode-legend'), r.hours, r.scenario.timezone, state.weatherOnly); renderModeTable(r); renderRuntime(r); renderOutdoorDrying(r);
@@ -829,8 +853,8 @@ function bindEvents() {
   on('export-scenario', 'click', () => {const errors = scenarioErrors(current()); if (errors.length) throw new Error(errors.join('\n')); downloadScenario(current());});
   for (const type of ['json', 'csv']) on(`export-${type}`, 'click', () => downloadRun(state.results, state.resultSnapshot, type));
   // The results document carries the multi-year and multi-site sections when those runs exist.
-  on('export-report', 'click', () => downloadRun(state.results, state.resultSnapshot, 'report', {aggregate: state.aggregate, sites: state.siteComparison}));
-  on('export-design-basis', 'click', () => downloadRun(state.results, state.resultSnapshot, 'design-basis', {aggregate: state.aggregate, sites: state.siteComparison}));
+  on('export-report', 'click', () => downloadRun(state.results, state.resultSnapshot, 'report', {aggregate: state.aggregate, sites: state.siteComparison, siteRuns: state.siteRuns}));
+  on('export-design-basis', 'click', () => downloadRun(state.results, state.resultSnapshot, 'design-basis', {aggregate: state.aggregate, sites: state.siteComparison, siteRuns: state.siteRuns}));
   on('import-button', 'click', () => $('import-file').click()); on('import-file', 'change', importFile);
   initTour();
   initLearn();
