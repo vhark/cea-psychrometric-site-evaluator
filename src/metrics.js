@@ -29,7 +29,7 @@ function outdoorDrying(hours, scenario) {
     basis: 'Maximum ventilation rate, fan power and heating of ventilation air to the target at scenario prices; sensible import in hot-dry hours is not costed here.'};
 }
 
-const ENERGY_FIELDS = ['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh','desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg','cropWaterL','padWaterL','humidifierWaterL','unmetSensibleKWh','unmetMoistureKg','doasKWh','doasRemovedKg'];
+const ENERGY_FIELDS = ['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh','desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg','cropWaterL','padWaterL','humidifierWaterL','unmetSensibleKWh','unmetMoistureKg','doasKWh','doasRemovedKg'];
 const eligible = h => h.valid && h.eligible !== false && !h.warmup;
 // Runtime: hours with any use, duty-weighted equivalent full-load hours, and distinct local days with any use.
 const RUNTIME_COMPONENTS=[['pad','padFraction'],['indirect','indirectFraction'],['dx','dxDuty'],['dehu','dehuDuty'],['desiccant','desiccantDuty'],['heating','heaterDuty'],['humidifier','humidifierFraction'],['light','lightFraction'],['doas','doasDuty']];

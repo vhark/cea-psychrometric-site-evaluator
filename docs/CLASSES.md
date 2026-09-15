@@ -4,9 +4,11 @@ Purpose: name the discrete classes of CEA environmental control, state the physi
 class insufficient, and show what each class actually achieved in six bundled climates so the choice between
 them is a measurement rather than a preference.
 
-Status: measured 2026-09-14 on model `0.2.0-screening`. Nine configurations against calendar year 2025 at six
-sites, under the ideal per-substep controller, with equipment sized per site by the rules in
-[How this was measured](#how-this-was-measured). These are capability ceilings, not installed-system
+Status: ladder measured 2026-09-14 on model `0.2.0-screening`. Nine configurations against calendar year 2025
+at six sites, under the ideal per-substep controller, with equipment sized per site by the rules in
+[How this was measured](#how-this-was-measured). The outside-air and closing-up sections were measured
+2026-09-15 on the same model, at Fairbanks, Denver and Miami 2025, on their own declared capacities rather
+than the ladder's per-site sizing. These are capability ceilings, not installed-system
 predictions, and no figure here is a manufacturer comparison or an equipment-sizing certificate.
 
 Read this if: you are deciding whether a site needs pads, a dehumidifier, a curtain, lights, or an opaque box,
@@ -29,7 +31,7 @@ class adds and the physical condition that exhausts it.
 | **C2** Pads, vent, heat and dehumidifier | C1 plus a condensing unit | Hold temperature and a moisture band together | The dehumidifier's coil dew point, and the fuel bill of heating the air it dried |
 | **C3** C2 plus movable curtain and shade | C2 plus scheduled envelope | Cut heat loss at night and solar gain at noon without buying capacity | Light. A shut curtain and a drawn screen both cost photons, and neither adds any |
 | **C4** Hybrid: supplemental LED, DX and dehumidifier, curtain, reduced ventilation | Semi-closed house with real cooling and real light | Hold the joint band and the daily light integral | Envelope loss. Everything gained is still paid for through a 4 W/m2K wall |
-| **C5** Indoor, insulated shell (SIP), DX and dehumidifier, all light electric | Opaque box, U 0.27 W/m2K | Near-total state authority at a fraction of the heating plant | Its own moisture. No solar gain means no free drying either, and a 2 ACH shell cannot use dry outside air |
+| **C5** Indoor, insulated shell (SIP), DX and dehumidifier, all light electric | Opaque box, U 0.27 W/m2K | Near-total state authority at a fraction of the heating plant | Its own moisture, as it ships. No solar gain means no free drying either, and the template's 2 ACH cap keeps it from using dry outside air until that cap is raised, which is [measured below](#closing-up-and-opening-up-the-outside-air-path-measured) |
 | **C5b** C5 with integrated HVAC and reheat | C5 plus coupled reheat | Overcool for latent control, then reheat with recovered heat | Same as C5, plus the reheat energy |
 | **C6** Indoor, uninsulated shell | Tilt-up or metal shell, U 4.54 W/m2K, 1.7 ACH | Same control authority as C5 | The envelope. It pays C5's electricity and a greenhouse's fuel bill at once |
 
@@ -172,9 +174,16 @@ Operating cost is within 4 percent, so the decision is not the energy bill. It i
    is capped at 2 ACH while the greenhouse can move 40. The condensing dehumidifier cannot make up the
    difference because it cannot dry below its own coil dew point.
 
-So: **in a subarctic climate, build the insulated box, and put a dry-air economizer on it.** The greenhouse's
-only real advantage in Fairbanks is that it can throw a door open at a moisture problem; give the box that
-ability and it wins on every remaining axis. A winter greenhouse is worth it there only if the summer crop pays
+So: **in a subarctic climate, build the insulated box, and put a dry-air economizer on it.** The second half of
+that sentence is now measured rather than inferred. On a separately configured sealed box (DX 150 kW,
+dehumidifier 100 kg/h, heater 40 kW, 150 W/m2 of fixtures, not the ladder's per-site sizing), raising the
+ventilation cap from the shipped 2 ACH to a designed 6 ACH moves attainment from 90.2 to 94.7 percent and
+unmet moisture from 1,496,419 kg to 274 kg while saving 981 dollars a year, and adding a dry-neutral DOAS on
+top holds that same 94.7 percent for 39,517 dollars against 43,739. The figures and their limits are in
+[Closing up and opening up](#closing-up-and-opening-up-the-outside-air-path-measured); they are one site, one
+year and one configuration, so they are a screening result rather than a design. The greenhouse's
+only real advantage in Fairbanks was that it can throw a door open at a moisture problem, and the box can be
+given the same door. A winter greenhouse is worth it there only if the summer crop pays
 for the envelope on its own, because the winter crop is being grown under electric light either way.
 
 ## Two results that are about control, not equipment
@@ -284,6 +293,162 @@ Two cautions. The measured reference is a 40-mesh screened house, not an unscree
 the first screen. And the measured Thai houses had fans off and no mechanical drying, which is the one
 configuration where the penalty can only be a penalty; the model reproduces exactly that direction in the
 pad-only rows.
+
+## Closing up and opening up: the outside-air path, measured
+
+**Yes, both directions are representable, and both have now been run.** A hybrid greenhouse can shut its
+thermal curtain, draw its shade and grow the crop under lamps instead of sunlight, and a sealed indoor room can
+take outside air through an evaporative pad, a dry-neutral DOAS or a plain outside-air economizer: maximum and
+minimum ventilation, DOAS supply flow, pad, curtain and shade are per-scenario inputs on every facility in this
+tool, not properties of a facility class, so every one of those configurations is an input you can set. What a
+facility template supplies is a default, and the opaque templates default to a 2 ACH maximum, which is why the
+cheapest closed configuration measured here was never on screen.
+
+The importable set is [examples/closed-and-hybrid-air.json](examples/closed-and-hybrid-air.json). All rows
+below are Fairbanks 2025 unless another site is named: 500 m2 floor, 4 m height, the same lettuce band as the
+ladder, 150 W/m2 of fixtures, ideal controller at 5 minute steps, 0.12 USD/kWh electricity and 0.045 USD/kWh
+fuel. Capacities are declared assumptions held fixed inside each facility so the air path is the only variable.
+Every row is one site, one year and one configuration under the ideal controller, so these are screening
+comparisons against a capability ceiling and not predictions of an installed system.
+
+### A sealed box should still have an economizer
+
+Sealed insulated shell (`warehouseSip`), recirculating DX at 150 kW, a 100 kg/h dehumidifier, a 40 kW heater
+and no pad, with only the outside-air path changing.
+
+| Air path | Attainment | Electricity MWh | Fuel MWh | Operating $/y | Unmet moisture kg |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Shipped opaque shell leakage, 2 ACH | 90.2% | 325 | 86 | 43,739 | 1,496,419 |
+| Outside-air economizer, 6 ACH | 94.7% | 311 | 101 | 42,758 | 274 |
+| Oversized economizer, 20 ACH (resolution-limited, not interpretable) | 76.4% | 345 | 58 | 44,879 | 12,371 |
+| Economizer 6 ACH plus dry-neutral DOAS | **94.7%** | 286 | 98 | **39,517** | 248 |
+
+The 2 ACH cap the opaque templates ship with is shell leakage, not a designed air path, and it is the most
+expensive default in the box: it costs **4.5 points of attainment** and leaves **1,496,419 kg of moisture
+unmet against 274 kg** at 6 ACH, while costing 981 dollars a year more rather than less. The reason is the one
+the Alaska section names: -20 C air holds almost no water, so at this site air exchange is nearly free drying,
+and the box's condensing dehumidifier cannot substitute for it because it cannot dry below its own coil dew
+point. **Adding a dry-neutral DOAS on top of the economizer is the cheapest closed configuration measured,
+39,517 dollars against 43,739**, at the same 94.7 percent attainment, with the DOAS removing 10,550 kg of
+water over the year. Unmet moisture is the engine's instantaneous imbalance integral, so it compares across
+these four rows, which share one control mode, and not against a staged-controller run.
+
+One configuration trap, because a user will hit it: applying the DOAS technology preset on its own also sets
+`dehuKgH` to 0 and `coolingKW` to 60, which scores 15.2 percent in this box. The working row keeps the box's
+own recirculating DX and dehumidifier and adds DOAS on top of them, which is how a closed facility is actually
+built.
+
+### Economizer sizing is resolution-limited, and this model cannot rank economizer capacities
+
+The 2 against 6 ACH comparison is trustworthy: both offer a useful intermediate flow, and the physics is
+unambiguous, since the path carries crop water out of the zone and displaces mechanical condensation. A
+comparison that changes the declared maximum by a large factor is **not** trustworthy, because the dispatcher
+offers exactly three airflow levels per substep, the declared minimum, the midpoint and the maximum, so raising
+the maximum also moves the midpoint and deletes the intermediate flow the controller was using. Measured
+directly on this box at Fairbanks: a 6 ACH maximum offers 0.30, 3.15 and 6.00 and scores 94.7 percent; 12 ACH
+offers 0.30, 6.15 and 12.00 and scores 89.9; 20 ACH offers 0.30, 10.15 and 20.00 and scores 76.4. **The
+degradation tracks the midpoint, not the air.**
+
+So the 20 ACH row above is reported as not interpretable rather than as evidence that oversizing an economizer
+hurts, and this document makes no claim about economizer sizing. Replacing the ladder with fixed fractions of
+the maximum, so that resolution stops depending on installed capacity, was tried and reverted: it made
+Fairbanks worse rather than better (82.0 percent at 6 ACH, 67.2 at 12), because the dispatcher is greedy per
+substep and a different option set sends it down a different trajectory. That is a controller redesign, not a
+tuning change. **A real facility's economizer should be sized by an engineer against the design condition**,
+and closing this gap in the model needs continuous or finer airflow modulation, which is a named open item
+rather than something to tune.
+
+### A hybrid that owns lamps should usually close up
+
+Same hybrid house (`hybrid`, integrated HVAC with reheat, DX 200 kW, 100 kg/h dehumidifier, 250 kW heater,
+150 W/m2 of fixtures) run open as shipped at 15 ACH, then closed up to 6 ACH with a thermal curtain and a
+shade screen, first with the shade guarded so it refuses to close while the crop is behind on light and then
+with that guard removed so the lamps cover the shortfall. Attainment and operating cost, 2025:
+
+| Site, 2025 | Open as shipped | Closed, shade guarded | Closed, shade unguarded |
+| --- | --- | --- | --- |
+| Denver | 86.3%, 32,260 | 91.1%, 25,098 | **97.2%, 23,166** |
+| Miami | 86.8%, 42,053 | 92.8%, 41,790 | **98.0%, 41,008** |
+| Fairbanks | 98.9%, 53,477 | 98.9%, 47,145 | 98.9%, 47,100 |
+
+The Denver and Miami rows are the same facility and equipment re-homed to each site's coordinates, ZIP and
+IANA time zone, which is the convention [REGIONS.md](REGIONS.md) uses: a scenario carries its own site, and
+running a Fairbanks-homed scenario against Colorado weather would schedule the photoperiod and the local-day
+light accounting on Alaska clock time. Measured here at a quarter of the lamp energy, so the re-homing is not
+cosmetic.
+
+In Fairbanks, closing up is free: **attainment is identical at 98.9 percent in all three rows while operating
+cost falls 6,332 dollars**, 53,477 to 47,145, because the curtain is cutting envelope loss on a house that
+spends its year heating, turning 159 MWh of fuel into 7 MWh of electricity. The light guard is irrelevant
+there, 47,100 against 47,145, because a light-limited house almost never has enough sun to want its shade
+closed.
+
+At the two sites with a real cooling load the guard **is** the result. Removing it is worth **6.1 points in
+Denver**, 91.1 to 97.2, and **5.2 in Miami**, 92.8 to 98.0, for 1 to 2 MWh more lamp energy: Denver 41 to
+42 MWh, Miami 34 to 36 MWh, with the DLI shortfall at 0 days in every hybrid row. In a house that already owns
+its lighting, lamp energy is cheap against the cooling load the sun imposes, and the lamps make the light back.
+So "open the curtain and use the sunlight when it makes sense" is right, and this is the measurement of when it
+makes sense: **when the house is not fighting a cooling load.** Where it is, shading and closing aggressively
+is the default and daylight is the exception, and the guard that protects crop light is the thing costing you
+attainment.
+
+## Where a dehumidifier's heat goes, measured
+
+A condensing dehumidifier releases the latent heat it removed plus its own electrical input. **Where that heat
+lands is a topology choice, not a property of the machine**, and it is the whole reason an integrated unit with
+hot-gas reheat exists. The model takes it as `dehuHeatFraction`, the share of released heat that reaches the
+crop air: 1.0 for an in-room unit, 0 for a remote-condenser or water-cooled one, and anything between for a
+machine that deliberately returns part of it.
+
+**Ducting the cabinet out of the room does not change this.** Serviceability and noise improve, but if the warm
+discharge returns to the room the heat path is unchanged, so the fraction stays 1.0. Only an external or
+water-side rejection path lowers it. The model has no separate flag for cabinet location precisely because the
+heat path is what the physics sees.
+
+Same box, 500 m2 indoor, 150 W/m2 lighting, DX 200 kW, dehumidifier 100 kg/h, heater 60 kW, ideal controller,
+2025, at 0.12 USD/kWh and 0.045 USD/kWh:
+
+| Topology | Miami attainment | Miami cost | Fairbanks attainment | Fairbanks cost |
+| --- | ---: | ---: | ---: | ---: |
+| In-room, or ducted with the discharge returned | 98.5% | 63,555 | 97.0% | **44,015** |
+| Remote condenser, heat rejected outdoors | 97.1% | 57,301 | 93.3% | 53,886 |
+| Rejected, plus recovered reheat at 1.0 | **99.1%** | **57,063** | 95.3% | 53,274 |
+
+In Miami the in-room unit dumps **389 MWh** into the zone and the cooling plant then spends **430 MWh** taking
+it back out. Rejecting that heat collapses cooling to 4 MWh and saves **6,254 dollars a year**, and adding
+recovered reheat buys 2.0 points on top. That is the AC-against-dehumidifier fight, quantified.
+
+**In Fairbanks the same decision reverses.** The dehumidifier's heat is free heating there, so rejecting it
+costs **9,871 dollars a year** and 3.7 points. So "never put the dehumidifier in the room" is right in a
+cooling-limited climate and wrong in a heating-limited one, and the tool is the way to tell which one you are.
+
+### Why the reheat has to modulate
+
+Sweeping the returned fraction shows the optimum is not at either end, and that it moves with climate:
+
+| Returned fraction | Miami | Tulsa | Fairbanks |
+| ---: | --- | --- | --- |
+| 0.00 | 97.1%, 57,301 | 95.0%, 53,011 | 93.3%, 53,886 |
+| 0.25 | 98.1%, **56,452** | 96.3%, 50,672 | 95.1%, 50,351 |
+| 0.50 | 98.4%, 59,146 | 97.1%, **50,387** | 96.1%, 47,225 |
+| 0.75 | 98.5%, 61,537 | 97.4%, 50,654 | 96.7%, 45,311 |
+| 1.00 | 98.5%, 63,555 | 97.5%, 51,073 | 97.0%, **44,015** |
+
+The cheapest fraction is **0.25 in Miami, 0.50 in Tulsa and 1.00 in Fairbanks**. A machine with a fixed return
+fraction is therefore mis-set nearly everywhere, which is the measured case for **modulating** hot-gas reheat:
+the right share of recovered heat is climate-dependent and, within a climate, hour-dependent, so it has to be a
+control output rather than a piece of ductwork. Note also that attainment and cost do not peak together in
+Miami, 98.5 percent at 1.00 against the cheapest 0.25, so this is a tolerance-versus-cost choice and not a
+single optimum.
+
+**Limits, which are real here.** `dehuHeatFraction` is a **static declared fraction, not a modulating
+control**: the run applies it every hour rather than deciding it from the hour's heating demand, so these rows
+bracket a modulating machine rather than simulating one. The separate `reheatFraction` term recovers heat from
+the **DX circuit**, not from the dehumidifier's own circuit, so a temperature-controlled dehumidifier with
+integrated reheat is expressed through `dehuHeatFraction` and not through `reheatFraction`. Nothing here is a
+product comparison: no manufacturer's machine, capacity table or price appears in this model, and a real unit
+must be selected on measured water removal in kg/h at the actual entering-air condition, not on these
+fractions. Single site, single year, single configuration, ideal controller, which is a capability ceiling.
 
 ## How this was measured
 

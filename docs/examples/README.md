@@ -2,7 +2,7 @@
 
 Purpose: importable comparison sets that each answer one design question, so the tool can be judged on a real question rather than on defaults. Each set below is written up as a lesson: the decision it informs, the physics behind it, what the measured run actually showed, and the case where the conclusion flips.
 
-Status: 2026-09-14, model `0.2.0-screening`. Every set is exercised by `test/examples.test.mjs` on a real weather week and must simulate with zero numerical failures.
+Status: 2026-09-15, model `0.2.0-screening`, nine sets. Every set is exercised by `test/examples.test.mjs` on a real weather week and must simulate with zero numerical failures.
 
 Read this if: you want a worked comparison to start from, you want the reasoning behind one of them, or you are adding one.
 
@@ -22,6 +22,7 @@ Most sets hold the site, crop band and geometry constant so the comparison isola
 | [crop-bands.json](crop-bands.json) | With the equipment fixed, how much does the crop program alone move the answer? | Crop program | Baby-leaf lettuce, basil, propagation seedlings, illustrative tomato |
 | [climate-archetypes.json](climate-archetypes.json) | Does the same facility face the same constraint at a different site? | Site | Tulsa, Phoenix, Miami, Denver, Seattle, Fairbanks |
 | [screens-and-heat-source.json](screens-and-heat-source.json) | Which days do you want a shade screen or a thermal curtain, and what does swapping fuel for a heat pump do? | Screens and heat source | No screens, light-guarded shade screen, thermal curtain with a declared gap, both, both plus heat pump |
+| [closed-and-hybrid-air.json](closed-and-hybrid-air.json) | Can a closed facility still use outside air, and when should a hybrid house shut its curtain and run lamps instead of sunlight? | Outside-air path | Sealed box at 2, 6 and 20 ACH, sealed box plus DOAS, hybrid open, hybrid closed with a light-guarded shade, hybrid closed with an unguarded shade |
 
 The canonical six-strategy comparison used throughout the documentation stays at [../example-scenarios.json](../example-scenarios.json).
 
@@ -127,6 +128,37 @@ With the equipment held fixed, attainment moves only 5.7 points across four very
 The curtain is the result worth staring at. It cut fuel by 22% and cost 4.9 points of attainment at the same time, because restricting the outside-air path while the crop keeps transpiring traps moisture in the zone. The tool reports both halves of that trade rather than only the saving, which is the entire reason to schedule a curtain by outdoor moisture and not only by outdoor temperature. The shade screen is the mirror image: guarded, it bought 1.75 points of attainment for essentially no energy change, because it removed solar heat in hours the crop could spare the light. Ungated, the same screen closes for 1,867 hours and pushes lighting energy up by 17,834 kWh against the no-screen baseline, to replace the photons it just blocked.
 
 **The counter-case.** Every number here is configuration-dependent in ways that flip the conclusion. The 0.1 h⁻¹ closed-gap exchange is a user input, not a sourced value: screen-gap leakage is UNSOURCED in [COMPONENT-PARAMETERS.md](../COMPONENT-PARAMETERS.md), and leaving it null makes the run warn that the moisture case is optimistic. The heat-pump rating points in this file are a labeled hypothetical, since only the eligibility floors are sourced (COP 1.75 at -15 C, 0.70 capacity derate), so whether the heat pump is cheaper than fuel depends entirely on your electricity-to-fuel price ratio and on rating points from a catalogued unit. In a cooling-dominated climate the shade screen would carry the set and the curtain would be close to irrelevant, which is the point [climate-archetypes.json](climate-archetypes.json) makes.
+
+### closed-and-hybrid-air.json: a closed box that breathes, a hybrid house that stops
+
+**Decision it informs.** Whether a sealed indoor room should be given a designed outside-air path instead of the leakage its template ships with, and whether a hybrid house that already owns lamps should shut its curtain and shade rather than run on daylight. Both were always representable as inputs, and neither was exercised by anything shipped, which is how the cheapest closed configuration stayed invisible.
+
+**Mechanism.** Ventilation is a moisture sink whose capacity comes from the difference between outside and inside air rather than from a machine rating, so at -20 C, where outside air holds almost no water, exchanging air is nearly free drying. A condensing dehumidifier cannot substitute for it, because it cannot dry below its own coil dew point. The shipped opaque facility templates cap maximum exchange at 2 ACH, which represents shell leakage rather than a designed economizer, so a box left on its defaults is held away from its cheapest drying path. The hybrid question is the mirror image: a roof delivers light and heat together, so drawing the shade and shutting the curtain removes solar gain and restricts the air path in the same move, and lamps at 2.5 umol/J can buy the lost photons back. Whether that trade pays depends on whether the house is fighting a cooling load or a heating load.
+
+**What the measured run showed.** Fairbanks, AK, calendar year 2025, 500 m2 floor, 4 m height, baby-leaf lettuce band, 150 W/m2 of fixtures, ideal controller at 5 minute steps, 0.12 USD/kWh electricity and 0.045 USD/kWh fuel. Capacities are declared assumptions held constant inside each facility so the air path is the only variable: every sealed row carries DX at 150 kW, a 100 kg/h dehumidifier, a 40 kW heater and no pad, and every hybrid row carries integrated HVAC with reheat, DX at 200 kW, a 100 kg/h dehumidifier and a 250 kW heater. One site, one year, one configuration per row, under a controller that reports a capability ceiling rather than a prediction.
+
+| Air path, sealed insulated box | Attainment | Electricity MWh | Fuel MWh | Operating cost | Unmet moisture kg |
+|---|---:|---:|---:|---:|---:|
+| Shipped opaque shell leakage, 2 ACH | 90.2% | 325 | 86 | 43,739 | 1,496,419 |
+| Outside-air economizer, 6 ACH | 94.7% | 311 | 101 | 42,758 | 274 |
+| Oversized economizer, 20 ACH (resolution-limited, not interpretable) | 76.4% | 345 | 58 | 44,879 | 12,371 |
+| Economizer 6 ACH plus dry-neutral DOAS | **94.7%** | 286 | 98 | **39,517** | 248 |
+
+Raising the cap from the shipped 2 ACH to a designed 6 ACH is worth 4.5 points of attainment, takes unmet moisture from 1,496,419 kg to 274 kg, and costs 981 dollars a year less rather than more. Adding a dry-neutral DOAS on top of that economizer is the cheapest closed configuration in the set, 39,517 dollars against 43,739, at the same 94.7 percent attainment, and the DOAS removed 10,550 kg of water over the year. Unmet moisture is the engine's instantaneous imbalance integral, so it compares across these four rows, which share one control mode, and not against a staged-controller run.
+
+The 20 ACH row is in the set to be looked at, not quoted. The ideal dispatcher offers three airflow levels per substep, the declared minimum, the midpoint and the maximum, so raising the maximum also moves the midpoint and deletes the intermediate flow the controller was using: 6 ACH offers 0.30, 3.15 and 6.00 and scores 94.7 percent, 12 ACH offers 0.30, 6.15 and 12.00 and scores 89.9, and 20 ACH offers 0.30, 10.15 and 20.00 and scores 76.4. The degradation tracks the midpoint, not the air, so the tool cannot currently rank economizer capacities and that row is not evidence that oversizing hurts. Size a real economizer with an engineer against the design condition.
+
+One configuration trap, because a user will hit it: applying the DOAS technology preset on its own also sets `dehuKgH` to 0 and `coolingKW` to 60, which scores 15.2 percent in this box, so the working row keeps the box's own recirculating DX and dehumidifier and adds DOAS on top of them, which is how a closed facility is actually built.
+
+| Hybrid house operation | Attainment | Electricity MWh | Fuel MWh | Operating cost |
+|---|---:|---:|---:|---:|
+| As shipped, open, 15 ACH | 98.9% | 238 | 533 | 53,477 |
+| Closed up: curtain plus shade guarded on crop light, 6 ACH | 98.9% | 245 | 374 | **47,145** |
+| Closed up: shade unguarded, lamps cover the light | 98.9% | 244 | 375 | 47,100 |
+
+Closing the hybrid house up at this site costs nothing in attainment, 98.9 percent in all three rows, and saves 6,332 dollars a year by turning 159 MWh of fuel into 7 MWh of electricity. Removing the light guard changes almost nothing here, 47,100 against 47,145, because a subarctic house is short of light and its shade screen rarely deploys. The cross-site version of this comparison, where the guard is worth 6.1 points in Denver and 5.2 in Miami, is in [../CLASSES.md](../CLASSES.md). Re-home the scenario before running it at another site, meaning its latitude, longitude, ZIP and time zone as well as its weather record: a Fairbanks-homed hybrid run against Colorado weather schedules the photoperiod and the local-day light accounting on Alaska clock time, which shifted lamp energy by about a quarter when it was measured.
+
+**Counter-case.** The economizer result is a cold-climate result. It works at Fairbanks because outside air is both cold and dry, and the same path at a hot-humid site imports latent load instead of removing it, which is the direction the Miami rows of the class ladder show. The cost ordering also rides on the 0.12 to 0.045 electricity-to-fuel price ratio: the DOAS and closed-up rows win partly by moving load between the two, so a site with expensive gas or cheap power reads them differently. And the fan, duct and heat-recovery capital that an economizer or a DOAS actually needs is not in the operating column at all, so treat these as screening comparisons of air paths, not as a purchase decision.
 
 ## The climate lesson: the binding constraint belongs to the climate, not the equipment
 

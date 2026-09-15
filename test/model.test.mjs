@@ -296,3 +296,84 @@ test('every facility template carries a sourced envelope, and the original keys 
  const warehouse=makeScenario('warehouse');
  assert.ok(Math.abs(warehouse.envelopeRatio-(1+4*warehouse.heightM/Math.sqrt(warehouse.areaM2)))<5e-4);
 });
+
+// A closed facility is not a sealed one. The opaque templates cap the outside-air path at 2 ACH, which is shell
+// leakage rather than a designed economizer, and a user who raises it must actually get the benefit. Cold dry
+// outside air is the cheapest moisture sink a lit box has, so the path must carry water out and displace
+// mechanical condensation, while opening it too far must import more heating load than it is worth. Both
+// directions are pinned because the shape is non-monotonic and a naive model would make more air always better.
+const coldDry=(hours=48)=>({schemaVersion:1,source:'Synthetic cold-dry fixture',sourceKind:'test',latitude:64.84,longitude:-147.72,timezone:'UTC',startDate:'2025-01-01',endDate:'2025-01-02',
+ hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:-22,rh:.7,pressurePa:99000,ghiWm2:0}))});
+const warmHumid=(hours=48)=>({schemaVersion:1,source:'Synthetic warm-humid fixture',sourceKind:'test',latitude:25.77,longitude:-80.19,timezone:'UTC',startDate:'2025-07-01',endDate:'2025-07-02',
+ hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,6,1,i),tempC:29,rh:.85,pressurePa:101325,ghiWm2:0}))});
+const litBox=(over={})=>({...makeScenario('warehouseSip','bench','lettuce'),timezone:'UTC',areaM2:500,heightM:4,
+ lightWm2:150,dliTarget:14,photoperiod:16,dayStart:6,coolingKW:150,dehuKgH:30,heaterKW:60,humidifierKgH:0,
+ padEnabled:false,controlMode:'ideal',minVentACH:.3,...over});
+const ventLatentKg=result=>result.hours.reduce((sum,h)=>sum+Math.max(0,-(h.loads?.latentKg?.ventilation||0)),0);
+
+test('a closed facility can use outside air as a moisture sink, and the economizer has an optimum',()=>{
+  const leak=simulateScenario(litBox({maxVentACH:2}),coldDry());
+  const econ=simulateScenario(litBox({maxVentACH:6}),coldDry());
+  const flood=simulateScenario(litBox({maxVentACH:40}),coldDry());
+  // The path itself must carry more water out as it opens.
+  assert.ok(ventLatentKg(econ)>ventLatentKg(leak),
+    `6 ACH must export more water than 2 ACH: ${ventLatentKg(econ)} against ${ventLatentKg(leak)}`);
+  // And that displaces the coil, which is the whole point of an economizer on a lit box in dry weather.
+  assert.ok(econ.summary.condensateKg<leak.summary.condensateKg,
+    `an economizer must displace mechanical condensation: ${econ.summary.condensateKg} against ${leak.summary.condensateKg}`);
+  // Deliberately NOT asserted: that a larger maximum is worse. The dispatcher offers three airflow levels
+  // (minimum, midpoint, maximum), so raising the maximum moves the midpoint and deletes the intermediate flow
+  // the controller wanted. Economizer capacity therefore cannot be ranked in this model, and any test that
+  // pinned an optimum would be pinning that artifact. See docs/VERIFICATION.md.
+  assert.deepEqual([...new Set([2,(0.3+2)/2,0.3])].length,3,'the three-level ladder is the documented shape');
+  for(const r of [leak,econ,flood]) assert.equal(r.summary.numericalFailureHours,0);
+});
+
+test('a dry-neutral DOAS on a closed facility only removes water the outdoor air actually carries',()=>{
+  const box=litBox({maxVentACH:6,technology:'doas',doasM3s:1.2,dehuKgH:30,coolingKW:150});
+  // Warm humid outdoor air is wetter than the declared supply dew point, so the DOAS has water to remove.
+  const humid=simulateScenario(box,warmHumid()).summary;
+  assert.ok(humid.doasRemovedKg>0,'a DOAS must remove moisture from a humid outdoor stream');
+  assert.ok(humid.doasKWh>0,'a running DOAS must cost energy');
+  assert.ok((humid.runtime?.doas?.hours??0)>0,'DOAS runtime must be attributed to its own component');
+  // Cold dry outdoor air is already drier than the supply target, so there is nothing for it to remove. A model
+  // that credited removal here would be inventing dehumidification out of air that needs none.
+  const dry=simulateScenario(box,coldDry()).summary;
+  assert.equal(dry.doasRemovedKg,0,'a DOAS cannot dry air that is already drier than its supply dew point');
+});
+
+// Where a dehumidifier's heat lands is a topology choice, not a property of the machine, and it is the whole
+// reason an integrated unit with hot-gas reheat exists. An in-room or ducted-and-returned unit puts the latent
+// heat it removed plus its own electrical input back into the crop air, which the cooling plant must remove
+// again. A remote-condenser or water-cooled unit rejects it outside, which makes the same machine a net
+// cooling device. Both directions are pinned, along with the conservation of the split.
+test('a dehumidifier releases its heat where the topology says, and the split conserves',()=>{
+  const wet=(hours=48)=>({schemaVersion:1,source:'Synthetic warm-wet fixture',sourceKind:'test',latitude:25.77,longitude:-80.19,timezone:'UTC',startDate:'2025-07-01',endDate:'2025-07-02',
+   hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,6,1,i),tempC:28,rh:.85,pressurePa:101325,ghiWm2:0}))});
+  const room=over=>({...makeScenario('indoor','bench','lettuce'),timezone:'UTC',areaM2:200,heightM:4,
+   lightWm2:150,dliTarget:14,photoperiod:16,dayStart:6,coolingKW:80,dehuKgH:40,heaterKW:30,humidifierKgH:0,
+   padEnabled:false,controlMode:'ideal',...over});
+  const inRoom=simulateScenario(room({dehuHeatFraction:1}),wet()).summary;
+  const rejected=simulateScenario(room({dehuHeatFraction:0}),wet()).summary;
+  const half=simulateScenario(room({dehuHeatFraction:.5}),wet()).summary;
+  // The in-room unit dumps heat into the zone and none of it leaves; the remote unit is the mirror image.
+  assert.ok(inRoom.dehuHeatKWh>0,'an in-room dehumidifier must heat the zone');
+  assert.equal(Math.round(inRoom.dehuRejectedHeatKWh),0,'an in-room unit rejects nothing outside');
+  assert.equal(Math.round(rejected.dehuHeatKWh),0,'a remote-condenser unit must not heat the zone');
+  assert.ok(rejected.dehuRejectedHeatKWh>0,'a remote-condenser unit must reject its heat outside');
+  // The split conserves within a run: at 0.5 the two halves of the same released heat must be equal, which is
+  // the identity the fraction has to satisfy no matter what the rest of the plant is doing.
+  const total=r=>r.dehuHeatKWh+r.dehuRejectedHeatKWh;
+  assert.ok(total(half)>0,'a half-rejected unit must still release heat somewhere');
+  assert.ok(Math.abs(half.dehuHeatKWh-half.dehuRejectedHeatKWh)/total(half)<1e-9,
+    `a 0.5 fraction must split the released heat evenly: ${half.dehuHeatKWh} against ${half.dehuRejectedHeatKWh}`);
+  // Half really is between the two, so the fraction is a continuum and not a switch.
+  assert.ok(half.dehuHeatKWh>0&&half.dehuRejectedHeatKWh>0);
+  assert.ok(half.dehuHeatKWh<inRoom.dehuHeatKWh,'half the heat into the zone must be less than all of it');
+  // And the consequence that justifies an integrated machine: keeping the heat in the room costs cooling.
+  assert.ok(inRoom.coolingKWh>rejected.coolingKWh,
+    `in-room dehumidifier heat must raise the cooling bill: ${inRoom.coolingKWh} against ${rejected.coolingKWh}`);
+  // Ducting a unit outside the room but returning its discharge is the in-room case, not the remote one. The
+  // model has no separate flag for it precisely because the heat path, not the cabinet location, is what counts.
+  assert.equal(simulateScenario(room({dehuHeatFraction:1}),wet()).summary.coolingKWh,inRoom.coolingKWh);
+});

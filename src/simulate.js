@@ -8,7 +8,7 @@ import {summarizeHours,weatherSummary} from './metrics.js';
 
 const HOUR=3600000,KWH=3600000;
 const TOTALS=['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','solarDLI','lightDLI','heatingKWh','heatPumpElectricKWh','coolingKWh',
-  'dehuKWh','dehuHeatKWh','unmetSensibleKWh','unmetMoistureKg','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh',
+  'dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','unmetSensibleKWh','unmetMoistureKg','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh',
   'desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg',
   'cropWaterL','padWaterL','humidifierWaterL','tempDegreeHours','vpdKPaHours','doasKWh','doasRemovedKg'];
 const SENSIBLE_LOADS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','ventilationSensibleKWh','fanKWh','cropSensibleKWh','cropLatentKWh','humidifierKWh','equipmentHeatKWh'];
@@ -131,7 +131,15 @@ function evaluate(ctx,rawAir,dxDuty,dehuDuty,desiccantDuty,plan) {
   // part-load model. No startup, cycling or frost performance is invented.
   const dxW=dxTotalW/s.coolingCOP;
   const dehuW=dehuKgS*3600/s.dehuLPerKWh*1000;
-  const dehuHeatW=L*dehuKgS+dehuW;
+  // A condensing dehumidifier releases the latent heat it takes out plus its own electrical input. Where that
+  // heat lands is a topology choice, not a property of the machine. An in-room or ducted-and-returned unit puts
+  // all of it back into the crop air, which the cooling plant must then remove, so dehuHeatFraction is 1. A
+  // remote-condenser or water-cooled unit rejects some or all of it outside the zone: declare the fraction that
+  // still reaches the air. Ducting a standalone unit outside the room changes serviceability and noise, not the
+  // heat path, so it does not by itself justify lowering this.
+  const dehuHeatTotalW=L*dehuKgS+dehuW;
+  const dehuHeatW=dehuHeatTotalW*s.dehuHeatFraction;
+  const dehuRejectedW=dehuHeatTotalW-dehuHeatW;
   const sorptionW=L*desiccantKgS*s.desiccantHeatFraction;
   const regenW=desiccantKgS*s.regenerationKWhPerKg*KWH;
   const regenElectricW=regenW*s.regenerationElectricFraction;
@@ -182,7 +190,7 @@ function evaluate(ctx,rawAir,dxDuty,dehuDuty,desiccantDuty,plan) {
   return {...final,k,air,rawT,rawW,q,moistureSource:forcing.cropKgS+humidifier-removal,violation,costRate,temperatureMiss,moistureMiss,
     fanW,pumpW,dxDuty,dehuDuty,desiccantDuty,dxKgS,dehuKgS,desiccantKgS,dxSensibleW,dxTotalW,dxW,dehuW,dehuHeatW,sorptionW,
     regenW,regenElectricW,regenFuelW,reheatW,heaterW,heaterElectricW,electricW,fuelW,waterKgS,padKgS:padKgS+indirectKgS,humidifier,doasKgS,doasW,
-    rejectedW:dxTotalW+dxW-reheatW,desiccantExportedW:L*desiccantKgS*(1-s.desiccantHeatFraction)+regenW,
+    rejectedW:dxTotalW+dxW-reheatW+dehuRejectedW,dehuRejectedW,desiccantExportedW:L*desiccantKgS*(1-s.desiccantHeatFraction)+regenW,
     unmetSensibleW,unmetMoistureKgS};
 }
 
@@ -484,7 +492,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       row.electricKWh+=picked.electricW*scale;row.fuelKWh+=picked.fuelW*scale;row.waterL+=picked.waterKgS*dt;
       row.lightKWh+=lightW*scale;row.solarDLI+=solarDLI;row.lightDLI+=lightDLI;
       row.heatingKWh+=picked.heaterW*scale;row.heatPumpElectricKWh+=picked.heaterElectricW*scale;row.coolingKWh+=picked.dxTotalW*scale;
-      row.dehuKWh+=picked.dehuW*scale;row.dehuHeatKWh+=picked.dehuHeatW*scale;
+      row.dehuKWh+=picked.dehuW*scale;row.dehuHeatKWh+=picked.dehuHeatW*scale;row.dehuRejectedHeatKWh+=(picked.dehuRejectedW||0)*scale;
       row.regenerationKWh+=picked.regenW*scale;row.regenerationElectricKWh+=picked.regenElectricW*scale;row.regenerationFuelKWh+=picked.regenFuelW*scale;
       row.desiccantRemovedKg+=picked.desiccantKgS*dt;row.desiccantHeatKWh+=picked.sorptionW*scale;
       row.desiccantExportedHeatKWh+=picked.desiccantExportedW*scale;row.reheatKWh+=picked.reheatW*scale;row.rejectedHeatKWh+=picked.rejectedW*scale;

@@ -157,6 +157,16 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **How it is computed here.** The mode itself is `PASSIVE_VENT_COOL_DRY`. The screen behind it, `outdoorDryingHour` in `src/physics.js`, takes the drying margin against the zone's moisture ceiling at maximum ventilation airflow and converts it into a removal potential in kg/h, then charges the fan power plus any heating needed to temper the incoming air, giving cost per kg and energy per kg at scenario prices. Compared against a 2.5 L/kWh dehumidifier at Tulsa, outside air wins on cost per kg in 4,970 h and on energy per kg in 1,752 h (see [AUDIT.md](AUDIT.md)). It is a weather-side screen, not a dispatch decision.
 
+## Dehumidifier heat returned to the zone
+
+**What it is.** The share of a condensing dehumidifier's released heat that reaches the crop air. A machine that condenses water releases the latent heat of the water it removed plus its own electrical input, and where that heat lands is a question about the installation rather than about the machine's drying ability. A fraction of 1.0 covers both an in-room unit and a ducted unit whose warm discharge returns to the room; 0 is a remote condenser or water-side rejection; anything in between is a machine deliberately returning part of its heat, which is what integrated hot-gas reheat does. It is distinct from `reheatFraction`, which recovers heat from the DX circuit: a temperature-controlled dehumidifier with integrated hot-gas reheat is declared through this field, not through that one.
+
+**Unit.** Dimensionless, 0 to 1. Default 1.
+
+**Where it appears.** The `dehuHeatFraction` slider labelled "Dehu heat returned to the zone" in the "Heating, cooling & dehumidification" field group, in steps of 0.1; the rejected remainder as the run total `dehuRejectedHeatKWh`, the released heat that did not reach the zone, in kWh; and the measured consequences across climates in [CLASSES.md](CLASSES.md).
+
+**How it is computed here.** `src/simulate.js` forms the released heat as `dehuHeatTotalW = L * dehuKgS + dehuW`, the latent heat of the condensed water plus the unit's electrical input, then splits it: `dehuHeatW = dehuHeatTotalW * dehuHeatFraction` enters the zone's sensible balance, while `dehuRejectedW = dehuHeatTotalW - dehuHeatW` joins the run's `rejectedW` and accumulates as `dehuRejectedHeatKWh`, so the two parts always sum to the released heat and the rejected share stays visible rather than vanishing. The fraction is a declared topology input and not a sourced parameter: no manufacturer performance map backs any particular value, the user declares where the machine sends its heat (see [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md)). It is also static rather than modulating, applying in every hour instead of being chosen from each hour's heating demand, so a machine that varies its own heat return is bracketed by two runs rather than simulated in one. A scenario saved before this field existed loads with 1 through `backfillScenario` in `src/config.js`.
+
 ## Enrichment window
 
 **What it is.** Hours in which CO2 enrichment is physically worth attempting, because the zone is not being flushed with outside air.

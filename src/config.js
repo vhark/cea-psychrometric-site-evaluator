@@ -70,7 +70,7 @@ export const DEFAULT_SCENARIO = {
  infiltrationACH:.3,solarTransmission:.65,parTransmission:.65,shadeFraction:.25,solarHeatFraction:1,
  minVentACH:.3,maxVentACH:40,fanWPerM3s:180,padEnabled:true,padEffectiveness:.8,padPumpW:250,
  heaterKW:120,heaterEfficiency:.9,coolingKW:0,coolingCOP:3,coolingSHR:.75,coolingMinOutdoorC:-5,coolingMaxOutdoorC:46,
- dehuKgH:0,dehuLPerKWh:2.5,integratedHVAC:false,reheatFraction:.5,humidifierKgH:0,
+ dehuKgH:0,dehuLPerKWh:2.5,dehuHeatFraction:1,integratedHVAC:false,reheatFraction:.5,humidifierKgH:0,
  desiccantKgH:0,regenerationKWhPerKg:1.2,regenerationElectricFraction:0,desiccantHeatFraction:1,hybridEvapEffectiveness:.8,
  lightWm2:80,efficacy:2.5,lightDelivery:.85,dayStart:6,photoperiod:16,dayTargetC:22,nightTargetC:18,tempToleranceC:2,
  vpdMin:.6,vpdMax:1,maxDewPointC:19,dliTarget:14,transpirationLDayM2:1.3*9/7,darkTranspirationFraction:.15,cropSensibleWm2:0,
@@ -87,7 +87,7 @@ export const FIELDS = [
  {label:'Geometry & envelope',fields:[f('areaM2','Floor area','m²',1,100000,10),f('canopyM2','Active canopy','m²',0,500000,10),f('heightM','Mean height','m',1,30,.1),f('envelopeRatio','Envelope / floor','×',.5,10,.1),f('uValue','Envelope U-value','W/m²K',.05,15,.1),f('thermalMassKJm2K','Effective thermal mass','kJ/m²K',5,2000,5),f('infiltrationACH','Air leakage','ACH',0,20,.1),f('solarTransmission','Thermal solar transmission','fraction',0,1,.05),f('parTransmission','Crop light transmission','fraction',0,1,.05),f('shadeFraction','Shade fraction','fraction',0,1,.05)]},
  {label:'Crop targets & lighting',fields:[f('dayTargetC','Day target','°C',5,40,.5),f('nightTargetC','Night target','°C',5,40,.5),f('tempToleranceC','Temperature tolerance','± °C',.1,10,.5),f('vpdMin','Minimum air VPD','kPa',0,4,.05),f('vpdMax','Maximum air VPD','kPa',.05,5,.05),f('maxDewPointC','Dew-point ceiling','°C',-10,35,.5),f('dayStart','Photoperiod start','local hour',0,23,1),f('photoperiod','Photoperiod','h/day',1,24,1),f('dliTarget','Daily light target','mol/m²/day',0,60,1),f('lightWm2','Installed fixture power','W/m² canopy',0,500,5),f('efficacy','Fixture photon efficacy','µmol/J',.5,5,.1),f('lightDelivery','Canopy light delivery','fraction',.1,1,.05),f('lai','Leaf area index','m²/m² canopy',0,8,.1),f('transpirationLDayM2','Assumed crop evaporation (schedule model)','L/m²/day',0,15,.1),f('darkTranspirationFraction','Dark / lit evaporation rate','fraction',0,1,.05),f('cropSensibleWm2','Respiration / other crop heat','W/m²',0,100,1)]},
  {label:'Airflow & evaporative cooling',fields:[f('minVentACH','Minimum outside air','ACH',0,60,.1),f('maxVentACH','Maximum outside air','ACH',0,120,1),f('fanWPerM3s','Fan specific power','W/(m³/s)',0,2000,10),f('padEffectiveness','Pad effectiveness','fraction',0,.95,.05),f('padPumpW','Pad pump','W',0,20000,50),f('humidifierKgH','Humidifier capacity','kg/h',0,1000,1)]},
- {label:'Heating, cooling & dehumidification',fields:[f('heaterKW','Delivered heater capacity','kW',0,10000,10),f('heaterEfficiency','Heater efficiency','fraction',.1,1,.05),f('coolingKW','Total DX cooling capacity','kW',0,10000,10),f('coolingCOP','Assumed cooling COP','W/W',.5,10,.1),f('coolingSHR','Sensible heat ratio','fraction',.2,1,.05),f('coolingMinOutdoorC','DX minimum outdoor','°C',-50,30,1),f('coolingMaxOutdoorC','DX maximum outdoor','°C',20,65,1),f('dehuKgH','Condensing dehu capacity','kg/h',0,2000,5),f('dehuLPerKWh','Dehu efficiency','L/kWh',.2,10,.1),f('reheatFraction','Recoverable condenser heat','fraction',0,1,.1)]},
+ {label:'Heating, cooling & dehumidification',fields:[f('heaterKW','Delivered heater capacity','kW',0,10000,10),f('heaterEfficiency','Heater efficiency','fraction',.1,1,.05),f('coolingKW','Total DX cooling capacity','kW',0,10000,10),f('coolingCOP','Assumed cooling COP','W/W',.5,10,.1),f('coolingSHR','Sensible heat ratio','fraction',.2,1,.05),f('coolingMinOutdoorC','DX minimum outdoor','°C',-50,30,1),f('coolingMaxOutdoorC','DX maximum outdoor','°C',20,65,1),f('dehuKgH','Condensing dehu capacity','kg/h',0,2000,5),f('dehuLPerKWh','Dehu efficiency','L/kWh',.2,10,.1),f('dehuHeatFraction','Dehu heat returned to the zone','fraction',0,1,.1),f('reheatFraction','Recoverable condenser heat','fraction',0,1,.1)]},
  {label:'Desiccant assumptions',fields:[f('desiccantKgH','Desiccant moisture capacity','kg/h',0,2000,5),f('regenerationKWhPerKg','Regeneration energy','kWh/kg water',.1,10,.1),f('regenerationElectricFraction','Electric share of regeneration','fraction',0,1,.1),f('desiccantHeatFraction','Sorption heat returned indoors','fraction',0,1,.1),f('hybridEvapEffectiveness','Hybrid indirect evap effectiveness','fraction',0,.95,.05)]},
  {label:'Dry-neutral DOAS (generic)',fields:[f('doasM3s','DOAS outdoor airflow','m³/s',0,50,.1),f('doasSupplyDewPointC','DOAS supply dew point','°C',-10,25,.5),f('doasSupplyTempC','DOAS supply temperature','°C',5,35,.5),f('doasKWhPerKg','DOAS energy per kg removed','kWh/kg water',.1,5,.1)]},
  {label:'Investment assumptions',fields:[f('electricityPrice','Manual electricity price','$/kWh',0,2,.01),f('fuelPrice','Purchased heating fuel','$/kWh',0,1,.005),f('waterPrice','Water price','$/L',0,.1,.001),f('installedCost','Installed component cost','$',0,10000000,1000),f('maintenanceYear','Annual maintenance','$/year',0,1000000,100),f('lifeYears','Equipment service life','years',1,50,1),f('discountRate','Discount rate','fraction',0,.3,.01)]}
@@ -130,11 +130,16 @@ const V02_KEYS=['controlMode','transpirationModel','lai','doasM3s','doasSupplyDe
 // written before they existed simulates exactly as it did. The nested screens are always rebuilt as fresh
 // objects, both to fill partially declared screens and to keep the frozen defaults unshared.
 const V03_KEYS=['heatSource',...HEAT_PUMP_RATING_FIELDS,'heatPumpCutoffC','heatPumpCapacityDerate'];
+// 0.4 component keys. Inert by default: dehuHeatFraction 1 keeps every dehumidifier's heat in the zone, which
+// is exactly what the model did before the topology became declarable, so a scenario written without the key
+// simulates unchanged.
+const V04_KEYS=['dehuHeatFraction'];
 export function backfillScenario(s){
  if(!s||typeof s!=='object')return s;
  const crop=CROPS[s.crop];
  for(const key of V02_KEYS)if(!Object.hasOwn(s,key))s[key]=(key==='lai'||key==='transpirationModel')&&crop&&Object.hasOwn(crop,key)?crop[key]:DEFAULT_SCENARIO[key];
  for(const key of V03_KEYS)if(!Object.hasOwn(s,key))s[key]=DEFAULT_SCENARIO[key];
+ for(const key of V04_KEYS)if(!Object.hasOwn(s,key))s[key]=DEFAULT_SCENARIO[key];
  s.shadeScreen=backfillShadeScreen(s.shadeScreen);
  s.thermalScreen=backfillThermalScreen(s.thermalScreen);
  s.insectScreen=backfillInsectScreen(s.insectScreen);

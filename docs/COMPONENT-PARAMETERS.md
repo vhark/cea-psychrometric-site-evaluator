@@ -24,6 +24,7 @@ Every parameter below is one of:
 - **VENDOR DATA / VENDOR CLAIM:** a manufacturer or distributor value, with unspecified tolerances explicitly noted.
 - **Derived:** transparent arithmetic using cited inputs.
 - **UNSOURCED:** no defensible numeric value was established in the inspected material. This means unavailable evidence, not a measured zero.
+- **DECLARED TOPOLOGY:** an installation choice the user declares, such as where a machine sends its heat. No performance evidence stands behind it because no product measurement can establish it, and it is not a missing number waiting to be sourced. Section 3B lists these.
 
 Ranges are reported source ranges, material differences, or explicitly identified method differences. They are not probability distributions or confidence intervals. No arbitrary uncertainty percentage has been added. If a source provides no tolerance, numerical uncertainty remains unquantified.
 
@@ -242,6 +243,38 @@ derated; if the derate would fall below it, the maximum clamps there and the run
 - **The measured direction is not universal across strategies.** It was measured in a house whose only moisture
   sink was the outside-air path. Where a mechanical sink exists the sign can reverse, which this repository
   measured and documented in [CLASSES.md](CLASSES.md).
+
+## 3B. Declared topology inputs, not sourced parameters
+
+Some inputs say where a machine is installed, not how well it performs. They carry no evidence grade, because no
+manufacturer test can report which room somebody put the condenser in. They are collected here so they are never
+read as sourced parameters, and they are not entries in the UNSOURCED register of section 5 either: the evidence
+is not missing, it is the user's own declaration.
+
+### 3B.1 `dehuHeatFraction`: where a dehumidifier's heat goes
+
+**DECLARED TOPOLOGY. No manufacturer performance map backs any value of it.** A condensing dehumidifier releases
+the latent heat of the water it removes plus its own electrical input. This fraction is the share of that released
+heat that reaches the crop air, and **the user declares where the machine sends its heat**:
+
+- **1.0**, an in-room unit, or a ducted unit whose warm discharge returns to the room.
+- **0**, a remote condenser or water-side rejection, so the released heat leaves the zone.
+- **Between**, a machine deliberately returning part of its heat, which is what integrated hot-gas reheat does.
+
+It is **static, not modulating**: the declared fraction applies in every hour rather than being chosen from each
+hour's heating demand. A machine that varies its own heat return is therefore bracketed by two runs at two
+fractions, not simulated by one.
+
+**It is not an equipment-selection parameter.** Choosing a real machine requires **measured water removal in kg/h
+at the actual entering-air condition**, that is at the entering dry bulb, entering humidity and station pressure
+the unit will really see, together with its electrical input at that same condition. A rating taken at a warmer,
+wetter entering condition overstates removal in a cool zone sitting at its moisture ceiling. This fraction says
+nothing about capacity and must never be substituted for a capacity rating.
+
+The measured consequences are in [CLASSES.md](CLASSES.md), section "Where a dehumidifier's heat goes, measured":
+the least-cost returned fraction is not the same in every climate, measuring 0.25 at Miami, 0.50 at Tulsa and 1.00
+at Fairbanks, and at Miami the cheapest fraction and the best-attaining one are different values, so this
+declaration carries an operating-cost consequence rather than being bookkeeping.
 
 ## 4. Air-source heat-pump heating
 

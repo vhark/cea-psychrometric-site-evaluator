@@ -492,7 +492,7 @@ function renderRuntime(r) {
     row('Evaporative pad', 'pad', r.scenario.padEnabled ? `${format(s.padWaterL)} L water. Weather screen: the pad could cool usefully in ${format(r.weatherSummary?.utility?.padCoolingHours)} h and was the only path to the ceiling in ${format(r.weatherSummary?.utility?.padDeeperThanVentHours)} h, against ${format(r.weatherSummary?.utility?.ventCoolingHours)} h a vent alone could cool.` : 'Not installed in this scenario'),
     row('Indirect evaporative stage', 'indirect', 'Hybrid secondary wet stream'),
     row('DX cooling', 'dx', `Peak ${format(s.peakCoolingKW, 1)} kW total cooling`),
-    row('Condensing dehumidifier', 'dehu', `${format(s.condensateKg)} kg condensate`),
+    row('Condensing dehumidifier', 'dehu', `${format(s.condensateKg)} kg condensate. ${finite(r.scenario.dehuHeatFraction) && r.scenario.dehuHeatFraction < 1 ? `${format(s.dehuRejectedHeatKWh)} kWh of its heat rejected outside the zone, ${format(s.dehuHeatKWh)} kWh returned to the air` : `${format(s.dehuHeatKWh)} kWh of its heat returned to the air, which the cooling plant has to remove again`}`),
     row('Shade screen', 'shadeScreen', finite(s.screens?.dliCostMol) ? `${format(s.screens.dliCostMol)} mol/m² of crop light given up while deployed` : 'Deployed hours; light cost not attributed'),
     row('Thermal curtain', 'thermalScreen', finite(s.screens?.heatingSavedKWh) ? `${format(s.screens.heatingSavedKWh)} kWh of delivered heat saved against the same run with it open` : 'Deployed hours; heating saving not attributed'),
     row('Desiccant', 'desiccant', `${format(s.desiccantRemovedKg)} kg removed; ${format(s.regenerationKWh)} kWh regeneration`),
