@@ -1,12 +1,12 @@
 import {simulateScenario} from './simulate.js';
-import {validateScenario} from './config.js';
+import {migrateScenario,validateScenario} from './config.js';
 import {applyEnergyContext} from './energy.js';
 import {parseImport} from './export.js';
 import {normalizeWeather} from './weather.js';
 const megabytes=size=>Number.isFinite(size)?`${(size/1048576).toLocaleString('en-US',{maximumFractionDigits:1})} MB`:'the file';
-/* Import parsing off the UI thread. Same guarantees as the main thread had: schemaVersion 1 only,
- * 1-20 validated scenarios, imported result claims dropped rather than displayed. The main thread
- * still re-checks its weather epoch before it adopts anything this returns. */
+/* Import parsing off the UI thread. Portable schema versions 1 and 2 migrate to current scenarios,
+ * 1-20 validated scenarios are accepted, and imported result claims are dropped rather than displayed.
+ * The main thread still re-checks its weather epoch before it adopts anything this returns. */
 async function parseFile({id,file}){
  const post=(value,message)=>self.postMessage({id,type:'progress',value,message});
  try{
@@ -39,7 +39,7 @@ self.onmessage=async ({data})=>{
   if(!snapshot||!Array.isArray(snapshot.hours)||!snapshot.hours.length)throw new Error('Load valid historical weather first.');
   const results=[];
   for(let i=0;i<scenarios.length;i++){
-   const scenario=scenarios[i];
+   const scenario=migrateScenario(scenarios[i]);
    const errors=validateScenario(scenario);
    if(errors.length)throw new Error(`${scenario.name}: ${errors.join(' ')}`);
    self.postMessage({id,type:'progress',value:i/scenarios.length,message:`${prefix}Evaluating ${scenario.name}`});

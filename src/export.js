@@ -1,15 +1,20 @@
-import {validateScenario,MODEL_VERSION} from './config.js';
+import {MODEL_VERSION,SCENARIO_SCHEMA_VERSION,migrateScenario,validateScenario} from './config.js';
 import {designHours,loadDecomposition,co2Window,aggregateYears,strategyFrontier,bindingConstraint} from './metrics.js';
 import {escapeHTML,reportHTML,shell,NOTICE,provenanceSection,localStamp} from './report.js';
 export {reportHTML};
 function csvValue(value){let text=String(value??'');if(typeof value==='string'&&/^[=+@\-\t\r]/.test(text))text=`'${text}`;return `"${text.replaceAll('"','""')}"`;}
 function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
-export function downloadScenario(scenario){download('cea-psychrometric-site-evaluator-scenario.json',JSON.stringify({schemaVersion:1,scenarios:[scenario]},null,2),'application/json');}
+export function downloadScenario(scenario){
+ const current=migrateScenario(scenario);
+ download('cea-psychrometric-site-evaluator-scenario.json',JSON.stringify({schemaVersion:SCENARIO_SCHEMA_VERSION,scenarios:[current]},null,2),'application/json');
+}
 export function parseImport(input){
  const data=typeof input==='string'?JSON.parse(input):input;
- if(!data||typeof data!=='object'||data.schemaVersion!==1)throw new Error('Unsupported portable import schema. Expected schemaVersion 1.');
- const scenarios=Array.isArray(data.scenarios)?data.scenarios:data.scenario?[data.scenario]:data.facility?[data]:Array.isArray(data.results)?data.results.map(r=>r.scenario):[];
- if(!scenarios.length||scenarios.length>20)throw new Error('Import needs between 1 and 20 facility scenarios.');
+ if(!data||typeof data!=='object'||![1,SCENARIO_SCHEMA_VERSION].includes(data.schemaVersion))
+  throw new Error(`Unsupported portable import schema. Expected schemaVersion 1 or ${SCENARIO_SCHEMA_VERSION}.`);
+ const rawScenarios=Array.isArray(data.scenarios)?data.scenarios:data.scenario?[data.scenario]:data.facility?[data]:[];
+ if(!rawScenarios.length||rawScenarios.length>20)throw new Error('Import needs between 1 and 20 facility scenarios.');
+ const scenarios=rawScenarios.map(migrateScenario);
  for(const s of scenarios){const errors=validateScenario(s);if(errors.length)throw new Error(`Invalid scenario: ${errors.join(' ')}`);}
  const ids=new Set();for(const s of scenarios){if(typeof s.id!=='string'||ids.has(s.id))s.id=crypto.randomUUID();ids.add(s.id);}
  return {scenarios,snapshot:data.snapshot||null};
@@ -76,5 +81,7 @@ export function downloadRun(results,snapshot,format='json',extras={}){
  download('cea-psychrometric-site-evaluator-hourly.csv',rows.join('\r\n'),'text/csv');return;
  }
  if(format!=='json')throw new Error('Unsupported export format.');
- download('cea-psychrometric-site-evaluator-run.json',JSON.stringify({schemaVersion:1,modelVersion:MODEL_VERSION,exportedAt:new Date().toISOString(),scenarios:results.map(r=>r.scenario),snapshot,results}),'application/json');
+ const scenarios=results.map(r=>migrateScenario(r.scenario));
+ const portableResults=results.map((result,index)=>({...result,scenario:scenarios[index]}));
+ download('cea-psychrometric-site-evaluator-run.json',JSON.stringify({schemaVersion:SCENARIO_SCHEMA_VERSION,modelVersion:MODEL_VERSION,exportedAt:new Date().toISOString(),scenarios,snapshot,results:portableResults}),'application/json');
 }

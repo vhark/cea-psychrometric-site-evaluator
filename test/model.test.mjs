@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {makeScenario,validateScenario,applyTechnology,DEFAULT_SCENARIO,SYSTEMS,FACILITIES,FACILITY_TEMPLATES,OPAQUE_FACILITIES} from '../src/config.js';
+import {AIRFLOW_BASIS,AIRFLOW_EVIDENCE,DEFAULT_SCENARIO,FACILITIES,FACILITY_TEMPLATES,OPAQUE_FACILITIES,SCENARIO_SCHEMA_VERSION,SYSTEMS,airflowEvidenceWarnings,applyTechnology,makeScenario,migrateScenario,validateScenario} from '../src/config.js';
 import {simulateScenario} from '../src/simulate.js';
 import {compareScenarios} from '../src/metrics.js';
 import {weatherState,padState,humidityRatio,enthalpy,stanghelliniTranspiration,saturationPressure,saturationHumidityRatio,dryAirDensity} from '../src/physics.js';
@@ -10,10 +10,114 @@ const diurnal=(hours=48,mean=18,amp=6)=>({schemaVersion:1,source:'Synthetic diur
  hours:Array.from({length:hours},(_,i)=>{const h=i%24,sun=Math.max(0,Math.sin(Math.PI*(h-6)/14));
   return {time:Date.UTC(2025,3,1,i),tempC:mean+amp*Math.sin(Math.PI*(h-9)/12),rh:.8-.3*sun,pressurePa:98500,ghiWm2:Math.round(800*sun)};})});
 const weather=(hours=24,changes={})=>({schemaVersion:1,source:'Synthetic boundary-test fixture',sourceKind:'test',latitude:36.15,longitude:-95.99,timezone:'UTC',startDate:'2025-01-01',endDate:'2025-01-01',hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:22,rh:.6,pressurePa:101325,ghiWm2:0,...changes}))});
-const closed=(overrides={})=>({...makeScenario('indoor'),timezone:'UTC',areaM2:100,canopyM2:100,heightM:4,dayTargetC:22,nightTargetC:22,tempToleranceC:2,vpdMin:.5,vpdMax:1.5,maxDewPointC:19,uValue:.05,infiltrationACH:0,minVentACH:0,maxVentACH:0,lightWm2:0,dliTarget:0,transpirationModel:'schedule',transpirationLDayM2:0,cropSensibleWm2:0,coolingKW:0,dehuKgH:0,heaterKW:0,humidifierKgH:0,...overrides});
+const closed=(overrides={})=>({...makeScenario('indoor'),outsideAirReviewed:true,timezone:'UTC',areaM2:100,canopyM2:100,heightM:4,dayTargetC:22,nightTargetC:22,tempToleranceC:2,vpdMin:.5,vpdMax:1.5,maxDewPointC:19,uValue:.05,infiltrationACH:0,minVentACH:0,maxVentACH:0,lightWm2:0,dliTarget:0,transpirationModel:'schedule',transpirationLDayM2:0,cropSensibleWm2:0,coolingKW:0,dehuKgH:0,heaterKW:0,humidifierKgH:0,...overrides});
 test('invalid control ranges cannot silently become a viable scenario',()=>{
- assert.ok(validateScenario(closed({minVentACH:10,maxVentACH:1})).length>0);
- assert.ok(validateScenario(closed({vpdMin:2,vpdMax:1})).length>0);
+ assert.match(validateScenario(closed({minVentACH:10,maxVentACH:1})).join(' '),/Minimum controlled outdoor air exceeds/);
+ assert.match(validateScenario(closed({vpdMin:2,vpdMax:1})).join(' '),/Minimum VPD must be below maximum VPD/);
+});
+test('scenario version 2 carries explicit airflow, cost, recovery, and DOAS completeness state',()=>{
+ const s=makeScenario('greenhouseDouble');
+ assert.equal(s.schemaVersion,SCENARIO_SCHEMA_VERSION);
+ assert.equal(s.outsideAirBasis,'literatureRange');
+ assert.equal(s.outsideAirReviewed,true);
+ assert.equal(s.installedCostBasis,'screeningAssumption');
+ assert.equal(s.heatRecovery.type,'none');
+ assert.equal(s.doasM3s,0);
+ assert.equal(s.doasSupplyDewPointC,null);
+ assert.equal(s.doasSupplyTempC,null);
+ assert.equal(s.doasCoolingCOP,null);
+ assert.equal(s.doasReheatRecoveryFraction,null);
+ assert.equal(Object.hasOwn(s,'doasKWhPerKg'),false);
+});
+test('airflow evidence identifies source scope and height-dependent controlled-air context',()=>{
+ assert.equal(Object.isFrozen(AIRFLOW_BASIS),true);
+ assert.deepEqual(AIRFLOW_BASIS,{literatureRange:'Literature range',adjacentProxy:'Adjacent-evidence proxy',
+  projectInput:'Project-specific input',screeningAssumption:'Screening assumption'});
+ assert.equal(AIRFLOW_EVIDENCE.infiltration.basis,'literatureRange');
+ assert.deepEqual(AIRFLOW_EVIDENCE.infiltration.constructionACH.glass,[.75,1]);
+ assert.deepEqual(AIRFLOW_EVIDENCE.infiltration.constructionACH.doublePolyethylene,[.5,1]);
+ assert.equal(AIRFLOW_EVIDENCE.infiltration.sourceUrl,'https://fieldreport.caes.uga.edu/publications/B792/greenhouses-heating-ventilation-and-cooling/');
+ assert.equal(AIRFLOW_EVIDENCE.controlled.basis,'literatureRange');
+ assert.equal(AIRFLOW_EVIDENCE.controlled.sourceUrl,'https://doi.org/10.25165/j.ijabe.20181101.3210');
+ assert.equal(AIRFLOW_EVIDENCE.closedRoom.basis,'adjacentProxy');
+ assert.equal(AIRFLOW_EVIDENCE.closedRoom.sourceUrl,'https://doi.org/10.23986/afsci.58936');
+ assert.equal(AIRFLOW_EVIDENCE.mushroom.sourceUrl,'https://doi.org/10.25165/j.ijabe.20221501.6872');
+ const s={...makeScenario('greenhouseGlass'),heightM:4,maxVentACH:20};
+ assert.deepEqual(validateScenario(s),[],'literature context is advisory, not a validation limit');
+ const warnings=airflowEvidenceWarnings(s);
+ assert.equal(warnings.length,1);
+ assert.match(warnings[0],/Shamshiri/i);
+ assert.match(warnings[0],/0\.04 to 0\.05 m3\/s per m2/);
+ assert.match(warnings[0],/4 m mean height/);
+ assert.match(warnings[0],/36 to 45 ACH/);
+ assert.match(warnings[0],/16 ACH below/);
+ const infiltrationWarnings=airflowEvidenceWarnings({...makeScenario('greenhouseGlass'),infiltrationACH:.2,maxVentACH:40});
+ assert.equal(infiltrationWarnings.length,1);
+ assert.match(infiltrationWarnings[0],/UGA Extension Bulletin 792/);
+ assert.match(infiltrationWarnings[0],/0\.75 to 1 ACH/);
+ assert.match(infiltrationWarnings[0],/0\.55 ACH below/);
+});
+test('unsupported facility airflow assumptions require explicit review',()=>{
+ for(const facility of ['greenhouse','greenhousePoly','hybrid','warehouse','warehouseSip','indoor']){
+  const s=makeScenario(facility);
+  assert.equal(s.outsideAirReviewed,false,facility);
+  assert.equal(s.outsideAirBasis,'screeningAssumption',facility);
+  assert.match(validateScenario(s).join(' '),/review/i,facility);
+ }
+});
+test('mushroom controlled outdoor air stays empty until a project design is reviewed',()=>{
+ const mushroom=makeScenario('greenhouseDouble','mushroom','mushroom');
+ assert.equal(mushroom.minVentACH,null);
+ assert.equal(mushroom.maxVentACH,null);
+ assert.equal(mushroom.outsideAirBasis,'projectInput');
+ assert.equal(mushroom.outsideAirReviewed,false);
+ const missing=validateScenario(mushroom).join(' ');
+ assert.match(missing,/Mushroom.*minimum controlled outdoor air/i);
+ assert.match(missing,/Mushroom.*maximum controlled outdoor air/i);
+ assert.deepEqual(validateScenario({...mushroom,minVentACH:2,maxVentACH:8,outsideAirReviewed:true}),[]);
+ const legacy=migrateScenario({...mushroom,schemaVersion:1,minVentACH:6,maxVentACH:15,outsideAirBasis:'literatureRange',outsideAirReviewed:true});
+ assert.equal(legacy.minVentACH,6);assert.equal(legacy.maxVentACH,15);
+ assert.equal(legacy.outsideAirBasis,'projectInput');assert.equal(legacy.outsideAirReviewed,false);
+ const missingReview={...mushroom,minVentACH:2,maxVentACH:8};delete missingReview.outsideAirBasis;delete missingReview.outsideAirReviewed;
+ assert.equal(migrateScenario(missingReview).outsideAirBasis,'projectInput');
+ assert.equal(migrateScenario(missingReview).outsideAirReviewed,false);
+ assert.match(validateScenario(missingReview).join(' '),/review/i);
+});
+test('DOAS treatment capacity and performance must be complete and fit the controlled-air path',()=>{
+ const base={...makeScenario('greenhouseDouble'),technology:'doas',outsideAirReviewed:true,maxVentACH:2,doasM3s:1.2,
+  doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5};
+ const maximumM3s=base.maxVentACH*base.areaM2*base.heightM/3600;
+ assert.ok(base.doasM3s>maximumM3s);
+ assert.match(validateScenario(base).join(' '),/DOAS.*maximum controlled.*1\.11 m3\/s/i);
+ assert.match(validateScenario({...base,doasM3s:.5,doasSupplyDewPointC:20,doasSupplyTempC:10}).join(' '),/dew point.*supply temperature/i);
+ const incomplete=migrateScenario({...base,schemaVersion:1,doasM3s:.5,doasKWhPerKg:.5});
+ assert.match(validateScenario(incomplete).join(' '),/review/i);
+ assert.match(validateScenario(incomplete).join(' '),/cooling COP/i);
+ assert.match(validateScenario(incomplete).join(' '),/reheat recovery/i);
+ const preset=applyTechnology(makeScenario('greenhouseDouble'),'doas');
+ assert.equal(preset.doasM3s,0);
+ assert.equal(preset.doasSupplyDewPointC,null);
+ assert.equal(preset.doasSupplyTempC,null);
+ assert.equal(preset.doasCoolingCOP,null);
+ assert.equal(preset.doasReheatRecoveryFraction,null);
+ assert.equal(preset.outsideAirReviewed,false);
+ assert.ok(validateScenario(preset).length>0);
+ const missingReview={...base,doasM3s:.5};delete missingReview.outsideAirReviewed;
+ assert.equal(migrateScenario(missingReview).outsideAirReviewed,false);
+ assert.match(validateScenario(missingReview).join(' '),/review/i);
+});
+test('configured HRV and ERV require their type-specific rating data',()=>{
+ const hrv=makeScenario('greenhouseDouble');
+ hrv.heatRecovery={type:'hrv'};
+ const hrvErrors=validateScenario(hrv);
+ assert.ok(hrvErrors.some(error=>error.includes('sensibleHeating75')));
+ assert.equal(hrvErrors.some(error=>error.includes('latentHeating75')),false);
+ const erv=makeScenario('greenhouseDouble');
+ erv.heatRecovery={type:'erv'};
+ const ervErrors=validateScenario(erv);
+ assert.ok(ervErrors.some(error=>error.includes('sensibleHeating75')));
+ assert.ok(ervErrors.some(error=>error.includes('latentHeating75')));
+ assert.match(validateScenario({...makeScenario('greenhouseDouble'),heatRecovery:'hrv'}).join(' '),/Heat recovery must be an object/);
 });
 test('missing weather stays missing instead of producing compliant hours',()=>{
  const w=weather(6);w.hours[2].tempC=null;w.hours[3].rh=null;
@@ -145,7 +249,9 @@ test('a fixture with surplus capacity reaches the daily light target and is not 
  for(const day of short.summary.daily.filter(d=>d.complete))assert.ok(day.dli>26.9&&day.dli<27.1,`capped at ${day.dli}`);
 });
 test('staged controller results converge with control cadence on the Tulsa example strategies',()=>{
- const scenarios=JSON.parse(readFileSync(new URL('../docs/example-scenarios.json',import.meta.url),'utf8')).scenarios.map(s=>{assert.deepEqual(validateScenario(s),[]);return {...s,timezone:'UTC'};});
+ const scenarios=JSON.parse(readFileSync(new URL('../docs/example-scenarios.json',import.meta.url),'utf8')).scenarios.map(raw=>{
+  const s=migrateScenario(raw);s.outsideAirReviewed=true;assert.deepEqual(validateScenario(s),[]);return {...s,timezone:'UTC'};
+ });
  const w=diurnal();
  let stagedMs=0,idealMs=0;
  for(const s of scenarios){
@@ -208,20 +314,29 @@ test('per-hour load decomposition closes the zone heat and moisture balances',()
  }
  assert.ok(removals>0&&result.summary.dehuKWh>0&&result.summary.heatingKWh>0,'fixture must exercise DX, dehumidifier and heater paths');
 });
-test('older scenario JSON without v0.2 keys validates with crop-specific defaults',()=>{
- const legacy={...makeScenario('greenhouse','bench','mushroom')};
- for(const key of ['controlMode','transpirationModel','lai','doasM3s','doasSupplyDewPointC','doasSupplyTempC','doasKWhPerKg'])delete legacy[key];
- assert.deepEqual(validateScenario(legacy),[]);
- assert.equal(legacy.transpirationModel,'schedule');assert.equal(legacy.lai,0);
- assert.equal(legacy.controlMode,'staged');assert.equal(legacy.doasM3s,0);assert.equal(legacy.doasKWhPerKg,DEFAULT_SCENARIO.doasKWhPerKg);
- const lettuce={...makeScenario('greenhouse')};delete lettuce.lai;delete lettuce.transpirationModel;
- assert.deepEqual(validateScenario(lettuce),[]);
- assert.equal(lettuce.transpirationModel,'stanghellini');assert.equal(lettuce.lai,3);
- assert.ok(validateScenario({...makeScenario(),controlMode:'optimal'}).length>0);
+test('older scenario JSON without later keys migrates with crop-specific inert defaults',()=>{
+ const legacy={...makeScenario('greenhouseDouble','bench','mushroom'),schemaVersion:1};
+ for(const key of ['controlMode','transpirationModel','lai','doasM3s','doasSupplyDewPointC','doasSupplyTempC'])delete legacy[key];
+ const migrated=migrateScenario(legacy);
+ assert.deepEqual(validateScenario(migrated),[]);
+ assert.equal(migrated.transpirationModel,'schedule');assert.equal(migrated.lai,0);
+ assert.equal(migrated.controlMode,'staged');assert.equal(migrated.doasM3s,0);
+ assert.equal(migrated.doasSupplyDewPointC,null);assert.equal(migrated.doasSupplyTempC,null);
+ assert.equal(Object.hasOwn(migrated,'doasKWhPerKg'),false);
+ assert.equal(Object.hasOwn(legacy,'lai'),false,'migration must not mutate its input');
+ const lettuce={...makeScenario('greenhouseDouble')};delete lettuce.lai;delete lettuce.transpirationModel;
+ const migratedLettuce=migrateScenario(lettuce);
+ assert.deepEqual(validateScenario(migratedLettuce),[]);
+ assert.equal(migratedLettuce.transpirationModel,'stanghellini');assert.equal(migratedLettuce.lai,3);
+ assert.ok(validateScenario({...makeScenario('greenhouseDouble'),controlMode:'optimal'}).length>0);
 });
-test('supported cultivation systems validate; a retired one fails with a message that names it',()=>{
- for(const system of Object.keys(SYSTEMS))assert.deepEqual(validateScenario({...makeScenario('greenhouse',system)}),[],`${system} must validate`);
- const errors=validateScenario({...makeScenario(),system:'wall'});
+test('supported cultivation systems validate when required project airflow is complete; a retired one fails by name',()=>{
+ for(const system of Object.keys(SYSTEMS)){
+  const s=makeScenario('greenhouseDouble',system);
+  if(system==='mushroom')Object.assign(s,{minVentACH:2,maxVentACH:8,outsideAirReviewed:true});
+  assert.deepEqual(validateScenario(s),[],`${system} must validate`);
+ }
+ const errors=validateScenario({...makeScenario('greenhouseDouble'),system:'wall'});
  assert.equal(errors.length,1,`expected one error, got ${errors.join(' | ')}`);
  assert.match(errors[0],/"wall" was retired/);
  assert.match(errors[0],/greenhouse benches/);
@@ -232,15 +347,16 @@ test('rack systems stack canopy above the floor footprint while benches do not',
  assert.ok(bench.canopyM2<=floor,`bench canopy ${bench.canopyM2} must not exceed its floor`);
  assert.equal(racks.canopyM2,Math.round(floor*.35/.7432*2.4));
  assert.ok(racks.canopyM2>floor,'stacked trays must give more canopy than floor');
- // Mushroom rooms are dark and ventilation-driven, and must not silently keep the lit-crop defaults.
- const mushroom=makeScenario('greenhouse','mushroom','mushroom');
+ // Mushroom rooms are dark and ventilation-driven, but their project airflow cannot be guessed.
+ const mushroom=makeScenario('greenhouseDouble','mushroom','mushroom');
  assert.equal(mushroom.canopyM2,racks.canopyM2);
- assert.ok(mushroom.lightWm2<bench.lightWm2&&mushroom.minVentACH>bench.minVentACH&&mushroom.humidifierKgH>0);
- assert.deepEqual(validateScenario(mushroom),[]);
+ assert.ok(mushroom.lightWm2<bench.lightWm2&&mushroom.humidifierKgH>0);
+ assert.equal(mushroom.minVentACH,null);assert.equal(mushroom.maxVentACH,null);
+ assert.ok(validateScenario(mushroom).length>0);
 });
-test('a schemaVersion 1 scenario simulates without a prior validate call',()=>{
- const legacy={...makeScenario('greenhouse')};
- for(const key of ['controlMode','transpirationModel','lai','doasM3s','doasSupplyDewPointC','doasSupplyTempC','doasKWhPerKg'])delete legacy[key];
+test('a schemaVersion 1 non-DOAS scenario simulates without a prior validate call',()=>{
+ const legacy={...makeScenario('greenhouseDouble'),schemaVersion:1};
+ for(const key of ['controlMode','transpirationModel','lai','doasM3s','doasSupplyDewPointC','doasSupplyTempC'])delete legacy[key];
  const result=simulateScenario(legacy,weather(24,{tempC:28,rh:.7,ghiWm2:500}));
  assert.equal(result.summary.numericalFailureHours,0);
  assert.equal(result.summary.validHours,24);
@@ -248,37 +364,41 @@ test('a schemaVersion 1 scenario simulates without a prior validate call',()=>{
 });
 const V03_KEYS=['heatSource','heatPumpCopAt8C','heatPumpCopAtMinus8C','heatPumpCopAtMinus15C','heatPumpCutoffC','heatPumpCapacityDerate','shadeScreen','thermalScreen'];
 test('scenario JSON written before the component keys existed validates and simulates unchanged',()=>{
- const legacy={...makeScenario('greenhouse')};
+ const legacy={...makeScenario('greenhouseDouble')};
  for(const key of V03_KEYS)delete legacy[key];
  const fixture=diurnal();
  const before=simulateScenario(legacy,fixture);
  assert.equal(Object.hasOwn(legacy,'shadeScreen'),false,'the caller object must not be mutated');
  assert.deepEqual(validateScenario(legacy),[]);
- assert.equal(legacy.heatSource,'fuel');
- assert.equal(legacy.shadeScreen.installed,false);
- assert.equal(legacy.thermalScreen.installed,false);
- assert.equal(legacy.heatPumpCopAt8C,null,'an unsourced rating point must stay null rather than acquire a default');
+ const migrated=migrateScenario(legacy);
+ assert.equal(Object.hasOwn(legacy,'heatSource'),false,'migration must not mutate its input');
+ assert.equal(migrated.heatSource,'fuel');
+ assert.equal(migrated.shadeScreen.installed,false);
+ assert.equal(migrated.thermalScreen.installed,false);
+ assert.equal(migrated.heatPumpCopAt8C,null,'an unsourced rating point must stay null rather than acquire a default');
  const after=simulateScenario(legacy,fixture);
  for(const key of ['electricKWh','fuelKWh','heatingKWh','coolingKWh','compliancePct'])assert.equal(after.summary[key],before.summary[key],`${key} changed for a scenario that declares no components`);
  assert.equal(after.summary.screens.shadeHours,0);
  assert.equal(after.summary.screens.dliCostMol,0);
  assert.equal(after.summary.screens.heatingSavedKWh,0);
  // Two scenarios must never share one screen object, or editing one would edit the other.
- const a=makeScenario('greenhouse'),b=makeScenario('greenhouse');
+ const a=makeScenario('greenhouseDouble'),b=makeScenario('greenhouseDouble');
  a.shadeScreen.installed=true;
  assert.equal(b.shadeScreen.installed,false);
  assert.equal(DEFAULT_SCENARIO.shadeScreen.installed,false);
 });
-test('every facility template carries a sourced envelope, and the original keys keep their published values',()=>{
+test('every facility template carries a sourced envelope and explicit airflow review status',()=>{
  for(const key of Object.keys(FACILITIES)){
   const s=makeScenario(key);
-  assert.deepEqual(validateScenario(s),[],`${key} must validate`);
+  const candidate={...s,outsideAirReviewed:true};
+  assert.deepEqual(validateScenario(candidate),[],`${key} must validate after explicit airflow review`);
   const template=FACILITY_TEMPLATES[key];
   assert.ok(template&&typeof template.source==='string'&&template.source.length>20,`${key} must state where its envelope came from`);
+  assert.ok(Object.hasOwn(template,'outsideAirBasis'),`${key} must classify its controlled-air basis`);
   assert.equal(s.uValue,template.uValue,`${key} must load its template U-value`);
   if(OPAQUE_FACILITIES.has(key)){
    assert.equal(s.parTransmission,0);assert.equal(s.solarTransmission,0);
-   assert.ok(validateScenario({...s,parTransmission:.5}).length>0,`${key} must refuse a transparent envelope`);
+   assert.ok(validateScenario({...candidate,parTransmission:.5}).length>0,`${key} must refuse a transparent envelope`);
   }
  }
  // The three keys that shipped before the ladder keep the exact numbers older saved scenarios were run with.
@@ -297,8 +417,8 @@ test('every facility template carries a sourced envelope, and the original keys 
  assert.ok(Math.abs(warehouse.envelopeRatio-(1+4*warehouse.heightM/Math.sqrt(warehouse.areaM2)))<5e-4);
 });
 
-// A closed facility is not a sealed one. The opaque templates cap the outside-air path at 2 ACH, which is shell
-// leakage rather than a designed economizer, and a user who raises it must actually get the benefit. Cold dry
+// A closed facility is not a sealed one. The opaque templates keep infiltration separate and cap the designed
+// controlled outdoor-air path at 2 ACH. A user who raises that capacity must actually get the benefit. Cold dry
 // outside air is the cheapest moisture sink a lit box has, so the path must carry water out and displace
 // mechanical condensation, while opening it too far must import more heating load than it is worth. Both
 // directions are pinned because the shape is non-monotonic and a naive model would make more air always better.
