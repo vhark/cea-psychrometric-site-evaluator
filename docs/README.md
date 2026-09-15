@@ -16,7 +16,7 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | Know how far to trust a result | [EVALUATION.md](EVALUATION.md), then [VERIFICATION.md](VERIFICATION.md) |
 | Know which assumption to measure first | [SENSITIVITY.md](SENSITIVITY.md) |
 | Learn the psychrometrics the tool applies | the **Learn** tab in the interface, then [REGIONS.md](REGIONS.md) |
-| Choose between pads, a dehumidifier, a curtain, lights or an opaque box | [CLASSES.md](CLASSES.md) |
+| Understand facility topologies and why older class rankings were withdrawn | [CLASSES.md](CLASSES.md) |
 | Know what published research actually proves for a humid site | [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) |
 | Know whether a screen, curtain, insect mesh or heat-pump number is measured or assumed | [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) |
 | Change the code | [ARCHITECTURE.md](ARCHITECTURE.md), then [IMPLEMENTATION.md](IMPLEMENTATION.md), then [../CONTRIBUTING.md](../CONTRIBUTING.md) |
@@ -31,12 +31,12 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | [WORKFLOW.md](WORKFLOW.md) | Step-by-step procedure, import schemas, exports and their limits | Anyone running the tool, or reading its output |
 | [examples/](examples/README.md) | Reviewed schema-2 comparison inputs, their design questions and current evidence limits | Anyone starting a real comparison |
 | [GLOSSARY.md](GLOSSARY.md) | Every domain term with unit, location in the interface, and how it is computed here | Anyone reading a result, report or brief |
-| [PRD.md](PRD.md) | Product requirements and approved scope, including the v0.2 site-evaluator contract in §10 | Product owner, implementer |
+| [PRD.md](PRD.md) | Current product requirements plus explicitly historical approved v0.2 scope | Product owner, implementer |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Deployment decision, module boundaries, canonical data contracts, controller design | Implementer, reviewer |
 | [IMPLEMENTATION.md](IMPLEMENTATION.md) | Cross-module interface contract, worker message protocol, file ownership | Implementer |
 | [EVALUATION.md](EVALUATION.md) | Evidence ladder and the acceptance gates each tier requires | Reviewer, anyone judging the claims |
 | [VERIFICATION.md](VERIFICATION.md) | Checks actually executed, with measured values, commands and dates | Reviewer, auditor |
-| [AUDIT.md](AUDIT.md) | Independent review findings, the fix for each, and the status of every open item | Reviewer, maintainer |
+| [AUDIT.md](AUDIT.md) | Dated independent-review findings and dispositions, with current supersession pointers | Reviewer, maintainer |
 | [SENSITIVITY.md](SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives them | Engineer choosing what to measure, reviewer |
 | [CLIMATES.md](CLIMATES.md) | The bundled hourly weather: six sites, 60 complete calendar years, the provenance of every file, and what a bundled year must not be read as | Anyone choosing a site or a year, quoting a climate figure, or adding a site |
 | [REGIONS.md](REGIONS.md) | The ten-year, six-climate study: method, recommendation rule, per-region verdict and what each unresolved region needs measured | Anyone choosing equipment for a climate, reviewer |
@@ -46,6 +46,8 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | [ENERGY-DATA.md](ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage counts, vintages, join limits, rebuild procedure | Data maintainer, anyone quoting a price or an emissions factor |
 | [RESEARCH.md](RESEARCH.md) | Landscape review, literature anchors and public source register behind the build decision | Reviewer, anyone asking why this exists |
 | [DIGITAL-TWIN.md](DIGITAL-TWIN.md) | Roadmap M1 to M6, with the claim each milestone earns and the gate it must pass | Product owner, reviewer |
+| [Airflow implementation plan](superpowers/plans/2026-09-15-ach-airflow-recovery-cost-labels.md) | Historical approved task sequence, not the current completion checklist or API | Maintainer reviewing design history |
+| [Airflow design specification](superpowers/specs/2026-09-15-ach-airflow-recovery-cost-labels-design.md) | Historical design intent, with current implementation and evidence pointers | Maintainer reviewing the cutover |
 
 ## Committed evidence artifacts
 
@@ -56,7 +58,7 @@ These are data, not prose. They are the primary record behind the numbers in the
 | [morris-screening.json](morris-screening.json) | The full committed Morris run: design, per-point results, effects and stability |
 | [regional-study.json](regional-study.json) | The full regional study: 360 full-year simulations, per-year rows, weather-side medians, design conditions and the verdict the Learn tab renders |
 | [browser-run-metrics.json](browser-run-metrics.json) | Measured metrics and export hashes from the full-year six-strategy browser run |
-| [seasonal-step-check.json](seasonal-step-check.json) | The seasonal cadence comparison behind the controller convergence evidence |
+| [seasonal-step-check.json](seasonal-step-check.json) | Historical seasonal cadence comparison for its recorded model/cases, not blanket convergence proof for current treatment topologies |
 | [step-sensitivity.json](step-sensitivity.json), [step-refinement.json](step-refinement.json) | Earlier cadence experiments, retained as development history, not as accuracy claims |
 | [example-scenarios.json](example-scenarios.json) | The six portable strategy configurations of the bundled example |
 | [example-comparison.html](example-comparison.html) | The exported comparison report from the verified browser run |

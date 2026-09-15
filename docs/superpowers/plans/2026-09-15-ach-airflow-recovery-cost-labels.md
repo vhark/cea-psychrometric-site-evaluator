@@ -1,5 +1,7 @@
 # ACH, Outdoor-Air Recovery, and Result Semantics Implementation Plan
 
+**Historical approved implementation plan, 2026-09-15.** Retained as the pre-implementation record, not an active task checklist or exact current API. Model `0.3.0-screening` has landed; current contracts are in [../../IMPLEMENTATION.md](../../IMPLEMENTATION.md), current evidence and the final 157/157 integration run in [../../VERIFICATION.md](../../VERIFICATION.md). Proposed field names below can differ from the implemented names (for example `controls.controlledOutdoorAirACH`). Unchecked boxes preserve the original plan rather than indicating unfinished release work. Old numerical claims were withdrawn where no corrected artifact substantiated them.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make ACH inputs contextually defensible, model one controlled outdoor-air stream with optional recovery and DOAS treatment, charge all conditioning energy, and make cost and attainment-difference labels self-explanatory.

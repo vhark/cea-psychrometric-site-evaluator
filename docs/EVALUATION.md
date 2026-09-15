@@ -2,7 +2,7 @@
 
 Purpose: define the evidence ladder, the gate each tier must pass, and the checks that would move this tool up a rung.
 
-Status: evaluation plan. Written 2026-09-11, reviewed 2026-09-14. The tool currently sits at tier 2, the assumption-based equipment screen; tiers 3 and 4 are unmet. This document specifies gates, it does not record that they passed. The record of executed checks is [VERIFICATION.md](VERIFICATION.md).
+Status: evaluation plan, written 2026-09-11 and reconciled with model `0.3.0-screening` on 2026-09-15. The tool remains at tier 2, the assumption-based equipment screen; tiers 3 and 4 are unmet. This document specifies gates, not a blanket assertion that they passed. Executed checks are in [VERIFICATION.md](VERIFICATION.md).
 
 Read this if: you are judging how far a result can be pushed, or designing the next round of checks.
 
@@ -17,7 +17,7 @@ Read this if: you are judging how far a result can be pushed, or designing the n
 
 A detailed interface does not raise the evidence tier. Display it beside results and exports.
 
-**Source grades are a different axis from these tiers, and the two must not be traded against each other.** [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) grades *external literature* A to E: A is peer-reviewed and measured in a real hot-humid facility with a baseline and reported uncertainty, E is vendor marketing with no disclosed method. The four rows above grade *this tool's own output*: what a number computed here is licensed to say. A citation does not move a run up the ladder, because a tier is earned by checking this model against data, and a screening run does not inherit the grade of a paper it borrowed a parameter from. They touch in exactly two places. First, provenance: a default taken from a Grade D extension bulletin stays labeled as that inside a tier-2 result, and a shipped assumption that a Grade B measurement happens to bracket is corroborated, not validated. Second, reachability: because the review found no Grade A evidence and no hot-humid benchmark dataset, tier 3 for hot-humid latent performance cannot currently be earned from measurement at all, only by model-to-model verification on matched forcing (§5).
+**Source grades are a different axis from these tiers.** [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) grades external literature A to E; the table above grades this tool's outputs. Borrowing a measured parameter does not validate the model. Provenance must preserve whether a value came from measured research, an adjacent application, an extension estimate or vendor material. Benchmarking must independently compare this model with matched measurements. The dated evidence search did not identify a suitable public hot-humid benchmark, but this is not proof none exists. Model-to-model verification alone cannot earn tier 3.
 
 ## 2. Data acceptance
 
@@ -98,7 +98,7 @@ These are development tolerances, not measured accuracy claims:
 - Halving integration step changes period energy by <1%, target compliance by <0.5 percentage points and maximum temperature by <0.2 K on representative stress cases; tighten or qualify where thresholds produce real classification sensitivity.
 - No invented exact indoor state in weather-only mode; equipment-mode outputs include assumptions, warm-up and model version.
 
-**Controller standing (added 2026-09-14).** Two controllers ship and they are licensed to say different things. The staged deadband controller is causal, is the interface default, and its converged results are the tool's ordinary tier-2 output. The ideal per-substep controller enumerates the best reachable air state in each substep and is a **declared capability ceiling, not a prediction**: a result computed under it states the most a given plant could do, so it may be compared with another ceiling but never presented as what an installed system will hold, and any figure produced under it must name it, as the control-class ladder does ([CLASSES.md](CLASSES.md)). Two measured facts fix the rule. The ideal optimizer does not converge with cadence (1.5 pp attainment and 1.95% electricity between 1 min and 0.5 min, against 0.004 to 0.383 pp and 0.31% for the staged controller; see [VERIFICATION.md](VERIFICATION.md)). And under the staged controller a Miami pad house fell from 9.6% to 0.0% attainment as cooling grew from 100 to 406 kW, because larger single stages overshoot the band harder, while the same sweep under the ideal controller rose from 10.1% to 18.7% and saturated. A capacity or class comparison is therefore only meaningful with staging or modulation matched, which is why cross-class comparisons are run at the ceiling and labeled as ceilings rather than presented as installed performance.
+**Controller standing, reconciled 2026-09-15.** The causal staged-deadband controller is the interface default. Historical cadence checks in [VERIFICATION.md](VERIFICATION.md) cover only the named cases and model dates, not every current recovery/DOAS configuration. The alternative ideal controller discretely enumerates admissible commands; it is a labeled optimistic experiment, not a continuous optimum or a demonstrated global plant-capability ceiling. Its historical cadence sensitivity prevents treating it as an installed-system prediction. The older ideal-controller class/capacity figures are withdrawn as current-model evidence ([CLASSES.md](CLASSES.md)).
 
 ### Behavioral experiments
 
@@ -126,7 +126,7 @@ Use Katzin et al. (2020), DOI 10.1016/j.biosystemseng.2020.03.010, and its actua
 
 Benchmark only matched envelope, crop and control cases. Report temperature/RH bias and RMSE, humidity-ratio error, energy bias, day/night and extreme-hour breakdown. Use a time-separated holdout to prevent tuning and evaluation on the same events. Agreement with GreenLight alone is model-to-model verification; agreement with held-out measurements is validation. No universal benchmark accuracy threshold is asserted before dataset applicability and sensor uncertainty are assessed.
 
-The 2026-09-14 evidence review found no independent hot-humid greenhouse benchmark dataset, and no greenhouse model it reviewed carries a published hot-humid latent validation ([EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) §7). This gate is therefore unreachable by measurement for a humid site until such a dataset exists: what remains available is the Dutch-winter reproduction above and model-to-model verification on matched Tulsa or Miami forcing, which is verification and not validation. The consequence for the roadmap is recorded as a named external blocker in [DIGITAL-TWIN.md](DIGITAL-TWIN.md).
+The 2026-09-14 review did not identify a suitable independent public hot-humid greenhouse benchmark or a reviewed greenhouse model with published hot-humid latent validation ([EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) §7). Further dataset discovery, author access or a measured campaign is needed for that domain. Dutch-winter reproduction and matched Tulsa/Miami model-to-model verification remain reachable work, but neither substitutes for hot-humid measurement validation. [DIGITAL-TWIN.md](DIGITAL-TWIN.md) records the outstanding prerequisite without asserting that no such data exist anywhere.
 
 Manufacturer curves are an additional validation source, not interchangeable with nominal equipment labels. Outside a published map, report out-of-domain operation or an explicit derating assumption; never extrapolate invisibly.
 
@@ -169,7 +169,7 @@ For partial-year or selected historical windows, show observed-period operating 
 
 Run low/base/high cases for crop moisture, envelope U/leakage, shade/transmission, pad effectiveness, equipment performance and tariffs. Report whether the preferred alternative changes. Scenario ranges are not statistical confidence intervals unless a probability model supports them. Several actual years plus hot/humid/cold event analysis are preferable to treating one TMY or year-to-date record as climate resilience proof.
 
-**Executed 2026-09-14 (roadmap M3).** This gate is now met by measurement rather than by prose: a Morris elementary-effects screening over twelve parameters and six strategies ranks the assumptions and produces a computed ranking-stability label on every comparison. The result is in [SENSITIVITY.md](SENSITIVITY.md). It remains a screening method, so the sentence above still holds: those ranges are not confidence intervals.
+**Executed for the current model, 2026-09-15.** The regenerated Morris study screens twelve parameters and six greenhouse strategies and reports ranking stability across its 104 parameter points; see [SENSITIVITY.md](SENSITIVITY.md). The regional study separately tests order stability across ten weather years at each site. Neither makes every interactive comparison a full structural-uncertainty analysis, and neither produces statistical confidence intervals.
 
 ## 8. Release proof
 

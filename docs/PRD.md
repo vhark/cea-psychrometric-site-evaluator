@@ -3,13 +3,13 @@
 
 Purpose: state what the product must do, for whom, and what it must never claim, including the approved v0.2 site-evaluator scope in §10 and the record of what shipped beyond it in §11.
 
-Status: approved for implementation. Written 2026-09-11, §10 approved 2026-09-13, reviewed 2026-09-14, §11 records scope that landed as of 2026-09-14. Execution and measured verification status are recorded separately in [VERIFICATION.md](VERIFICATION.md); this specification is not evidence of validation.
+Status: approved scope, reconciled to model `0.3.0-screening` on 2026-09-15. Written 2026-09-11; §10 preserves the 2026-09-13 approval and §11 the 2026-09-14 delivery record, with explicit supersession notes. Current implementation, schemas and executed evidence are in [IMPLEMENTATION.md](IMPLEMENTATION.md) and [VERIFICATION.md](VERIFICATION.md). This specification is not validation evidence.
 
 Read this if: you are deciding whether a proposed capability is in scope, or checking a shipped behaviour against what was approved.
 
 **Working name: CEA Psychrometric Site Evaluator.** Descriptor: CEA climate & equipment explorer. Promise: See when your climate strategy works, what closes the gap, and what that control costs. Alternatives: Canopy Atlas (broader siting emphasis), Climate Ledger (stronger economic emphasis). Name and trademark availability have not been checked.
 
-**Ownership and positioning.** CEA Psychrometric Site Evaluator is a standalone Grownetics product with no customer-specific content. Tulsa is a worked example, not a client configuration: it is bundled because ten complete public weather years there let the tool run offline end to end. Every crop, envelope, equipment and price default is a labeled, editable assumption sourced from public references or stated as a planning figure. Any engagement-specific material stays with that engagement and outside this repository.
+**Ownership and positioning.** CEA Psychrometric Site Evaluator is a One Season Farmers-branded tool with no customer-specific content. Grownetics code copyright remains as recorded in [../LICENSE](../LICENSE). Tulsa is a worked example, not a client configuration: ten complete public weather years let the tool run locally without live weather requests. Every crop, envelope, equipment and price default is a labeled, editable assumption sourced from public references or stated as a planning figure. Engagement-specific material stays outside this repository.
 
 ## 1. Product decision
 
@@ -38,7 +38,7 @@ Core question: For this crop, building, equipment, weather history, and price se
 
 ### A. Weather-side operating windows
 
-Preserve the supplied Tulsa brief in `resources/psychrometric_greenhouse_operating_hours_analysis_agent_brief.md` as the reference case. Primary source: observed KTUL/TUL temperature and dew point. Report thermodynamic opportunities, wet-bulb limits, moisture import/export, pad leaving-air conditions, and the brief's mode codes.
+Preserve the supplied Tulsa observed-weather brief as the reference case, delivered in [../reference-study/](../reference-study/README.md). The original brief belongs to the originating project and is not bundled at a repository `resources/` path. Primary source: observed KTUL/TUL temperature and dew point. Report thermodynamic opportunities, wet-bulb limits, moisture import/export, pad leaving-air conditions and the brief's mode codes.
 
 This mode does not calculate indoor temperature, actual dehumidification demand, equipment tonnage, energy cost, or an economic optimum. Do not call powered ventilation zero-energy passive cooling. Keep the familiar label with an explanation that the source of cooling is outside air.
 
@@ -76,7 +76,7 @@ Both modes are part of the proposed prototype. Weather-only mode is not a substi
 - Separate crop choice from HVAC choice.
 - Day/night temperature target and acceptable band, VPD band, dew-point guardrail, photoperiod, DLI target and crop-water/transpiration assumptions.
 - Display RH as derived, humidity ratio/dew point as moisture state. Air VPD is the default; leaf VPD needs an explicit leaf-temperature model or user offset and is labeled separately.
-- Stage/calendar schedules and canopy occupancy can be configured. Do not use outdoor reference-grass ET0 as indoor crop transpiration.
+- Day/night and photoperiod schedules are configured; stage/calendar programs and dynamic canopy occupancy remain future scope. Do not use outdoor reference-grass ET0 as indoor crop transpiration.
 
 ### Equipment and controls
 
@@ -123,7 +123,7 @@ Accessibility: keyboard-operable forms/tabs, associated units and help, text/tab
 
 ### Brand
 
-Grownetics, per `brand.grownetics.com` and the V4 "minimal aerospace" concept (2026-09-12 decision). Locked tokens: Brand Green `#4DB405` as the single accent, Carbon `#1C1C1A` canvas, Flash White `#F5F5F0` text, hairline dividers at 10%/20% white. Type: DM Sans display, Inter body, IBM Plex Mono for labels, data and buttons. The app runs in the dark Carbon register only; there is no light toggle. Exported documents (analysis report, observed-weather study) use Archive mode: Parchment `#F3F0ED`, Charleston `#2B2C2E`, Gold `#9A8860` catalog labels with § numbering. Chart categoricals are drawn from the brand palette (green, amber, nitrogen, electric lime, gold, sage, terracotta); attainment uses green/amber/red. Rules kept: max-width 68ch on paragraphs, left-anchored text, no gradients, no shadows, dark text on green buttons.
+One Season Farmers, superseding the 2026-09-12 Grownetics visual decision. The canonical source is the facility-design project's `brand/index.html`. Interactive tools use Instrument; the explainer and all reports default to Field regardless of OS theme, with document dark mode opt-in only. Titles use Young Serif at weight 400, body/UI Hanken Grotesk, and numbers Spline Sans Mono. Preserve the canonical four-season pinwheel and seasonal roles. Use approved ground/panel/ink/accent tokens, full-border tinted callouts, no colored side stripes, no pure black/white, no gradient text and no default glassmorphism. Copyright attribution is independent of the visual brand.
 
 ## 6. Definition of value and precision
 
@@ -151,7 +151,7 @@ Grownetics, per `brand.grownetics.com` and the V4 "minimal aerospace" concept (2
 
 ## 8. Preserved brief deliverables
 
-The existing brief also requests a full KTUL 2026-to-date study, raw/derived/summary CSVs, report, reproducible script/notebook and README. Preserve these as an explicit reference-study workstream and export target; the one-day research probe is not that study. Its missing future months must remain absent. This draft does not claim those artifacts or the prototype have been completed.
+The supplied brief requested the full available KTUL 2026-to-date study, raw/derived/summary CSVs, report, reproducible script and README. These now exist in [../reference-study/](../reference-study/README.md), generated by `scripts/reference-study.mjs`. The archived record ends 2026-09-11 21:00 UTC exclusive: 6,087 expected hours, 6,064 valid and 23 missing. It is weather-side opportunity analysis, not a complete calendar year or indoor simulation.
 
 ## 9. Approval recorded
 
@@ -159,9 +159,11 @@ The user approved the static-first build and subsequently clarified the coarse c
 
 ## 10. v0.2 scope: from Tulsa demonstration to site evaluator (approved 2026-09-13)
 
+Historical approval record, not a promise that every original implementation detail remains active. In model 0.3.0, schema 2, reviewed one-stream airflow and enthalpy/COP DOAS replace the original DOAS shortcut. Neither controller provides continuous economizer optimization.
+
 ### Purpose, restated
 
-The tool answers three questions for a specific site and crop band before capital is committed: what the climate gives for free, what the binding constraint is, and which class of equipment closes the gap at what running cost and with what confidence. It is Grownetics' "See" step before sensors exist. It is deliberately not the calibrated twin: at the site-evaluation stage the dominant uncertainties are crop transpiration, envelope leakage and the choice of weather year, all of which dwarf model fidelity. Value therefore comes from breadth of evidence (years, sites, bands) and honest sensitivity, not from physics resolution.
+The approved goal was to answer three questions for a specific site and crop band before capital is committed: what the climate gives for free, what binds, and which declared equipment class closes the gap at what running cost. It remains an assumption-based screen, not a calibrated twin. Multi-year evidence and structural sensitivity reveal variation, but do not establish that model fidelity or unmeasured equipment performance is negligible.
 
 ### Scope (in order of value)
 
@@ -175,7 +177,7 @@ The tool answers three questions for a specific site and crop band before capita
 | 6 | **Design-basis brief** | One-page export a mechanical engineer accepts: peak sensible and latent hours with coincident outdoor state and frequency, ventilation air requirement, condensate, pad water, free-cooling hours, binding constraint, strategy verdict, evidence tier. | none |
 | 7 | **Staged controller (roadmap M1)** | Deadband, minimum on/off, ordered staging as the default causal controller; the enumerating dispatcher retained as "ideal modulation upper bound". Removes the cadence artifact. | controller |
 | 8 | **Stanghellini transpiration (roadmap M2)** | Vanthoor 2011 §8.9 form: `mv = 2ρ·cp·LAI/(L·γ·(rB+rS))·(satVp(Tcan) − vpAir)`, rB = 275 s/m, rS = 82·rfR·rfVP with rfR = (R+4.3)/(R+0.54), rfVP = min(5.8, 1 + c(VPD)²), c = 4.3e-6 day / 5.2e-6 night, day/night switch at 5 W/m². Canopy temperature = air temperature as a declared simplification. LAI is a scenario input. The L/m²/day schedule stays as a fallback. | crop |
-| 9 | **Modulating ventilation and generic DOAS stage** | Continuous ventilation rate; a dry-neutral-supply device defined by supply dew point, supply temperature, airflow and kWh/kg. Brand-agnostic. | equipment |
+| 9 | **Controlled ventilation and generic DOAS stage** | Current contract: discrete staged controlled flow, optionally recovered then DOAS-conditioned once. DOAS declares treatment capacity, supply dew point/temperature, cooling COP and bounded recovered reheat; remaining heat draws on the finite shared source. The original continuous-flow and kWh/kg specification is superseded. | equipment |
 
 Explicitly not in v0.2: brand performance maps, 3-D or multi-zone spatial modeling, crop yield, GreenLight coupling.
 
@@ -191,7 +193,7 @@ This section is a record of shipped work, not a new set of promises. Each entry 
 |---|---|---|---|
 | **Learn view** | `src/learn.js`: ten curriculum modules that teach the reading of a result, each able to switch to Analyze and spotlight the panel it describes, reusing the guided tour's `spotlight` rather than a second implementation. `#learn` and `#learn/<module-key>` are routes alongside `#analyze`; every other fragment stays an ordinary anchor. | the view itself | Explanatory. It computes no new quantity and makes no claim of its own. |
 | **Six bundled sites, ten years each** | Tulsa, Phoenix, Miami, Denver, Seattle and Fairbanks, 2016 to 2025 per site: 60 complete site-years, 87,672 h per site, 526,032 h in total, discovered from `data/weather/index.json`. §10 item 1 assumed Tulsa alone was bundled, so multi-year and multi-site work now runs offline across six climates. Fairbanks was added because the control-class ladder needed a site whose binding limit is photons rather than heat. | [CLIMATES.md](CLIMATES.md), [REGIONS.md](REGIONS.md) | Same tier as before: more weather evidence, no physics change. Reanalysis, not station observations. |
-| **Control-class ladder** | [CLASSES.md](CLASSES.md): nine configurations from pad-and-vent with no heat to an insulated opaque box, each run against calendar year 2025 at all six sites under the ideal per-substep controller, with capacities sized per site by stated rules, plus four hot-humid design questions measured on Miami 2025 rather than asserted. | [CLASSES.md](CLASSES.md) | Capability ceilings under a declared upper-bound controller. Not installed-system predictions, not equipment sizing, not a manufacturer comparison. |
+| **Control-class ladder, historical** | The 2026-09-14 record compared nine ideal-controller configurations and four hot-humid design questions. Those numerical rankings, DOAS costs and hybrid-close-up conclusions are withdrawn as current evidence after the 0.3.0 airflow/conditioning correction. | [CLASSES.md](CLASSES.md) | Current document explains topologies and limits only; current numerical evidence is the regenerated canonical browser, regional and Morris studies. |
 | **Graded evidence review** | [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md): six parallel literature searches, 52 machine-checked DOIs, and an A to E grade plus a plain-words provenance note on every external claim. Its headline result is an absence: no Grade A evidence was found in any of the six domains. | [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) | Applies §7 item 12 outward. It grades the literature, it does not promote any output of this tool. External source grades are not the internal evidence tiers; the relationship is stated once in [EVALUATION.md](EVALUATION.md) §1. |
 | **Insect-screen ventilation model** | `insectScreen` in `src/screens.js` derates the achievable maximum outside-air exchange by measured ratios 1.000, 0.641 and 0.502 for nominal 40, 52 and 78 mesh. The reference is the measured 40-mesh house and not an unscreened one, so the cost of the first screen stays unsourced; an installed screen with no declared factor blocks the run rather than costing nothing; minimum ventilation is a requirement rather than a capability and is not derated. | [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) §3A, [CLASSES.md](CLASSES.md) | One instrumented Thai rainy-season campaign, one house per treatment: a measured direction and magnitude, not a validated universal mesh penalty. |
 
@@ -200,4 +202,4 @@ This section is a record of shipped work, not a new set of promises. Each entry 
 The §10 exclusions stand unchanged: no brand performance maps, no 3-D or multi-zone spatial modeling, no crop yield, no GreenLight coupling. Two further exclusions are recorded because the work above invites them:
 
 - **Central chiller and boiler plant is not modeled and is out of scope.** Every class in the ladder is packaged equipment. The scale at which central plant, hydronic distribution and a plant-side part-load curve beat packaged units is not answered here, and no figure in this repository may be read as that answer.
-- **The ideal per-substep controller stays a labeled upper bound**, not a product capability. Results computed under it, the control-class ladder included, are ceilings. The staged deadband controller remains the interface default (§10 item 7), and a capacity comparison is only meaningful with staging or modulation to match.
+- **The ideal per-substep controller remains a labeled upper-bound experiment**, not a product capability or a proven continuous optimum. Both controllers are resolution-limited. The former class ladder is withdrawn as current numerical evidence; a new capacity comparison must match control assumptions and report its discrete stages.

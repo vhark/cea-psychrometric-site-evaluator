@@ -8,7 +8,7 @@ Thanks for looking. This project has unusual rules, and they are the point: the 
 git clone https://github.com/vhark/cea-psychrometric-site-evaluator.git
 cd cea-psychrometric-site-evaluator
 python3 -m http.server 8150 --bind 127.0.0.1   # then open http://127.0.0.1:8150/
-npm test                                        # node --test test/*.test.mjs, 91 tests
+npm test                                    # node --test test/*.test.mjs
 ```
 
 There is nothing to install. Node 20 or newer runs the tests and the reproduction scripts. Python 3 serves the folder and rebuilds the energy catalogs (`build-energy.py` needs `openpyxl`, and only for a rebuild). Do not open `index.html` over `file://`: ES modules and Web Workers need HTTP.
@@ -55,7 +55,9 @@ No em dashes: use commas, colons, periods or parentheses. Numbers in the interfa
 
 ### 5. Brand
 
-The interface follows the Grownetics brand system (brand.grownetics.com): Carbon register for the app, Archive register for exported documents. Colours resolve through CSS custom properties, so palette changes never touch chart code. Do not introduce new palettes, gradients or shadows.
+The interface follows the One Season Farmers brand system, whose source of truth is the facility-design project's `brand/index.html`. Interactive tools use Instrument; the public explainer and exported documents use Field by default, regardless of OS theme. Titles use Young Serif at weight 400, body/UI use Hanken Grotesk, and data use Spline Sans Mono. Preserve the canonical four-season pinwheel and seasonal colors. Use CSS custom properties and full-border tinted callouts, never colored side stripes, pure black/white, gradient text or glassmorphism. Grownetics copyright and third-party licence attribution remain intact.
+
+Current release screenshots belong in `site/assets/screenshots/` and ship from that directory unchanged. `docs/screenshots/` is historical, not a source to copy over current site assets. Capture the actual app/report after a behavior or brand change rather than relabeling an old image.
 
 ## File ownership map
 
@@ -66,13 +68,16 @@ Keep changes inside one boundary where you can. Concurrent work is divided along
 | Contracts and defaults | `src/config.js` | Scenario schema, crop, facility, system and technology catalogs, field limits, validation. Changing the schema is a cross-cutting change: see the contract in [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md). |
 | Physics | `src/physics.js` | Psychrometric state, pad process, weather classification, outdoor drying screen. Pure functions, no DOM, no I/O. |
 | Simulation | `src/simulate.js` | Coupled zone integration, controller, equipment dispatch, per-hour result rows. Pure calculation. |
+| Air treatment | `src/airflow.js` | Geometry conversions, balanced HRV/ERV, frost/preheat and DOAS enthalpy/COP primitives. One controlled outdoor-air stream, no DOM or dispatch policy. |
 | Analysis | `src/metrics.js` | Summaries, comparison and dominance, runtime, loads, enrichment, across-years and across-sites aggregation, design basis. Pure calculation. |
 | Screening | `src/sensitivity.js` | Morris design, point application, elementary effects, ranking stability. Importable without a DOM. |
 | Data adapters | `src/weather.js`, `src/energy.js` | Retrieval, normalization, provenance, coverage. Never fabricate a value to fill a gap. |
 | Interface | `index.html`, `styles.css`, `src/app.js`, `src/charts.js` | No calculation. Charts are views of the same arrays the tables use, never a second approximate calculation. |
-| Plumbing | `src/worker.js`, `src/storage.js`, `src/export.js` | Worker protocol (simulate and parse paths), IndexedDB and local storage, portable exports and the printable report. |
-| Scripts | `scripts/` | Reproducible acquisition and offline studies. Each retains source bytes and SHA-256 manifests. |
-| Tests | `test/` | One file per boundary: model, data, analysis, conservation, sensitivity. |
+| Presentation | `src/report.js`, `src/learn.js`, `src/tour.js` | Shared cost/airflow/conditioning labels, printable Field reports, curriculum and guided navigation. No second physical model. |
+| Plumbing | `src/worker.js`, `src/storage.js`, `src/export.js` | Worker protocol (simulate and parse paths), IndexedDB and local storage, portable exports and design-basis brief. |
+| Components | `src/screens.js` | Screen and heat-pump evidence, validation and resolvers; dispatch stays in the simulation. |
+| Scripts and vintages | `scripts/`, `src/vintages.js` | Acquisition retains source bytes and SHA-256 manifests; studies retain reproducible inputs/results; vintage assessment reads committed provenance. |
+| Tests | `test/` | Physical and data boundaries: airflow, model, data, analysis, conservation, screens, examples, regional studies, sensitivity and vintages. |
 | Documentation | `README.md`, `docs/` | Index and conventions in [docs/README.md](docs/README.md). |
 
 ## How to add a crop

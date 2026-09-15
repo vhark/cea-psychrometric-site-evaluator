@@ -52,12 +52,6 @@ jobs:
             --exclude=./_site \
             . | tar -xf - -C _site/app
 
-          # Keep the deployed copies in step with the canonical docs/screenshots set.
-          if [ -d docs/screenshots ]; then
-            mkdir -p _site/assets/screenshots
-            cp -R docs/screenshots/. _site/assets/screenshots/
-          fi
-
           # Serve paths containing underscores verbatim.
           touch _site/.nojekyll
 

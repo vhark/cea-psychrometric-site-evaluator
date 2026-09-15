@@ -18,7 +18,7 @@ A note on precedence: where a general industry definition and the computation be
 
 **Where it appears.** The target-band inputs, the headline "Joint target attainment" metric, the hour inspector, the misses chart, every comparison row and the design-basis brief.
 
-**How it is computed here.** `src/simulate.js` converts the band into a temperature window around the scheduled target and a humidity-ratio window whose upper bound is the lower of the VPD maximum and the saturation state at the dew-point ceiling. A sampled substep is compliant when its state sits inside every bound at once. The violation used for control ordering is the temperature miss divided by the temperature tolerance plus the moisture miss divided by the VPD band width, so a scenario with a tight band is not automatically ranked as worse behaved than one with a loose band.
+**How it is computed here.** `moistureBounds` in `src/physics.js` intersects the humidity-ratio limits implied by VPD with the dew-point ceiling. The upper moisture bound uses the **minimum** VPD (the moist edge); the lower bound uses the maximum VPD (the dry edge). `src/simulate.js` counts substep time only when temperature, VPD and dew point all pass. The controller's violation score normalizes temperature and moisture misses by their declared bands; it is not a separate agronomic outcome.
 
 Throughout these documents, "control window" means only this: the count of hours inside the joint band. It never means a controller setting, a dispatch interval or a time-of-day schedule.
 
@@ -35,8 +35,8 @@ each hour is scored for both independently rather than receiving one mutually ex
 - **Pad could usefully humidify**: outside air is drier than the band's moisture floor and the pad does not
   overshoot the ceiling, so the water the pad adds is the point rather than a side effect.
 - **Pad only, vent cannot hold the ceiling**: outside air is above the ceiling, so ventilation alone cannot
-  hold the band, while pad leaving air still can. **This is the only set of hours a pad is necessary rather
-  than merely also working**, and it reproduces the older mutually exclusive pad-effective count exactly.
+  hold the band, while pad leaving air still can. These are `padDeeperThanVentHours`, not the
+  mutually exclusive `PAD_EFFECTIVE` primary-mode count; their thresholds can give slightly different totals.
 - **Vent could cool usefully**: outside air is below the target by the ventilation margin without importing
   moisture past the ceiling. **Vent could dry usefully**: outside air sits below the zone moisture ceiling by
   the drying margin.
@@ -89,13 +89,13 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 ## Dew-point ceiling
 
-**What it is.** A hard upper bound on absolute moisture, expressed as the dew point above which condensation and disease risk are unacceptable.
+**What it is.** A user-declared upper bound on absolute moisture, expressed as dew point. It can be chosen as a condensation or crop-risk guardrail, but the model does not establish a universal disease-safe threshold.
 
 **Unit.** °C.
 
 **Where it appears.** The `maxDewPointC` input (day and night variants), the moisture-limited miss category, the weather-side pad screen, the binding-constraint verdict.
 
-**How it is computed here.** The ceiling is converted to a saturation humidity ratio at the hour's actual barometric pressure, and the zone's upper moisture bound is the lower of that value and the bound implied by the minimum VPD. Because it is an absolute-moisture bound, it binds independently of temperature, which is why a moisture ceiling and a temperature margin can fail in different hours. At Tulsa the moisture ceiling binds in 3,851 h against 2,952 h for the temperature margin (see [AUDIT.md](AUDIT.md)).
+**How it is computed here.** The ceiling is converted to a saturation humidity ratio at the hour's actual pressure; the upper moisture bound is the lower of that value and the bound implied by minimum VPD. Moisture and temperature can bind in different hours. Current per-region weather-side counts, explicitly distinguished from indoor attainment, are in [REGIONS.md](REGIONS.md).
 
 ## DLI (daily light integral)
 
@@ -105,11 +105,11 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **Where it appears.** The DLI target input, the daily light chart, the DLI-deficit day count, the lighting energy line.
 
-**How it is computed here.** Solar photons come from measured GHI at 2.02 µmol/J, after PAR transmission and shade fraction, and are shared across stacked canopy by footprint rather than multiplied by tier area, so stacking cannot create photons. Supplemental light is scheduled causally: the controller sees current sunlight and the photons already accumulated in the local day, never future weather. Each step asks for the outstanding deficit spread over the lit time actually left in the civil day, floored at one step, so the final step requests exactly what is missing and a fixture with the capacity to meet the target lands on it rather than finishing fractionally short. A deficit day is therefore a real shortfall of photons, not an artefact of the request window: `src/metrics.js` counts one only on a complete local day, when `max(0, dliTarget - dli)` exceeds 1e-6 mol/m²/day. Days are accumulated on the local calendar, including fractional UTC offsets and daylight-saving transitions, so a DST day keeps its actual elapsed hours.
+**How it is computed here.** Solar photons come from the snapshot's GHI, including gridded satellite solar, using the declared screening conversion 2.02 µmol/J after PAR transmission and shade. They are shared over stacked canopy by footprint, not multiplied by tier area. Supplemental lighting is causal: current sunlight and accumulated local-day photons determine the outstanding demand, divided by the remaining lit time and floored at one step. Finite fixture capacity can leave a real deficit. `src/metrics.js` counts a deficit day only for a complete local day when `max(0, dliTarget - dli)` exceeds 1e-6 mol/m²/day. Fractional UTC offsets and DST retain actual elapsed time.
 
 ## SHR (sensible heat ratio)
 
-**What it is.** Positive sensible gains divided by those gains plus crop latent heat in this model. A low SHR motivates checking moisture-removal capacity and reheat, but does not prove that a DOAS can remove the zone load: DOAS conditions the controlled outdoor-air stream, not a separate zone-recirculation stream.
+**What it is.** Positive sensible gains divided by those gains plus crop latent load and positive outdoor-air moisture import in this model. A low SHR motivates checking moisture-removal capacity and reheat, but does not prove that a DOAS can remove the zone load: DOAS conditions the controlled outdoor-air stream, not a separate zone-recirculation stream.
 
 **Unit.** Dimensionless, 0 to 1.
 
@@ -125,11 +125,11 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **Where it appears.** The `padEffectiveness` input, the pad-viability table, the pad runtime row, the Morris parameter table.
 
-**How it is computed here.** `padState` in `src/physics.js`: `padTempC = tempC - effectiveness * (tempC - wetBulbC)`, with leaving moisture set by the approximately isoenthalpic process and clamped at saturation. Effectiveness is a constant here; the real dependence on face velocity, media depth, fouling and wetting uniformity is roadmap M4. Morris ranks this parameter last or near last on every metric at Tulsa, because a moisture-limited climate is not fixed by a better pad.
+**How it is computed here.** `padState` in `src/physics.js`: `padTempC = tempC - effectiveness * (tempC - wetBulbC)`, with leaving humidity from the approximately isoenthalpic process and a saturation bound. Effectiveness is constant here; face velocity, media depth, fouling and wetting uniformity remain roadmap M4. Current aggregate Morris effects and their screened ranges are in [SENSITIVITY.md](SENSITIVITY.md); they do not establish a universal importance ranking.
 
 ## Wet-bulb temperature
 
-**What it is.** The lowest temperature reachable by evaporating water into the air adiabatically. It is the floor on any evaporative process.
+**What it is.** The adiabatic-saturation temperature approached by direct evaporative cooling under the stated psychrometric approximation. It is a direct-pad limit, not a universal floor for indirect or pre-dried multistage equipment.
 
 **Unit.** °C.
 
@@ -141,11 +141,11 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **What it is.** Hours in which outside air can do the cooling without mechanical refrigeration.
 
-**Unit.** Hours per year (a count).
+**Unit.** Hours in the supplied weather record, annual only when the record covers a complete year.
 
 **Where it appears.** The weather-side mode counts, the across-sites comparison, the design-basis brief.
 
-**How it is computed here.** `FREE_COOLING_MODES = ['PASSIVE_VENT_COOL_DRY', 'PAD_EFFECTIVE']` in `src/metrics.js`, counted from the weather-side classification, which runs independently of any equipment dispatch. Passive vent cool-dry requires outside air below the target by the ventilation margin, a drying margin against the moisture ceiling, and outdoor enthalpy below the target enthalpy at once. This is a capability count for the outside air, not a statement that fans are free: powered ventilation still consumes energy in the coupled run. Tulsa gives 401 h against Phoenix 2,636 h.
+**How it is computed here.** `FREE_COOLING_MODES = ['PASSIVE_VENT_COOL_DRY', 'PAD_EFFECTIVE']` in `src/metrics.js`, counted from weather-side classification independently of equipment dispatch. The cool-dry mode checks temperature margin, drying margin and enthalpy. This is outside-air opportunity, not free fan energy or indoor attainment. Current ten-year median counts are in [REGIONS.md](REGIONS.md).
 
 ## Latent economizer
 
@@ -155,21 +155,21 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **Where it appears.** The weather-mode legend ("Cool and dry (free latent economizer)"), and the outside-air dehumidification screen.
 
-**How it is computed here.** The mode itself is `PASSIVE_VENT_COOL_DRY`. The screen behind it, `outdoorDryingHour` in `src/physics.js`, takes the drying margin against the zone's moisture ceiling at maximum ventilation airflow and converts it into a removal potential in kg/h, then charges the fan power plus any heating needed to temper the incoming air, giving cost per kg and energy per kg at scenario prices. Compared against a 2.5 L/kWh dehumidifier at Tulsa, outside air wins on cost per kg in 4,970 h and on energy per kg in 1,752 h (see [AUDIT.md](AUDIT.md)). It is a weather-side screen, not a dispatch decision.
+**How it is computed here.** The mode is `PASSIVE_VENT_COOL_DRY`. `outdoorDryingHour` in `src/physics.js` calculates removal potential at the declared maximum controlled flow, then fan and incoming-air tempering energy per kg at scenario prices. Heating uses the declared fuel efficiency or outdoor-temperature heat-pump COP; a locked-out heat source cannot provide a cold-air drying opportunity. This weather-side calculation does not dispatch the zone or apply the full recovery/DOAS train and finite heating allocation. It must not be read as actual removal, annual savings or a sizing result.
 
 ## Dehumidifier heat returned to the zone
 
-**What it is.** The share of a condensing dehumidifier's released heat that reaches the crop air. A machine that condenses water releases the latent heat of the water it removed plus its own electrical input, and where that heat lands is a question about the installation rather than about the machine's drying ability. A fraction of 1.0 covers both an in-room unit and a ducted unit whose warm discharge returns to the room; 0 is a remote condenser or water-side rejection; anything in between is a machine deliberately returning part of its heat, which is what integrated hot-gas reheat does. It is distinct from `reheatFraction`, which recovers heat from the DX circuit: a temperature-controlled dehumidifier with integrated hot-gas reheat is declared through this field, not through that one.
+**What it is.** The fraction of a standalone condensing dehumidifier's condensate latent heat plus electrical input returned to the zone. A value of 1 covers an in-room unit or ducted warm discharge returned to the room; 0 declares remote heat rejection; an intermediate value declares a fixed split. This is a static topology, not demand-modulating hot-gas reheat. `reheatFraction` is separate and applies to the DX condenser circuit.
 
 **Unit.** Dimensionless, 0 to 1. Default 1.
 
-**Where it appears.** The `dehuHeatFraction` slider labelled "Dehu heat returned to the zone" in the "Heating, cooling & dehumidification" field group, in steps of 0.1; the rejected remainder as the run total `dehuRejectedHeatKWh`, the released heat that did not reach the zone, in kWh; and the measured consequences across climates in [CLASSES.md](CLASSES.md).
+**Where it appears.** The `dehuHeatFraction` field in "Heating, cooling & dehumidification"; the rejected remainder is reported as `dehuRejectedHeatKWh`. [CLASSES.md](CLASSES.md) explains the topology and withdraws older numerical heat-return comparisons.
 
-**How it is computed here.** `src/simulate.js` forms the released heat as `dehuHeatTotalW = L * dehuKgS + dehuW`, the latent heat of the condensed water plus the unit's electrical input, then splits it: `dehuHeatW = dehuHeatTotalW * dehuHeatFraction` enters the zone's sensible balance, while `dehuRejectedW = dehuHeatTotalW - dehuHeatW` joins the run's `rejectedW` and accumulates as `dehuRejectedHeatKWh`, so the two parts always sum to the released heat and the rejected share stays visible rather than vanishing. The fraction is a declared topology input and not a sourced parameter: no manufacturer performance map backs any particular value, the user declares where the machine sends its heat (see [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md)). It is also static rather than modulating, applying in every hour instead of being chosen from each hour's heating demand, so a machine that varies its own heat return is bracketed by two runs rather than simulated in one. A scenario saved before this field existed loads with 1 through `backfillScenario` in `src/config.js`.
+**How it is computed here.** `src/simulate.js` forms `dehuHeatTotalW = L * dehuKgS + dehuW` and splits it into `dehuHeatW = dehuHeatTotalW * dehuHeatFraction` and rejected remainder. The parts sum to the released heat; only the returned part enters the zone sensible balance. The fraction is user-declared, with no inferred manufacturer map, and applies in every hour. Earlier scenarios missing this field receive the retained value 1 through `migrateScenario` in `src/config.js`.
 
 ## Enrichment window
 
-**What it is.** Hours in which CO2 enrichment is physically worth attempting, because the zone is not being flushed with outside air.
+**What it is.** A low-outdoor-air-exchange opportunity indicator for considering CO2 enrichment. It does not establish that enrichment is biologically beneficial or economically worthwhile.
 
 **Unit.** Equivalent hours (duty-weighted), plus a count of hours with any window.
 
@@ -185,7 +185,7 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **Where it appears.** The equipment runtime table (alongside hours with use and days with use) and the runtime rows of the exported report.
 
-**How it is computed here.** `src/metrics.js` sums each component's per-hour duty or modulating fraction over the run: `equivalentHours += duty`, while `hours` increments whenever duty exceeds 1e-9 and `days` counts distinct local dates with any use. The Tulsa baseline pad shows the contrast directly: 2,772 h with use on 296 days, but 1,830 equivalent full-load hours.
+**How it is computed here.** `src/metrics.js` sums each component's per-hour duty or modulating fraction: `equivalentHours += duty`; `hours` increments when duty exceeds 1e-9; `days` counts distinct local dates with use. A component operating part-load can therefore have more hours with use than equivalent full-load hours. Runtime figures must retain their scenario and period.
 
 ## Pad viability (weather-side)
 
@@ -195,7 +195,7 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **Where it appears.** The "Pad viability from weather alone" table in the weather view, and the pad rows of the exported report.
 
-**How it is computed here.** From the weather classification only: `PAD_EFFECTIVE` when pad leaving air clears both the temperature margin and the moisture ceiling, `PAD_MARGINAL` when it clears the ceiling but not the margin, `PAD_INEFFECTIVE_DEHU_NEEDED` otherwise, with the failing limit recorded. The coupled controller still runs the pad in hours the screen calls ineffective, because partial cooling beats none under the violation-first rule. Reading the two tables side by side is intended: 2,772 h of pad runtime against 244 h of weather-side viability is the honest picture of a moisture-limited climate.
+**How it is computed here.** Primary weather classifications count `PAD_EFFECTIVE`, `PAD_MARGINAL` and `PAD_INEFFECTIVE_DEHU_NEEDED` with temperature/moisture causes. Separate usefulness flags retain overlapping vent and pad opportunities. The coupled controller may use a pad even when the weather-side band cannot be met, because partial cooling can reduce a violation. Neither the primary-mode count nor the usefulness count is actual runtime.
 
 ## Insect screen and its ventilation factor
 
@@ -203,7 +203,7 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **Unit.** Dimensionless, 0 to 1. Catalogued grades: `mesh40` 1.000, `mesh52` 0.641, `mesh78` 0.502.
 
-**Where it appears.** The `insectScreen` object of a scenario (`{installed, grade, ventilationFactor}`), which arrives with an imported or hand-edited scenario rather than from a control in the interface; the run warnings in the results panel, which name the factor, its basis and the resulting ACH; the warnings list of the exported report and the reproducible-assumptions appendix of the design-basis brief; and "Does an insect screen cost you, or help?" in [CLASSES.md](CLASSES.md).
+**Where it appears.** The imported or edited scenario object `insectScreen: {installed, grade, ventilationFactor}`, run warnings, exported report and design-basis assumptions. Component evidence and limits are in [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md#3a-insect-screens-the-ventilation-penalty).
 
 **How it is computed here.** `resolveInsectScreen` in `src/screens.js` resolves the factor, preferring a user-declared product measurement over a catalogued grade and reporting which of the two it used. `src/simulate.js` applies it once, at the physics entry point, by multiplying `maxVentACH` by the factor. The declared `minVentACH` is never derated: if the derate would fall below it the maximum clamps to the minimum, the run records `clampedToMinimum` and says so, because a screened house that cannot deliver the ventilation the scenario requires is a finding rather than a rounding. An installed screen that resolves to no factor is a validation error, so a mesh can never quietly cost nothing.
 
@@ -217,7 +217,7 @@ The measured basis is one instrumented rainy-season campaign at the Asian Instit
 
 **Where it appears.** The "Operating-cost frontier" and "Operating-dominated" labels in the comparison table, and the site verdict.
 
-**How it is computed here.** Two related computations. `compareScenarios` in `src/metrics.js` marks a row dominated when another comparable row has `cost <= cost` and `compliantHours >= compliantHours` with at least one strict inequality, scored on the common eligible hour set. `strategyFrontier` does the same over median cost and median attainment across weather years, and reports the cheapest frontier member as the verdict. Both are **operating cost only**: capital recovery and maintenance are displayed separately and are not in the dominance test. A scenario with missing prices or numerical-failure hours is not comparable and is excluded rather than assumed. Being the cheapest frontier member is a position on the cost axis, not a recommendation: at Tulsa the pad baseline is the cheapest non-dominated strategy in 100% of screened points while holding the band in a median 28.9% of hours against 66.4% for DX.
+**How it is computed here.** `compareScenarios` compares cost and compliant hours on the common eligible set; `strategyFrontier` compares median cost and median attainment across years. A row is dominated only if another is no worse on either axis and strictly better on at least one. Missing-price or numerically failed scenarios cannot receive a favorable comparable ranking. Capital and maintenance remain separate. The cheapest frontier member is not necessarily an acceptable design: the regional recommendation rule also imposes an explicit capability tier and cost band (see [REGIONS.md](REGIONS.md)).
 
 ## Control class
 
@@ -225,9 +225,9 @@ The measured basis is one instrumented rainy-season campaign at the Asian Instit
 
 **Unit.** A label: C0, C1, C2, C3, C4, C5, C5b, C6.
 
-**Where it appears.** Not in the interface. It is the organizing spine of [CLASSES.md](CLASSES.md) and the vocabulary [REGIONS.md](REGIONS.md) uses when a climate needs more than the class it has.
+**Where it appears.** The topology vocabulary in [CLASSES.md](CLASSES.md), not a computed equipment-selection output.
 
-**How it is computed here.** A class is not computed, it is constructed: each one is an ordinary scenario built from the shipped components, and it is run through the same coupled model as any other scenario. The comparison in CLASSES.md reports nine configurations (the ladder plus a heat-pump variant of C1) against calendar year 2025 at six bundled sites, under the ideal per-substep controller, with heating, cooling and dehumidification sized per site by the stated rules. What a class row reports is therefore a capability ceiling for that climate, not an installed-system prediction, not an equipment-sizing certificate and not a manufacturer comparison.
+**How it is computed here.** A class is constructed as a scenario, not derived from climate alone. The old nine-configuration ideal-controller class comparison is withdrawn as current-model evidence. The current canonical studies compare six greenhouse strategies, not the full facility ladder; they cannot establish an opaque/DOAS/class ranking.
 
 ## Elementary effect and mu\*
 
@@ -287,8 +287,8 @@ The measured basis is one instrumented rainy-season campaign at the Asian Instit
 |---|---|
 | Weather-side screen | A classification of outside air against the target band, with no equipment and no zone simulation. Fast, and never to be read as indoor conditions. |
 | Coupled run | The full single-zone sensible and moisture simulation with finite equipment, which is what produces attainment, energy and cost. |
-| Staged controller | The default causal controller: deadbands, ordered stages, minimum on and off times, dispatched on a one-minute step. Converges with cadence. |
-| Ideal modulation upper bound | The retained older controller that re-optimizes every substep. Selectable, labeled, and known not to converge with cadence (1.5 pp, 1.95%). Not a prediction of achievable performance. |
+| Staged controller | Default causal deadbands, ordered stages and minimum on/off times at one-minute dispatch. Historical cadence results cover the cases dated in VERIFICATION.md, not every current topology. |
+| Ideal modulation upper bound | A selectable, labeled discrete enumeration experiment with historical cadence sensitivity. Not a continuous optimum or prediction of installed-system performance. |
 | Unmet load | The steady capacity shortfall in an hour: the extra W or kg/s that would have been needed to hold a violated bound under that hour's forcing, integrated over time. Cadence-invariant to first order, and not a sum of re-counted inventory deficits. |
 | Common eligible set | The intersection of eligible hours across all compared scenarios. Comparison dollars and hours use it, so they differ slightly from single-scenario totals. |
 | Capital recovery | Annualized capital plus maintenance, shown separately from historical-period operating cost, and never added into the dominance test. |

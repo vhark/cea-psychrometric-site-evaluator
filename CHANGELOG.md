@@ -14,6 +14,7 @@ Versions are model versions: the string the engine stamps into every result and 
 - Outside-air context carries literature-range, adjacent-proxy, project-input or screening-assumption status. Construction-specific UGA/Shamshiri guidance is not a universal validation limit. The one-room 0.18 ACH proxy is correctly attributed to Shao. Mushroom minimum/maximum start incomplete and require project input/review, not a universal 6 to 15 ACH preset.
 - Operating-cost labels now retain simulated period/population, purchased electricity/heating fuel/water, applied numeric prices and exclusions. Capital is separately estimated or user-entered. Modeled differences/reductions are not quotes or guaranteed savings. Joint-attainment differences use percentage points (pp) with both endpoints, not generic points or relative percent change.
 - One Season Farmers visual identity: Instrument for interactive tools, Field by default for reports regardless of OS theme. Shared presentation helpers render cost, airflow and conditioning evidence consistently.
+- Reconciled maintained documentation and the public landing page with current model evidence. Historical audits, plans and numerical findings are explicitly dated or superseded. The Field-branded site uses genuine current screenshots and social assets; deployment no longer overwrites them with historical documentation screenshots.
 
 ### Added
 
@@ -37,7 +38,8 @@ Versions are model versions: the string the engine stamps into every result and 
 - Actual browser export: Tulsa 2025, six strategies, 8,760 valid hours and 8,759 common eligible hours, zero numerical-failure hours. Full annual operating cost includes warm-up; matched-period comparison cost excludes it. Current values/hashes are in `docs/browser-run-metrics.json`.
 - Regional study: 360 full-year simulations, zero numerical-failure hours. Artifact envelope 1 remains Learn-compatible; scenarios are schema 2. Morris: envelope 2, 1,872 simulations, 104 design points, zero numerical-failure hours. Aggregate joint-attainment mu* is LAI/transpiration 9.098627 pp and maximum controlled-air capacity 2.164460 pp per full screened range, not a confidence bound.
 - Observed Tulsa reference documents regenerated with the actual generator, retaining weather-side opportunity scope and archived partial-year coverage, not indoor simulation.
-- Final whole-suite and browser integration status is recorded in `docs/VERIFICATION.md` by the integrating parent. This documentation entry does not claim a whole-suite green run before that evidence exists.
+- Final source integration at `686d876`: `npm test` passed 157/157 with zero failures or skips; ten `node --check` commands succeeded. Actual Chromium verified saved schema-1 migration, unsupported-entry isolation, schema-2 saving, retained HRV/DOAS inputs, frost blocking and a conditioned Tulsa 2025 run with zero numerical-failure hours. Exact scope is recorded in [docs/VERIFICATION.md](docs/VERIFICATION.md).
+- Publication check: 157/157 tests passed after documentation/site reconciliation and the curtain evidence-text correction. Checked local paths and section anchors in 25 maintained Markdown documents. Actual Chromium verified the assembled site and `/app/` links, loaded gallery assets, and no page overflow at 390, 820 and 1440 pixels; the public site remains Field under an OS-dark preference.
 
 ## [0.2.0-screening] - 2026-09-13
 

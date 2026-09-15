@@ -3,353 +3,198 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#1C1C1A">
-  <title>CEA Psychrometric Site Evaluator | Grownetics</title>
-  <meta name="description" content="Free, open-source screening for controlled-environment agriculture: what the climate gives free, what binds, and which strategy class closes the gap at what cost. Assumption-based, run against hourly historical weather in your browser.">
+  <meta name="theme-color" content="#F7FAF6">
+  <title>CEA Psychrometric Site Evaluator | One Season Farmers</title>
+  <meta name="description" content="Open-source climate and equipment screening for controlled-environment agriculture. Compare hourly weather, joint target attainment and modeled operating costs, with explicit airflow and evidence limits. Model 0.3.0-screening.">
   <link rel="canonical" href="https://vhark.github.io/cea-psychrometric-site-evaluator/">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Grownetics">
+  <meta property="og:site_name" content="One Season Farmers">
   <meta property="og:url" content="https://vhark.github.io/cea-psychrometric-site-evaluator/">
   <meta property="og:title" content="CEA Psychrometric Site Evaluator">
-  <meta property="og:description" content="See what the climate gives free, what binds, and what closing the gap costs. An open, assumption-based screen over hourly historical weather. Not a calibrated digital twin.">
+  <meta property="og:description" content="Climate, control and cost, with the assumptions in view. Model 0.3.0-screening: an open-source equipment screen, not a calibrated digital twin.">
   <meta property="og:image" content="https://vhark.github.io/cea-psychrometric-site-evaluator/og.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="CEA Psychrometric Site Evaluator, a Grownetics tool.">
+  <meta property="og:image:alt" content="One Season Farmers: CEA Psychrometric Site Evaluator, model 0.3.0-screening. Climate, control and cost, with the assumptions in view.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CEA Psychrometric Site Evaluator">
-  <meta name="twitter:description" content="See what the climate gives free, what binds, and what closing the gap costs. An open, assumption-based screen over hourly historical weather.">
+  <meta name="twitter:description" content="Climate, control and cost, with the assumptions in view. Open-source model 0.3.0-screening, not a calibrated digital twin.">
   <meta name="twitter:image" content="https://vhark.github.io/cea-psychrometric-site-evaluator/og.png">
+  <meta name="twitter:image:alt" content="One Season Farmers: CEA Psychrometric Site Evaluator, model 0.3.0-screening.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <a class="skip-link" href="#content">Skip to content</a>
-<div class="orbital" aria-hidden="true"><svg viewBox="0 0 800 800" fill="none"><circle cx="400" cy="400" r="380" stroke="#F5F5F0" stroke-width="1"/><circle cx="400" cy="400" r="280" stroke="#F5F5F0" stroke-width="0.5"/><circle cx="400" cy="120" r="4" fill="#4DB405"/></svg></div>
-
 <header class="topbar">
-  <a class="wordmark" href="./" aria-label="CEA Psychrometric Site Evaluator home">Grownetics<em>.</em></a>
+  <a class="wordmark" href="./" aria-label="CEA Psychrometric Site Evaluator home"><img src="favicon.svg" alt="" width="42" height="42">One Season Farmers</a>
   <nav class="header-actions" aria-label="Section navigation">
     <a class="nav-hide" href="#answers">What it answers</a>
     <a class="nav-hide" href="#outputs">What you get</a>
     <a href="#evidence">Evidence</a>
     <a href="#roadmap">Roadmap</a>
-    <span class="version">Screening 0.2</span>
+    <span class="version">Screening 0.3.0</span>
   </nav>
 </header>
-
 <main id="content">
-
   <section class="intro" aria-labelledby="title">
     <div>
-      <p class="eyebrow">Grownetics &middot; open source &middot; MIT</p>
+      <p class="eyebrow">One Season Farmers &middot; open source &middot; MIT</p>
       <h1 id="title">CEA Psychrometric<br>Site Evaluator<span class="title-dot">.</span></h1>
-      <p class="subtitle">See what your climate gives for free, what actually binds, and what closing the gap costs.</p>
-      <p class="disclaimer">It is an <strong>assumption-based screen</strong> over hourly historical weather, run entirely in your browser. It is not a calibrated digital twin, not equipment sizing, and not a manufacturer comparison. Every figure it prints carries the assumption set it came from.</p>
-      <p class="button-row">
-        <a class="button primary" href="app/">Open the tool</a>
-        <a class="button" href="https://github.com/vhark/cea-psychrometric-site-evaluator">View the source</a>
-      </p>
+      <p class="subtitle">See what your climate makes possible, what limits control, and what closing the gap could cost.</p>
+      <p class="disclaimer">An <strong>assumption-based screen</strong> over hourly historical weather, run in your browser. Not a calibrated digital twin, equipment sizing service or manufacturer comparison. Read every result with its weather period, target band and assumptions.</p>
+      <p class="button-row"><a class="button primary" href="app/">Open the tool</a><a class="button" href="https://github.com/vhark/cea-psychrometric-site-evaluator">View the source</a></p>
     </div>
-    <p class="intro-note">Start with the weather.<br>Compare what your equipment can change.<br><strong>Keep the assumptions in view.</strong></p>
+    <p class="intro-note">Start with the weather.<br>Separate airflow from air treatment.<br><strong>Keep the assumptions in view.</strong></p>
   </section>
 
   <section class="panel" id="problem" aria-labelledby="problem-title">
     <div class="section-heading"><div><span class="step">&sect; 01</span><h2 id="problem-title">The problem</h2></div></div>
     <div class="two-grid">
-      <div>
-        <p class="lead">Climate decisions get made on a design day and a vendor spreadsheet. The hours that actually bind are invisible.</p>
-        <p class="prose" style="margin-top:16px">A 0.4% design dry bulb sizes a coil. It does not tell you how many hours of the year outside air alone would have held the band, how many hours a pad was worth running rather than merely running, or whether your binding constraint is temperature at all. In a Tulsa pad and vent baseline the moisture ceiling binds in <span class="mono">3,851</span> hours and the temperature margin in <span class="mono">2,952</span>, so the cheapest sensible-cooling upgrade is answering the wrong question.</p>
-      </div>
-      <div>
-        <p class="prose">The hour is the unit of the decision. Whether a strategy is worth capital depends on the joint distribution of dry bulb, moisture and solar across a whole year, and on how that distribution shifts between weather years. One year is an anecdote. In the six-strategy Tulsa example, baseline attainment ranges from a median of <span class="mono">28.9%</span> to a worst year of <span class="mono">27.1%</span>, and the cost ranking of the six strategies is <strong>not stable</strong>: five years produce two distinct orders.</p>
-        <p class="prose" style="margin-top:14px">That instability is the finding. A tool that hid it behind a single ranked list would be more confident and less useful.</p>
-      </div>
+      <div><p class="lead">A design day cannot tell you how often a crop band will hold across a weather year.</p><p class="prose" style="margin-top:16px">Cooling air and removing moisture are different tasks. A pad can lower dry-bulb temperature while adding moisture. Ventilation can dry the room while increasing heating demand. The useful question is whether the combined temperature and moisture target holds, with finite equipment capacity and the crop load included.</p></div>
+      <div><p class="prose">The current Tulsa regional example makes the distinction visible. The pad and vent baseline reaches a median joint attainment of <span class="mono">28.038%</span> over 2016 to 2025. Its worst and best years reach <span class="mono">22.589%</span> and <span class="mono">30.315%</span>, a spread of <span class="mono">7.726 percentage points (pp)</span>. These are model outputs under the declared assumptions, not measured indoor conditions.</p><p class="prose">The six strategies produce two operating-cost orders across those ten years. One year, or one ranked list, is not the whole decision.</p></div>
     </div>
   </section>
 
   <section class="panel" id="answers" aria-labelledby="answers-title">
     <div class="section-heading"><div><span class="step">&sect; 02</span><h2 id="answers-title">What it answers</h2></div><span class="badge">Three site questions</span></div>
     <div class="rows">
-      <div class="row-item">
-        <span class="step">Q1</span>
-        <h3>What does the climate give you free?</h3>
-        <p>Hours where outside air alone holds the crop band, hours where an evaporative pad is thermodynamically worth running, and hours where ventilation can stay at minimum so CO<sub>2</sub> enrichment is possible. Tulsa gives <span class="mono">401</span> free-cooling hours and <span class="mono">244</span> pad-effective hours. Phoenix, same facility and crop, gives <span class="mono">2,636</span> and <span class="mono">2,334</span>.</p>
-      </div>
-      <div class="row-item">
-        <span class="step">Q2</span>
-        <h3>What is the binding constraint?</h3>
-        <p>Every missed hour is attributed: temperature margin, moisture ceiling, dew-point guardrail, or unmet capacity. Sensible and latent loads are decomposed by source (solar, lights, envelope, infiltration, fans, crop) with the space sensible heat ratio, which is what decides between reheat and a dedicated drying path.</p>
-      </div>
-      <div class="row-item">
-        <span class="step">Q3</span>
-        <h3>Which strategy class closes the gap, at what cost and confidence?</h3>
-        <p>Six equipment strategies compared on identical weather, geometry and crop assumptions, across ten weather years, reported as median, worst, spread and trend, with a computed verdict on whether the ranking survives the years and the screened parameter ranges. Class, not brand: there are no performance maps behind this. A separate measured ladder of nine control classes, from a pad and vent house with no heat to an insulated indoor box, records what each class reached in six climates and the physical condition that exhausts it: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/CLASSES.md">CLASSES.md</a>.</p>
-      </div>
+      <div class="row-item"><span class="step">Q1</span><h3>What can the outside air do?</h3><p>Weather-side cooling, drying and pad opportunities, separate from simulated indoor attainment or actual equipment runtime. In the ten-year regional study, median free-cooling opportunity is <span class="mono">342.0 h</span> in Tulsa and <span class="mono">2,577.5 h</span> in Phoenix under the same target program. Those opportunities are not a promise of free indoor control.</p></div>
+      <div class="row-item"><span class="step">Q2</span><h3>What is the binding constraint?</h3><p>Missed targets, unmet capacity, sensible and latent loads, and their sources. Follow solar, lights, envelope, infiltration, controlled outdoor air, fans and crop moisture through the single-zone balance instead of treating every missed hour as a cooling problem.</p></div>
+      <div class="row-item"><span class="step">Q3</span><h3>Which strategy closes the gap, under which assumptions?</h3><p>Compare six canonical equipment strategies on common weather and target hours. Inspect weather-year variation, modeled operating cost and sensitivity to selected inputs. The <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/REGIONS.md">regional study</a> reports unresolved decisions as unresolved. Control classes in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/CLASSES.md">CLASSES.md</a> explain topology, not a current measured nine-class performance ladder.</p></div>
     </div>
   </section>
 
   <section class="panel" id="how" aria-labelledby="how-title">
     <div class="section-heading"><div><span class="step">&sect; 03</span><h2 id="how-title">How it works</h2></div><span class="badge">Static browser tool, no account</span></div>
     <div class="rows">
-      <div class="row-item">
-        <span class="step">01</span>
-        <h3>Pick a site and the years</h3>
-        <p>Enter a US ZIP, confirm the centroid and time zone, then retrieve NASA POWER hourly weather, use station observations with independent solar, or import a CSV or JSON snapshot. Six sites are bundled, Tulsa, Phoenix, Miami, Denver, Seattle and Fairbanks, each with 2016 to 2025 complete, so you can run sixty site-years offline.</p>
-      </div>
-      <div class="row-item">
-        <span class="step">02</span>
-        <h3>Describe the facility and the crop band</h3>
-        <p>Greenhouse, hybrid or indoor. Floor, canopy and envelope areas are separate. Targets are a joint band: day and night temperature, VPD, dew-point guardrail, photoperiod and DLI. Defaults are visibly labeled assumptions, not prescriptions.</p>
-      </div>
-      <div class="row-item">
-        <span class="step">03</span>
-        <h3>Add the strategies you are choosing between</h3>
-        <p>Ventilation, evaporative pad, heating, standalone dehumidification, DX with coupled sensible and latent capacity, integrated cooling with reheat, and generic desiccant or hybrid topologies with explicit regeneration energy. Add sensitivity cases on any input.</p>
-      </div>
-      <div class="row-item">
-        <span class="step">04</span>
-        <h3>Run, then compare on the common hours</h3>
-        <p>A Web Worker simulates a coupled single-zone balance at one-minute control steps. Comparisons use the common eligible hour set, excluding the warm-up hour of each weather segment. Exports carry the full assumption set, the model version and the pinned PsychroLib commit.</p>
-      </div>
+      <div class="row-item"><span class="step">01</span><h3>Pick a site and weather period</h3><p>Enter a US ZIP, confirm the centroid and time zone, then retrieve NASA POWER hourly weather, use station observations with independent solar, or import a CSV or JSON snapshot. Tulsa, Phoenix, Miami, Denver, Seattle and Fairbanks each have bundled weather for 2016 to 2025.</p></div>
+      <div class="row-item"><span class="step">02</span><h3>Describe the facility and crop band</h3><p>Greenhouse, hybrid or indoor. Floor, canopy and envelope areas are separate. Set day and night temperature, VPD, dew-point guardrail, photoperiod and DLI. Review template values as assumptions, not prescriptions.</p></div>
+      <div class="row-item"><span class="step">03</span><h3>Declare the airflow and equipment</h3><p>Set uncontrolled infiltration separately from minimum and maximum controlled outdoor air. Add pads, heating, dehumidification, cooling, recovery or DOAS treatment as appropriate. Project or manufacturer performance inputs are required where the model has no supported default.</p></div>
+      <div class="row-item"><span class="step">04</span><h3>Run, compare and export</h3><p>A Web Worker simulates a coupled single-zone balance with one-minute staged control. Attainment comparisons use common eligible hours, excluding each weather segment's warm-up. Exports retain assumptions, price basis, model version and the pinned PsychroLib version.</p></div>
     </div>
     <div class="metrics-grid">
-      <div class="metric"><div class="metric-label">Site-years bundled</div><p class="metric-value">60</p><p class="metric-detail">Six climates x 2016 to 2025, NASA POWER, complete coverage, 87,672 h per site, 526,032 h in all</p></div>
-      <div class="metric"><div class="metric-label">Regression tests</div><p class="metric-value">91</p><p class="metric-detail">Passing, 0 failures. Physical and data boundaries, not empirical validation</p></div>
-      <div class="metric"><div class="metric-label">Cadence convergence</div><p class="metric-value">0.38 pp</p><p class="metric-detail">Largest attainment difference, 1 min vs 0.5 min, Tulsa 2025 full year, max 0.31% electricity</p></div>
-      <div class="metric"><div class="metric-label">Conservation closure</div><p class="metric-value">1e-16</p><p class="metric-detail">Relative residual, heat and moisture identities, up to 5e-13 worst case</p></div>
-      <div class="metric"><div class="metric-label">Regional study</div><p class="metric-value">360</p><p class="metric-detail">Full-year simulations: 6 climates, 10 years, 6 strategies, 1 min step, 281.7 s on 8 threads</p></div>
-      <div class="metric"><div class="metric-label">Sensitivity simulations</div><p class="metric-value">1,872</p><p class="metric-detail">Morris screen: 104 design points, 8 trajectories, 12 parameters, 3 years, seed 1, 290 s</p></div>
-      <div class="metric"><div class="metric-label">Dominant assumption</div><p class="metric-value">9.10 pp</p><p class="metric-detail">mu* of leaf area and transpiration on attainment, the leader on all three metrics</p></div>
-      <div class="metric"><div class="metric-label">Ranking stability</div><p class="metric-value">Unstable</p><p class="metric-detail">3 orders across the screened ranges, most common in 61.5% of points; 3 cheapest positions identical in 104 of 104</p></div>
-      <div class="metric"><div class="metric-label">Backend services</div><p class="metric-value">0</p><p class="metric-detail">Static files, MIT licensed, self-hostable, no account and no server key</p></div>
+      <div class="metric"><div class="metric-label">Site-years bundled</div><p class="metric-value">60</p><p class="metric-detail">Six climates, ten years each, 2016 to 2025</p></div>
+      <div class="metric"><div class="metric-label">Regional simulations</div><p class="metric-value">360</p><p class="metric-detail">Six strategies × six climates × ten full weather years</p></div>
+      <div class="metric"><div class="metric-label">Morris simulations</div><p class="metric-value">1,872</p><p class="metric-detail">104 design points; six strategies; three sampled years</p></div>
+      <div class="metric"><div class="metric-label">Current model</div><p class="metric-value">0.3.0</p><p class="metric-detail">Screening release; scenario schema 2; weather schema 1</p></div>
     </div>
+    <p class="source-line">Both regenerated study artifacts report zero numerical-failure hours. That is a computational check, not empirical validation. Full executed evidence: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/VERIFICATION.md">VERIFICATION.md</a>.</p>
   </section>
 
   <section class="panel" id="outputs" aria-labelledby="outputs-title">
     <div class="section-heading"><div><span class="step">&sect; 04</span><h2 id="outputs-title">What you get</h2></div><span class="badge">Output, and the basis under it</span></div>
     <div class="cards">
-      <article class="card">
-        <h3>Multi-year climate risk</h3>
-        <p>Attainment and operating cost as a distribution per strategy: median year, worst year, spread, trend, plus a computed stable or unstable verdict on the cost ranking.</p>
-        <p class="basis"><strong>Basis</strong> Ten bundled NASA POWER years at each of six bundled sites, 60 site-years in all. Measured example, six strategies over five Tulsa years: baseline median 28.9%, worst 27.1% in 2025, spread 2.7 pts, ranking not stable (2 orders).</p>
-      </article>
-      <article class="card">
-        <h3>Multi-site comparison</h3>
-        <p>The same facility, crop and strategies across several ZIPs, ranked by free-cooling hours, binding constraint and operating cost.</p>
-        <p class="basis"><strong>Basis</strong> Measured two-site run, Tulsa 74103 vs Phoenix 85001: 244 vs 2,334 pad-effective hours, 401 vs 2,636 free-cooling hours. The bundled six-climate study runs the same six strategies over ten years at every site, 360 full-year simulations, in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/REGIONS.md">REGIONS.md</a>. Time zone is entered explicitly, the public ZIP catalog has no time-zone column.</p>
-      </article>
-      <article class="card">
-        <h3>Pad viability, not just runtime</h3>
-        <p>Hours and days each component ran, separated from the hours the weather made that component worth running.</p>
-        <p class="basis"><strong>Basis</strong> Tulsa pad and vent baseline: the pad ran 2,772 h on 296 days, while the weather-side screen rates only 244 h on 65 days as pad-effective.</p>
-      </article>
-      <article class="card">
-        <h3>Outside-air dehumidification screen</h3>
-        <p>Hour by hour, whether ventilating with outside air removes moisture more cheaply than running the machine, on both cost per kg and energy per kg.</p>
-        <p class="basis"><strong>Basis</strong> Tulsa year against a 2.5 L/kWh dehumidifier: outside air wins on cost per kg in 4,970 h and on energy per kg in 1,752 h. The two counts differ because fan energy and price are different questions.</p>
-      </article>
-      <article class="card">
-        <h3>Sensible and latent, with SHR</h3>
-        <p>Hourly and monthly split of solar, lighting, envelope, infiltration, fan and crop sensible gains against crop and ventilation-import latent load, with the space sensible heat ratio. Losses draw below the axis.</p>
-        <p class="basis"><strong>Basis</strong> Exposed terms of the same zone balance whose conservation identities close between 1e-16 and 5e-13 relative.</p>
-      </article>
-      <article class="card">
-        <h3>CO<sub>2</sub> enrichment window</h3>
-        <p>Hours per strategy where ventilation stays at its minimum, which is when enrichment is physically possible rather than vented away.</p>
-        <p class="basis"><strong>Basis</strong> The controller's own dispatch record, not a separate estimate. No enrichment feedback on transpiration is modeled, and that is declared in the run assumptions.</p>
-      </article>
-      <article class="card">
-        <h3>Equipment runtime and unmet load</h3>
-        <p>Hours and days each component ran, capacity limits that bound, and hours where demand exceeded capacity, reported rather than absorbed.</p>
-        <p class="basis"><strong>Basis</strong> Finite-capacity dispatch at one-minute control steps with a staged deadband controller. The older ideal optimizer stays selectable as a labeled upper bound.</p>
-      </article>
-      <article class="card">
-        <h3>Design-basis brief</h3>
-        <p>A printable page for the engineer of record: peak sensible and latent hours with the coincident outdoor state and its frequency, ventilation air requirement, condensate, pad water, free-cooling hours, binding constraint, strategy verdict and evidence tier.</p>
-        <p class="basis"><strong>Basis</strong> Generated from the run, in the brand's Archive register. It is a basis of design to argue with, not a stamped design.</p>
-      </article>
+      <article class="card"><h3>Multi-year climate risk</h3><p>Median, worst, best, spread and trend per strategy, plus operating-cost ranking stability.</p><p class="basis"><strong>Basis</strong>Historical years, not a probability distribution. Interactive across-years stability requires the same order every year; the regional artifact uses its separate 90% rule.</p></article>
+      <article class="card"><h3>Multi-site comparison</h3><p>The same facility, crop and strategies across sites, so weather changes without silently changing installed capacity.</p><p class="basis"><strong>Basis</strong>The committed regional study holds capacities and manual prices constant. Its costs are not local equipment quotes or local tariffs.</p></article>
+      <article class="card"><h3>Pad opportunity and runtime</h3><p>Separate hours when the weather makes a pad useful from hours when the controller actually runs it.</p><p class="basis"><strong>Basis</strong>Weather-side classifications and equipment dispatch are different measures. Neither alone establishes joint indoor attainment.</p></article>
+      <article class="card"><h3>Outdoor-air drying screen</h3><p>Compare outside-air moisture removal with mechanical dehumidification on cost per kilogram and energy per kilogram.</p><p class="basis"><strong>Basis</strong>A conditional screening comparison with declared fan, conditioning and price inputs, not a universal operating instruction.</p></article>
+      <article class="card"><h3>Sensible and latent loads</h3><p>Hourly and monthly source decomposition, with heat losses below the axis and space sensible heat ratio alongside moisture load.</p><p class="basis"><strong>Basis</strong>One controlled outdoor-air stream in the balance. Infiltration is separate; recovery and DOAS do not add another stream.</p></article>
+      <article class="card"><h3>Enrichment-compatible hours</h3><p>See when controlled ventilation stays at its minimum, rather than assuming the facility is always closed.</p><p class="basis"><strong>Basis</strong>A dispatch-based opportunity indicator. CO<sub>2</sub> enrichment feedback on transpiration and internal circulation are not modeled.</p></article>
+      <article class="card"><h3>Air-treatment accounting</h3><p>Inspect actual outdoor airflow, recovery core and bypass flow, treatment energy, condensate and unmet conditioning.</p><p class="basis"><strong>Basis</strong>Installed ACH capacity is not actual hourly flow. Recovery transfer is not purchased energy or an automatic savings claim.</p></article>
+      <article class="card"><h3>Design-basis brief</h3><p>Export coincident weather conditions, loads, air requirements, water, target attainment and evidence limits for engineering review.</p><p class="basis"><strong>Basis</strong>A printable One Season Farmers Field document, not a stamped design or equipment selection certificate.</p></article>
     </div>
   </section>
 
   <section class="panel" id="evidence" aria-labelledby="evidence-title">
     <div class="section-heading"><div><span class="step">&sect; 05</span><h2 id="evidence-title">Evidence and honesty</h2></div><span class="badge on">Tier 2 of 4</span></div>
-    <div class="table-wrap">
-      <table>
-        <caption>The evidence ladder from docs/EVALUATION.md. This tool sits on the second rung and says so in the interface and in every export.</caption>
-        <thead>
-          <tr><th scope="col">Tier</th><th scope="col">Inputs and checks</th><th scope="col">Permitted output</th><th scope="col">Prohibited implication</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="row-name">Weather feasibility</td>
-            <td>Traceable outside state, vetted psychrometrics, target bands</td>
-            <td>Air-side cooling, drying and pad operating windows</td>
-            <td>Actual indoor conditions, tonnage, energy cost or ROI</td>
-          </tr>
-          <tr class="here">
-            <td class="row-name">Assumption-based equipment screen</td>
-            <td>Envelope, crop, light, airflow and equipment model, conservation and numerical checks. <strong>This tool.</strong></td>
-            <td>Conditional zone trajectories, target hours, loads, energy, costs</td>
-            <td>Calibrated prediction or manufacturer performance guarantee</td>
-          </tr>
-          <tr>
-            <td class="row-name">Benchmarked simulation</td>
-            <td>Matched conditions against an independent model and published measured data</td>
-            <td>Documented benchmark errors for the covered conditions</td>
-            <td>General accuracy outside the crop, system and climate domain</td>
-          </tr>
-          <tr>
-            <td class="row-name">Site-calibrated analysis</td>
-            <td>Held-out facility sensor, energy and condensate data, documented calibration</td>
-            <td>Project-specific predictive performance with uncertainty</td>
-            <td>Guaranteed yield, life safety, stamped design or spatial precision</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="table-wrap"><table>
+      <caption>The evidence ladder in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVALUATION.md">EVALUATION.md</a>. This tool is an assumption-based equipment screen.</caption>
+      <thead><tr><th scope="col">Tier</th><th scope="col">Inputs and checks</th><th scope="col">Permitted output</th><th scope="col">Not established</th></tr></thead>
+      <tbody>
+        <tr><td class="row-name">Weather feasibility</td><td>Traceable outside state, psychrometrics and target bands</td><td>Air-side cooling, drying and pad windows</td><td>Indoor conditions, energy cost or ROI</td></tr>
+        <tr class="here"><td class="row-name">Assumption-based equipment screen</td><td>Declared envelope, crop, airflow and finite equipment. <strong>This tool.</strong></td><td>Conditional zone trajectories, target hours, energy and costs</td><td>Calibrated prediction or manufacturer guarantee</td></tr>
+        <tr><td class="row-name">Benchmarked simulation</td><td>Matched independent model and published measured cases</td><td>Documented errors for covered conditions</td><td>General accuracy outside the benchmark domain</td></tr>
+        <tr><td class="row-name">Site-calibrated analysis</td><td>Held-out facility climate, energy and condensate data</td><td>Project-specific predictive performance with uncertainty</td><td>Guaranteed yield, life safety or spatial precision</td></tr>
+      </tbody>
+    </table></div>
+    <h3 style="margin-top:36px">Read costs and percentage points with their populations</h3>
+    <p class="prose" style="margin-top:12px">The current browser example uses Tulsa calendar 2025 and the six canonical scenarios. Each strategy has <span class="mono">8,760 valid hours</span>, <span class="mono">8,759 eligible hours</span>, one warm-up hour, and zero missing or numerical-failure hours.</p>
+    <div class="table-wrap" style="margin-top:20px"><table>
+      <caption>Model 0.3.0-screening, Tulsa 2025. Joint temperature-and-moisture attainment uses eligible hours. Both dollar columns are model-estimated operating costs, not installed prices.</caption>
+      <thead><tr><th scope="col">Strategy</th><th scope="col">Joint attainment</th><th scope="col">Annual operating cost<br>8,760 valid h</th><th scope="col">Matched operating cost<br>8,759 eligible h</th></tr></thead>
+      <tbody>
+        <tr><td class="row-name">Pad + vent baseline</td><td class="mono">27.135%</td><td class="mono">$22,064.29</td><td class="mono">$22,060.97</td></tr>
+        <tr><td class="row-name">Pads + condensing dehumidifier</td><td class="mono">41.638%</td><td class="mono">$28,493.30</td><td class="mono">$28,489.98</td></tr>
+        <tr><td class="row-name">DX / mini-split + dehumidifier</td><td class="mono">73.066%</td><td class="mono">$39,915.37</td><td class="mono">$39,912.06</td></tr>
+        <tr><td class="row-name">Integrated HVAC + reheat</td><td class="mono">55.297%</td><td class="mono">$47,201.10</td><td class="mono">$47,196.78</td></tr>
+        <tr><td class="row-name">Desiccant + evaporative cooling</td><td class="mono">51.875%</td><td class="mono">$33,827.30</td><td class="mono">$33,823.78</td></tr>
+        <tr><td class="row-name">Liquid-desiccant hybrid (generic)</td><td class="mono">52.619%</td><td class="mono">$47,332.88</td><td class="mono">$47,328.69</td></tr>
+      </tbody>
+    </table></div>
+    <p class="notice" style="margin-top:20px"><strong>Cost basis.</strong> Purchased electricity, purchased heating fuel and scenario water at manual prices of <span class="mono">$0.12/kWh</span>, <span class="mono">$0.045/kWh</span> and <span class="mono">$0.002/L</span>. Annual totals include valid warm-up consumption; matched totals exclude it. Installed capital is separate. These operating costs exclude maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects and other unmodeled tariff components. Differences are not quotes or guaranteed savings.</p>
+    <p class="prose" style="margin-top:16px">Pad baseline to DX/dehumidifier changes joint attainment from <span class="mono">27.135%</span> to <span class="mono">73.066%</span>: <span class="mono">+45.931 percentage points (pp)</span> on the same eligible population, not a 45.931% relative improvement. The regional study instead reports medians of full weather-record costs over ten years. The Morris study reports sampled-period costs, not annual totals.</p>
+    <p class="source-line">Source: genuine current browser-run export, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/browser-run-metrics.json">browser-run-metrics.json</a>. Inputs: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/example-scenarios.json">example-scenarios.json</a>.</p>
     <div class="two-grid" style="margin-top:36px">
       <div>
-        <h3>What the sensitivity screen found</h3>
-        <p class="prose" style="margin-top:12px">A Morris elementary-effects screen (<span class="mono">1,872</span> full simulations over <span class="mono">104</span> design points, 8 trajectories, 12 parameters, three weather years, seed 1, reproducible in <span class="mono">290</span> s) ranks which assumptions move the answer. Crop leaf area and transpiration lead on all three metrics (<span class="mono">9.10</span> pp of attainment), then envelope U value (<span class="mono">5.89</span>), then shade fraction (<span class="mono">3.43</span>).</p>
-        <p class="prose">The cost ranking is <strong>not stable</strong> across those ranges: three distinct orders appear, the most common in <span class="mono">61.5%</span> of points. The instability is confined to the DX, hybrid-desiccant and integrated positions, whose median costs sit within <span class="mono">16%</span> of each other. The three cheapest positions are identical in <span class="mono">104</span> of <span class="mono">104</span> points. So the screen supports a coarse verdict and refuses a fine one, which is the correct output for this tier.</p>
-        <p class="prose">Morris is a screening method. It gives no probability distribution, no confidence interval and no probability that one strategy beats another. Quantified uncertainty needs calibration against measurements, which is milestone M6.</p>
-        <h3 style="margin-top:32px">What the measured literature actually proves</h3>
-        <p class="prose" style="margin-top:12px">A graded review of the published evidence for hot and humid CEA, six parallel searches over evaporative cooling, mechanical cooling and dehumidification, desiccants, enclosed plant factories, crop and control setpoints, and validation data, found <strong>no Grade A evidence in any of the six domains</strong>: not one peer-reviewed study that measured two or more climate-control strategies in a real hot-humid facility against a shared crop and a shared target band, with separated energy metering and reported uncertainty. <span class="mono">52</span> cited DOIs were machine-checked and all <span class="mono">52</span> resolve (<span class="mono">49</span> through Crossref, <span class="mono">3</span> through DataCite).</p>
-        <p class="prose">That absence is the finding, and it changes how the humid-climate output of this tool should be read: those numbers are this model's screening result, not a measured comparison. The review records what each claim is worth, grade by grade, including the two known biases that pull in opposite directions and the closest thing to external corroboration in the repository, the shipped 2.5 L/kWh dehumidifier assumption sitting inside a measured 2.0 to 3.1 kg/kWh band from a Mediterranean winter. It is in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVIDENCE-HOT-HUMID.md">EVIDENCE-HOT-HUMID.md</a>.</p>
+        <h3>What changed in airflow and air treatment</h3>
+        <p class="prose" style="margin-top:12px"><strong>One controlled outdoor-air stream.</strong> ACH means air changes per hour. Infiltration is uncontrolled exchange; minimum and maximum ventilation ACH bound controlled outdoor air. Recovery and DOAS treat that stream, not additional ventilation. Internal recirculation is outside this model.</p>
+        <p class="prose">HRV/ERV performance and frost behavior require declared inputs. Above the supported recovery flow range, excess air bypasses the core and mixes once. Core heat or moisture transfer is not purchased energy.</p>
+        <p class="prose">DOAS now accounts for sensible and latent cooling through enthalpy and COP, plus reheat and available heating capacity. Unmet conditioning remains visible. The former <span class="mono">$39,517</span> DOAS result and derived reductions are withdrawn because sensible conditioning energy was omitted. Old class rankings and hybrid close-up savings are not current evidence.</p>
+        <p class="prose">A modeled <span class="mono">6 ACH</span> capacity is not a recommendation. A <span class="mono">15 ACH</span> constrained semi-closed case is not conventional open-greenhouse capacity. Project airflow still needs engineering review.</p>
+        <h3 style="margin-top:28px">What the sensitivity screen supports</h3>
+        <p class="prose" style="margin-top:12px">The regenerated Morris screen has <span class="mono">104</span> design points, eight trajectories and twelve parameters. It runs six strategies over sampled days in three Tulsa years: <span class="mono">1,872</span> simulations, not 1,872 full-year simulations.</p>
+        <p class="prose">LAI/transpiration leads aggregate joint-attainment influence at <span class="mono">9.098627 pp</span> per full screened parameter range. Maximum controlled outdoor-air capacity has <span class="mono">2.164460 pp</span> influence. These are mean absolute normalized elementary effects (mu*), not a single before/after pair or a confidence interval.</p>
+        <p class="prose">Three complete operating-cost orders occur; the most common holds <span class="mono">61.5385%</span> of design points. The full ranking is unstable under these ranges. The regional <span class="mono">5 pp</span> capability tier and <span class="mono">16%</span> cost band are retained methodological rules, not newly calibrated uncertainty thresholds.</p>
       </div>
       <div>
         <h3>What this is not</h3>
         <ul class="not-list" style="margin-top:12px">
-          <li>Not a calibrated digital twin. No site calibration has been performed.</li>
-          <li>Not benchmarked against an independent greenhouse model. The GreenLight comparison is milestone M5.</li>
-          <li>Not equipment sizing, a tonnage schedule or a stamped mechanical design.</li>
-          <li>Not a manufacturer or brand comparison. No product performance maps are implemented, and generic topologies carry an assumed-performance label.</li>
+          <li>Not a calibrated digital twin. No measured-site calibration has been performed.</li>
+          <li>Not independently benchmarked against another greenhouse model.</li>
+          <li>Not equipment sizing, a tonnage schedule or stamped mechanical design.</li>
+          <li>Not a manufacturer comparison. Generic equipment assumptions are not product performance maps.</li>
           <li>Not a yield, revenue or ROI forecast. Added control hours are not crop value.</li>
-          <li>Not a forecast of any kind. Historical weather years are evidence about a site, not a prediction of the next one.</li>
-          <li>Not a site locator. ZIP centroids are not exact facility locations, and utility candidates are not tariffs.</li>
-          <li>Not spatial. A well-mixed single zone cannot evaluate canopy-to-canopy precision.</li>
-          <li>Not corroborated by measured hot-humid field data. The graded review found no Grade A evidence in six domains, so the humid-climate verdicts are model output whose direction follows from physics and whose magnitude is unconfirmed.</li>
+          <li>Not a weather forecast. Historical years are not probabilities for the next year.</li>
+          <li>Not an exact site locator. ZIP centroids are not facility locations; utility candidates are not tariffs.</li>
+          <li>Not spatial. A well-mixed zone cannot establish canopy-to-canopy precision.</li>
+          <li>Not proof of present-release cadence convergence. Older step-refinement checks remain historical development evidence.</li>
         </ul>
-        <p class="notice warning" style="margin-top:20px"><strong>Read the caveats with the numbers.</strong> Executed checks are in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/VERIFICATION.md">VERIFICATION.md</a>, the independent reviews and open items in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/AUDIT.md">AUDIT.md</a>, the sensitivity screen in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/SENSITIVITY.md">SENSITIVITY.md</a>, the graded state of the measured evidence in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVIDENCE-HOT-HUMID.md">EVIDENCE-HOT-HUMID.md</a>, and what each class of control reached per climate in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/CLASSES.md">CLASSES.md</a>.</p>
+        <p class="notice warning" style="margin-top:20px"><strong>Read the caveats with the numbers.</strong> Conservation and numerical checks do not establish real-world accuracy. Close rankings still need measured loads, equipment maps, capital and maintenance comparisons, and a project-specific engineering review.</p>
+        <p class="prose" style="margin-top:20px">The repository's <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVIDENCE-HOT-HUMID.md">graded hot-humid literature review</a> found no Grade A head-to-head evidence within its reviewed scope. That is a bounded literature finding, not proof that no such study exists. The current outputs remain modeled screening results.</p>
+        <p class="source-line">Read the records: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/VERIFICATION.md">verification</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/AUDIT.md">dated audit</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/SENSITIVITY.md">Morris sensitivity</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/REGIONS.md">regional evidence</a>, and <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/COMPONENT-PARAMETERS.md">component parameters</a>.</p>
       </div>
     </div>
   </section>
 
   <section class="panel" id="screens" aria-labelledby="screens-title">
-    <div class="section-heading"><div><span class="step">&sect; 06</span><h2 id="screens-title">The interface</h2></div><span class="badge">Actual screenshots, bundled Tulsa example</span></div>
-    <p class="prose">The tool has two views. <strong>Analyze</strong> is the calculator: configure a site, a facility, a crop band and the strategies, then run. <strong>Learn</strong> is a ten-part curriculum on the psychrometrics the model applies, in the order it applies them, each part carrying a number measured in this repository and a control that switches to Analyze and highlights the panel where that quantity is read. Views are linkable, so a section can be sent to someone as a URL: <span class="mono">#analyze</span>, <span class="mono">#learn</span>, <span class="mono">#learn/&lt;module&gt;</span>.</p>
+    <div class="section-heading"><div><span class="step">&sect; 06</span><h2 id="screens-title">The interface</h2></div><span class="badge">Current model, genuine browser captures</span></div>
+    <p class="prose" style="margin-bottom:24px"><strong>Analyze</strong> is the interactive calculator. <strong>Learn</strong> explains the decisions, with deeper technical sections and the committed regional study. Link directly to <a href="app/#analyze">Analyze</a>, <a href="app/#learn">Learn</a> or <a href="app/#learn/regional-findings">regional findings</a>. Tools use the dark Instrument mode; exported documents default to light Field.</p>
     <div class="shots">
-      <figure class="shot">
-        <img src="assets/screenshots/app-overview.png" alt="The evaluator workspace: configuration rail on the left, joint band attainment and headline metrics on the right." width="1875" height="1250" loading="lazy" decoding="async">
-        <figcaption><b>Overview</b> Joint temperature and VPD attainment, misses by cause, energy and cost, with the evidence tier beside the result.</figcaption>
-      </figure>
-      <figure class="shot">
-        <img src="assets/screenshots/across-years.png" alt="Across-years table showing median, worst, best, spread and trend attainment per strategy with a ranking stability verdict." width="1875" height="1250" loading="lazy" decoding="async">
-        <figcaption><b>Across years</b> Median, worst, best, spread and trend per strategy, plus the computed ranking-stability verdict.</figcaption>
-      </figure>
-      <figure class="shot">
-        <img src="assets/screenshots/learn.png" alt="The Learn view: a numbered curriculum of ten sections, the first expanded to explain the outdoor state." width="1875" height="1250" loading="lazy" decoding="async">
-        <figcaption><b>Learn</b> Ten sections in the order the model applies them. Each states the concept, the relationship behind it, a number measured in this repository, and the caveat that travels with it.</figcaption>
-      </figure>
-      <figure class="shot">
-        <img src="assets/screenshots/learn-regional.png" alt="The closing Learn section: the recommended strategy for a region with the attainment, worst year, cost, capability tier and caveats that justify it." width="1875" height="1250" loading="lazy" decoding="async">
-        <figcaption><b>Regional verdict</b> The closing section reads the committed six-climate study at load. Here Tulsa resolves to DX at 71.5% of eligible hours, worst year 68.9%; three of the six climates return no recommendation, because inside the capability tier the candidates are not separated by this evidence.</figcaption>
-      </figure>
-      <figure class="shot">
-        <img src="assets/screenshots/loads.png" alt="Monthly sensible and latent load decomposition chart with losses drawn below the axis." width="1875" height="1250" loading="lazy" decoding="async">
-        <figcaption><b>Loads</b> Sensible gains by source above the axis, losses below it in the same colours, latent load and space SHR.</figcaption>
-      </figure>
-      <figure class="shot">
-        <img src="assets/screenshots/pad-viability.png" alt="Equipment runtime table separating hours a pad ran from hours the weather made the pad effective." width="1875" height="1250" loading="lazy" decoding="async">
-        <figcaption><b>Pad viability</b> Hours and days each component ran, next to the weather-side hours that justified running it.</figcaption>
-      </figure>
-      <figure class="shot">
-        <img src="assets/screenshots/design-basis.png" alt="Exported design-basis brief rendered in the parchment Archive register with numbered sections." width="1200" height="900" loading="lazy" decoding="async">
-        <figcaption><b>Design-basis brief</b> The export a mechanical engineer can argue with, in the Archive register, with the evidence tier on the page.</figcaption>
-      </figure>
-      <figure class="shot">
-        <img src="assets/screenshots/tour.png" alt="The guided tour overlay explaining a panel of the interface." width="1875" height="1250" loading="lazy" decoding="async">
-        <figcaption><b>Guided tour</b> A first-run walkthrough of the workflow, so the assumptions are visible before the first run, not after it.</figcaption>
-      </figure>
+      <figure class="shot"><a href="assets/screenshots/app-overview.png"><img src="assets/screenshots/app-overview.png" alt="Instrument-mode hourly inspector showing actual controlled outdoor air, installed capacity, and separate infiltration at a Tulsa warm-up hour." width="1440" height="1000" loading="lazy" decoding="async"></a><figcaption><b>Hourly inspector</b> Actual flow and installed capacity are separate. The selected initialization hour is explicitly ineligible for joint-target comparison.</figcaption></figure>
+      <figure class="shot"><a href="assets/screenshots/learn.png"><img src="assets/screenshots/learn.png" alt="Current Learn introduction explaining what the screening tool does and the decisions it supports." width="1440" height="1050" loading="lazy" decoding="async"></a><figcaption><b>Learn</b> A plain-language introduction before the deeper technical sections. Explanatory classes are not validated equipment rankings.</figcaption></figure>
+      <figure class="shot"><a href="assets/screenshots/learn-regional.png"><img src="assets/screenshots/learn-regional.png" alt="Regional findings section with method, weather years, simulation count and explicit retained decision rules." width="1440" height="1050" loading="lazy" decoding="async"></a><figcaption><b>Regional evidence</b> The regenerated six-climate study and its decision rules. Phoenix, Denver and Seattle remain unresolved under those rules.</figcaption></figure>
+      <figure class="shot"><a href="assets/screenshots/design-basis.png"><img src="assets/screenshots/design-basis.png" alt="Light Field-mode design-basis brief for Tulsa 2025, with model 0.3.0-screening, evidence limits and coincident climate conditions." width="1440" height="1000" loading="lazy" decoding="async"></a><figcaption><b>Design-basis brief</b> A current Tulsa 2025 export. Field mode remains light even under a dark operating-system preference.</figcaption></figure>
     </div>
   </section>
 
   <section class="panel" id="roadmap" aria-labelledby="roadmap-title">
-    <div class="section-heading"><div><span class="step">&sect; 07</span><h2 id="roadmap-title">Roadmap</h2></div><span class="badge">Each rung earns one claim</span></div>
-    <p class="prose">The route from a coarse screen to a calibrated twin is ordered so the cheap accuracy wins come first: an unconverged controller or a static crop load would make any later benchmark compare artifacts rather than physics. Milestones and acceptance gates are in <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/DIGITAL-TWIN.md">DIGITAL-TWIN.md</a>.</p>
-    <div class="table-wrap" style="margin-top:24px">
-      <table>
-        <thead>
-          <tr><th scope="col">Milestone</th><th scope="col">Status</th><th scope="col">What it delivers</th><th scope="col">The claim it earns</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="row-name">M0 site evaluator</td>
-            <td class="mono done">Done, v0.2</td>
-            <td>Multi-year risk, multi-site comparison across six bundled climates, sensible and latent split, CO<sub>2</sub> window, cost-of-precision sweeps, design-basis brief, Learn curriculum</td>
-            <td>Results reported as a distribution over ten weather years per site, not a single year</td>
-          </tr>
-          <tr>
-            <td class="row-name">M1 converged controller</td>
-            <td class="mono done">Done</td>
-            <td>Staged deadband controller as default, ideal optimizer retained as a labeled upper bound</td>
-            <td>Cost rankings are not artifacts of control cadence (0.38 pp, 0.31% at half the step)</td>
-          </tr>
-          <tr>
-            <td class="row-name">M2 state-coupled crop load</td>
-            <td class="mono done">Done</td>
-            <td>Stanghellini transpiration from leaf area, absorbed radiation and zone VPD</td>
-            <td>The moisture load responds to the zone state, so dehumidification changes it</td>
-          </tr>
-          <tr>
-            <td class="row-name">M3 structural sensitivity</td>
-            <td class="mono done">Done</td>
-            <td>Morris screening over 12 parameters and six strategies, with a non-dominated-set stability test</td>
-            <td>Every comparison carries a computed stability label instead of a prose disclaimer</td>
-          </tr>
-          <tr>
-            <td class="row-name">M4 equipment maps</td>
-            <td class="mono">Next</td>
-            <td>DX capacity and EIR curves, pad effectiveness against face velocity, wind and stack ventilation, out-of-domain flags</td>
-            <td>Map-based screening where a map was supplied, assumed-constant badge otherwise</td>
-          </tr>
-          <tr>
-            <td class="row-name">M5 benchmarked simulation</td>
-            <td class="mono">Planned</td>
-            <td>GreenLight reproduction of the Katzin 2020 case, then a matched Tulsa model-to-model run</td>
-            <td>Tier 3: documented benchmark errors, for the covered conditions only</td>
-          </tr>
-          <tr>
-            <td class="row-name">M6 site calibration</td>
-            <td class="mono">Planned</td>
-            <td>Instrumented campaign, identifiable parameter fit, held-out validation report</td>
-            <td>Tier 4: site-calibrated with uncertainty, for the instrumented facility only</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="source-line">Tool documentation: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/PRD.md">PRD</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/ARCHITECTURE.md">architecture</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/ENERGY-DATA.md">energy data</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/RESEARCH.md">research</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVALUATION.md">evaluation scheme</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/CLASSES.md">control classes</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVIDENCE-HOT-HUMID.md">hot-humid evidence review</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/REGIONS.md">regional study</a>. Public data sources: NASA POWER, Iowa Environmental Mesonet, US Census and HUD ZIP records, EIA electricity prices, EPA eGRID 2023. PsychroLib 2.5.0 is vendored at a pinned commit.</p>
-    <p class="button-row" style="margin-top:28px">
-      <a class="button primary" href="app/">Open the tool</a>
-      <a class="button" href="https://github.com/vhark/cea-psychrometric-site-evaluator">Read the source and the docs</a>
-    </p>
+    <div class="section-heading"><div><span class="step">&sect; 07</span><h2 id="roadmap-title">Roadmap</h2></div><span class="badge">Each claim needs evidence</span></div>
+    <p class="prose">The implemented screen is not the end of the accuracy work. <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/DIGITAL-TWIN.md">DIGITAL-TWIN.md</a> records the route to equipment maps, independent benchmarking and held-out site calibration. Historical milestone evidence must not be read as fresh verification of model 0.3.0.</p>
+    <div class="table-wrap" style="margin-top:24px"><table>
+      <thead><tr><th scope="col">Area</th><th scope="col">Current status</th><th scope="col">What the evidence permits</th></tr></thead>
+      <tbody>
+        <tr><td class="row-name">Site evaluator</td><td class="mono done">Implemented</td><td>Weather-year and site comparisons, load decomposition, Learn, portable runs and design-basis exports.</td></tr>
+        <tr><td class="row-name">Staged controller</td><td class="mono done">Implemented</td><td>Finite-capacity causal dispatch. Older cadence studies are historical; discrete airflow ladders remain resolution-limited.</td></tr>
+        <tr><td class="row-name">State-coupled crop</td><td class="mono done">Implemented</td><td>Stanghellini transpiration responds to radiation and zone state, under declared canopy assumptions.</td></tr>
+        <tr><td class="row-name">Structural sensitivity</td><td class="mono done">Regenerated, 0.3.0</td><td>Morris influence and ranking stability over selected ranges, not quantified probability or calibration.</td></tr>
+        <tr><td class="row-name">Airflow and conditioning</td><td class="mono done">Corrected, 0.3.0</td><td>One-stream recovery/DOAS accounting, source-capacity limits and explicit cost populations. Old savings claims withdrawn.</td></tr>
+        <tr><td class="row-name">Equipment maps</td><td class="mono">Planned</td><td>Manufacturer-map-based screening only where supported maps and operating domains are supplied.</td></tr>
+        <tr><td class="row-name">Independent benchmark</td><td class="mono">Planned</td><td>Documented model-to-model and measured-case errors for the covered conditions.</td></tr>
+        <tr><td class="row-name">Site calibration</td><td class="mono">Planned</td><td>Project-specific predictive performance only after identifiable calibration and held-out validation.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="source-line">Tool documentation: <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/PRD.md">PRD</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/ARCHITECTURE.md">architecture</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/ENERGY-DATA.md">energy data</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/RESEARCH.md">research</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVALUATION.md">evaluation scheme</a>, <a href="https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/CLASSES.md">control classes and limits</a>.</p>
+    <p class="button-row" style="margin-top:28px"><a class="button primary" href="app/">Open the tool</a><a class="button" href="https://github.com/vhark/cea-psychrometric-site-evaluator">Read the source and docs</a></p>
   </section>
-
 </main>
-
 <footer>
-  <div>
-    <a class="wordmark" href="https://grownetics.co">Grownetics<em>.</em></a>
-    <div style="margin-top:10px">MIT licensed <span class="footer-divider">/</span> Model 0.2.0-screening <span class="footer-divider">/</span> <a href="https://github.com/vhark/cea-psychrometric-site-evaluator">github.com/vhark/cea-psychrometric-site-evaluator</a></div>
-  </div>
-  <div class="footer-right">
-    No data leaves the browser except the public weather requests you trigger (NASA POWER, Iowa Environmental Mesonet). No account, no analytics, no backend. Scenarios and results stay in local browser storage until you export them.
-  </div>
+  <div><a class="wordmark" href="./"><img src="favicon.svg" alt="" width="36" height="36">One Season Farmers</a><div style="margin-top:10px">MIT licensed <span class="footer-divider">/</span> Model 0.3.0-screening <span class="footer-divider">/</span> <a href="https://github.com/vhark/cea-psychrometric-site-evaluator">Source on GitHub</a></div></div>
+  <div class="footer-right">No account, analytics or application backend. Weather and location lookup requests contact public services; fonts load from Google Fonts. Scenarios and results are processed in your browser. Export files when you need a portable record.</div>
 </footer>
 </body>
 </html>

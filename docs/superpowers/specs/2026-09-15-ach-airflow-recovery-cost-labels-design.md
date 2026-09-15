@@ -1,6 +1,6 @@
 # ACH, Outdoor-Air Recovery, and Result Semantics Design
 
-Status: approved in conversation on 2026-09-15. This document specifies the design to implement. It does not claim that implementation is complete.
+Status: historical design approved in conversation on 2026-09-15. Model `0.3.0-screening` now implements the corrected contract; see [../../IMPLEMENTATION.md](../../IMPLEMENTATION.md) and [../../VERIFICATION.md](../../VERIFICATION.md) for current APIs and executed evidence. Statements about the "current" broken model below describe the pre-cutover implementation, not the released code. Dollar and percentage-point examples in §13 illustrate label syntax, not measured findings or surviving savings claims. The old DOAS result and derived reductions are withdrawn.
 
 ## 1. Problem
 

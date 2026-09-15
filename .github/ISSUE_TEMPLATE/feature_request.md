@@ -12,7 +12,7 @@ What question about a site would this answer that the tool cannot answer today? 
 
 ## Proposal
 
-Describe the capability. If it is a crop, a strategy or a data source, [CONTRIBUTING.md](../../CONTRIBUTING.md) lists what each one needs.
+Describe the capability. If it is a crop, a strategy or a data source, [CONTRIBUTING.md](https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/CONTRIBUTING.md) lists what each needs.
 
 ## Evidence it would rest on
 
@@ -20,7 +20,7 @@ Every number this tool shows carries its basis. Name the source for any value th
 
 ## Claim it would allow, and claims it would not
 
-State the strongest honest sentence a user could say after this feature exists, and the sentence they still could not say. The evidence ladder is in [docs/EVALUATION.md](../../docs/EVALUATION.md) and the roadmap gates are in [docs/DIGITAL-TWIN.md](../../docs/DIGITAL-TWIN.md).
+State the strongest honest sentence a user could say after this feature exists, and the sentence they still could not say. See the [evidence ladder](https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/EVALUATION.md) and [roadmap gates](https://github.com/vhark/cea-psychrometric-site-evaluator/blob/main/docs/DIGITAL-TWIN.md).
 
 ## Constraints to respect
 

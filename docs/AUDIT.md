@@ -2,11 +2,13 @@
 
 Purpose: record what four independent reviews found, what was changed in response, and the honest status of every item that was not closed.
 
-Status: reviews executed 2026-09-12, item status updated 2026-09-14 for model `0.2.0-screening`. Items 1 to 6 are closed, as are items 8 to 11 raised after the audit; item 7 (benchmark gap) remains open and is now blocked by an external absence rather than by unfinished work here.
+Status: historical review record. Reviews executed 2026-09-12; item status last updated 2026-09-14 for model `0.2.0-screening`. At that date items 1 to 6 and 8 to 11 were closed; item 7 lacked a suitable measured benchmark in the bounded evidence search.
+
+**Current-status pointer, 2026-09-15:** model `0.3.0-screening` uses schema 2, one controlled-air stream, corrected DOAS energy and One Season Farmers branding. Current test counts and numerical evidence are in [VERIFICATION.md](VERIFICATION.md); current regional and Morris results are in [REGIONS.md](REGIONS.md) and [SENSITIVITY.md](SENSITIVITY.md). The figures, APIs and review conclusions below are historical, not a new audit of v0.3. Old DOAS/class/hybrid-close-up cost claims are withdrawn; a dated search gap does not prove that no benchmark dataset exists.
 
 Read this if: you are judging how much scrutiny this model has survived, or picking up an open item.
 
-Four independent read-only reviews (model, data, interface, roadmap) plus a metric gap the client raised. Findings are cited to file:line at audit time; line numbers drift after fixes. The regression suite was 22 tests before the audit and 26 after it; it stands at 91 on 2026-09-14 (see [VERIFICATION.md](VERIFICATION.md)).
+Four independent read-only reviews (model, data, interface, roadmap) plus a metric gap the client raised. Findings are cited to file:line at audit time; line numbers drift after fixes. The regression suite was 22 tests before the audit, 26 after it and 91 on 2026-09-14. These are historical counts; current executed status is in [VERIFICATION.md](VERIFICATION.md).
 
 ## Fixed in this audit
 
@@ -54,7 +56,7 @@ Three further items surfaced in the waves after the audit, recorded in the same 
 | 4 | Hour inspector has no live announcement | **Closed.** `aria-valuetext` on the slider plus one debounced polite status line; calendar and table selection both drive the same path. |
 | 5 | Import parses on the main thread | **Closed.** Imports post the File to a parse worker; the misleading 512 MB file-size limit is replaced by an honest statement that the ceiling is the memory the tab can allocate, with staged progress. All prior guarantees kept, and the epoch re-check now covers CSV and bare weather JSON as well as run bundles. |
 | 6 | Data vintages | **Closed.** `src/vintages.js` declares a per-dataset staleness budget with a stated rationale and `scripts/check-vintages.mjs` reports ages offline, exiting 1 when anything is past budget. Measured 2026-09-14: 4 current, 1 aging (eGRID 2023, 32 mo), 1 stale (utility mapping 2021, 56 mo, not fixable by `--refresh` because the source URLs are pinned to that year), 1 unknown (the EPA ZIP tool carries no machine-readable published date). CI reports it without failing the build. |
-| 7 | Benchmark gap | **Open, externally blocked.** Roadmap M4/M5. The only named public dataset cannot exercise pad, DX or dehumidification paths, so the benchmark needs a model-to-model run on the same forcing. The evidence review then found the harder half: no independent hot-humid greenhouse benchmark dataset exists, and no greenhouse model reviewed has a published hot-humid latent validation ([EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) §7). Closing this item as originally written is therefore not available at any effort we control; see [DIGITAL-TWIN.md](DIGITAL-TWIN.md). |
+| 7 | Benchmark gap | **Open at the historical review.** Roadmap M4/M5. The named Dutch dataset could not exercise pad, DX or dehumidification paths. The 2026-09-14 bounded review did not identify a suitable independent hot-humid greenhouse benchmark or hot-humid latent validation in the models inspected. Model-to-model work remains useful but cannot replace measurement. Further discovery, author access or a measured campaign may close the gap; see [DIGITAL-TWIN.md](DIGITAL-TWIN.md). |
 | 8 | Lighting under-delivery | **Closed** by M3 above. Delivery lands on the daily target exactly and is step-invariant at 5 and 1 minute; shortfalls of undersized fixtures are still reported. |
 | 9 | Design conditions named as ASHRAE mean coincident | **Closed** by D6 above. The reported figure is the coincident state of the single ranked exceedance hour, and says so. |
 | 10 | Insect-screen ventilation penalty not modeled | **Closed** by G2 above, with the first screen's cost left explicitly unsourced. |

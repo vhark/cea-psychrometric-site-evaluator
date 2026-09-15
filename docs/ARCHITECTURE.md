@@ -1,6 +1,6 @@
 # CEA Psychrometric Site Evaluator: architecture
 
-Purpose: record the deployment decision, the module boundaries, the canonical data contracts and the controller design, so an implementer can change one part without breaking the others.
+Purpose: record the deployment decision, module boundaries, data-contract design and controller design. Exact shipped schema/API details are in [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
 Status: current for model `0.3.0-screening`, scenario schema 2, reviewed 2026-09-15. Runtime evidence and limits are in [VERIFICATION.md](VERIFICATION.md). No site calibration is claimed; future design constraints below are not manufacturer performance.
 
@@ -8,9 +8,9 @@ Read this if: you are implementing or reviewing code in `src/`, or deciding wher
 
 ## 1. Deployment decision
 
-Use static HTML/CSS/JavaScript modules and a dedicated Web Worker for numerical analysis. No user accounts, database server, build service, or server-side calculation is required for the proposed reduced-order engine. Serve from any ordinary static HTTP(S) host. Opening `file://` is not the supported module/worker deployment path.
+The shipped application uses static HTML/CSS/JavaScript modules and a dedicated Web Worker for numerical analysis. No user accounts, database server, build service or server-side calculation is required. Serve from an ordinary static HTTP(S) host. Opening `file://` is not supported for module/worker deployment.
 
-Use native browser forms, SVG/canvas charts with accessible table equivalents, and IndexedDB for reusable weather/run snapshots. Small preferences and template indexes can use local storage. Avoid a framework until interface complexity justifies one. Vendor/pin the MIT PsychroLib JavaScript source with license and provenance; do not recreate wet-bulb equations from scratch. Self-host runtime fonts/assets if offline operation is promised.
+Native browser forms and SVG charts have table equivalents. IndexedDB stores weather snapshots; localStorage stores saved scenarios and small preferences. Results remain in memory until exported, not an automatically persisted run database. PsychroLib JavaScript is vendored and pinned with its license and provenance. Google Fonts are optional external presentation requests; self-host them before promising a fully offline presentation.
 
 “Static application” does not mean “no external dependencies.” Live weather retrieval contacts public services. Saved raw-weather imports make analysis usable without those services. A paid shared API credential can never be secret in downloadable JavaScript.
 
@@ -38,7 +38,7 @@ Data flow:
 
 Location + date range -> weather adapters -> immutable raw snapshot -> normalized weather + quality -> scenario configuration -> weather screen OR coupled worker -> hourly results -> aggregation/comparison -> charts and portable exports.
 
-### The seventeen modules, as shipped
+### The eighteen modules, as shipped
 
 Every file in `src/` and the boundary it holds. Concrete per-person ownership is in [IMPLEMENTATION.md](IMPLEMENTATION.md); this table is what each module is allowed to know.
 
@@ -47,7 +47,8 @@ Every file in `src/` and the boundary it holds. Concrete per-person ownership is
 | `config.js` | Defaults, crop/facility/system catalogs, editable field descriptors, scenario back-fill and `validateScenario` | Simulate anything, or accept a component that resolves to no usable parameter |
 | `physics.js` | Typed SI psychrometrics over pinned PsychroLib, pad state, canopy absorption, Stanghellini transpiration, the outside-air drying screen | Hold state across hours, or decide equipment operation |
 | `screens.js` | Movable shade, thermal curtain, insect screen and heat-pump parameters, their catalogued grades, resolvers and deployment predicates | Ship an unsourced number as a default, or dispatch equipment |
-| `simulate.js` | The coupled single-zone run: substep integration, the staged controller and the ideal-modulation alternative, causal light scheduling, per-hour results and warnings | Aggregate, price or rank; read future weather |
+| `airflow.js` | Geometry conversions, recovery/frost ratings, moist-air mixing and DOAS enthalpy/COP transformations on one controlled stream | Invent product ratings, recover leakage or dispatch a second ventilation path |
+| `simulate.js` | Coupled zone state, substep dispatch, causal lighting, per-hour results and summaries through shared metrics; manual-price dispatch objective | Render UI, use future weather or treat historical recosting as re-optimized dispatch |
 | `metrics.js` | Summaries, monthly and daily reductions, load decomposition, design hours, multi-year aggregation, comparison and dominance | Recompute physics, or annualize a partial period |
 | `sensitivity.js` | Morris design, elementary effects, mu\*, and the ranking-stability rule | Touch the DOM, or claim a distribution |
 | `weather.js` | Provider adapters, normalization, continuity checks, the bundled site index and year loader | Classify modes or fill a gap |
@@ -97,7 +98,9 @@ EPW import is useful but must distinguish actual-year weather from TMY. A TMY is
 
 Bundle a dated US GeoNames postal-code index with attribution for a small, keyless ZIP lookup; preserve leading zeros and display approximate coordinates. Time zone lookup must be explicit: station metadata, a licensed coordinate-to-time-zone dataset/library, or user selection. Never infer civil timezone solely from longitude. Coordinate entry and station selection remain available when a ZIP is absent or ambiguous.
 
-## 4. Canonical data contracts
+## 4. Data-contract design and implemented boundaries
+
+This inventory combines architectural requirements and future fidelity targets; it is not a literal exported JSON schema. `IMPLEMENTATION.md` and a current exported run define the shipped field names and envelope. Dynamic crop calendars, occupancy schedules, equipment performance maps and full tariffs below remain unimplemented design targets, not inputs currently solved by the engine.
 
 ### WeatherSnapshot
 
@@ -109,7 +112,7 @@ Bundle a dated US GeoNames postal-code index with attribution for a small, keyle
 
 ### WeatherInterval
 
-- UTC start/end seconds, original source timestamp(s), duration, local display date/time/UTC offset.
+- UTC interval-start epoch **milliseconds**, original source timestamp(s), interval semantics and local display date/time/UTC offset. Seconds are not the canonical `time` unit.
 - SI Tdry C, Tdew C where observed, RH fraction, pressure Pa, wind m/s, GHI mean W/m2 and optional DNI/DHI.
 - Value-level quality flags: original, aggregated, missing, suspect, inferred, imputed, cross-source.
 - Meteorology-valid, solar-valid and jointly-valid flags.
@@ -188,7 +191,7 @@ Compare explicit scenario clones. Compute the marginal effect of one upgrade fir
 - Saving handles denied/quota-full storage and offers JSON export. Imports are validated before entering storage or worker state.
 - Names and imported strings render as text, not executable HTML. CSV exports escape delimiters and spreadsheet-formula prefixes in user strings.
 - Charts are derived views of the same result arrays as tables and exports; no separate approximate chart calculations.
-- The page holds two views, Analyze and Learn, in one document. Switching hides a panel rather than unmounting it: no code inside the hidden view runs, nothing re-renders, and a run in flight is not interrupted. `learn.js` owns the switch, remembers the last view in local storage, and keeps a per-view scroll position.
+- The page holds Analyze and Learn in one document. Switching hides rather than unmounts a panel and does not cancel a run in flight. Hidden status is not a guarantee that asynchronous handlers stop executing. `learn.js` owns the switch, remembers the last view in localStorage and keeps per-view scroll positions.
 - `#learn` and `#learn/<module-key>` are routes into the Learn view and `#analyze` is the route back; every other fragment stays an ordinary in-page anchor, so an existing deep link still works. Opening a curriculum section rewrites the hash with `replaceState`, which keeps the back button meaningful.
 - The Learn view's regional section reads `docs/regional-study.json` at run time and renders only what that file contains. An absent or unreadable study renders as an absent study, naming the file and the command that regenerates it, and never falls back to an example.
 - The highlight a Learn section uses to point at a panel is the guided tour's `spotlight()`, exported from `tour.js` and imported by `learn.js`. There is one highlight implementation, and it is a no-op while a tour owns the screen. If the panel a section refers to does not exist yet, the highlight lands on the first visible fallback, which is the control that would produce it.
@@ -196,7 +199,7 @@ Compare explicit scenario clones. Compute the marginal effect of one upgrade fir
 
 ## 7. Open-source and reproducibility
 
-Proposed application license: MIT, with separate third-party notices. Do not apply this license to weather, benchmark data, logos or manufacturer literature owned by others.
+The application is MIT-licensed under [LICENSE](../LICENSE), with separate third-party notices. That license does not cover weather, benchmark data, logos or manufacturer literature owned by others.
 
 - PsychroLib: MIT, preserve notice and pin version/commit.
 
@@ -215,4 +218,4 @@ Reproducible export bundle contains config JSON, raw weather and metadata, norma
 
 `research-evidence/browser-access-probe.json`: real JavaScript `fetch` calls from https://example.org returned HTTP 200 with response type `cors` for IEM and NASA POWER. NASA returned 24 values per requested variable and `Wh/m^2` solar under community RE. This confirms those small cross-origin requests at the check time, not continuous availability, all-origin support, full-year scalability or scientific validity.
 
-The static coarse-screen application and the full available 2026-to-date observed Tulsa reference study are now implemented. See VERIFICATION.md for executed checks and control-cadence sensitivity. No independent greenhouse-model benchmark, measured-site calibration or public production deployment is claimed.
+The static coarse-screen application and the archived available-2026-to-date Tulsa reference study are implemented. The Pages workflow publishes `site/` at the public root and the calculator at `/app/` when `main` is pushed; [README.md](../README.md) gives those URLs and [VERIFICATION.md](VERIFICATION.md) records executed checks. Publication does not establish independent model benchmarking or measured-site calibration.

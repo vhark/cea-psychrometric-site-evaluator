@@ -14,7 +14,7 @@ python3 -m http.server 8150 --bind 127.0.0.1
 
 Open http://127.0.0.1:8150/. Module fetches and Web Workers do not work over `file://`. To self-host, copy the folder to any static host that serves JavaScript and JSON with correct MIME types, keep paths relative, and serve over HTTPS or localhost. No shared API key is embedded and none is needed.
 
-A lightweight deployment may omit raw datasets and reports, but must retain `data/us-zips.json`, `data/energy/*.json`, `data/weather/`, `src/`, `vendor/`, `styles.css` and `index.html`, with source and licence attribution intact. Google Fonts are optional presentation assets; system fallbacks remain usable.
+A deployment must retain `data/us-zips.json`, `data/energy/*.json`, `data/weather/`, `src/`, `vendor/`, `styles.css` and `index.html`, with source and license attribution. Keep `docs/regional-study.json` for Learn's findings and the linked docs/examples/reports for the complete reader workflow; omitting them leaves those surfaces unavailable. Raw regeneration downloads are not runtime requirements. Google Fonts are optional presentation assets; system fallbacks remain usable. The repository's Pages workflow packages the public site at `/` and this calculator plus its documentation at `/app/`.
 
 The interface opens on **Analyze**, the calculator these steps describe. The **Learn** tab beside it is a
 ten-part curriculum on the psychrometrics behind the screening, each part pointing at the Analyze panel where
@@ -30,7 +30,7 @@ The bundled example selects Tulsa (ZIP 74103, America/Chicago) explicitly.
 
 ## 3. Get weather
 
-Three paths, none of which invents data:
+Four paths, none of which invents data:
 
 | Path | What you get |
 |---|---|
@@ -43,7 +43,7 @@ Retrieval failures never generate substitute weather. A partially observed perio
 
 ## 4. Describe the facility
 
-Choose facility (greenhouse, hybrid, indoor), cultivation system (greenhouse benches) and crop, then edit floor and canopy geometry, envelope, moisture, light and DLI, target bands, capacities, efficiencies and costs. Every default is a labeled assumption with a stated source. Inputs are SI, with live °F, ft and ft² equivalents shown on the corresponding fields.
+Choose facility (greenhouse, hybrid or indoor), cultivation system (benches, microgreens, propagation or mushroom) and crop, then edit floor/canopy geometry, envelope, moisture, light/DLI, target bands, capacities, efficiencies and costs. Defaults are labeled assumptions, not measured facility inputs. Inputs are SI, with live °F, ft and ft² equivalents on corresponding fields.
 
 Terms used on these fields are defined in [GLOSSARY.md](GLOSSARY.md). To start from a worked comparison instead of the defaults, import one of the sets in [examples/](examples/README.md).
 
@@ -98,11 +98,6 @@ Operating cost includes purchased electricity, fuel and modeled water. Read the 
 
 The verified Tulsa 2025 run has 8,760 valid hours but 8,759 common eligible hours. Full-run annual costs include warm-up energy and water; matched comparison costs exclude that hour. Label matched costs as simulated-period costs and never silently substitute them for annual totals.
 
-![Sensible and latent load decomposition, with losses drawn below the axis](screenshots/loads.png)
-
-![Attainment and cost across ten weather years, with the ranking-stability verdict](screenshots/across-years.png)
-
-![Pad viability from the weather screen alone, beside actual pad runtime](screenshots/pad-viability.png)
 
 ## 7. Export
 
@@ -114,7 +109,6 @@ The verified Tulsa 2025 run has 8,760 valid hours but 8,759 common eligible hour
 | Report HTML | A standalone printable One Season Farmers Field document, with assumptions and provenance sections open by default | The full reproducibility bundle; keep the run JSON as well |
 | Design-basis brief | Peak sensible and latent hours with coincident outdoor state and frequency, ventilation air requirement, condensate, pad water, free-cooling hours, binding constraint, strategy verdict, evidence tier | A stamped design, equipment selection, or safety margin |
 
-![The design-basis brief, exported in Field mode](screenshots/design-basis.png)
 
 Imported result claims are discarded and inputs must be rerun. The actual model-0.3.0 browser export was 207,706,978 bytes for six strategies and 8,760 hours; memory remains the practical limit, and parsing runs in a Web Worker. Export hashes and population proof are in [browser-run-metrics.json](browser-run-metrics.json).
 
@@ -132,7 +126,9 @@ JSON imports carry `schemaVersion`, explicit units, source and time-zone metadat
 
 ### Scenario schema 2 migration
 
-`migrateScenario` returns a copy; imported outputs are not trusted. Version-1 airflow numbers are preserved, not silently resized, with template-specific evidence status and review gates. Recovery is initialized to `type: 'none'`. Old DOAS supply settings are reset to null, obsolete `doasKWhPerKg` is discarded, and `doasCoolingCOP` plus `doasReheatRecoveryFraction` must be supplied. Active DOAS and mushroom imports remain blocked until reviewed; unsupported generic, hybrid and opaque defaults are screening assumptions requiring review. Inert component defaults may be supplied without inventing performance. Unsupported future schema versions fail explicitly. Weather snapshots remain schema 1.
+`migrateScenario` returns a copy; imported outputs are not trusted. Version-1 airflow numbers are preserved, not silently resized, with template-specific evidence status and review gates. Recovery is initialized to `type: 'none'`. Old DOAS supply settings are reset to null, obsolete `doasKWhPerKg` is discarded, and `doasCoolingCOP` plus `doasReheatRecoveryFraction` must be supplied. Unsupported generic/hybrid/opaque defaults require explicit review; mushrooms need project-specific flow. Inert component defaults may be supplied without inventing performance. Unsupported future schema versions fail explicitly. Weather snapshots remain schema 1.
+
+On startup, saved localStorage scenarios migrate individually: a valid legacy entry remains editable, while an unsupported entry is isolated with a warning rather than crashing initialization. Missing treatment inputs or review still block a run. File import is stricter: after migration all scenarios must validate before the file is adopted, so incomplete legacy active-DOAS or mushroom JSON must be completed/reviewed in the input file and reimported. Save/export writes current schema 2.
 
 ## Reproducible example
 

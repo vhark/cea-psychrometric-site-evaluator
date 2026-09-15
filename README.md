@@ -4,11 +4,10 @@ Screen a controlled-environment agriculture site against real historical weather
 
 [![tests](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml/badge.svg)](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml)
 [![model](https://img.shields.io/badge/model-0.3.0--screening-5E9643)](docs/VERIFICATION.md)
-[![runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-none-4DB405)](#quick-start)
-[![licence](https://img.shields.io/badge/licence-MIT-4DB405)](LICENSE)
-[![demo](https://img.shields.io/badge/demo-GitHub%20Pages-4DB405)](https://vhark.github.io/cea-psychrometric-site-evaluator/)
+[![runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-none-5E9643)](#quick-start)
+[![licence](https://img.shields.io/badge/licence-MIT-5E9643)](LICENSE)
+[![demo](https://img.shields.io/badge/demo-GitHub%20Pages-5E9643)](https://vhark.github.io/cea-psychrometric-site-evaluator/)
 
-![The site evaluator running the bundled Tulsa 2025 example](docs/screenshots/app-overview.png)
 
 A One Season Farmers tool. Static HTML and JavaScript, no build step, no backend, no account. Everything computes in your browser. Interactive tools use Instrument; exported documents use Field by default regardless of operating-system theme.
 
@@ -29,7 +28,7 @@ Three questions about a specific site, crop band and equipment class, before cap
 | Explainer site | https://vhark.github.io/cea-psychrometric-site-evaluator/ |
 | The tool itself | https://vhark.github.io/cea-psychrometric-site-evaluator/app/ |
 
-The hosted tool is the same static folder as this repository. Nothing you enter leaves your browser except the public weather requests you trigger yourself (see [SECURITY.md](SECURITY.md)).
+The Pages workflow publishes the explainer from `site/` at the root and packages this static calculator at `/app/` on pushes to `main`. Calculations and saved scenarios remain in your browser; triggered public weather requests transmit selected location/dates, and hosted assets/fonts generate ordinary network requests (see [SECURITY.md](SECURITY.md)). The release gallery uses `site/assets/screenshots/`; `docs/screenshots/` contains historical captures and is not the current UI reference.
 
 ## Quick start
 
@@ -102,7 +101,6 @@ Load a weather record, then **Import JSON / CSV** and pick a set from [docs/exam
 
 ## Learn tab
 
-![The Learn view: ten numbered sections, the first expanded](docs/screenshots/learn.png)
 
 The interface has two views. **Analyze** is the calculator. **Learn** is a ten-part curriculum that teaches the
 psychrometrics behind the screening in the order the tool applies it: reading the outdoor state, what attainment
@@ -125,15 +123,17 @@ region and what measurement would. Three of the six regions currently return no 
 | [docs/README.md](docs/README.md) | Index of every document with reading order |
 | [docs/GLOSSARY.md](docs/GLOSSARY.md) | Every domain term the interface uses, with unit and how it is computed here |
 | [docs/WORKFLOW.md](docs/WORKFLOW.md) | Step-by-step use of the tool, import formats, exports and their limits |
-| [docs/PRD.md](docs/PRD.md) | Product requirements and approved scope, including the v0.2 site-evaluator contract (§10) |
+| [docs/PRD.md](docs/PRD.md) | Current requirements and explicitly historical approved v0.2 scope |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Deployment decision, module boundaries, data contracts, controller design |
 | [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md) | Cross-module interface contract and file ownership |
 | [docs/EVALUATION.md](docs/EVALUATION.md) | Evidence ladder, acceptance gates and the checks each tier requires |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Checks actually executed, with measured values and dates |
-| [docs/AUDIT.md](docs/AUDIT.md) | Independent review findings, fixes, and the status of every open item |
+| [docs/AUDIT.md](docs/AUDIT.md) | Dated independent-review findings/dispositions and current supersession pointers |
 | [docs/SENSITIVITY.md](docs/SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives |
 | [docs/REGIONS.md](docs/REGIONS.md) | The ten-year regional study: method, recommendation rule, and the verdict for each bundled climate |
-| [docs/CLASSES.md](docs/CLASSES.md) | Classes of environmental control, the condition that exhausts each, and what each achieved in six climates |
+| [docs/CLASSES.md](docs/CLASSES.md) | Facility topology vocabulary, physical limits and withdrawal of unsupported older class rankings |
+| [docs/COMPONENT-PARAMETERS.md](docs/COMPONENT-PARAMETERS.md) | Current airflow, recovery, DOAS, screen and heat-pump assumptions and evidence limits |
+| [docs/CLIMATES.md](docs/CLIMATES.md) | All six bundled climates, 60 weather years, provenance and site-addition procedure |
 | [docs/EVIDENCE-HOT-HUMID.md](docs/EVIDENCE-HOT-HUMID.md) | What measured research proves for hot-humid CEA, graded by evidence tier, with the gaps named |
 | [docs/ENERGY-DATA.md](docs/ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage, vintages and limits |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Landscape review and source register behind the build decision |
@@ -146,7 +146,7 @@ region and what measurement would. Three of the six regions currently return no 
 
 | Dataset | Vintage | What it is, and is not |
 |---|---|---|
-| NASA POWER hourly meteorology and solar | Ten Tulsa years, 2016 to 2025. The 2025 snapshot was retrieved 2026-09-11, the other nine 2026-09-13 | A gridded reconstruction with UTC source timestamps and original payloads retained. RE hourly solar Wh/m² becomes interval-mean W/m² over one hour. Canonical RH is authoritative; inconsistent auxiliary dew and frost points are flagged, never used to overwrite RH. Not station truth. |
+| NASA POWER hourly meteorology and solar | Six sites, ten years each, 2016 to 2025; per-file retrieval dates in `data/weather/index.json` and snapshots | A gridded reconstruction with UTC source timestamps and original payloads retained. RE hourly solar Wh/m² becomes interval-mean W/m² over one hour. Canonical RH is authoritative; inconsistent auxiliary dew and frost points are flagged, never used to overwrite RH. Not station truth. |
 | Iowa Environmental Mesonet station observations | Archived study period 2026-01-01 to 2026-09-11 | Routine observations nearest the UTC hour within 30 minutes, original timestamps kept, estimated station pressure flagged. Missing observations never receive NASA meteorology. Solar is independently sourced and can be unavailable. |
 | GeoNames ZIP inventory | Retrieved 2026-09-11 | 42,185 records, 39,146 with dated candidate utilities, 27,037 with several candidates, 3,039 with none mapped, 479 mapping-only records without invented coordinates. Not a certified current USPS inventory, and a ZIP does not identify street service. |
 | OpenEI utility to ZIP mapping | Mapping year 2021 | Candidate providers only. Not a service-territory determination. |
@@ -164,9 +164,10 @@ python3 scripts/build-energy.py         # ZIP, utility, price and grid catalogs
 node scripts/fetch-observed.mjs         # IEM station observations plus independent solar
 node scripts/reference-study.mjs        # the observed weather-only Tulsa study
 node scripts/morris-screening.mjs       # Morris elementary-effects screening
+node scripts/regional-study.mjs         # 360 full-year six-site/six-strategy runs
 ```
 
-`build-energy.py` uses openpyxl for the source workbooks: `python3 -m pip install openpyxl` in a virtual environment if it is unavailable. Downloaded source files and SHA-256 manifests are retained, and `--refresh` re-downloads and verifies against them. Source updates can legitimately change data and cutoff dates.
+`build-energy.py` uses openpyxl for source workbooks: install it in a virtual environment if unavailable. Cached raw files are checked against their local acquisition hashes. Missing files or `--refresh` download current upstream bytes and record new hashes, so mutable sources need not reproduce the archived snapshot. Source updates can legitimately change data and cutoff dates.
 
 The committed Morris run is 1,872 simulations over 104 design points (8 trajectories, 12 parameters, three years, 120 sampled local days per year), seed 1. Its costs are sampled-period totals, not annual cost. Same seed and inputs reproduce numerical results; timestamps and elapsed time are provenance, not numerical outputs. Faster variant:
 
@@ -192,11 +193,11 @@ They are **not empirical greenhouse validation**. A passing suite says the code 
 | Milestone | Goal | Status |
 |---|---|---|
 | M0 | v0.2 site-evaluator sprint: multi-year, multi-site, load split, enrichment window, precision sweeps, design-basis brief | Done, 2026-09-13 |
-| M1 | Converged staged controller | Done, measured in [VERIFICATION.md](docs/VERIFICATION.md) |
+| M1 | Causal staged controller and scoped cadence checks | Implemented; historical case-specific evidence in [VERIFICATION.md](docs/VERIFICATION.md) |
 | M2 | State-coupled crop load (Stanghellini transpiration) | Done |
-| M3 | Quantified structural sensitivity (Morris) | Done, 2026-09-14, see [SENSITIVITY.md](docs/SENSITIVITY.md) |
+| M3 | Quantified structural sensitivity (Morris) | Implemented; current-model regeneration 2026-09-15 in [SENSITIVITY.md](docs/SENSITIVITY.md) |
 | M4 | Equipment maps where they matter | Open |
-| M5 | Benchmarked simulation against an independent model (evidence tier 3) | Open |
+| M5 | Matched independent-model and measured-data benchmark (evidence tier 3) | Open |
 | M6 | Site-calibrated analysis with held-out validation (evidence tier 4) | Open |
 
 Each milestone states the claim it earns, and nothing beyond it, in [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md).
@@ -206,7 +207,7 @@ Each milestone states the claim it earns, and nothing beyond it, in [docs/DIGITA
 This public repository holds the tool, its public data catalogs and its documentation. Two things are deliberately not here, both listed in `.gitignore`:
 
 - `private/`: material belonging to a client engagement, including an audit of a client's own separate internal calculator. It stays with that engagement.
-- `data/energy/raw/`: 36 MB of public-domain government workbooks and CSVs that `scripts/build-energy.py --refresh` re-downloads and verifies against the SHA-256 values already recorded in the committed manifests. The derived catalogs the application actually loads are committed.
+- `data/energy/raw/`: original public-data archives/workbooks regenerated by `scripts/build-energy.py`. Existing local downloads are checksum-checked; a refresh records new mutable upstream bytes and provenance rather than promising identical historic hashes. Derived runtime catalogs and their dated manifests are committed.
 
 Tulsa, Oklahoma is the bundled worked example: ten complete NASA POWER weather years and the ZIP 74103 default give a full run with no network access. Nothing in the tool is specific to that site. Every crop, envelope, equipment and price input is an editable, labeled assumption.
 

@@ -241,8 +241,8 @@ derated; if the derate would fall below it, the maximum clamps there and the run
 - **No optical or thermal effect of the mesh is modeled.** Mesh also changes light transmission [S24], and
   screen-specific PAR transmission is UNSOURCED. Use the shade-screen fields to declare an optical loss.
 - **The measured direction is not universal across strategies.** It was measured in a house whose only moisture
-  sink was the outside-air path. Where a mechanical sink exists the sign can reverse, which this repository
-  measured and documented in [CLASSES.md](CLASSES.md).
+  sink was the outside-air path. Mechanical conditioning changes that boundary. The older class-study
+  numerical comparisons are withdrawn as current-model evidence; see [CLASSES.md](CLASSES.md).
 
 ## 3B. Declared topology inputs, not sourced parameters
 
@@ -271,10 +271,7 @@ the unit will really see, together with its electrical input at that same condit
 wetter entering condition overstates removal in a cool zone sitting at its moisture ceiling. This fraction says
 nothing about capacity and must never be substituted for a capacity rating.
 
-The measured consequences are in [CLASSES.md](CLASSES.md), section "Where a dehumidifier's heat goes, measured":
-the least-cost returned fraction is not the same in every climate, measuring 0.25 at Miami, 0.50 at Tulsa and 1.00
-at Fairbanks, and at Miami the cheapest fraction and the best-attaining one are different values, so this
-declaration carries an operating-cost consequence rather than being bookkeeping.
+Returned heat can displace heating or add cooling demand, depending on conditions. The former climate-specific least-cost heat-return fractions are withdrawn as current evidence with the older class study. No current artifact establishes an optimal fraction or product selection.
 
 ## 4. Air-source heat-pump heating
 
@@ -300,7 +297,7 @@ No defensible generic `heatingCOP_vsOutdoorC`, low-ambient capacity curve, defro
 - `panHeater_kW` and its control conditions, plus any separately supplied standby power.
 - Backup type, finite `backupCapacity_kW`, and fuel efficiency or electrical-input accounting.
 
-### 4.3 Reduced-order interpolation contract
+### 4.3 Recommended future interpolation contract
 
 A simple piecewise-linear table is preferable to a polynomial because it exposes the supplied evidence and avoids unsupported low-temperature extrapolation. Interpolate **capacity and input power**, then derive COP:
 
@@ -324,7 +321,7 @@ Below an evidenced compressor cutoff, delivered compressor heat is **0 kW by the
 
 ENERGY STAR defines COP for a single operating condition and HSPF2 as seasonally accumulated delivered heat divided by electrical energy under its prescribed regional rating procedure [S22]. Actual seasonal COP should be `sum(deliveredHeating_kWh) / sum(heatingElectricity_kWh)`, including the declared auxiliaries and backup within a clearly stated boundary. It is not an arithmetic mean of point COPs, and an HSPF2 label is not an hourly COP input.
 
-The current code books `heaterW / heaterEfficiency` to fuel and limits `heaterEfficiency` to a combustion-style fraction. A heat pump needs a separate electrical-heating branch and temperature-dependent finite heat capacity. Update moisture-tempering economics as well as zone heating: `physics.js` also uses fuel heater efficiency in its ventilation-drying comparison. This is a future integration requirement, not an implemented change.
+**Implemented boundary in model 0.3.0:** `src/screens.js` interpolates the three user-entered COPs directly at 8.33, −8.33 and −15 °C, with a separate linear capacity derate to −15 °C. COP and capacity are held flat above/below the rating range until the declared compressor cutoff; these extensions are explicit assumptions, not manufacturer evidence. Below cutoff the compressor delivers no heat and no automatic backup source is invented. `src/simulate.js` charges heat-pump electricity or heating fuel on actual delivered heat, sharing finite capacity across recovery preheat, DOAS external heat and zone heat. `physics.js` uses the same source/COP for its simpler weather-side drying screen. The preferred capacity/input interpolation above, integrated defrost and a separately dispatched backup remain future fidelity work, not current capabilities.
 
 ## 5. UNSOURCED register and least-certain parameters
 
@@ -349,7 +346,7 @@ The current code books `heaterW / heaterEfficiency` to fuel and limits `heaterEf
 
 ## 6. Source register and access record
 
-All sources below were accessed directly during this research. **23 distinct source documents/pages are cited**, counting the NEEP specification separately from its product-list access page and individual vendor product datasheets separately. The SIP chart is part of its parent technical page, not an extra source. This is a mixed primary/extension/vendor reference, not a systematic literature review.
+The original component research cited S1 to S23; S24 added the insect-screen campaign. The later airflow/recovery sources are linked separately below. Access records distinguish full texts, abstracts, extension estimates and vendor pages. This is a mixed-source reference, not a systematic literature review.
 
 - **[S1]** Gilbert, D.L., Bertling, I., and Savage, M.J. (2013). *Radiation transmission through coloured shade netting and plastics and its effect on Eucalyptus grandis × E. nitens hybrid mini-hedge shoot internode length, stem diameter and leaf area.* Acta Horticulturae 1007, 773-780. DOI 10.17660/ActaHortic.2013.1007.91. Publisher abstract read: https://ishs.org/ishs-article/1007_91/ . Full numeric tables not accessed.
 - **[S2]** Ferrarezi, R.S. and Worley, J.W. *Greenhouses: Heating, Ventilation, and Cooling*, UGA Extension Bulletin 792, revised November 2025. Heating/material/ACH sections and worked geometry example read: https://fieldreport.caes.uga.edu/publications/B792/greenhouses-heating-ventilation-and-cooling/ . Extension estimates.
@@ -404,6 +401,8 @@ Do not dismiss a parameter merely because it is uncertain. Run separate cold/hea
 ### Separate quantities and conversion
 
 Uncontrolled envelope infiltration (`infiltrationACH`) and controlled outdoor air (`minVentACH` to installed `maxVentACH`) are separate. The actual total outdoor-air exchange is their sum. The controlled stream passes through optional HRV/ERV recovery or bypass, then optional DOAS, then enters the zone once. `doasM3s` is maximum treatment capacity at the DOAS inlet, not additional outdoor flow. Inlet density changes after recovery/preheat can constrain the outdoor-reference command. Unconditioned excess is admitted only as explicit useful economizer bypass, not silently credited as conditioned air.
+
+For a closed thermal curtain with a declared effective exchange cap, the model allocates that cap to effective infiltration first, then limits the controlled stream to the remainder. Recovery and DOAS act on that same capped stream; neither is an unrestricted second ducted path. With no declared cap, the model reports an optimistic moisture assumption rather than inferring airflow from curtain gap percentage.
 
 Internal recirculation, crop air velocity, distribution uniformity, CO2 balance, wind/stack pressure and natural-vent opening geometry are not modeled. A natural-house maximum is a declared effective capacity, not a predicted wind-dependent flow.
 

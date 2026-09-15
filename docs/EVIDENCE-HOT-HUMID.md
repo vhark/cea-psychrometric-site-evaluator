@@ -9,12 +9,12 @@ evaporative cooling, mechanical cooling and dehumidification, desiccants, enclos
 control setpoints, and validation data and standards. 52 cited DOIs were machine-checked and all 52 resolve
 (49 through Crossref, 3 through DataCite).
 
+**Current-status pointer, 2026-09-15:** this is a dated literature review, not a fresh model-0.3.0 audit or an exhaustive search of all published data. Current implementation and numerical evidence are in [IMPLEMENTATION.md](IMPLEMENTATION.md), [VERIFICATION.md](VERIFICATION.md) and [REGIONS.md](REGIONS.md). The old DOAS/class/hybrid-close-up conclusions are withdrawn. Section 6 preserves the issues identified during this review; design-condition naming and insect-screen derating have since been corrected. Absence statements mean not identified within the search described in §9.
+
 Read this if: you are choosing equipment for a humid site, or you want to know which of this tool's numbers
 rest on measurement and which rest on assumption.
 
-For what this tool itself computes for humid climates, including four hot-humid design questions measured
-rather than asserted, see [CLASSES.md](CLASSES.md). Those are model results held to the screening tier, not
-evidence of the kind graded below.
+For current conditional greenhouse results see [REGIONS.md](REGIONS.md). [CLASSES.md](CLASSES.md) now explains topology limits and the withdrawal of older four-question/class-ladder numerical findings; it is not a regenerated class benchmark.
 
 ## The headline
 
@@ -265,7 +265,9 @@ rose and canopy-to-air VPD increased in the lower crop layer
 ([10.13031/2013.15636](https://doi.org/10.13031/2013.15636), **B**, winter roses, transfer). Air RH alone is
 insufficient to predict condensation risk, because what matters is leaf temperature against air dew point.
 
-## 6. What this means for this tool
+## 6. Historical implementation appraisal, 2026-09-14
+
+The following text records the pre-0.3.0 appraisal. Its referenced artifact paths now contain regenerated outputs, so they are not immutable evidence for every old statement below. In particular, the old tropical-indoor/class results are withdrawn; the insect-screen omission and design-condition naming were fixed. Literature findings remain subject to the dated search limits.
 
 The tool's Miami verdict is that pad-and-vent reaches 7.8 percent joint-band attainment, pads plus a
 dehumidifier 9.8 percent, desiccant with evaporative cooling 10.5 percent, and DX with a dehumidifier
@@ -329,10 +331,10 @@ Neither is quantified for our configuration, and they do not cancel in any way w
    energy factor including prescribed low-power terms (10 CFR 430 Appendix X1). A crop room near 26 C is 3 to 8
    K away from those rating points. Our L/kWh input is a single number where the physics needs a performance
    map.
-3. **We do not model the screen ventilation penalty.** The measured Thai result is that finer insect screens
-   cut ventilation by about 35 and 50 percent and raised indoor moisture accumulation. Our tool takes
-   `maxVentACH` as a user input with no screen-dependent derate, so a user who fits fine mesh in the tropics
-   will get an optimistic ventilation answer unless they lower that input themselves.
+3. **Insect-screen ventilation penalty, subsequently implemented.** The review found that `maxVentACH`
+   had no screen-dependent derate. Model 0.3.0 includes declared or catalogued `insectScreen`
+   factors, with minimum-flow and reference-house limitations in [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md).
+   The source measurement is not a universal mesh-to-ACH design rule.
 
 **What would settle the tool's Miami verdict**: one instrumented hot-humid facility running two strategies
 against a shared band, with separated metering of compressors, pumps, fans, reheat and heat rejection,

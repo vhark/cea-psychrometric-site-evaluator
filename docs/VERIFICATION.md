@@ -14,8 +14,10 @@ Status: model `0.3.0-screening`, scenario schema 2, updated 2026-09-15. The date
 | Focused model/data/export checks in browser artifact | 121 passed, zero failed, command and date retained in artifact; this is not the whole suite |
 | Screen-fixture cutover | `node --test test/screens.test.mjs`: 12 passed, zero failed after schema-2 review and one-stream moisture closure correction. Heat-pump fixtures explicitly review zero controlled air/fan power; conservation bounds are unchanged |
 | Focused post-cleanup contracts | `node --test test/data.test.mjs test/examples.test.mjs test/sensitivity.test.mjs test/regional.test.mjs`: 36 passed, zero failed, including real-weather example runs and current artifact schema/cost contracts |
-| Source syntax | `node --check` succeeded for config, app, Learn, report, tour, sensitivity and the reference-study generator |
-| Full integration suite | Before this documentation/test cutover the parent observed 157 total, 154 pass and three screen-fixture failures. Those three fixtures are repaired and the focused screen suite is green. Final project-wide integration validation is owned by the parent; no full-suite-green claim is made here |
+| Source syntax | Ten successful `node --check` commands at `686d876`: `src/airflow.js`, `src/config.js`, `src/simulate.js`, `src/metrics.js`, `src/export.js`, `src/report.js`, `src/app.js`, `scripts/regional-study.mjs`, `scripts/morris-screening.mjs`, `scripts/reference-study.mjs` |
+| Full integration suite | Integrating parent executed `npm test` at source commit `686d876`: **157 tests, 157 pass, zero failures or skips**, 10.47 s. This supersedes the earlier 154/157 run and its three repaired screen-fixture failures |
+| Saved-schema migration smoke | Actual Chromium seeded localStorage with a valid schema-1 `greenhouseGlass` scenario plus unsupported schema 999. Reload retained/migrated the valid entry, skipped the unsupported entry with a warning, and saved the editable scenario as schema 2. Original localStorage was restored afterward |
+| Conditioned-air browser smoke | HRV nominal 4 m³/s, auxiliary 50 W and sensible heating 75%/100% ratings 0.8/0.7 plus cooling ratings 0.75/0.65; DOAS 1 m³/s, dew point 10 °C, supply 18 °C, COP 3, reheat fraction 0.5. Inputs survived worker submission/result unchanged. Qualified no-frost minimum −10 °C blocked colder weather; switching to declared preheat threshold −5 °C completed the full Tulsa 2025 run with zero numerical-failure hours. These are smoke-test inputs, not product ratings or recommended settings |
 | Regional regeneration | `node scripts/regional-study.mjs`: 360 full-year simulations, zero numerical-failure hours; artifact envelope 1 with scenario schema 2, compatible with Learn; 220 s recorded |
 | Morris regeneration | `node scripts/morris-screening.mjs`: 1,872 simulations, 104 design points, zero numerical-failure hours; envelope 2, scenario schema 2; 418.7 s recorded |
 | Current Morris influence | Aggregate joint-attainment mu* LAI/transpiration 9.098627 pp per full screened range; maximum controlled-air capacity 2.164460 pp. Not a probability bound or threshold calibration |
@@ -46,9 +48,9 @@ Historical cadence checks below are explicitly old-model development evidence. T
 
 `node scripts/reference-study.mjs` regenerated the observed reference study during this release: 6,087 expected hours, 6,064 valid, 23 missing, 251 NOAA daily records and 16 sensitivity cases. All eight CSVs were hash-compared: seven are unchanged; the hourly psychrometric CSV changes only secondary flags in 2,928 rows to reflect the current independent pad/vent opportunity classifier. Numeric fields, primary modes and row counts are unchanged. The report remains weather-side opportunity analysis, not indoor simulation. Actual Chromium inspection under emulated dark OS confirmed Field ground `#F7FAF6` and no horizontal overflow. See [../reference-study/manifest.json](../reference-study/manifest.json) for source provenance. Interactive tools use Instrument.
 
-## 0.1.0-screening record (2026-09-11)
+## Historical 0.1.0 and 0.2.0 development records (2026-09-11 to 2026-09-14)
 
-Release model at the time: `0.1.0-screening`.
+The remaining sections preserve what was observed at those dates. Old figures, brand names, test counts, APIs and deployment statements describe those versions only. Refer to the current-state table above for model 0.3.0. Links to regenerated artifact paths now resolve to current outputs, not immutable copies of these historical runs.
 
 ## Result and evidence tier
 
@@ -88,7 +90,7 @@ A real browser loaded the bundled NASA POWER Tulsa 2025 snapshot and ran six str
 - Largest reported moisture residual: approximately **3.87 × 10⁻¹⁶ kg/s**.
 - Correct shared location: ZIP 74103, Tulsa coordinates, America/Chicago; Oklahoma public energy context. These example scenarios deliberately use manual electricity prices, not the available state-price series.
 
-[The compact metrics and export hashes](browser-run-metrics.json) preserve the exact measured values. [The example report](example-comparison.html) was regenerated from the unchanged browser-run JSON with the final exporter after a font-loading correction; its numeric results are unchanged and its separate hash is recorded. [The six portable configurations](example-scenarios.json) can be imported after loading the Tulsa 2025 example.
+At the time, compact metrics, export hashes and the example report were retained from this browser run. Those paths have since been regenerated for model 0.3.0: [browser-run-metrics.json](browser-run-metrics.json), [example-comparison.html](example-comparison.html) and [example-scenarios.json](example-scenarios.json) now contain current evidence and must not be cited as the archived bytes of the 0.1.0 run.
 
 Individual result totals cover valid hours including warm-up energy. Comparative costs use the common eligible set, so their dollar totals differ slightly. Annual capital recovery plus maintenance is displayed separately from historical-period operating cost. No partial-period weather-dependent cost is annualized.
 
