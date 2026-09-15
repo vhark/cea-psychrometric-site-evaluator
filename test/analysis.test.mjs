@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {aggregateYears,compareScenarios,compareSites,designHours,loadDecomposition,co2Window,summarizeHours,LATENT_KWH_PER_KG} from '../src/metrics.js';
 import {designBasisHTML,reportHTML} from '../src/export.js';
+import {attainmentComparisonText} from '../src/report.js';
 import {wetBulb,dewPoint,humidityRatio} from '../src/physics.js';
 import {weatherSummary} from '../src/metrics.js';
 import {makeScenario} from '../src/config.js';
@@ -120,6 +121,26 @@ test('scenario comparison exposes reductions only for a cheaper named alternativ
   assert.deepEqual(rows[1].costBasis.excluded,['installed capital','maintenance','labor','financing','taxes','demand charges','fixed charges','time-of-use effects','other unmodeled tariff components']);
   assert.equal(rows[1].costBasis.isQuote,false);
   assert.equal(rows[1].costBasis.isGuaranteedSavings,false);
+});
+
+test('attainment comparison rejects numerical failures on either side but retains unpriced valid endpoints',()=>{
+  const baseline={scenario:scenario('baseline','Baseline'),summary:{numericalFailureHours:0},
+    hours:[hour(0,{compliantFraction:.234,cost:null})]};
+  const alternative={scenario:scenario('alternative','Alternative'),summary:{numericalFailureHours:0},
+    hours:[hour(0,{compliantFraction:.678,cost:null})]};
+  const unpriced=compareScenarios([baseline,alternative]);
+  assert.equal(unpriced[0].comparable,false);
+  assert.equal(unpriced[1].comparable,false);
+  const validText=attainmentComparisonText(...unpriced);
+  for(const endpoint of ['23.4%','67.8%','44.4'])assert.ok(validText.includes(endpoint));
+  for(const failedIndex of [0,1]){
+    const inputs=[baseline,alternative].map((r,i)=>({...r,summary:{numericalFailureHours:i===failedIndex?1:0}}));
+    const compared=compareScenarios(inputs);
+    assert.ok(compared.every(row=>Number.isFinite(row.compliancePct)));
+    const rejectedText=attainmentComparisonText(...compared);
+    assert.doesNotMatch(rejectedText,/\d|%|\bpp\b/,'failed numerical coverage must not advertise attainment endpoints or a pp difference');
+    assert.match(rejectedText,/numerical/i,'explain the eligibility failure instead of reporting a price problem');
+  }
 });
 
 test('comparison and design-basis data retain numeric rates for common state-priced periods',()=>{

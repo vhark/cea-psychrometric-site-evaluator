@@ -47,6 +47,8 @@ export function airflowRows(result) {
     ['Actual maximum controlled outdoor-air flow', air?.maximum ? `${num(air.maximum.m3s, 3)} m³/s, ${num(air.maximum.cfm)} cfm` : 'Not available']];
 }
 export function attainmentComparisonText(baseline, alternative) {
+  if (baseline?.numericalFailureHours > 0 || alternative?.numericalFailureHours > 0)
+    return 'Joint temperature-and-moisture target attainment is not comparable because the baseline or alternative has numerical failures. Resolve those failures before comparing attainment.';
   if (!finite(baseline?.compliancePct) || !finite(alternative?.compliancePct)) return 'Joint temperature-and-moisture target attainment is not comparable.';
   return `Joint temperature-and-moisture target attainment: ${alternative.name} minus baseline ${baseline.name}, ${num(alternative.compliancePct-baseline.compliancePct, 2)} percentage points (pp), from ${pct(baseline.compliancePct)} (${num(baseline.compliantHours, 2)} / ${num(baseline.matchedHours)} eligible h) to ${pct(alternative.compliancePct)} (${num(alternative.compliantHours, 2)} / ${num(alternative.matchedHours)} eligible h). Not a relative percent change.`;
 }
