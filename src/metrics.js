@@ -29,10 +29,13 @@ function outdoorDrying(hours, scenario) {
     basis: 'Maximum ventilation rate, fan power and heating of ventilation air to the target at scenario prices; sensible import in hot-dry hours is not costed here.'};
 }
 
-const ENERGY_FIELDS = ['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh','desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg','cropWaterL','padWaterL','humidifierWaterL','unmetSensibleKWh','unmetMoistureKg','doasKWh','doasRemovedKg'];
+const ENERGY_FIELDS = ['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh','desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg','cropWaterL','padWaterL','humidifierWaterL','unmetSensibleKWh','unmetMoistureKg','doasKWh','doasRemovedKg',
+  'recoverySensibleKWh','recoveryLatentKWh','recoveryAuxKWh','recoveryCoreM3','recoveryBypassM3','recoveryDefrostHours',
+  'preheatDeliveredKWh','preheatElectricKWh','preheatFuelKWh','preheatInsufficientHours'];
 const eligible = h => h.valid && h.eligible !== false && !h.warmup;
 // Runtime: hours with any use, duty-weighted equivalent full-load hours, and distinct local days with any use.
-const RUNTIME_COMPONENTS=[['pad','padFraction'],['indirect','indirectFraction'],['dx','dxDuty'],['dehu','dehuDuty'],['desiccant','desiccantDuty'],['heating','heaterDuty'],['humidifier','humidifierFraction'],['light','lightFraction'],['doas','doasConditionedFraction']];
+const RUNTIME_COMPONENTS=[['pad','padFraction'],['indirect','indirectFraction'],['dx','dxDuty'],['dehu','dehuDuty'],['desiccant','desiccantDuty'],['heating','heaterDuty'],['humidifier','humidifierFraction'],['light','lightFraction'],['doas','doasConditionedFraction'],
+  ['recoveryActive','recoveryCoreFraction'],['recoveryBypass','recoveryBypassFraction'],['recoveryDefrost','recoveryDefrostFraction'],['preheat','preheatFraction']];
 export function hourCost(hour,scenario) {
   if (Object.hasOwn(hour,'cost')) return Number.isFinite(hour.cost)?hour.cost:null;
   return (hour.electricKWh||0)*scenario.electricityPrice+(hour.fuelKWh||0)*scenario.fuelPrice+(hour.waterL||0)*scenario.waterPrice;

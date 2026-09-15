@@ -24,6 +24,74 @@ function zoneInventory(s,pressurePa=101325,tempC=s.dayTargetC) {
   return {tempC,w,minW:b.minW,maxW:b.maxW,mass,capacity:s.areaM2*s.thermalMassKJm2K*1000+mass*CP};
 }
 const runSeconds=(result,field)=>result.hours.reduce((sum,h)=>sum+(h.controls?.[field]||0)*3600,0);
+const recovery=(type='hrv',overrides={})=>({
+  type,nominalM3s:1,auxiliaryW:45,
+  sensibleHeating75:.7,sensibleHeating100:.7,sensibleCooling75:.7,sensibleCooling100:.7,
+  latentHeating75:.5,latentHeating100:.5,latentCooling75:.5,latentCooling100:.5,
+  economizerBypass:true,frostControl:'none',minimumOutdoorOperatingC:-30,
+  frostThresholdC:null,initialDefrostFraction:null,defrostRatePerK:null,...overrides});
+function expectedRecoveryHour(s,outdoor,sensibleEffectiveness,latentEffectiveness=0,coreFraction=1) {
+  const initial=zoneInventory(s,outdoor.pressurePa),dt=300,flowM3s=s.minVentACH*s.areaM2*s.heightM/3600;
+  const flowKgS=dryAirDensity(outdoor.tempC,humidityRatio(outdoor.tempC,outdoor.rh,outdoor.pressurePa),outdoor.pressurePa)*flowM3s;
+  const outsideW=humidityRatio(outdoor.tempC,outdoor.rh,outdoor.pressurePa);
+  const ua=s.areaM2*s.envelopeRatio*s.uValue,conductance=ua+CP*flowKgS;
+  const heatDecay=Math.exp(-conductance*dt/initial.capacity),massDecay=Math.exp(-flowKgS*dt/initial.mass);
+  let tempC=initial.tempC,w=initial.w,sensibleKWh=0,latentKWh=0;
+  for(let step=0;step<12;step++){
+    const coreKgS=flowKgS*coreFraction;
+    const recoveredTempC=outdoor.tempC+sensibleEffectiveness*(tempC-outdoor.tempC);
+    const recoveredW=outsideW+latentEffectiveness*(w-outsideW);
+    const supplyTempC=outdoor.tempC+coreFraction*(recoveredTempC-outdoor.tempC);
+    const supplyW=outsideW+coreFraction*(recoveredW-outsideW);
+    sensibleKWh+=coreKgS*CP*(recoveredTempC-outdoor.tempC)*dt/KWH;
+    latentKWh+=coreKgS*L*(recoveredW-outsideW)*dt/KWH;
+    tempC=tempC*heatDecay+(ua*outdoor.tempC+CP*flowKgS*supplyTempC)*(1-heatDecay)/conductance;
+    w=w*massDecay+supplyW*(1-massDecay);
+  }
+  return {sensibleKWh,latentKWh};
+}
+
+test('closed-zone HRV supply sensible gain equals balanced exhaust loss and latent transfer is zero',()=>{
+ const outdoor={tempC:-10,rh:.35,pressurePa:101325};
+ const s=closed({controlMode:'ideal',minVentACH:9,maxVentACH:9,fanWPerM3s:0,thermalMassKJm2K:20,heatRecovery:recovery('hrv')});
+ const result=simulateScenario(s,weather(1,outdoor),{stepMinutes:5});
+ const expected=expectedRecoveryHour(s,outdoor,.7);
+ const row=result.hours[0];
+ assert.equal(row.controls.recoveryCoreFraction,1,'the closed-zone fixture must use the full balanced core flow');
+ assert.ok(Math.abs(row.recoverySensibleKWh-expected.sensibleKWh)<=1e-9*Math.max(1,expected.sensibleKWh),
+  `supply gained ${row.recoverySensibleKWh} kWh while the independently calculated exhaust loss was ${expected.sensibleKWh} kWh`);
+ assert.equal(row.recoveryLatentKWh,0,'an HRV cannot transfer latent energy');
+ assert.equal(result.summary.recoveryLatentKWh,0);
+});
+
+test('closed-zone ERV sensible plus latent transfer equals its balanced exhaust-side loss',()=>{
+ const outdoor={tempC:-8,rh:.25,pressurePa:101325};
+ const s=closed({controlMode:'ideal',minVentACH:9,maxVentACH:9,fanWPerM3s:0,thermalMassKJm2K:20,heatRecovery:recovery('erv')});
+ const result=simulateScenario(s,weather(1,outdoor),{stepMinutes:5});
+ const expected=expectedRecoveryHour(s,outdoor,.7,.5);
+ const row=result.hours[0];
+ assert.equal(row.controls.recoveryCoreFraction,1);
+ assert.ok(Math.abs(row.recoverySensibleKWh-expected.sensibleKWh)<=1e-9*Math.max(1,expected.sensibleKWh));
+ assert.ok(Math.abs(row.recoveryLatentKWh-expected.latentKWh)<=1e-9*Math.max(1,expected.latentKWh));
+ assert.ok(Math.abs(row.recoverySensibleKWh+row.recoveryLatentKWh-expected.sensibleKWh-expected.latentKWh)<=1e-9*Math.max(1,expected.sensibleKWh+expected.latentKWh),
+  'ERV supply transfer must close against the independently calculated balanced exhaust loss');
+});
+
+test('exhaust-only frost reduces recovered flow exactly while preserving the controlled supply stream',()=>{
+ const outdoor={tempC:-10,rh:.35,pressurePa:101325};
+ const configured=recovery('hrv',{frostControl:'exhaustOnly',frostThresholdC:-5,initialDefrostFraction:.1,defrostRatePerK:.05,minimumOutdoorOperatingC:null});
+ const s=closed({controlMode:'ideal',minVentACH:9,maxVentACH:9,fanWPerM3s:0,thermalMassKJm2K:20,heatRecovery:configured});
+ const result=simulateScenario(s,weather(1,outdoor),{stepMinutes:5});
+ const row=result.hours[0],expected=expectedRecoveryHour(s,outdoor,.7,0,.65);
+ assert.ok(Math.abs(row.controls.controlledM3s-1)<1e-12,'defrost must not reduce controlled supply volume');
+ assert.ok(Math.abs(row.controls.recoveryCoreFraction-.65)<1e-12);
+ assert.ok(Math.abs(row.controls.recoveryBypassFraction-.35)<1e-12);
+ assert.ok(Math.abs(row.recoveryCoreM3-2340)<1e-8);
+ assert.ok(Math.abs(result.summary.recoveryCoreM3-2340)<1e-8);
+ assert.ok(Math.abs(row.recoverySensibleKWh-expected.sensibleKWh)<=1e-9*Math.max(1,expected.sensibleKWh),
+  `frost recovery ${row.recoverySensibleKWh} kWh did not equal 0.65 of each independently calculated full-core transfer`);
+ assert.ok(Math.abs(row.recoveryDefrostHours-.35)<1e-12);
+});
 
 test('pad water is the humidity-ratio rise across the pad carried by the ventilation dry-air mass flow',()=>{
  const s=closed({padEnabled:true,technology:'pad',minVentACH:0,maxVentACH:20,padEffectiveness:.8,padPumpW:0,uValue:1,envelopeRatio:1.8});
@@ -147,6 +215,12 @@ test('free-running exchange uses infiltration plus exactly one controlled dry-ai
    `hour ${index+1}: ${row.humidityRatio} kg/kg vs one-stream analytic ${expectedW} kg/kg`);
   assert.ok(Math.abs(row.controls.controlledACH-2)<1e-12);
   assert.ok(Math.abs(row.controls.totalOutdoorACH-3)<1e-12);
+ }
+ assert.equal(result.summary.recoveryCoreM3,0);
+ assert.equal(result.summary.recoveryBypassM3,0);
+ for(const row of result.hours){
+  assert.equal(row.recoveryCoreM3,0);
+  assert.equal(row.recoveryBypassM3,0);
  }
 });
 

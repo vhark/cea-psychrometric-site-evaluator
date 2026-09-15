@@ -11,6 +11,13 @@ const diurnal=(hours=48,mean=18,amp=6)=>({schemaVersion:1,source:'Synthetic diur
   return {time:Date.UTC(2025,3,1,i),tempC:mean+amp*Math.sin(Math.PI*(h-9)/12),rh:.8-.3*sun,pressurePa:98500,ghiWm2:Math.round(800*sun)};})});
 const weather=(hours=24,changes={})=>({schemaVersion:1,source:'Synthetic boundary-test fixture',sourceKind:'test',latitude:36.15,longitude:-95.99,timezone:'UTC',startDate:'2025-01-01',endDate:'2025-01-01',hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:22,rh:.6,pressurePa:101325,ghiWm2:0,...changes}))});
 const closed=(overrides={})=>({...makeScenario('indoor'),outsideAirReviewed:true,timezone:'UTC',areaM2:100,canopyM2:100,heightM:4,dayTargetC:22,nightTargetC:22,tempToleranceC:2,vpdMin:.5,vpdMax:1.5,maxDewPointC:19,uValue:.05,infiltrationACH:0,minVentACH:0,maxVentACH:0,lightWm2:0,dliTarget:0,transpirationModel:'schedule',transpirationLDayM2:0,cropSensibleWm2:0,coolingKW:0,dehuKgH:0,heaterKW:0,humidifierKgH:0,...overrides});
+const recovery=(type='hrv',overrides={})=>({
+ type,nominalM3s:1,auxiliaryW:45,
+ sensibleHeating75:.7,sensibleHeating100:.7,sensibleCooling75:.7,sensibleCooling100:.7,
+ latentHeating75:.5,latentHeating100:.5,latentCooling75:.5,latentCooling100:.5,
+ economizerBypass:true,frostControl:'none',minimumOutdoorOperatingC:-30,
+ frostThresholdC:null,initialDefrostFraction:null,defrostRatePerK:null,...overrides});
+
 test('invalid control ranges cannot silently become a viable scenario',()=>{
  assert.match(validateScenario(closed({minVentACH:10,maxVentACH:1})).join(' '),/Minimum controlled outdoor air exceeds/);
  assert.match(validateScenario(closed({vpdMin:2,vpdMax:1})).join(' '),/Minimum VPD must be below maximum VPD/);
@@ -118,6 +125,125 @@ test('configured HRV and ERV require their type-specific rating data',()=>{
  assert.ok(ervErrors.some(error=>error.includes('sensibleHeating75')));
  assert.ok(ervErrors.some(error=>error.includes('latentHeating75')));
  assert.match(validateScenario({...makeScenario('greenhouseDouble'),heatRecovery:'hrv'}).join(' '),/Heat recovery must be an object/);
+});
+test('configured recovery exposes active, bypass, frost, preheat, and airflow assumptions',()=>{
+ const s=closed({controlMode:'staged',minVentACH:9,maxVentACH:9,heaterKW:0,heatRecovery:recovery('hrv')});
+ const result=simulateScenario(s,weather(2,{tempC:-10,rh:.35}),{stepMinutes:5});
+ assert.ok(result.summary.recoverySensibleKWh>0);
+ assert.ok(result.summary.recoveryAuxKWh>0);
+ assert.equal(result.summary.recoveryLatentKWh,0);
+ assert.ok(result.summary.runtime.recoveryActive.hours>0);
+ assert.equal(result.summary.runtime.recoveryBypass.hours,0);
+ assert.equal(result.summary.runtime.recoveryDefrost.hours,0);
+ assert.equal(result.summary.runtime.preheat.hours,0);
+ assert.equal(result.assumptions.airflow.balancedRecoveryFlow,true);
+ assert.deepEqual(result.assumptions.airflow.supportedRecoveryFlowFraction,{minimum:.5,maximum:1.3});
+ assert.match(result.assumptions.airflow.ratingInputs,/manufacturer/i);
+});
+test('staged economizer and evaporative pad bypass recovery on the same controlled stream',()=>{
+ const cool=closed({controlMode:'staged',minVentACH:.3,maxVentACH:9,cropSensibleWm2:100,thermalMassKJm2K:20,
+  fanWPerM3s:0,heatRecovery:recovery('hrv')});
+ const economizer=simulateScenario(cool,weather(24,{tempC:5,rh:.35}),{stepMinutes:5});
+ const bypassRows=economizer.hours.filter(h=>h.controls?.controlledACH>cool.minVentACH+1e-9&&h.controls.recoveryBypassFraction>0);
+ assert.ok(bypassRows.length>0,'fixture must call staged economizer bypass');
+ for(const h of bypassRows){
+  assert.equal(h.controls.recoveryCoreFraction,0);
+  assert.equal(h.recoverySensibleKWh,0);
+  assert.ok(h.recoveryBypassM3>0);
+ }
+ const padScenario=closed({controlMode:'staged',technology:'pad',padEnabled:true,minVentACH:.3,maxVentACH:20,
+  padEffectiveness:.8,padPumpW:0,uValue:1,envelopeRatio:1.8,heatRecovery:recovery('erv')});
+ const pad=simulateScenario(padScenario,weather(24,{tempC:38,rh:.1}),{stepMinutes:5});
+ const padRows=pad.hours.filter(h=>h.controls?.padFraction>0);
+ assert.ok(padRows.length>0,'fixture must operate the direct pad');
+ for(const h of padRows){
+  assert.equal(h.controls.recoveryCoreFraction,0);
+  assert.ok(Math.abs(h.controls.recoveryBypassFraction-1)<1e-12);
+  assert.equal(h.recoverySensibleKWh+h.recoveryLatentKWh,0);
+ }
+});
+test('staged recovery bypass also weighs useful outdoor heating and humidification',()=>{
+ const heatingWeather=weather(2,{tempC:-20,rh:.35});
+ heatingWeather.hours[1]={...heatingWeather.hours[1],tempC:35,rh:.35};
+ const heating=simulateScenario(closed({controlMode:'staged',minVentACH:9,maxVentACH:9,heaterKW:0,
+  fanWPerM3s:0,thermalMassKJm2K:20,heatRecovery:recovery('hrv')}),heatingWeather,{stepMinutes:5});
+ assert.ok(heating.hours[0].tempC<20,'first hour must leave the unheated fixture cold');
+ assert.ok(heating.hours[1].controls.recoveryBypassFraction>0,
+  'untreated warm outdoor air must compete with recovery when the zone needs heat');
+ const humidWeather=weather(2,{tempC:22,rh:.05});
+ humidWeather.hours[1]={...humidWeather.hours[1],rh:.7};
+ const humidifying=simulateScenario(closed({controlMode:'staged',minVentACH:9,maxVentACH:9,heaterKW:0,
+  fanWPerM3s:0,thermalMassKJm2K:20,heatRecovery:recovery('erv')}),humidWeather,{stepMinutes:5});
+ assert.ok(humidifying.hours[1].controls.recoveryBypassFraction>0,
+  'untreated moist outdoor air must compete with recovery when the zone needs moisture');
+});
+test('unsupported low recovery flow bypasses with a warning and high flow caps the core once',()=>{
+ const low=closed({controlMode:'ideal',minVentACH:4.41,maxVentACH:4.41,heaterKW:0,heatRecovery:recovery('hrv')});
+ const lowResult=simulateScenario(low,weather(1,{tempC:-10,rh:.35}),{stepMinutes:5});
+ assert.equal(lowResult.hours[0].controls.recoveryCoreFraction,0);
+ assert.equal(lowResult.hours[0].controls.recoveryBypassFraction,1);
+ assert.equal(lowResult.summary.recoveryAuxKWh,0);
+ assert.ok(lowResult.warnings.some(w=>/below.*50%|50%.*nominal/i.test(w)));
+ const high=closed({controlMode:'ideal',minVentACH:18,maxVentACH:18,heaterKW:0,heatRecovery:recovery('hrv')});
+ const highResult=simulateScenario(high,weather(1,{tempC:-10,rh:.35}),{stepMinutes:5});
+ assert.ok(Math.abs(highResult.hours[0].controls.controlledM3s-2)<1e-12);
+ assert.ok(Math.abs(highResult.hours[0].controls.recoveryCoreFraction-.65)<1e-12);
+ assert.ok(Math.abs(highResult.hours[0].controls.recoveryBypassFraction-.35)<1e-12);
+ assert.ok(Math.abs(highResult.hours[0].recoveryBypassM3-2520)<1e-8);
+ assert.ok(Math.abs(highResult.hours[0].recoveryCoreM3-4680)<1e-8);
+ assert.ok(Math.abs(highResult.summary.recoveryCoreM3-4680)<1e-8);
+});
+test('frost preheat consumes finite heating capacity first and charges its declared source',()=>{
+ const base={controlMode:'staged',minVentACH:9,maxVentACH:9,heaterKW:20,thermalMassKJm2K:20,
+  heatRecovery:recovery('hrv',{frostControl:'preheat',minimumOutdoorOperatingC:null,frostThresholdC:-5})};
+ const outsideW=humidityRatio(-15,.35,101325);
+ const expectedPreheatKWh=dryAirDensity(-15,outsideW,101325)*
+  (enthalpy(-5,outsideW)-enthalpy(-15,outsideW))/1000;
+ const fuel=simulateScenario(closed(base),weather(1,{tempC:-15,rh:.35}),{stepMinutes:5});
+ assert.ok(Math.abs(fuel.summary.preheatDeliveredKWh-expectedPreheatKWh)<=1e-9*expectedPreheatKWh,
+  `${fuel.summary.preheatDeliveredKWh} kWh delivered vs independent inlet enthalpy rise ${expectedPreheatKWh} kWh`);
+ assert.equal(fuel.hours[0].controls.recoveryCoreFraction,1,'core may operate only after preheat reaches its threshold');
+ assert.ok(fuel.summary.recoverySensibleKWh>0,'protected core must deliver observable recovery');
+ assert.ok(fuel.summary.heatingKWh>0,'remaining capacity must reach the later zone heater');
+ assert.ok(fuel.summary.preheatDeliveredKWh+fuel.summary.heatingKWh<=20+1e-9);
+ assert.equal(fuel.summary.preheatElectricKWh,0);
+ assert.ok(Math.abs(fuel.summary.preheatFuelKWh-fuel.summary.preheatDeliveredKWh/fuel.scenario.heaterEfficiency)<1e-9);
+ const heatPump=simulateScenario(closed({...base,heatSource:'heatpump',heatPumpCopAt8C:2,heatPumpCopAtMinus8C:2,
+  heatPumpCopAtMinus15C:2,heatPumpCutoffC:-25,heatPumpCapacityDerate:1}),weather(1,{tempC:-15,rh:.35}),{stepMinutes:5});
+ assert.equal(heatPump.summary.preheatFuelKWh,0);
+ assert.ok(Math.abs(heatPump.summary.preheatElectricKWh-heatPump.summary.preheatDeliveredKWh/2)<1e-9);
+ assert.ok(heatPump.summary.preheatDeliveredKWh+heatPump.summary.heatingKWh<=20+1e-9);
+ const boundary=simulateScenario(closed(base),weather(1,{tempC:-5,rh:.35}),{stepMinutes:5});
+ assert.equal(boundary.summary.preheatDeliveredKWh,0,'air already at the threshold needs no preheat');
+ assert.equal(boundary.hours[0].controls.recoveryCoreFraction,1);
+ assert.ok(boundary.summary.recoverySensibleKWh>0);
+});
+test('insufficient preheat retains delivered heat, bypasses the core, and reports insufficiency',()=>{
+ const s=closed({controlMode:'staged',minVentACH:9,maxVentACH:9,heaterKW:1,thermalMassKJm2K:20,
+  heatRecovery:recovery('hrv',{frostControl:'preheat',minimumOutdoorOperatingC:null,frostThresholdC:-5})});
+ const result=simulateScenario(s,weather(1,{tempC:-15,rh:.35}),{stepMinutes:5});
+ assert.ok(Math.abs(result.summary.preheatDeliveredKWh-1)<1e-9);
+ assert.equal(result.summary.heatingKWh,0,'preheat has first claim on the finite heater');
+ assert.ok(Math.abs(result.hours[0].controls.recoveryCoreFraction)<1e-12);
+ assert.ok(Math.abs(result.hours[0].controls.recoveryBypassFraction-1)<1e-12);
+ assert.equal(result.summary.preheatInsufficientHours,1);
+ assert.equal(result.summary.runtime.preheat.hours,1);
+});
+test("frostControl 'none' rejects weather below the manufacturer-qualified operating limit",()=>{
+ const s=closed({minVentACH:9,maxVentACH:9,heatRecovery:recovery('hrv',{minimumOutdoorOperatingC:-5})});
+ assert.throws(()=>simulateScenario(s,weather(2,{tempC:-10,rh:.35})),/minimum outdoor operating|below.*-5|frost control/i);
+});
+test('pressure changes reconcile a carried near-saturated zone before recovery inlet validation',()=>{
+ const pressureStep=weather(2,{tempC:22,rh:.99,pressurePa:80000});
+ pressureStep.hours[1]={...pressureStep.hours[1],pressurePa:101325};
+ const base={controlMode:'staged',minVentACH:9,maxVentACH:9,fanWPerM3s:0,heaterKW:0,
+  vpdMin:0,vpdMax:.05,maxDewPointC:35,thermalMassKJm2K:20};
+ for(const heatRecovery of [recovery('none'),recovery('hrv')]){
+  const result=simulateScenario(closed({...base,heatRecovery}),pressureStep,{stepMinutes:5});
+  assert.equal(result.hours.length,2);
+  assert.equal(result.summary.numericalFailureHours,0,heatRecovery.type);
+  assert.ok(result.hours.every(h=>h.valid),heatRecovery.type);
+ }
 });
 test('direct simulation migrates a clone and reports every incomplete airflow treatment requirement',()=>{
  const incomplete=makeScenario('greenhouseDouble','mushroom','mushroom');
