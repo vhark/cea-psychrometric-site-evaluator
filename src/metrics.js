@@ -456,12 +456,14 @@ function exceedance(states,key){
 // Design conditions from the weather record plus the strategy's peak hours with coincident outdoor state.
 export function designHours(weatherHours,resultHours,scenario){
   const byTime=new Map();for(const h of weatherHours||[])if(finite(h?.time))byTime.set(h.time,h);
-  const states=[];for(const [time,h] of byTime){const s=outdoorState(h);if(s)states.push({...s,time});}
+  const states=[],yearSet=new Set();
+  for(const [time,h] of byTime){const s=outdoorState(h);if(s){states.push({...s,time});yearSet.add(Number(localClock(time,scenario.timezone).date.slice(0,4)));}}
+  const weatherYears=[...yearSet].sort((a,b)=>a-b);
   const outdoor=row=>outdoorState(byTime.get(row.time),row);
-  const out={dryBulb:exceedance(states,'tempC'),dewPoint:exceedance(states,'dewPointC'),wetBulb:exceedance(states,'wetBulbC'),
+  const out={weatherYears,dryBulb:exceedance(states,'tempC'),dewPoint:exceedance(states,'dewPointC'),wetBulb:exceedance(states,'wetBulbC'),
     jointFailure:{worstHour:null,p99Violation:null,failingHours:0,eligibleHours:0},peakLatentHour:null,peakSensibleHour:null,
     controlledOutdoorAirRequirement:{...airflowConversion(null,scenario),atHour:null,outdoor:null},condensatePeakKgH:null,padWaterPeakLH:null,
-    basis:'Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record, so a ranked-hour coincidence is a different and noisier statistic computed here from ten reanalysis years (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single-hour maxima and do not include a safety factor.'};
+    basis:`Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record. This ranked-hour statistic uses the supplied valid weather spanning ${weatherYears.length} local calendar year${weatherYears.length===1?'':'s'} (${weatherYears.join(', ')||'none'}), which may be partial records, not an assumed multi-year climate normal (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single-hour maxima and do not include a safety factor.`};
   const misses=[];
   for(const h of resultHours||[]){
     if(!eligible(h))continue;

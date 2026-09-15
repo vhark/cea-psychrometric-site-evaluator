@@ -6,7 +6,7 @@ import {loadScenarios, saveScenarios, loadWeather, saveWeather, listWeather, loa
 import {downloadRun, downloadScenario} from './export.js';
 import {compareScenarios, aggregateYears, compareSites, loadDecomposition, co2Window} from './metrics.js';
 import {modeLabel, modeEntries, attainmentClass, attainmentText, renderMonthly, renderTimeline, renderTimelineTable, renderScatter, renderDLI, renderLoads, renderYears} from './charts.js';
-import {costBasisText, capitalBasisText, conditioningRows, airflowRows, attainmentComparisonText} from './report.js';
+import {costBasisText, capitalBasisText, conditioningRows, airflowRows, attainmentComparisonText, comparisonPopulationText} from './report.js';
 import {initTour} from './tour.js';
 import {initLearn} from './learn.js';
 
@@ -747,13 +747,13 @@ function renderInspector() {
 }
 function renderComparison() {
   const rows = compareScenarios(state.results);
-  table($('comparison-table'), ['Scenario', 'Estimated / user-entered capital', 'Estimated annual ownership · USD/y', 'Modeled period operating cost · USD', 'Joint hours · h', 'Added joint hours · h', 'Modeled operating-cost difference · USD', 'Cost / added hour', 'Operating-cost frontier', 'Eligibility'], rows.map((row, index) => {
+  table($('comparison-table'), ['Scenario', 'Estimated / user-entered capital', 'Estimated annual ownership · USD/y', 'Matched modeled operating cost · USD', 'Joint hours · h', 'Added joint hours · h', 'Matched modeled operating-cost difference · USD', 'Matched cost / added hour', 'Operating-cost frontier', 'Common eligible population'], rows.map((row, index) => {
     const r = state.results.find(r => r.scenario.id === row.id) || state.results[index];
     return [r.scenario.name, capitalBasisText(r.scenario), money(r.summary.annualOwnershipCost), money(row.cost), format(row.compliantHours, 1), finite(row.addedHours) ? `${row.addedHours > 0 ? '+' : ''}${format(row.addedHours, 1)}` : 'Not comparable', finite(row.addedCost) ? `${row.addedCost > 0 ? '+' : ''}${money(row.addedCost)}` : 'Unpriced', finite(row.costPerAddedHour)?money(row.costPerAddedHour,true):'Not applicable', row.comparable?(row.dominated?'Operating-dominated':'Operating frontier'):'Not comparable', r.summary.numericalFailureHours ? 'Numerical failures: review' : `${format(row.matchedHours)} matched h`];
   }));
   for (const row of rows) {
     const r = state.results.find(r => r.scenario.id === row.id);
-    $('comparison-table').append(node('p', `${attainmentComparisonText(rows[0], row)} ${costBasisText(row.costBasis)} ${row.operatingCostReduction ? `${row.operatingCostReduction.label}: ${money(row.operatingCostReduction.amount)} for ${row.name} versus ${rows[0].name}.` : ''}`, 'source-line'));
+    $('comparison-table').append(node('p', `${attainmentComparisonText(rows[0], row)} ${comparisonPopulationText(row, r)} Matched cost basis: ${costBasisText(row.costBasis)} ${row.operatingCostReduction ? `${row.operatingCostReduction.label}: ${money(row.operatingCostReduction.amount)} for ${row.name} versus ${rows[0].name}, over ${format(row.matchedHours)} common eligible hours only (warm-up excluded), not the full-run cost population.` : ''}`, 'source-line'));
     if (r) $('comparison-table').append(node('p', `${row.name}: ${[...airflowRows(r), ...conditioningRows(r.summary)].map(([k,v]) => `${k}: ${v}`).join('. ')}`, 'source-line'));
   }
   $('comparison-table').append(node('p', 'Annual ownership = capital recovery at the stated discount/life assumptions plus annual maintenance. It is not added to partial-period operating cost. The operating-cost frontier excludes capital. Climate attainment is temperature + VPD + dew-point guardrail, not light sufficiency. Different crop or geometry assumptions are not an equipment-only comparison.', 'source-line'));

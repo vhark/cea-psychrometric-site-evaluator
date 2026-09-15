@@ -181,6 +181,37 @@ test('comparison and design-basis data retain numeric rates for common state-pri
   }
 });
 
+test('cost documents expose both matched and full-run endpoints when warm-up costs differ',()=>{
+  const make=(id,costs)=>{
+    const r=result(id,id);
+    r.scenario={...r.scenario,priceMode:'manual',electricityPrice:1,fuelPrice:0,waterPrice:0,maintenanceYear:0,discountRate:0,lifeYears:10};
+    r.hours=costs.map((cost,i)=>hour(i,{cost,electricKWh:cost,fuelKWh:0,waterL:0,warmup:i===0,eligible:i!==0}));
+    r.summary=summarizeHours(r.hours,r.scenario);
+    return r;
+  };
+  const results=[make('Baseline',[100.01,20.02,30.03]),make('Alternative',[200.02,40.04,50.05])];
+  const compared=compareScenarios(results);
+  assert.equal(compared[0].matchedHours,2);
+  assert.ok(Math.abs(compared[1].addedCost-40.04)<1e-9);
+  assert.ok(Math.abs(results[1].summary.cost-results[0].summary.cost-140.05)<1e-9);
+  const snapshot={startDate:'2025-01-01',endDate:'2025-01-01',timezone:'UTC',source:'test',sourceKind:'synthetic',
+    latitude:36.15,longitude:-95.99,hours:results[0].hours.map(h=>({time:h.time,tempC:20,rh:.5,pressurePa:101325,ghiWm2:0}))};
+  for(const render of [reportHTML,designBasisHTML]){
+    const html=render(results,snapshot);
+    for(const amount of ['$50.05','$90.09','$150.06','$290.11'])
+      assert.ok(html.includes(amount),`cost population endpoint omitted: ${amount}`);
+  }
+});
+
+test('design weather-year metadata counts actual local years, including partial records',()=>{
+  const s=scenario('local','Local',{timezone:'America/Chicago'});
+  const weather=[{time:Date.UTC(2025,0,1,5),tempC:20,rh:.5,pressurePa:101325,ghiWm2:0},
+    {time:Date.UTC(2025,0,1,6),tempC:21,rh:.5,pressurePa:101325,ghiWm2:0}];
+  assert.deepEqual(designHours(weather,[],s).weatherYears,[2024,2025]);
+  assert.deepEqual(designHours(weather.slice(1),[],s).weatherYears,[2025]);
+  assert.deepEqual(designHours([],[],s).weatherYears,[]);
+});
+
 test('multi-year aggregate selects median, worst and best years and fits a trend only with 5 or more numeric years',()=>{
   const pct=[80,95,70,85,90];
   const runs=pct.map((p,i)=>run(String(2019+i),[['a',{compliancePct:p,cost:100+i}]]));
