@@ -2,7 +2,7 @@ import {SHADE_SCREEN_DEFAULT,THERMAL_SCREEN_DEFAULT,INSECT_SCREEN_DEFAULT,HEAT_P
   backfillShadeScreen,backfillThermalScreen,backfillInsectScreen,shadeScreenErrors,thermalScreenErrors,
   insectScreenErrors,heatSourceErrors} from './screens.js';
 import {HEAT_RECOVERY_DEFAULT,backfillHeatRecovery,heatRecoveryErrors} from './airflow.js';
-export const MODEL_VERSION = '0.2.0-screening';
+export const MODEL_VERSION = '0.3.0-screening';
 export const SCENARIO_SCHEMA_VERSION = 2;
 // lai: leaf area index (m² leaf / m² canopy) for the Stanghellini transpiration model; screening assumptions, not measured canopies.
 export const CROPS = {
