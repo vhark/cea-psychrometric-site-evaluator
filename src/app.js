@@ -11,7 +11,7 @@ import {initLearn} from './learn.js';
 
 const $ = id => document.getElementById(id);
 const state = {scenarios: [], selected: null, snapshot: null, results: [], resultSnapshot: null, resultId: null, revision: 0, resultRevision: -1, pool: null, runId: null, runController: null, catalog: null, zipInfo: null, energyContext: null, energyEpoch: 0, weatherEpoch: 0, weatherController: null, parseWorker: null, weatherOnly: false, hour: 0,
-  bundledIndex: null, cached: [], yearSources: new Map(), years: new Set(), sites: [], runs: [], primaryRun: 0, siteRuns: [], aggregate: null, siteComparison: null};
+  weatherBusy: false, bundledIndex: null, cached: [], yearSources: new Map(), years: new Set(), sites: [], runs: [], primaryRun: 0, siteRuns: [], aggregate: null, siteComparison: null};
 const coreKeys = new Set(['areaM2', 'canopyM2', 'dayTargetC', 'nightTargetC']);
 const modelKeys = new Set(['controlMode', 'transpirationModel']);
 const fieldByKey = new Map(FIELDS.flatMap(g => g.fields).map(f => [f.key, f]));
@@ -114,9 +114,20 @@ function renderComponentStatus() {
   }));
   for (const key of doasKeys) $(`field-${key}`).required = key === 'doasM3s' || s.technology === 'doas' || s.doasM3s > 0;
   showErrors('doas-errors', errors.filter(error => error.startsWith('DOAS')));
-  const incomplete = state.scenarios.filter(scenario => scenarioErrors(scenario).length);
-  $('configuration-status').textContent = incomplete.length ? `Run blocked. Complete and review: ${incomplete.map(scenario => scenario.name).join('; ')}. Select each scenario to resolve its inputs.` : '';
-  $('run-all').disabled = !state.snapshot || !!state.pool || !!state.runId || !!incomplete.length;
+  const status = $('configuration-status'); status.replaceChildren();
+  let incomplete = false;
+  for (const scenario of state.scenarios) {
+    const scenarioIssues = scenario === s ? errors : scenarioErrors(scenario);
+    if (!scenarioIssues.length) continue;
+    if (!incomplete) status.append(node('p', 'Run blocked. Resolve these scenario inputs before running.', 'help'));
+    incomplete = true;
+    const box = node('div', undefined, 'component-callout component-errors'), list = node('ul');
+    box.append(node('strong', scenario.name || 'Unnamed scenario'), list);
+    for (const error of scenarioIssues) list.append(node('li', error));
+    status.append(box);
+  }
+  status.hidden = !incomplete;
+  $('run-all').disabled = !state.snapshot || state.weatherBusy || !!state.pool || !!state.runId || incomplete;
 }
 function renderAirflow() {
   const s = current();
@@ -260,7 +271,7 @@ function copyLocationToScenarios(location) {for (const s of state.scenarios) Obj
 function reflectLocation(location) {for (const id of ['latitude', 'longitude', 'timezone', 'zip']) if (location[id] != null) $(id).value = location[id];}
 function weatherBusy(busy, text = '') {
   $('fetch-weather').disabled = busy; $('load-example').disabled = busy; $('retrieve-years').disabled = busy; $('weather-status').className = 'status-line'; $('weather-status').textContent = text;
-  $('run-all').disabled = busy || !state.snapshot || !!state.pool;
+  state.weatherBusy = busy; renderComponentStatus();
 }
 /* Weather years: every calendar-year snapshot available for a coordinate pair, by source. Loaded > bundled > cached. */
 function bundledSite(latitude, longitude) {return state.bundledIndex?.sites.find(site => near(site.latitude, latitude) && near(site.longitude, longitude)) || null;}
@@ -527,7 +538,7 @@ async function run() {
   stopPool(); message(''); persist();
   const runId = uid(), revision = state.revision, sector = $('sector').value, controller = new AbortController();
   state.runId = runId; state.runController = controller;
-  $('run-all').disabled = true; $('cancel-run').hidden = false; $('run-progress').hidden = false; $('progress').value = 0; $('progress-label').textContent = 'Loading weather years…';
+  renderComponentStatus(); $('cancel-run').hidden = false; $('run-progress').hidden = false; $('progress').value = 0; $('progress-label').textContent = 'Loading weather years…';
   const primary = {zip: location.zip || null, city: state.zipInfo?.city || null, state: state.zipInfo?.state || null, latitude: location.latitude, longitude: location.longitude, timezone: location.timezone};
   const sites = [{site: primary, scenarios: state.scenarios, priced: true}, ...state.sites.map(site => ({site, scenarios: state.scenarios.map(s => ({...s, latitude: site.latitude, longitude: site.longitude, timezone: site.timezone, zip: site.zip, priceMode: 'manual'})), priced: false}))];
   const jobs = [];
