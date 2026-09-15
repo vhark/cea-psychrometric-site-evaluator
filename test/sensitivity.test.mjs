@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {MORRIS_PARAMETERS,morrisDesign,elementaryEffects,rankByMuStar,rankingStability,applyPoint,fieldLimits} from '../src/sensitivity.js';
-import {makeScenario,validateScenario,applyTechnology,FIELDS} from '../src/config.js';
+import {makeScenario,validateScenario,applyTechnology,FIELDS,MODEL_VERSION,SCENARIO_SCHEMA_VERSION} from '../src/config.js';
+import {readFileSync} from 'node:fs';
 
 const design=(over={})=>morrisDesign({trajectories:6,seed:'fixture',...over});
 
@@ -18,7 +19,7 @@ test('a seeded Morris design is reproducible and a different seed gives a differ
 test('every sampled value stays inside its screened range and inside the editable field limits once applied',()=>{
   const d=design();
   const scenarios=[makeScenario('greenhouse'),makeScenario('indoor'),applyTechnology(makeScenario('greenhouse'),'desiccant')]
-    .map(s=>({...s,timezone:'UTC'}));
+    .map(s=>({...s,timezone:'UTC',outsideAirReviewed:true}));
   const byKey=new Map(MORRIS_PARAMETERS.map(p=>[p.key,p]));
   const limits=new Map();for(const g of FIELDS)for(const f of g.fields)limits.set(f.key,f);
   for(const point of d.points){
@@ -30,7 +31,7 @@ test('every sampled value stays inside its screened range and inside the editabl
     for(const base of scenarios){
       const s=applyPoint(base,point);
       assert.deepEqual(validateScenario({...s}),[],`screened scenario must stay valid: ${JSON.stringify(point.values)}`);
-      for(const [key,field] of limits)
+      for(const [key,field] of limits)if(byKey.has(key))
         assert.ok(s[key]>=field.min&&s[key]<=field.max,`${key}=${s[key]} outside field limits ${field.min}..${field.max}`);
       assert.ok(s.solarHeatFraction>=0&&s.solarHeatFraction<=1);
     }
@@ -129,4 +130,56 @@ test('ranking stability needs one order in at least 90% of screened points',()=>
   const none=rankingStability([{id:'p',ranking:[]}]);
   assert.equal(none.stable,false,'no ranking is unknown, not stable');
   assert.equal(none.mostCommon,null);
+});
+
+test('committed Morris evidence uses the current model, unchanged design and complete numerical coverage',()=>{
+  const study=JSON.parse(readFileSync(new URL('../docs/morris-screening.json',import.meta.url),'utf8'));
+  assert.equal(study.schemaVersion,2);
+  assert.equal(study.provenance.modelVersion,MODEL_VERSION);
+  assert.equal(study.provenance.scenarioSchemaVersion,SCENARIO_SCHEMA_VERSION);
+  assert.deepEqual(study.provenance.years,[2023,2024,2025]);
+  assert.equal(study.provenance.simulations,1872);
+  assert.equal(study.provenance.days,120);
+  const expected=morrisDesign({trajectories:8,levels:4,seed:1});
+  assert.deepEqual(study.design.points,expected.points.map(p=>({id:p.id,trajectory:p.trajectory,step:p.step,
+    changedKey:p.changedKey,values:Object.fromEntries(Object.entries(p.values).map(([k,v])=>[k,Number(v.toFixed(6))]))})));
+  assert.equal(study.observations.length,expected.points.length);
+  assert.equal(study.provenance.effectUnits.compliancePct,'pp per full screened parameter range');
+  const totalHours=study.provenance.coverage.reduce((sum,y)=>sum+y.hours,0)*6;
+  for(const row of study.observations){
+    assert.equal(row.numericalFailureHours,0);
+    assert.equal(row.validHours,totalHours);
+    assert.ok(row.eligibleHours>0&&row.eligibleHours<row.validHours);
+    assert.ok(Object.values(row.metrics).every(Number.isFinite));
+  }
+  const effects=elementaryEffects(expected,study.observations);
+  for(const [key,byMetric] of Object.entries(effects))for(const [metric,e] of Object.entries(byMetric)){
+    const actual=study.effects[key][metric];
+    assert.equal(actual.n,8);
+    for(const value of ['mu','muStar','sigma'])assert.ok(Math.abs(actual[value]-e[value])<1e-6);
+  }
+});
+
+test('Morris period costs retain applied prices and year-specific sampled coverage',()=>{
+  const study=JSON.parse(readFileSync(new URL('../docs/morris-screening.json',import.meta.url),'utf8'));
+  const scenarios=JSON.parse(readFileSync(new URL('../docs/example-scenarios.json',import.meta.url),'utf8')).scenarios;
+  assert.equal(study.provenance.scenarios.length,scenarios.length);
+  for(const s of study.provenance.scenarios){
+    const input=scenarios.find(x=>x.technology===s.id),basis=s.costBasis;
+    assert.equal(s.installedCostBasis,input.installedCostBasis);
+    assert.equal(basis.scope,'multiYear');
+    assert.deepEqual(basis.aggregation,{statistic:'median',years:study.provenance.years});
+    assert.equal(basis.priceBasis.electricity.usdPerKWh,input.electricityPrice);
+    assert.equal(basis.priceBasis.fuel.usdPerKWh,input.fuelPrice);
+    assert.equal(basis.priceBasis.water.usdPerL,input.waterPrice);
+    assert.equal(basis.isQuote,false);
+    assert.equal(basis.isGuaranteedSavings,false);
+    assert.ok(basis.included.includes('purchased electricity'));
+    assert.ok(basis.excluded.includes('installed capital'));
+    assert.deepEqual(basis.periods.map(p=>p.year),study.provenance.years);
+    for(const [i,p] of basis.periods.entries()){
+      assert.equal(p.startDate,study.provenance.coverage[i].firstDay);
+      assert.equal(p.endDate,study.provenance.coverage[i].lastDay);
+    }
+  }
 });

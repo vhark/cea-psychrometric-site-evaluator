@@ -13,24 +13,20 @@
 //
 // The two decision rules this script applies, both stated in the output and in docs/REGIONS.md:
 //
-//  * Capability tier. Strategies whose median joint-band attainment is within CAPABILITY_TIER_PTS of the
-//    best median attainment in that region are treated as equally capable. The Morris screening
-//    (docs/SENSITIVITY.md) moves attainment by 9.10 pp over the leaf-area range alone, so attainment
-//    differences narrower than a few points are not resolved by this evidence tier.
-//  * Indistinguishable cost band. Inside the capability tier the cheaper strategy is recommended only when
-//    it is more than INDISTINGUISHABLE_PCT cheaper than the next one. That threshold is the measured Morris
-//    result, not a preference: the screened parameter ranges reorder the three strategies whose median costs
-//    sit within about 16 percent of each other (13,006 / 13,732 / 15,058 dollars over the sampled days), so
-//    a margin inside that band is not a finding. Inside the band the verdict says the choice is unresolved
-//    and names what would resolve it.
+//  * Capability tier: the existing 5 pp band around the region's best median joint-target attainment.
+//  * Indistinguishable cost band: the existing 16 percent relative operating-cost margin.
+// These are retained screening decision rules, not newly measured uncertainty bounds. Regeneration
+// updates the evidence without recalibrating the methodology or treating historical Morris numbers
+// as results of the current model.
 import {readFileSync,writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {availableParallelism} from 'node:os';
 import {Worker,isMainThread,parentPort,workerData} from 'node:worker_threads';
-import {MODEL_VERSION,validateScenario} from '../src/config.js';
+import {MODEL_VERSION,SCENARIO_SCHEMA_VERSION,validateScenario} from '../src/config.js';
 import {simulateScenario} from '../src/simulate.js';
 import {aggregateYears,strategyFrontier,bindingConstraint,FREE_COOLING_MODES} from '../src/metrics.js';
 import {weatherState,wetBulb,dewPoint,localClock} from '../src/physics.js';
+import {costBasisText} from '../src/report.js';
 
 const YEARS=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
 const SITES=['tulsa','phoenix','miami','denver','seattle','fairbanks'];
@@ -90,7 +86,7 @@ function evaluateYear(site,year,scenarios){
   const results=scenarios.map(scenario=>simulateScenario(rehome(scenario,site),snapshot));
   const strategies=results.map((r,i)=>({id:scenarios[i].technology,name:scenarios[i].name,scenarioId:scenarios[i].id,
     compliancePct:round(r.summary.compliancePct,6),compliantHours:r.summary.compliantHours,
-    eligibleHours:r.summary.eligibleHours,cost:round(r.summary.cost,6),
+    eligibleHours:r.summary.eligibleHours,validHours:r.summary.validHours,cost:round(r.summary.cost,6),costBasis:r.summary.costBasis,
     electricKWh:round(r.summary.electricKWh,6),fuelKWh:round(r.summary.fuelKWh,6),
     padRuntimeHours:r.summary.runtime?.pad?.hours??null,numericalFailureHours:r.summary.numericalFailureHours||0}));
   // All six strategies share one target band, so the weather-side screen is identical across them; take it
@@ -270,7 +266,7 @@ function rankStrategies(aggregate,frontier,order){
       attainmentBestPct:round(entry.best?.compliancePct??null),
       attainmentSpreadPts:round(entry.spread.compliancePct),
       attainmentWorstYear:entry.worst?.label??null,attainmentBestYear:entry.best?.label??null,
-      costMedianUsd:round(entry.median.cost),costSpreadUsd:round(entry.spread.cost),
+      costMedianUsd:round(entry.median.cost),costSpreadUsd:round(entry.spread.cost),costBasis:s.costBasis,
       electricMedianKWh:round(entry.median.electricKWh),fuelMedianKWh:round(entry.median.fuelKWh),
       frontier:frontier.frontier.some(f=>f.id===s.scenarioId),dominated:Boolean(row.dominated),
       numericalFailureHours:s.numericalFailureHours};
@@ -314,7 +310,7 @@ function buildVerdict({region,strategies,aggregate,weather,yearRows}){
   verdict.bindingConstraintHours=Object.fromEntries(Object.entries(constraint.hours).map(([k,v])=>[k,round(v)]));
   // Heating hours are counted against the band's own heating threshold (20 C by day, 16 C by night for this
   // 22/18 C lettuce band), so every temperate site accumulates thousands of them and "heating" wins the
-  // count at four of the five bundled sites. That is a true statement about hours and a misleading one about
+  // count at many temperate sites. That is a true statement about hours and a misleading one about
   // climate, so the cooling-side constraint, moisture against temperature, is reported beside it: that is the
   // comparison that separates a hot-humid site from a hot-dry one.
   verdict.coolingSideConstraint=constraint.hours.moisture===constraint.hours.temperature?null
@@ -340,29 +336,29 @@ function buildVerdict({region,strategies,aggregate,weather,yearRows}){
   if(second&&margin<INDISTINGUISHABLE_PCT){
     verdict.resolved=false;
     verdict.candidates=[top.id,second.id];
-    verdict.recommendedBasis=`Not resolved by this evidence: ${top.label} at ${usd(top.costMedianUsd)} and ${second.label} at ${usd(second.costMedianUsd)} median annual operating cost differ by ${margin.toFixed(1)} percent, inside the ${INDISTINGUISHABLE_PCT} percent band the Morris screening shows the screened parameter ranges can reorder, while holding the joint band in ${pct(top.attainmentMedianPct)} and ${pct(second.attainmentMedianPct)} of eligible hours; measuring canopy leaf area and transpiration and the as-built envelope U-value at the site, then comparing capital, maintenance and redundancy, is what would resolve it.`;
-    caveats.push(`The ${INDISTINGUISHABLE_PCT} percent band is the measured Morris reorder band from docs/SENSITIVITY.md, not a confidence interval: nothing here says which of ${top.label} and ${second.label} is cheaper at a real site.`);
+    verdict.recommendedBasis=`Not resolved by this evidence: ${top.label} at ${usd(top.costMedianUsd)} and ${second.label} at ${usd(second.costMedianUsd)} modeled operating cost (median over weather years ${region.years.join(', ')}) differ by ${margin.toFixed(1)} percent relative to ${top.label}, inside the retained ${INDISTINGUISHABLE_PCT} percent screening band, while holding the joint temperature-and-moisture target in ${pct(top.attainmentMedianPct)} and ${pct(second.attainmentMedianPct)} of eligible hours; measuring canopy leaf area and transpiration and the as-built envelope U-value at the site, then comparing capital, maintenance and redundancy, is what would resolve it.`;
+    caveats.push(`The ${INDISTINGUISHABLE_PCT} percent decision band is retained from the original screening methodology, not a confidence interval or a newly measured current-model reorder band: nothing here says which of ${top.label} and ${second.label} is cheaper at a real site.`);
   }else{
     verdict.resolved=true;
     verdict.recommended=top.id;
     verdict.candidates=[top.id];
     verdict.recommendedBasis=second
-      ?`${top.label} holds the joint band in a median ${pct(top.attainmentMedianPct)} of eligible hours (worst year ${pct(top.attainmentWorstPct)}, spread ${round(top.attainmentSpreadPts,1)} pts) at ${usd(top.costMedianUsd)} median annual operating cost, ${margin.toFixed(1)} percent below the ${usd(second.costMedianUsd)} of ${second.label} at ${pct(second.attainmentMedianPct)}, and it is the cheapest strategy inside the capability tier in ${topYears} of the ${stability.years} years.`
-      :`${top.label} is the only strategy within ${CAPABILITY_TIER_PTS} points of the best median attainment in this region, holding the joint band in ${pct(top.attainmentMedianPct)} of eligible hours (worst year ${pct(top.attainmentWorstPct)}) at ${usd(top.costMedianUsd)} median annual operating cost; the next strategy is ${round(bestAttainment-Math.max(...priced.filter(s=>s!==top).map(s=>s.attainmentMedianPct)),1)} points behind on attainment.`;
+      ?`${top.label} holds the joint temperature-and-moisture target in a median ${pct(top.attainmentMedianPct)} of eligible hours (worst year ${pct(top.attainmentWorstPct)}, best year ${pct(top.attainmentBestPct)}, worst-to-best spread ${round(top.attainmentSpreadPts,1)} pp) at ${usd(top.costMedianUsd)} modeled operating cost (median over weather years ${region.years.join(', ')}). ${second.label} at ${pct(second.attainmentMedianPct)} attainment and ${usd(second.costMedianUsd)} costs ${margin.toFixed(1)} percent more relative to ${top.label}. ${top.label} is the cheapest strategy inside the capability tier in ${topYears} of the ${stability.years} years.`
+      :`${top.label} is the only strategy within ${CAPABILITY_TIER_PTS} pp of the best median joint temperature-and-moisture target attainment in this region, holding the target in ${pct(top.attainmentMedianPct)} of eligible hours (worst year ${pct(top.attainmentWorstPct)}) at ${usd(top.costMedianUsd)} modeled operating cost (median over weather years ${region.years.join(', ')}); its ${pct(bestAttainment)} median attainment exceeds the next strategy's ${pct(Math.max(...priced.filter(s=>s!==top).map(s=>s.attainmentMedianPct)))} by ${round(bestAttainment-Math.max(...priced.filter(s=>s!==top).map(s=>s.attainmentMedianPct)),1)} pp.`;
   }
   verdict.stabilityBasis=`${stability.distinctOrders} distinct operating-cost orders of the six strategies over ${stability.years} weather years; the most common holds in ${stability.mostCommonCount} of ${stability.years} (${(stability.share*100).toFixed(0)} percent), against the pre-set rule that one order must hold in at least ${(STABLE_SHARE*100).toFixed(0)} percent of years. The cheapest member of the capability tier is ${top.label} in ${topYears} of ${stability.years} years.`;
 
   // Caveats every region carries, then the ones this region's numbers earn.
   caveats.push(`These are ${yearRows.length} observed years (${yearRows[0].year} to ${yearRows[yearRows.length-1].year}), ${yearRows.length} particular years, not a sample from a stationary distribution: the worst-to-best spread is what happened, not a forecast, a confidence interval or a design year.`);
-  caveats.push('Operating cost only, at the example scenarios\' declared 0.12 USD/kWh electricity and 0.045 USD/kWh fuel at every site. Capital, maintenance, redundancy and real tariffs are outside the model, and the six strategies range from 15,000 to 125,000 USD of declared installed cost.');
+  caveats.push(`All strategies use the same declared prices at this site. ${costBasisText(top.costBasis)} Installed capital is a separate screening assumption, not an equipment quote.`);
   if(!verdict.stable)caveats.push('The full six-strategy cost order is year-dependent at this region, so a ranking quoted from any single year is an anecdote.');
   const failures=strategies.reduce((sum,s)=>sum+(s.numericalFailureHours||0),0);
   if(failures)caveats.push(`${failures} hours failed numerically or physically across the run; a favourable economic ranking is prohibited until they are explained.`);
   const cheaperOutside=priced.filter(s=>!tierIds.has(s.scenarioId)&&s.costMedianUsd<top.costMedianUsd)
     .sort((a,b)=>a.costMedianUsd-b.costMedianUsd)[0];
-  if(cheaperOutside)caveats.push(`${cheaperOutside.label} is cheaper again at ${usd(cheaperOutside.costMedianUsd)} but holds the band in only ${pct(cheaperOutside.attainmentMedianPct)} of hours, ${round(top.attainmentMedianPct-cheaperOutside.attainmentMedianPct,1)} points below the capability tier; buying that saving is a decision about how much of the band you are willing to miss.`);
+  if(cheaperOutside)caveats.push(`${cheaperOutside.label} is cheaper again at ${usd(cheaperOutside.costMedianUsd)} but holds the joint temperature-and-moisture target in only ${pct(cheaperOutside.attainmentMedianPct)} of eligible hours, ${round(top.attainmentMedianPct-cheaperOutside.attainmentMedianPct,1)} pp below ${top.label} at ${pct(top.attainmentMedianPct)}; buying that saving is a decision about how much of the target you are willing to miss.`);
   if(finite(bestAttainment)&&bestAttainment<60)caveats.push(`No strategy here holds the joint band in more than ${pct(bestAttainment)} of eligible hours, so the band itself, the crop targets and the envelope are the first thing to revisit at this site, ahead of equipment class.`);
-  if(region.key==='denver')caveats.push('Station pressure runs 76 to 80 kPa at this source elevation, so every psychrometric quantity here depends on the pressure path; a sea-level assumption would be wrong in humidity ratio, enthalpy, wet bulb and fan mass flow at once.');
+  if(region.key==='denver')caveats.push('Every psychrometric quantity uses the bundled station-pressure path at this source elevation; a sea-level assumption would change humidity ratio, enthalpy, wet bulb and fan mass flow.');
   return verdict;
 }
 
@@ -375,6 +371,15 @@ function buildRegion(site,yearRows,scenarios){
   const aggregate=aggregateYears(runs);
   const frontier=strategyFrontier(aggregate);
   const strategies=rankStrategies(aggregate,frontier,scenarios.map(s=>({id:s.technology,name:s.name,scenarioId:s.id,
+    costBasis:(()=>{
+      const bases=yearRows.map(row=>row.strategies.find(x=>x.scenarioId===s.id).costBasis);
+      const years=yearRows.map(row=>row.year);
+      return {...bases[0],scope:'multiYear',
+        label:`Model-estimated operating cost, median of full weather-record totals over years ${years.join(', ')} (not one annual result)`,
+        aggregation:{statistic:'median',years},
+        period:{startDate:bases[0].period.startDate,endDate:bases.at(-1).period.endDate},
+        periods:bases.map((basis,i)=>({year:years[i],...basis.period}))};
+    })(),
     numericalFailureHours:yearRows.reduce((sum,row)=>sum+(row.strategies.find(x=>x.scenarioId===s.id)?.numericalFailureHours||0),0)})));
   const weather=regionWeather(yearRows);
   const region={key:site.key,label:site.label,zip:site.zip,climate:site.climate,
@@ -383,7 +388,8 @@ function buildRegion(site,yearRows,scenarios){
     strategies,
     perYear:yearRows.map(row=>({year:row.year,validHours:row.weather.validHours,expectedHours:row.weather.expectedHours,
       strategies:row.strategies.map(s=>({id:s.id,attainmentPct:round(s.compliancePct),costUsd:round(s.cost),
-        electricKWh:round(s.electricKWh),fuelKWh:round(s.fuelKWh)}))})),
+        electricKWh:round(s.electricKWh),fuelKWh:round(s.fuelKWh),costBasis:s.costBasis,
+        validHours:s.validHours,eligibleHours:s.eligibleHours,numericalFailureHours:s.numericalFailureHours}))})),
     costOrderByYear:Object.fromEntries(Object.entries(aggregate.ranking.byYear).map(([year,ids])=>
       [year,ids.map(id=>scenarios.find(s=>s.id===id)?.technology??id)]))};
   region.verdict=buildVerdict({region,strategies,aggregate,weather,yearRows});
@@ -397,7 +403,7 @@ function printSummary(output){
     const w=region.weather;
     process.stdout.write(`  weather medians: pad-effective ${Math.round(w.padEffectiveHoursMedian)} h, free cooling ${Math.round(w.freeCoolingHoursMedian)} h, heating ${Math.round(w.heatingHoursMedian)} h, moisture-limited ${Math.round(w.moistureLimitedHoursMedian)} h, temperature-limited ${Math.round(w.temperatureLimitedHoursMedian)} h\n`);
     process.stdout.write(`  design (0.4% of ${w.designHours.toLocaleString('en-US')} pooled hours): dry bulb ${w.designDryBulbC} C at coincident wet bulb ${w.coincidentWetBulbC} C, dew point ${w.designDewPointC} C, mean summer wet bulb ${w.meanSummerWetBulbC} C\n`);
-    process.stdout.write(`  ${pad('rank strategy',40)}${padStart('attain med',11)}${padStart('worst',8)}${padStart('best',8)}${padStart('spread',8)}${padStart('cost med',11)}${padStart('cost spread',12)}${padStart('elec kWh',10)}${padStart('fuel kWh',10)}\n`);
+    process.stdout.write(`  ${pad('rank strategy',40)}${padStart('attain med',11)}${padStart('worst',8)}${padStart('best',8)}${padStart('span pp',8)}${padStart('cost med',11)}${padStart('cost spread',12)}${padStart('elec kWh',10)}${padStart('fuel kWh',10)}\n`);
     for(const s of region.strategies)
       process.stdout.write(`  ${pad(`${s.rank}. ${s.label}${s.dominated?' (dominated)':''}`,40)}${padStart(pct(s.attainmentMedianPct),11)}${padStart(pct(s.attainmentWorstPct),8)}${padStart(pct(s.attainmentBestPct),8)}${padStart(round(s.attainmentSpreadPts,1),8)}${padStart(usd(s.costMedianUsd),11)}${padStart(usd(s.costSpreadUsd),12)}${padStart(Math.round(s.electricMedianKWh).toLocaleString('en-US'),10)}${padStart(Math.round(s.fuelMedianKWh).toLocaleString('en-US'),10)}\n`);
     const v=region.verdict;
@@ -434,25 +440,28 @@ async function main(){
   const regions=sites.map(site=>buildRegion(site,
     options.years.map(year=>results.get(`${site.key}|${year}`)),scenarios));
   const runtimeSeconds=(Date.now()-started)/1000;
-  const output={schemaVersion:1,generatedAt:new Date().toISOString(),modelVersion:MODEL_VERSION,
+  const output={schemaVersion:1,scenarioSchemaVersion:SCENARIO_SCHEMA_VERSION,generatedAt:new Date().toISOString(),modelVersion:MODEL_VERSION,
     method:{years:options.years,sites:options.sites,scenarios:scenarios.map(s=>({id:s.technology,label:s.name,
-        scenarioId:s.id,installedCostUsd:s.installedCost})),
+        scenarioId:s.id,installedCostUsd:s.installedCost,installedCostBasis:s.installedCostBasis})),
+      metricUnits:{attainmentMedianPct:'% of eligible hours meeting the joint temperature-and-moisture target',
+        attainmentSpreadPts:'pp',capabilityTierPts:'pp',marginPct:'% relative to the cheaper capability-tier strategy'},
       controller:'Staged deadband controller, the interface default; the ideal per-substep optimizer is not used here.',
       transpirationModel:'stanghellini',stepMinutes:1,
       simulations,runtimeSeconds:round(runtimeSeconds,1),
       notes:[
         `Every number is computed from the committed NASA POWER snapshots in data/weather by src/simulate.js at model ${MODEL_VERSION}. Nothing is quoted from a published climate summary and nothing is interpolated between sites.`,
         'Each of the six strategies is the same 500 m2 greenhouse, crop band and target band as docs/example-scenarios.json, re-homed to the site coordinates, ZIP and IANA time zone so the day/night schedule and local-day accounting follow local time.',
-        'Operating cost is at the scenarios\' declared 0.12 USD/kWh electricity and 0.045 USD/kWh fuel at every site, so a cost difference between regions is a dispatch difference, not a tariff difference. Capital and maintenance are excluded.',
+        'Operating costs use the numeric applied electricity, fuel and water prices retained in each strategy costBasis from simulation results. All sites use the same scenario prices, not local tariffs. Capital, maintenance and other exclusions are stated in costBasis.',
         'Attainment is the joint-band compliant share of eligible hours: hours that are valid, not a segment warm-up hour and not excluded. Median, worst, best and spread are over the ten weather years, not over a distribution.',
         `Ranking: non-dominated strategies first by ascending median cost, then dominated ones by ascending median cost. Dominated means another strategy costs no more and holds the band no worse. Ranks are dense, 1 to ${scenarios.length}.`,
-        `Capability tier: strategies within ${CAPABILITY_TIER_PTS} attainment points of the region's best median attainment. The Morris screening in docs/SENSITIVITY.md moves attainment 9.10 pp over the leaf-area range alone, so smaller attainment differences are not resolved at this evidence tier.`,
-        `Recommendation rule: the cheapest strategy in the capability tier, but only when it is more than ${INDISTINGUISHABLE_PCT} percent cheaper than the next one in that tier. ${INDISTINGUISHABLE_PCT} percent is the measured Morris reorder band: the screened parameter ranges reordered the three strategies whose median costs sat within about 16 percent of each other. Inside the band recommended is null, resolved is false and candidates names both.`,
+        `Capability tier: strategies within ${CAPABILITY_TIER_PTS} percentage points (pp) of the region's best median joint temperature-and-moisture target attainment. This decision rule is retained from the original screening methodology, not recalibrated or newly inferred from this regeneration.`,
+        `Recommendation rule: the cheapest strategy in the capability tier, but only outside the retained ${INDISTINGUISHABLE_PCT} percent cost band. The margin is (next cost minus cheapest cost) / cheapest cost. Inside the band recommended is null, resolved is false and candidates names both. The threshold is not a current-model uncertainty estimate.`,
         `Ranking stability: stable is true when one per-year operating-cost order of the six strategies holds in at least ${(STABLE_SHARE*100).toFixed(0)} percent of the ten years, the same rule the Morris screening applies over design points.`,
         `Design conditions are the value exceeded in ${DESIGN_FRACTION*100} percent of the pooled ten-year hours, with the coincident state of that same hour, the same convention src/metrics.js designHours uses for a single year. Coincident values are not independent percentiles.`,
-        'Binding constraint is the largest of three mean hour counts from the weather-side screen: moisture-limited, temperature-limited and below the band\'s heating threshold. The heating threshold for this 22/18 C band is 20 C by day and 16 C by night, so hours below it are plentiful at every temperate site and the heating count wins at four of the five bundled sites. Read coolingSideConstraint, moisture against temperature, for the comparison that distinguishes one warm climate from another.',
+        'Binding constraint is the largest of three mean hour counts from the weather-side screen: moisture-limited, temperature-limited and below the band\'s heating threshold. The heating threshold for this 22/18 C band is 20 C by day and 16 C by night, so hours below it are plentiful at temperate sites. Read coolingSideConstraint, moisture against temperature, for the comparison that distinguishes one warm climate from another.',
         'Mean summer wet bulb is the arithmetic mean over local June, July and August hours at each hour\'s own station pressure, over all ten years.',
         'Ten observed years are ten particular years. A spread between the worst and best of them is not a confidence interval, not a probability distribution and not a design year, and this file supports no statement of the form "cost is X plus or minus Y".',
+        'Maximum controlled outdoor-air ACH is installed capacity, not uncontrolled infiltration or actual continuous flow. The staged controller dispatches within that capacity; minimum controlled air and uncontrolled leakage remain separate inputs.',
         'Evidence tier: assumption-based screening (tier 2 of docs/EVALUATION.md). No independent model benchmark, no site calibration and no equipment performance maps stand behind any number here.']},
     regions};
   if(options.json)process.stdout.write(JSON.stringify(output,null,1)+'\n');

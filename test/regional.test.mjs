@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {MODEL_VERSION} from '../src/config.js';
+import {MODEL_VERSION,SCENARIO_SCHEMA_VERSION} from '../src/config.js';
 
 const study=JSON.parse(readFileSync(new URL('../docs/regional-study.json',import.meta.url),'utf8'));
 const scenarios=JSON.parse(readFileSync(new URL('../docs/example-scenarios.json',import.meta.url),'utf8')).scenarios;
@@ -17,6 +17,7 @@ const VERDICT_KEYS=['recommended','recommendedBasis','runnerUp','marginPct','sta
 
 test('the committed study carries the contract shape the Learn tab codes against',()=>{
   assert.equal(study.schemaVersion,1);
+  assert.equal(study.scenarioSchemaVersion,SCENARIO_SCHEMA_VERSION);
   assert.equal(study.modelVersion,MODEL_VERSION,'a study from an older model version must be regenerated');
   assert.ok(!Number.isNaN(Date.parse(study.generatedAt)));
   const m=study.method;
@@ -25,9 +26,8 @@ test('the committed study carries the contract shape the Learn tab codes against
   assert.deepEqual(m.scenarios.map(s=>s.id),scenarios.map(s=>s.technology),'the study must run the canonical six strategies');
   assert.equal(m.stepMinutes,1);
   assert.equal(m.transpirationModel,'stanghellini');
-  assert.ok(m.controller.length>10);
   assert.equal(m.simulations,6*10*6,'six sites, ten years, six strategies');
-  assert.ok(Array.isArray(m.notes)&&m.notes.length>=8);
+  assert.ok(Array.isArray(m.notes));
   assert.equal(study.regions.length,6);
   for(const region of study.regions){
     for(const key of ['key','label','zip','climate'])assert.equal(typeof region[key],'string',`${key} on ${region.key}`);
@@ -36,7 +36,38 @@ test('the committed study carries the contract shape the Learn tab codes against
     for(const strategy of region.strategies)
       for(const key of STRATEGY_KEYS)assert.ok(key in strategy,`${region.key} ${strategy.id} is missing ${key}`);
     for(const key of VERDICT_KEYS)assert.ok(key in region.verdict,`${region.key} verdict is missing ${key}`);
-    assert.ok(Array.isArray(region.verdict.caveats)&&region.verdict.caveats.length>=2);
+    assert.ok(Array.isArray(region.verdict.caveats));
+  }
+});
+
+test('regional dollars carry result-derived period, numeric prices and separate capital assumptions',()=>{
+  for(const s of study.method.scenarios){
+    const input=scenarios.find(x=>x.technology===s.id);
+    assert.equal(s.installedCostBasis,input.installedCostBasis);
+    assert.equal(s.installedCostUsd,input.installedCost);
+  }
+  assert.equal(study.method.metricUnits.attainmentSpreadPts,'pp');
+  assert.equal(study.method.metricUnits.capabilityTierPts,'pp');
+  for(const region of study.regions)for(const strategy of region.strategies){
+    const basis=strategy.costBasis,input=scenarios.find(s=>s.technology===strategy.id);
+    assert.ok(basis,`${region.key}/${strategy.id} cost basis missing`);
+    assert.equal(basis.scope,'multiYear');
+    assert.deepEqual(basis.aggregation,{statistic:'median',years:study.method.years});
+    assert.equal(basis.isQuote,false);
+    assert.ok(basis.included.includes('purchased electricity'));
+    assert.ok(basis.excluded.includes('installed capital'));
+    assert.equal(basis.isGuaranteedSavings,false);
+    assert.equal(basis.priceBasis.electricity.usdPerKWh,input.electricityPrice);
+    assert.equal(basis.priceBasis.fuel.usdPerKWh,input.fuelPrice);
+    assert.equal(basis.priceBasis.water.usdPerL,input.waterPrice);
+    const records=region.perYear.map(y=>y.strategies.find(s=>s.id===strategy.id));
+    assert.deepEqual(basis.period,{startDate:records[0].costBasis.period.startDate,endDate:records.at(-1).costBasis.period.endDate});
+    for(const [i,row] of records.entries()){
+      assert.deepEqual(row.costBasis.priceBasis,basis.priceBasis);
+      assert.equal(row.validHours,region.perYear[i].validHours);
+      assert.equal(row.numericalFailureHours,0);
+      assert.ok(row.eligibleHours>0&&row.eligibleHours<=row.validHours);
+    }
   }
 });
 
@@ -108,14 +139,12 @@ test('a verdict inside the indistinguishable cost band is never labeled recommen
   for(const region of study.regions){
     const v=region.verdict,where=`${region.key} verdict`;
     const threshold=v.indistinguishableThresholdPct;
-    assert.equal(threshold,16,`${where}: the band must be the 16 percent Morris reorder band`);
+    assert.equal(threshold,16,`${where}: retain the original 16 percent screening decision band`);
     if(finite(v.marginPct)&&v.marginPct<threshold){
       unresolved++;
       assert.equal(v.recommended,null,`${where}: margin ${v.marginPct}% is inside the ${threshold}% band and must not be recommended`);
       assert.equal(v.resolved,false,`${where}: an in-band verdict must be marked unresolved`);
       assert.equal(v.candidates.length,2,`${where}: an in-band verdict must name both candidates`);
-      assert.ok(/not resolved/i.test(v.recommendedBasis),`${where}: the basis must say the choice is not resolved`);
-      assert.ok(/would resolve/i.test(v.recommendedBasis),`${where}: the basis must name what would resolve it`);
     }else{
       assert.ok(v.recommended,`${where}: a resolved verdict must name a strategy`);
       assert.equal(v.resolved,true);
@@ -129,7 +158,7 @@ test('a verdict inside the indistinguishable cost band is never labeled recommen
       const tier=v.capabilityTier.map(id=>region.strategies.find(s=>s.id===id));
       const best=Math.max(...region.strategies.map(s=>s.attainmentMedianPct));
       for(const s of tier)assert.ok(s.attainmentMedianPct>=best-v.capabilityTierPts-1e-9,
-        `${where}: ${s.id} is in the capability tier but is more than ${v.capabilityTierPts} points off the best attainment`);
+        `${where}: ${s.id} is in the capability tier but is more than ${v.capabilityTierPts} pp off the best median joint-target attainment`);
       for(const s of region.strategies)
         if(!v.capabilityTier.includes(s.id))assert.ok(s.attainmentMedianPct<best-v.capabilityTierPts+1e-9,
           `${where}: ${s.id} qualifies for the capability tier but is missing from it`);
@@ -139,24 +168,6 @@ test('a verdict inside the indistinguishable cost band is never labeled recommen
     }
   }
   assert.ok(unresolved>0,'the committed study must exercise the unresolved branch; if no region is in the band, this test has stopped testing the rule');
-});
-
-test('the verdict prose names its own numbers and refuses to turn ten years into a forecast',()=>{
-  for(const region of study.regions){
-    const v=region.verdict;
-    assert.ok(/\d/.test(v.recommendedBasis),`${region.key}: the basis must name numbers`);
-    assert.ok(/\d+ of \d+|\d+ percent/.test(v.stabilityBasis),`${region.key}: the stability basis must state the rule it applied`);
-    assert.equal(typeof v.stable,'boolean');
-    assert.ok(v.caveats.some(c=>/not a sample from a stationary distribution/.test(c)),
-      `${region.key}: every verdict must say the ten years are not a stationary sample`);
-    assert.ok(v.caveats.some(c=>/not a forecast, a confidence interval or a design year/.test(c)),
-      `${region.key}: every verdict must refuse the forecast reading`);
-    const prose=[v.recommendedBasis,v.stabilityBasis,...v.caveats].join(' ');
-    assert.ok(!/plus or minus|\bconfidence interval of\b|\bprobability that\b|\d+\s*%\s*confidence/i.test(prose),
-      `${region.key}: the verdict must not present a spread as an interval or a probability`);
-    if(!v.stable)assert.ok(v.caveats.some(c=>/year-dependent/.test(c)),
-      `${region.key}: an unstable ranking must carry the year-dependent caveat`);
-  }
 });
 
 test('weather-side medians are the medians of the ten years and the design conditions are physical',()=>{

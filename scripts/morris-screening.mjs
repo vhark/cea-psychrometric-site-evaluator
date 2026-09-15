@@ -14,13 +14,14 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {availableParallelism} from 'node:os';
 import {Worker,isMainThread,parentPort,workerData} from 'node:worker_threads';
-import {MODEL_VERSION,validateScenario} from '../src/config.js';
+import {MODEL_VERSION,SCENARIO_SCHEMA_VERSION,validateScenario} from '../src/config.js';
 import {simulateScenario} from '../src/simulate.js';
 import {aggregateYears,strategyFrontier} from '../src/metrics.js';
 import {MORRIS_PARAMETERS,morrisDesign,elementaryEffects,rankByMuStar,rankingStability,applyPoint} from '../src/sensitivity.js';
 
 const METRICS=['compliancePct','cost','electricKWh'];
-const UNITS={compliancePct:'% of eligible hours',cost:'$ over the screened period',electricKWh:'kWh over the screened period'};
+const UNITS={compliancePct:'% of eligible hours meeting the joint temperature-and-moisture target',cost:'USD over the sampled days',electricKWh:'kWh over the sampled days'};
+const EFFECT_UNITS={compliancePct:'pp per full screened parameter range',cost:'USD per full screened parameter range',electricKWh:'kWh per full screened parameter range'};
 const here=path=>new URL(path,import.meta.url);
 const round=(value,places=6)=>Number.isFinite(value)?Number(value.toFixed(places)):null;
 
@@ -89,7 +90,18 @@ function evaluatePoint(point,scenarios,years){
   .map(r=>r.technology);
  const best=frontier.best?scenarios.find(s=>s.id===frontier.best.id).technology:null;
  const failures=runs.reduce((sum,run)=>sum+run.results.reduce((s,r)=>s+(r.summary.numericalFailureHours||0),0),0);
- return {id:point.id,changedKey:point.changedKey,metrics,ranking,best,numericalFailureHours:failures};
+ const validHours=runs.reduce((sum,run)=>sum+run.results.reduce((s,r)=>s+r.summary.validHours,0),0);
+ const eligibleHours=runs.reduce((sum,run)=>sum+run.results.reduce((s,r)=>s+r.summary.eligibleHours,0),0);
+ const costBases=scenarios.map((scenario,i)=>{
+  const bases=runs.map(run=>run.results[i].summary.costBasis);
+  const labels=runs.map(run=>Number(run.label));
+  return {...bases[0],scope:'multiYear',
+   label:`Model-estimated operating cost, median of sampled-day totals over weather years ${labels.join(', ')} (not annual cost)`,
+   aggregation:{statistic:'median',years:labels},
+   period:{startDate:bases[0].period.startDate,endDate:bases.at(-1).period.endDate},
+   periods:bases.map((basis,j)=>({year:labels[j],...basis.period}))};
+ });
+ return {id:point.id,changedKey:point.changedKey,metrics,ranking,best,numericalFailureHours:failures,validHours,eligibleHours,costBases};
 }
 
 function buildInputs({years,days}){
@@ -180,23 +192,28 @@ async function main(){
   bestStrategy:rankingStability(observations.map(o=>({id:o.id,ranking:o.best?[o.best]:[]})))};
  const runtimeSeconds=(Date.now()-started)/1000;
  const output={
-  design:{parameters:design.parameters,levels:design.levels,trajectories:design.trajectories,seed:design.seed,delta:design.delta,
+  schemaVersion:2,
+  design:{parameters:design.parameters.map(p=>p.key==='maxVentACH'?{...p,label:'Installed maximum controlled outdoor-air capacity',
+    rationale:`${p.rationale} Controlled capacity is not uncontrolled leakage or actual continuous dispatched airflow.`}:p),
+   levels:design.levels,trajectories:design.trajectories,seed:design.seed,delta:design.delta,
    basis:design.basis,points:design.points.map(p=>({id:p.id,trajectory:p.trajectory,step:p.step,changedKey:p.changedKey,
     values:Object.fromEntries(Object.entries(p.values).map(([k,v])=>[k,round(v)]))}))},
-  observations:observations.map(o=>({id:o.id,changedKey:o.changedKey,metrics:o.metrics,ranking:o.ranking,best:o.best,numericalFailureHours:o.numericalFailureHours})),
+  observations:observations.map(({costBases,...observation})=>observation),
   effects:Object.fromEntries(Object.entries(effects).map(([key,byMetric])=>[key,
    Object.fromEntries(Object.entries(byMetric).map(([metric,e])=>[metric,{mu:round(e.mu),muStar:round(e.muStar),sigma:round(e.sigma),n:e.n}]))])),
   stability,
-  provenance:{modelVersion:MODEL_VERSION,site:'Tulsa, OK (74103), bundled NASA POWER years',years:options.years,days:options.days,
+  provenance:{modelVersion:MODEL_VERSION,scenarioSchemaVersion:SCENARIO_SCHEMA_VERSION,site:'Tulsa, OK (74103), bundled NASA POWER years',years:options.years,days:options.days,
    trajectories:options.trajectories,levels:design.levels,seed:options.seed,strategies:loadScenarios().map(s=>s.technology),
+   scenarios:loadScenarios().map((s,i)=>({id:s.technology,scenarioId:s.id,installedCostUsd:s.installedCost,
+    installedCostBasis:s.installedCostBasis,costBasis:observations[0].costBases[i]})),
    simulations:runs,coverage,generatedAt:new Date().toISOString(),runtimeSeconds:round(runtimeSeconds,1),
-   metricUnits:UNITS,
+   metricUnits:UNITS,effectUnits:EFFECT_UNITS,
    method:'Morris elementary effects. Each effect is the metric change per full screened range of one parameter, measured one parameter at a time along random trajectories. mu* ranks influence; sigma indicates interaction or non-linearity. This is a screening method: it produces no probability distribution and no confidence interval.',
    subsampling:`Each weather year is subsampled to ${options.days} evenly spaced whole local days; totals are for those days, not a calendar year, and each sampled day costs its first hour as controller warm-up.`,
    headlineMetric:'Unweighted mean over the six strategies of each metric\'s median over weather years; per-strategy values are suffixed @technology.'}};
  writeFileSync(new URL(options.out,here('../')),JSON.stringify(output,null,1)+'\n');
  for(const metric of METRICS){
-  process.stdout.write(`\n${metric} (${UNITS[metric]}) ranked by mu*:\n`);
+  process.stdout.write(`\n${metric} (${EFFECT_UNITS[metric]}) ranked by mu*:\n`);
   for(const row of rankByMuStar(effects,metric))
    process.stdout.write(`  ${row.key.padEnd(20)} mu*=${row.muStar.toPrecision(4).padStart(11)}  mu=${row.mu.toPrecision(4).padStart(11)}  sigma=${row.sigma.toPrecision(4).padStart(11)}  n=${row.n}\n`);
  }
