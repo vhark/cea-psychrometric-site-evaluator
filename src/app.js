@@ -1,4 +1,5 @@
-import {CROPS, FACILITIES, SYSTEMS, TECHNOLOGIES, FIELDS, DEFAULT_SCENARIO, OPAQUE_FACILITIES, makeScenario, applyTechnology, validateScenario, MODEL_VERSION} from './config.js';
+import {CROPS, FACILITIES, SYSTEMS, TECHNOLOGIES, FIELDS, DEFAULT_SCENARIO, OPAQUE_FACILITIES, AIRFLOW_BASIS, AIRFLOW_EVIDENCE, makeScenario, applyTechnology, validateScenario, airflowEvidenceWarnings, MODEL_VERSION} from './config.js';
+import {airflowConversions, heatRecoveryErrors, backfillHeatRecovery} from './airflow.js';
 import {fetchWeather, loadExample, normalizeWeather, loadBundledIndex, loadBundledYear} from './weather.js';
 import {loadEnergyCatalog, lookupZip, getEnergyContext} from './energy.js';
 import {loadScenarios, saveScenarios, loadWeather, saveWeather, listWeather, loadCachedWeather, weatherKey} from './storage.js';
@@ -14,6 +15,19 @@ const state = {scenarios: [], selected: null, snapshot: null, results: [], resul
 const coreKeys = new Set(['areaM2', 'canopyM2', 'dayTargetC', 'nightTargetC']);
 const modelKeys = new Set(['controlMode', 'transpirationModel']);
 const fieldByKey = new Map(FIELDS.flatMap(g => g.fields).map(f => [f.key, f]));
+const airflowKeys = new Set(['infiltrationACH', 'minVentACH', 'maxVentACH', 'fanWPerM3s']);
+const doasKeys = new Set(['doasM3s', 'doasSupplyDewPointC', 'doasSupplyTempC', 'doasCoolingCOP', 'doasReheatRecoveryFraction']);
+const recoveryFields = [
+  {key:'nominalM3s', label:'Nominal recovery flow', unit:'m³/s', min:0, group:'capacity'},
+  {key:'auxiliaryW', label:'Recovery auxiliary power', unit:'W', min:0, group:'capacity'},
+  ...['sensible', 'latent'].flatMap(kind => ['Heating', 'Cooling'].flatMap(mode => [75, 100].map(point => ({
+    key:`${kind}${mode}${point}`, label:`${kind === 'sensible' ? 'Sensible' : 'Latent'} ${mode.toLowerCase()} at ${point}%`, unit:'fraction', min:0, max:1, group:kind
+  })))),
+  {key:'minimumOutdoorOperatingC', label:'Minimum outdoor operating temperature', unit:'°C', frost:'none'},
+  {key:'frostThresholdC', label:'Frost threshold', unit:'°C', frost:'active'},
+  {key:'initialDefrostFraction', label:'Initial defrost fraction', unit:'fraction', min:0, max:1, frost:'exhaustOnly'},
+  {key:'defrostRatePerK', label:'Defrost increase per degree', unit:'1/K', min:0, frost:'exhaustOnly'}
+];
 const UNIT_CONVERSIONS={'°C':[1.8,32,'°F'],'± °C':[1.8,0,'± °F'],'m²':[10.7639104,0,'ft²'],'m':[3.2808399,0,'ft']};
 const MAX_SITES = 5;
 const uid = () => crypto.randomUUID();
@@ -43,7 +57,7 @@ function safeSource(container, label, url) {
   try {const parsed = new URL(url); if (!['https:', 'http:'].includes(parsed.protocol)) throw new Error(); const a = node('a', text); a.href = parsed.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; container.append(a);}
   catch {container.append(document.createTextNode(text));}
 }
-function markChanged() {state.revision++; $('stale-notice').hidden = !state.results.length || state.resultRevision === state.revision; $('save-status').textContent = 'Unsaved input changes. Save or export this scenario before closing.';}
+function markChanged() {state.revision++; $('stale-notice').hidden = !state.results.length || state.resultRevision === state.revision; $('save-status').textContent = 'Unsaved input changes. Save or export this scenario before closing.'; renderComponentStatus();}
 function persist(notify = false) {
   try {saveScenarios(state.scenarios); $('save-status').textContent = 'Scenarios saved in this browser. Export a portable copy for safekeeping.'; if (notify) message('Scenarios saved locally.', 'success');}
   catch (error) {$('save-status').textContent = error.message; message('Browser storage is unavailable or full. Your current inputs still work; export them to preserve your work.', 'warning');}
@@ -55,19 +69,107 @@ function renderUnitReadout(field,value) {
 }
 function fieldControl(field) {
   const label = node('label'), title = node('span', field.label, 'field-label'), unit = node('span', field.unit, 'unit'); title.append(unit);
-  const input = node('input'); Object.assign(input, {id: `field-${field.key}`, name: field.key, type: 'number', min: String(field.min), max: String(field.max), step: 'any', required: true});
+  const input = node('input'); Object.assign(input, {id: `field-${field.key}`, name: field.key, type: 'number', step: 'any', required: true});
+  if (field.min !== undefined) input.min = String(field.min);
+  if (field.max !== undefined) input.max = String(field.max);
   input.dataset.suggestedStep = field.step; label.append(title, input);
   if(['°C','± °C','m²','m'].includes(field.unit)){const equivalent=node('small','','unit-conversion');equivalent.id=`unit-${field.key}`;label.append(equivalent);}
   return label;
 }
 function buildFields() {
   for (const group of FIELDS) {
-    const details = node('details'), summary = node('summary', group.label), grid = node('div', undefined, 'two-grid'); details.append(summary, grid);
-    for (const field of group.fields) (coreKeys.has(field.key) ? $('core-fields') : grid).append(fieldControl(field));
-    $('advanced-fields').append(details);
+    const details = node('details'), summary = node('summary', group.label === 'Airflow & evaporative cooling' ? 'Evaporative cooling & humidification' : group.label), grid = node('div', undefined, 'two-grid'); details.append(summary, grid);
+    for (const field of group.fields) {
+      const target = coreKeys.has(field.key) ? $('core-fields') : airflowKeys.has(field.key) ? $('airflow-fields') : doasKeys.has(field.key) ? $('doas-fields') : grid;
+      const label = field.key === 'fanWPerM3s' ? 'Combined supply / exhaust fan specific power' : field.key === 'doasM3s' ? 'Maximum DOAS treatment capacity' : field.label;
+      target.append(fieldControl({...field, label}));
+    }
+    if (grid.childElementCount) $('advanced-fields').append(details);
   }
+  for (const field of recoveryFields) {
+    const control = fieldControl({...field, key:`heatRecovery.${field.key}`});
+    $(`recovery-${field.group || 'frost'}-fields`).append(control);
+  }
+  options($('outside-air-basis'), Object.entries(AIRFLOW_BASIS));
+  $('run-all').setAttribute('aria-describedby', 'configuration-status');
   for (const [id, source] of [['facility', FACILITIES], ['system', SYSTEMS], ['technology', TECHNOLOGIES], ['upgrade-select', TECHNOLOGIES]]) options($(id), Object.entries(source));
   options($('crop'), Object.entries(CROPS).map(([key, crop]) => [key, crop.label])); $('upgrade-select').value = 'integrated';
+}
+function scenarioErrors(s) {
+  const errors = validateScenario(s);
+  if (!s.outsideAirReviewed && !errors.some(error => /review/i.test(error))) errors.push('Review the controlled outdoor-air capacities and fan specific power before running this scenario.');
+  return errors;
+}
+function showErrors(id, errors) {
+  const box = $(id); box.replaceChildren(); box.hidden = !errors.length;
+  if (errors.length) {const list = node('ul'); for (const error of errors) list.append(node('li', error)); box.append(list);}
+}
+function renderComponentStatus() {
+  const s = current(); if (!s) return;
+  const errors = scenarioErrors(s);
+  showErrors('airflow-errors', errors.filter(error => /outdoor.air|infiltration|fan specific power/i.test(error) && !error.startsWith('DOAS treatment')));
+  showErrors('recovery-errors', heatRecoveryErrors(s.heatRecovery).map(error => {
+    for (const field of recoveryFields) if (error.startsWith(field.key)) return `${field.label}${error.slice(field.key.length)}`;
+    return error;
+  }));
+  for (const key of doasKeys) $(`field-${key}`).required = key === 'doasM3s' || s.technology === 'doas' || s.doasM3s > 0;
+  showErrors('doas-errors', errors.filter(error => error.startsWith('DOAS')));
+  const incomplete = state.scenarios.filter(scenario => scenarioErrors(scenario).length);
+  $('configuration-status').textContent = incomplete.length ? `Run blocked. Complete and review: ${incomplete.map(scenario => scenario.name).join('; ')}. Select each scenario to resolve its inputs.` : '';
+  $('run-all').disabled = !state.snapshot || !!state.pool || !!state.runId || !!incomplete.length;
+}
+function renderAirflow() {
+  const s = current();
+  $('outside-air-basis').value = s.outsideAirBasis;
+  $('outside-air-reviewed').checked = s.outsideAirReviewed === true;
+  $('airflow-basis-readout').textContent = `${AIRFLOW_BASIS[s.outsideAirBasis] || 'Unknown basis'}. ${s.outsideAirReviewed ? 'Reviewed inputs.' : 'Review required.'} Changing minimum, maximum or fan power clears review.`;
+  $('mushroom-airflow-note').hidden = s.system !== 'mushroom';
+  const readouts = $('airflow-conversions'); readouts.replaceChildren();
+  readouts.append(node('p', `Flow conversion at ${units(s.heightM, 'm', 2)} mean height and ${units(s.areaM2, 'm²', 1)} floor area.`, 'help'));
+  for (const key of ['infiltrationACH', 'minVentACH', 'maxVentACH']) {
+    const row = node('div'); row.append(node('strong', fieldByKey.get(key).label));
+    let text = 'Enter a finite nonnegative ACH value and positive floor area and mean height.';
+    if (finite(s[key]) && s[key] >= 0 && finite(s.heightM) && s.heightM > 0 && finite(s.areaM2) && s.areaM2 > 0) {
+      const flow = airflowConversions(s, s[key]);
+      text = `${format(flow.m3s, 4)} m³/s · ${format(flow.m3sPerM2, 6)} m³/s per m² · ${format(flow.cfm, 1)} cfm · ${format(flow.cfmPerFt2, 4)} cfm/ft²`;
+    }
+    row.append(node('p', text, 'mono')); readouts.append(row);
+  }
+  const literature = $('airflow-literature'); literature.replaceChildren();
+  const card = (title, text, source) => {
+    const box = node('div', undefined, 'component-callout'); box.append(node('strong', title), node('p', text));
+    if (source?.sourceUrl) safeSource(box, source.source, source.sourceUrl);
+    literature.append(box);
+  };
+  const evidence = AIRFLOW_EVIDENCE;
+  card('Uncontrolled infiltration', `Original units, ACH: new glass or fiberglass ${evidence.infiltration.constructionACH.glass.join(' to ')}; new double-layer polyethylene ${evidence.infiltration.constructionACH.doublePolyethylene.join(' to ')}. These are construction-specific ranges.`, evidence.infiltration);
+  for (const [material, range] of Object.entries(evidence.controlled.floorNormalizedM3sPerM2)) {
+    const conversion = finite(s.heightM) && s.heightM > 0 ? `${range.map(flow => format(flow * 3600 / s.heightM, 2)).join(' to ')} ACH at ${format(s.heightM, 2)} m mean height.` : 'Enter positive mean height to convert to ACH.';
+    card(`${material === 'glass' ? 'Glass' : 'Polyethylene'} controlled air`, `Original units: ${range.join(' to ')} m³/s per m² of floor. ${conversion}`, evidence.controlled);
+  }
+  card('Warm-weather operating context', 'UGA 60 ACH warm-weather guidance and Shamshiri 60 to 90 ACH fan-and-pad guidance are operating context, not universal validation limits.', evidence.controlled);
+  card('Closed-room adjacent proxy', `${evidence.closedRoom.measuredACH} ACH, original measured units. ${evidence.closedRoom.applicability}`, evidence.closedRoom);
+  card('Applicability limits', evidence.unsupported.applicability);
+  if (s.system === 'mushroom') card('Mushroom project basis', evidence.mushroom.applicability, evidence.mushroom);
+  for (const warning of airflowEvidenceWarnings(s)) card('Outside the source context', warning);
+}
+function renderRecovery() {
+  const recovery = backfillHeatRecovery(current().heatRecovery), active = recovery.type !== 'none';
+  $('recovery-type').value = recovery.type; $('recovery-frost').value = recovery.frostControl;
+  $('recovery-active').hidden = !active;
+  $('recovery-latent-fields').hidden = recovery.type !== 'erv';
+  $('recovery-latent-note').hidden = recovery.type !== 'hrv';
+  $('recovery-frost').disabled = !active;
+  for (const field of recoveryFields) {
+    const key = `heatRecovery.${field.key}`, input = $(`field-${key}`);
+    const visible = active && (field.group !== 'latent' || recovery.type === 'erv') && (!field.frost || field.frost === recovery.frostControl || field.frost === 'active' && recovery.frostControl !== 'none');
+    input.closest('label').hidden = !visible; input.disabled = !visible; input.required = visible;
+    input.value = finite(recovery[field.key]) ? recovery[field.key] : '';
+    renderUnitReadout({...field, key}, recovery[field.key]);
+  }
+}
+function focusDoas() {
+  if (current().technology === 'doas') {$('doas-panel').focus(); $('doas-panel').scrollIntoView({block:'center'});}
 }
 function renderScenarioList() {
   options($('scenario-select'), state.scenarios.map((s, i) => [s.id, `${i === 0 ? 'Baseline · ' : ''}${s.name}`]), state.selected);
@@ -76,7 +178,7 @@ function renderScenarioList() {
 }
 function renderScenario() {
   const s = current(); if (!s) return; state.selected = s.id; renderScenarioList();
-  for (const field of fieldByKey.values()) {$(`field-${field.key}`).value = s[field.key];renderUnitReadout(field,s[field.key]);}
+  for (const field of fieldByKey.values()) {$(`field-${field.key}`).value = finite(s[field.key]) ? s[field.key] : '';renderUnitReadout(field,s[field.key]);}
   for (const id of ['facility', 'system', 'crop', 'technology']) $(id).value = s[id];
   // Scenarios saved before v0.2 carry no model choice; validateScenario back-fills the same defaults at run time.
   $('control-mode').value = s.controlMode ?? DEFAULT_SCENARIO.controlMode ?? 'staged';
@@ -84,14 +186,32 @@ function renderScenario() {
   $('scenario-name').value = s.name; $('pad-enabled').checked = s.padEnabled; $('integrated-hvac').checked = s.integratedHVAC;
   $('crop-source').textContent = `Assumed crop defaults: ${CROPS[s.crop]?.source || 'User-defined program. Review targets, lighting and evaporation explicitly.'}`;
   $('price-mode').value = s.priceMode === 'manual' ? 'manual' : 'state';
+  renderAirflow(); renderRecovery(); renderComponentStatus();
 }
 function updateScenario(event) {
   const input = event.target, s = current(); if (!s || !input.name) return;
-  if (fieldByKey.has(input.name)) {s[input.name] = input.value === '' ? NaN : Number(input.value);renderUnitReadout(fieldByKey.get(input.name),s[input.name]);}
+  if (input.name.startsWith('heatRecovery.')) {
+    const key = input.name.slice('heatRecovery.'.length), recovery = {...backfillHeatRecovery(s.heatRecovery)};
+    recovery[key] = input.tagName === 'SELECT' ? input.value : input.value === '' ? null : Number(input.value);
+    if (key === 'type') {
+      recovery.economizerBypass = true;
+      for (const field of recoveryFields.filter(field => field.group === 'latent')) recovery[field.key] = recovery.type === 'hrv' ? 0 : null;
+    }
+    s.heatRecovery = recovery;
+    if (input.tagName === 'SELECT') renderRecovery();
+    else {const field = recoveryFields.find(field => field.key === key); if (field) renderUnitReadout({...field, key:input.name}, recovery[key]);}
+  }
+  else if (fieldByKey.has(input.name)) {
+    s[input.name] = input.value === '' ? null : Number(input.value); renderUnitReadout(fieldByKey.get(input.name),s[input.name]);
+    if (['minVentACH', 'maxVentACH'].includes(input.name)) {s.outsideAirBasis = 'projectInput'; s.outsideAirReviewed = false;}
+    if (input.name === 'fanWPerM3s') s.outsideAirReviewed = false;
+  }
+  else if (input.name === 'outsideAirBasis') {s.outsideAirBasis = input.value; s.outsideAirReviewed = false;}
   else if (input.type === 'checkbox') s[input.name] = input.checked;
   else if (modelKeys.has(input.name)) s[input.name] = input.value;
   else if (input.name === 'name') {s.name = input.value; renderScenarioList();}
   else return;
+  if (airflowKeys.has(input.name) || ['areaM2', 'heightM', 'outsideAirBasis', 'outsideAirReviewed'].includes(input.name)) renderAirflow();
   markChanged();
 }
 function templateChanged(kind) {
@@ -271,7 +391,7 @@ async function acceptWeather(snapshot, {example = false, persistSnapshot = true,
   safeSource(detail, `${describe(snapshot.source)} · ${describe(snapshot.sourceKind)}`, snapshot.sourceUrl);
   detail.append(document.createTextNode(` · ${snapshot.startDate} to ${snapshot.endDate} · ${snapshot.timezone}. Meteorology ${format(met)}/${format(hours.length)} h; solar ${format(solar)}/${format(hours.length)} h. Retrieved ${snapshot.retrievedAt || 'date unavailable'}.`));
   if (snapshot.warnings?.length) detail.append(document.createTextNode(` ${snapshot.warnings.map(describe).join(' ')}`));
-  markChanged(); persist(); $('run-all').disabled = !!state.pool;
+  markChanged(); persist(); renderComponentStatus();
   if (persistSnapshot) {try {await saveWeather(state.snapshot);} catch (error) {message(`Weather is loaded but could not be cached: ${error.message}`, 'warning');}}
   const year = calendarYear(state.snapshot); state.years = new Set(year ? [year] : []);
   await refreshYears();
@@ -348,7 +468,7 @@ async function initializeEnergy() {
 function stopPool() {
   for (const worker of state.pool?.workers || []) worker.terminate();
   state.pool = null; state.runId = null; state.runController?.abort(); state.runController = null;
-  $('run-all').disabled = !state.snapshot; $('cancel-run').hidden = true; $('run-progress').hidden = true;
+  renderComponentStatus(); $('cancel-run').hidden = true; $('run-progress').hidden = true;
 }
 function startPool(jobs, {onProgress, onDone, onError}) {
   const size = Math.max(1, Math.min((navigator.hardwareConcurrency - 1) || 2, jobs.length, 8));
@@ -399,7 +519,7 @@ async function run() {
   if (years.length) {state.yearSources = yearSources(location.latitude, location.longitude); for (const year of years) if (!state.yearSources.has(year)) throw new Error(`Weather year ${year} is not available for the current coordinates. Locate the site again or refresh the year list.`);}
   else if (Math.abs(location.latitude - state.snapshot.latitude) > .001 || Math.abs(location.longitude - state.snapshot.longitude) > .001 || location.timezone !== state.snapshot.timezone || $('start-date').value !== state.snapshot.startDate || $('end-date').value !== state.snapshot.endDate) throw new Error('Location or dates do not match the loaded snapshot. Retrieve weather again, or restore the snapshot location and dates. No old weather is silently reused for a new site.');
   copyLocationToScenarios({...location, sector: $('sector').value});
-  const errors = state.scenarios.flatMap(s => validateScenario(s).map(error => `${s.name}: ${error}`));
+  const errors = state.scenarios.flatMap(s => scenarioErrors(s).map(error => `${s.name}: ${error}`));
   if (errors.length) throw new Error(errors.join('\n'));
   const historical = state.scenarios.some(s => s.priceMode !== 'manual');
   if (historical && !state.energyContext) throw new Error('Historical state price mode needs a loaded ZIP energy context. Select manual costing or resolve the ZIP first.');
@@ -681,11 +801,11 @@ function bindEvents() {
   on('scenario-select', 'change', () => {state.selected = $('scenario-select').value; renderScenario(); return refreshEnergy();});
   on('facility', 'change', () => templateChanged('Facility')); on('system', 'change', () => templateChanged('Cultivation'));
   on('crop', 'change', () => {const s = current(), crop = $('crop').value, defaults = CROPS[crop]; for (const [key, value] of Object.entries(defaults)) if (key in s && key !== 'name') s[key] = value; s.crop = crop; markChanged(); renderScenario();});
-  on('technology', 'change', () => {const s = current(), next = applyTechnology(s, $('technology').value); state.scenarios[state.scenarios.indexOf(s)] = next; markChanged(); renderScenario();});
-  on('save-scenario', 'click', () => {const errors = state.scenarios.flatMap(s => validateScenario(s).map(e => `${s.name}: ${e}`)); if (errors.length) throw new Error(errors.join('\n')); persist(true);});
+  on('technology', 'change', () => {const s = current(), next = applyTechnology(s, $('technology').value); if (next.technology === 'doas') next.doasM3s = null; state.scenarios[state.scenarios.indexOf(s)] = next; markChanged(); renderScenario(); focusDoas();});
+  on('save-scenario', 'click', () => {const errors = state.scenarios.flatMap(s => scenarioErrors(s).map(e => `${s.name}: ${e}`)); if (errors.length) throw new Error(errors.join('\n')); persist(true);});
   on('duplicate-scenario', 'click', () => {const s = current(); addScenario({...s, name: `${s.name.slice(0, 110)} copy`});});
   on('remove-scenario', 'click', () => {if (state.scenarios.length <= 1) return; if (!confirm(`Remove “${current().name}” from this workspace? Export first if you need a copy.`)) return; state.scenarios = state.scenarios.filter(s => s.id !== state.selected); state.selected = state.scenarios[0].id; markChanged(); renderScenario(); persist();});
-  on('add-upgrade', 'click', () => addScenario(applyTechnology(state.scenarios[0], $('upgrade-select').value))); on('add-sensitivity', 'click', sensitivity);
+  on('add-upgrade', 'click', () => {const next = applyTechnology(state.scenarios[0], $('upgrade-select').value); if (next.technology === 'doas') next.doasM3s = null; addScenario(next); focusDoas();}); on('add-sensitivity', 'click', sensitivity);
   on('price-mode', 'change', () => {current().priceMode = $('price-mode').value; markChanged(); return refreshEnergy();});
   on('sector', 'change', () => {for (const s of state.scenarios) s.sector = $('sector').value; markChanged(); return refreshEnergy();});
   on('utility', 'change', () => {const selected = $('utility').selectedOptions[0]?.textContent; message($('utility').value ? `${selected}: candidate selected for review only. Confirm service with the provider. Costing remains the selected manual assumption or historical state/sector proxy.` : 'No provider candidate selected. No utility tariff is inferred.');});
@@ -695,7 +815,7 @@ function bindEvents() {
   on('equipment-tab', 'click', () => {state.weatherOnly = false; renderResults();}); on('weather-tab', 'click', () => {state.weatherOnly = true; renderResults();});
   on('timeline-month', 'change', renderCalendar); on('hour-slider', 'input', () => {state.hour = Number($('hour-slider').value); renderInspector();});
   on('hour-prev', 'click', () => {state.hour--; renderInspector();}); on('hour-next', 'click', () => {state.hour++; renderInspector();});
-  on('export-scenario', 'click', () => {const errors = validateScenario(current()); if (errors.length) throw new Error(errors.join('\n')); downloadScenario(current());});
+  on('export-scenario', 'click', () => {const errors = scenarioErrors(current()); if (errors.length) throw new Error(errors.join('\n')); downloadScenario(current());});
   for (const type of ['json', 'csv']) on(`export-${type}`, 'click', () => downloadRun(state.results, state.resultSnapshot, type));
   // The results document carries the multi-year and multi-site sections when those runs exist.
   on('export-report', 'click', () => downloadRun(state.results, state.resultSnapshot, 'report', {aggregate: state.aggregate, sites: state.siteComparison}));

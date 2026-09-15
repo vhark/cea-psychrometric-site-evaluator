@@ -214,6 +214,43 @@ button.chip[aria-pressed="true"]::before { content: ""; width: 5px; height: 5px;
 .sensitivity-controls button { margin-top: 14px; width: 100%; }
 .file-actions { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--hairline); }
 
+/* Reviewed component inputs adopt the OSF Instrument tokens. The remaining surface
+   retains its existing theme until the separate result/brand migration. */
+.component-panel {
+  --paper: oklch(0.180 0.012 145); --mist: oklch(0.225 0.014 145); --stone: oklch(0.270 0.016 145);
+  --ink: oklch(0.935 0.014 118); --ink-2: oklch(0.740 0.022 122); --ink-3: oklch(0.600 0.022 125);
+  --line: oklch(0.320 0.018 145); --leaf: oklch(0.720 0.150 140); --pine: oklch(0.640 0.120 148);
+  --warn: oklch(0.780 0.130 78);
+  --font-body: 'Hanken Grotesk', sans-serif; --font-display: 'Young Serif', serif; --font-mono: 'Spline Sans Mono', monospace;
+  --text: var(--ink); --text-2: var(--ink-2); --text-3: var(--ink-3); --canvas: var(--paper); --green: var(--pine); --hairline-strong: var(--line);
+  min-width: 0; margin: 24px 0 0; padding: 16px; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--paper); color: var(--ink); font-family: var(--font-body);
+}
+.component-panel legend { padding: 0 8px; color: var(--ink); font: 400 18px/1.3 var(--font-display); }
+.component-panel > label, .component-panel .two-grid, #recovery-active > label { margin-top: 16px; }
+.component-panel label { color: var(--ink-2); font: 500 12px/1.5 var(--font-body); letter-spacing: 0; text-transform: none; }
+.component-panel .field-label { min-height: 0; }
+.component-panel .unit { color: var(--ink-2); font-size: 10px; }
+.component-panel input, .component-panel select { border: 1px solid var(--line); border-radius: 6px; padding: 8px; background-color: var(--mist); color: var(--ink); }
+.component-panel select { appearance: auto; background-image: none; }
+.component-panel input:focus-visible, .component-panel select:focus-visible, .component-panel:focus-visible { outline: 2px solid var(--pine); outline-offset: 3px; }
+.component-panel .help { color: var(--ink-2); font-size: 12px; }
+.component-panel .review-control { display: flex; align-items: flex-start; gap: 10px; }
+.component-panel .review-control input { flex-shrink: 0; margin-top: 3px; }
+.component-callout { margin: 14px 0 0; padding: 12px; border: 1px solid color-mix(in oklch, var(--leaf) 28%, var(--line)); border-radius: 12px; background: color-mix(in oklch, var(--leaf) 8%, var(--paper)); color: var(--ink-2); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.component-callout strong { color: var(--ink); }
+.component-callout a { display: block; margin-top: 8px; color: var(--leaf); }
+.component-errors { border-color: color-mix(in oklch, var(--warn) 30%, var(--line)); background: color-mix(in oklch, var(--warn) 9%, var(--paper)); }
+.component-errors ul { margin: 0; padding-left: 16px; }
+.component-errors li + li { margin-top: 8px; }
+.flow-readouts { display: grid; gap: 12px; margin-top: 16px; font-size: 12px; }
+.flow-readouts > div { border-top: 1px solid var(--line); padding-top: 10px; }
+.flow-readouts .mono { color: var(--ink-2); font-size: 11px; margin-top: 4px; overflow-wrap: anywhere; }
+.airflow-literature { margin-top: 16px; }
+.airflow-literature summary { color: var(--leaf); cursor: pointer; font-size: 12px; }
+#recovery-active > .help { margin-top: 16px; }
+.component-panel .two-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+
 /* Results */
 .runbar { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding: 28px 0 24px; border-top: 1px solid var(--hairline); }
 .runbar h2 { margin-top: 12px; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -.025em; }
