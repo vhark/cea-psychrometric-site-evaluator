@@ -1,4 +1,5 @@
 import {localClock} from './physics.js';
+import {costBasisForHours} from './metrics.js';
 
 let catalogPromise;
 let loadedCatalog;
@@ -143,10 +144,20 @@ export function applyEnergyContext(result, context) {
       effectiveElectricityPrice:value.pricedElectricKWh > 0 ? value.electricityCost / value.pricedElectricKWh : null,
     };
   }
+  const priorCostBasis=result.summary?.costBasis;
+  const baseCostBasis=priorCostBasis&&typeof priorCostBasis==='object'&&!Array.isArray(priorCostBasis)?
+    priorCostBasis:costBasisForHours(hours,scenario);
+  const appliedElectricityRates=new Map();
+  for(const hour of hours)if(hour.valid&&finite(hour.electricityPriceUsdPerKWh)&&hour.pricePeriod)
+    appliedElectricityRates.set(hour.pricePeriod,{period:hour.pricePeriod,usdPerKWh:hour.electricityPriceUsdPerKWh});
+  const electricityPriceBasis=manual?
+    {source:'manual scenario input',usdPerKWh:finite(scenario.electricityPrice)?scenario.electricityPrice:null}:
+    {source:'calendar-matched state-sector average proxy',sector:context?.sector??scenario.sector??null,
+      rates:[...appliedElectricityRates.values()].sort((a,b)=>a.period.localeCompare(b.period))};
   const summary = {...result.summary, ...costFields(total),
     monthly:(result.summary.monthly || []).map(month => ({...month, ...costFields(months.get(month.month) || fresh())})),
     daily:(result.summary.daily || []).map(day => ({...day, ...costFields(days.get(day.date) || fresh())})),
-    costBasis:manual ? 'Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.' : 'Calendar-matched EIA state-sector monthly average proxy plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate.',
+    costBasis:{...baseCostBasis,priceBasis:{...baseCostBasis.priceBasis,electricity:electricityPriceBasis}},
     emissionsBasis:'Year-matched annual eGRID total-output CO2, kg CO2; regional generation proxy, not marginal or supplier procurement. No grid-loss adjustment.',
   };
   const warnings = [...new Set([...(result.warnings || []), ...(context?.warnings || [])])];

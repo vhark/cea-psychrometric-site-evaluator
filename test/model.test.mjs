@@ -637,6 +637,21 @@ test('staged controller can sustain every controlled outdoor-air stage and rejec
   assert.ok(Math.abs(h.controls.controlledACH-adverseScenario.minVentACH)<1e-9,
    `adverse untreated air selected ${h.controls.controlledACH} ACH`);
 });
+test('mixed staged-control hours preserve selected stage durations and extrema',()=>{
+ const s=closed({controlMode:'staged',minVentACH:.3,maxVentACH:9,cropSensibleWm2:100,thermalMassKJm2K:20,
+  fanWPerM3s:0,heaterKW:0});
+ const result=simulateScenario(s,weather(24,{tempC:5,rh:.35}),{stepMinutes:5});
+ const mixed=result.hours.find(h=>Array.isArray(h.controls?.controlledACHStages)&&h.controls.controlledACHStages.length>1);
+ assert.ok(mixed,'fixture must select more than one controlled-air stage within an hour');
+ assert.ok(Math.abs(mixed.controls.controlledACHStages.reduce((sum,stage)=>sum+stage.hours,0)-1)<1e-12);
+ const weighted=mixed.controls.controlledACHStages.reduce((sum,stage)=>sum+stage.ach*stage.hours,0);
+ assert.ok(Math.abs(weighted-mixed.controls.controlledACH)<1e-12);
+ assert.equal(mixed.controls.controlledACHStages.some(stage=>Math.abs(stage.ach-mixed.controls.controlledACH)<1e-12),false,
+  'hourly average must not be emitted as a selected stage');
+ assert.equal(mixed.controls.controlledACHMin,Math.min(...mixed.controls.controlledACHStages.map(stage=>stage.ach)));
+ assert.equal(mixed.controls.controlledACHMax,Math.max(...mixed.controls.controlledACHStages.map(stage=>stage.ach)));
+ assert.equal(result.summary.outdoorAir.controlledACH.stages.some(stage=>Math.abs(stage.ach-mixed.controls.controlledACH)<1e-12),false);
+});
 test('DOAS capacity conditions one selected stream without increasing outdoor airflow',()=>{
  const s=closed({controlMode:'staged',infiltrationACH:.7,minVentACH:.3,maxVentACH:40,technology:'doas',
   doasM3s:2,doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,

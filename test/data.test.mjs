@@ -4,6 +4,7 @@ import {normalizeWeather} from '../src/weather.js';
 import {applyEnergyContext} from '../src/energy.js';
 import {makeScenario,migrateScenario,SCENARIO_SCHEMA_VERSION,validateScenario} from '../src/config.js';
 import {downloadRun,downloadScenario,parseImport} from '../src/export.js';
+import {summarizeHours} from '../src/metrics.js';
 const units={time:'UTC epoch milliseconds',tempC:'C',dewPointC:'C',rh:'fraction',pressurePa:'Pa',ghiWm2:'W/m2',windMs:'m/s'};
 const sample=time=>({time,tempC:20,rh:.6,pressurePa:101325,ghiWm2:0});
 const snapshot=(hours,extra={})=>({schemaVersion:1,source:'Boundary fixture',timezone:'UTC',units,hours,...extra});
@@ -18,10 +19,46 @@ test('new scenarios and every portable JSON export use schema version 2',async()
  URL.revokeObjectURL=()=>{};globalThis.setTimeout=callback=>{callback();return 0;};
  try{
   downloadScenario(scenario);
-  downloadRun([{scenario,hours:[],summary:{},warnings:[]}],snapshot([]));
+  downloadRun([{scenario,hours:[],summary:{contractMarker:'current-result'},warnings:[]}],snapshot([]));
   const payloads=await Promise.all(downloads.map(blob=>blob.text().then(JSON.parse)));
   assert.deepEqual(payloads.map(data=>data.schemaVersion),[2,2]);
   assert.ok(payloads.every(data=>data.scenarios.every(item=>item.schemaVersion===2)));
+  assert.equal(payloads[1].results[0].scenario.schemaVersion,2);
+  assert.equal(payloads[1].results[0].summary.contractMarker,'current-result');
+ }finally{
+  globalThis.document=priorDocument;URL.createObjectURL=priorCreate;URL.revokeObjectURL=priorRevoke;globalThis.setTimeout=priorTimeout;
+ }
+});
+
+test('hourly CSV exports actual airflow, recovery, frost, preheat, and explicit DOAS quantities',async()=>{
+ const s=makeScenario();
+ const controls={controlledACH:1.25,controlledM3s:2.25,controlledACHMin:.5,controlledACHMax:2,
+  controlledACHStages:[{ach:.5,hours:.5},{ach:2,hours:.5}],
+  totalOutdoorACH:3.25,totalOutdoorM3s:4.25,totalOutdoorACHMin:2.5,totalOutdoorACHMax:4,
+  recoveryCoreFraction:.5,recoveryBypassFraction:.25,recoveryDefrostFraction:.125,preheatFraction:.75,
+  doasConditionedFraction:.625,doasTreatmentM3s:1.75};
+ const componentValues={
+  recoverySensibleKWh:5.1,recoveryLatentKWh:5.2,recoveryAuxKWh:5.3,recoveryCoreM3:5.4,recoveryBypassM3:5.5,recoveryDefrostHours:5.6,
+  preheatDeliveredKWh:6.1,preheatElectricKWh:6.2,preheatFuelKWh:6.3,preheatInsufficientHours:6.4,
+  doasCondensateKg:7.1,doasCoolingDeliveredKWh:7.2,doasCoolingElectricKWh:7.3,doasRecoveredReheatKWh:7.4,
+  doasExternalHeatKWh:7.5,doasUnmetConditioningKWh:7.6,
+ };
+ const downloads=[];
+ const priorDocument=globalThis.document,priorCreate=URL.createObjectURL,priorRevoke=URL.revokeObjectURL,priorTimeout=globalThis.setTimeout;
+ globalThis.document={createElement:()=>({click(){}})};
+ URL.createObjectURL=blob=>{downloads.push(blob);return 'blob:test';};
+ URL.revokeObjectURL=()=>{};globalThis.setTimeout=callback=>{callback();return 0;};
+ try{
+  downloadRun([{scenario:s,hours:[{time:Date.UTC(2025,0,1),valid:true,controls,...componentValues}],summary:{},warnings:[]}],snapshot([]),'csv');
+  const csv=await downloads[0].text(),[headerLine,rowLine]=csv.split('\r\n');
+  const cells=line=>[...line.matchAll(/"((?:[^"]|"")*)"/g)].map(match=>match[1].replaceAll('""','"'));
+  const headers=cells(headerLine),values=cells(rowLine),row=Object.fromEntries(headers.map((key,index)=>[key,values[index]]));
+  for(const [key,value] of Object.entries({...controls,...componentValues})){
+   assert.ok(headers.includes(key),`CSV is missing ${key}`);
+   if(Array.isArray(value))assert.deepEqual(JSON.parse(row[key]),value);
+   else assert.equal(Number(row[key]),value);
+  }
+  for(const removed of ['ventACH','doasDuty','doasKWhPerKg'])assert.equal(headers.includes(removed),false);
  }finally{
   globalThis.document=priorDocument;URL.createObjectURL=priorCreate;URL.revokeObjectURL=priorRevoke;globalThis.setTimeout=priorTimeout;
  }
@@ -47,8 +84,9 @@ test('portable import migrates version 1 scenarios and discards imported result 
  assert.equal(Object.hasOwn(imported,'results'),false);
  assert.deepEqual(imported.snapshot,{schemaVersion:1,hours:[]});
  assert.equal(legacy.schemaVersion,1,'migration must not mutate imported input');
- const currentBundle=parseImport({schemaVersion:2,scenarios:[current]});
+ const currentBundle=parseImport({schemaVersion:2,scenarios:[current],results:[{scenario:current,summary:{cost:-1}}]});
  assert.equal(currentBundle.scenarios[0].schemaVersion,2);
+ assert.equal(Object.hasOwn(currentBundle,'results'),false);
  assert.throws(()=>parseImport({schemaVersion:1,results:[{scenario:legacy}]}),/Import needs/);
  const unreviewed={...current,outsideAirBasis:'projectInput'};delete unreviewed.outsideAirReviewed;
  const migratedUnreviewed=migrateScenario(unreviewed);
@@ -132,4 +170,24 @@ test('manual price overrides catalog rates without losing provenance',()=>{
  assert.ok(Math.abs(r.summary.cost-18.46)<1e-10);
  assert.equal(r.energyContext.appliedPriceMode,'manual');
  assert.equal(r.hours[0].pricePeriod,'manual');
+});
+
+
+test('energy pricing preserves the structured operating-cost result contract',()=>{
+ const r=result('state');
+ r.summary=summarizeHours(r.hours,r.scenario);
+ const priced=applyEnergyContext(r,context),basis=priced.summary.costBasis;
+ assert.equal(basis.scope,'period');
+ assert.equal(basis.label,'Model-estimated operating cost for the simulated period');
+ assert.deepEqual(basis.period,{startDate:'2025-01-31',endDate:'2025-02-01'});
+ assert.deepEqual(basis.included,['purchased electricity','purchased heating fuel','water represented by the scenario']);
+ assert.deepEqual(basis.priceBasis,{
+  electricity:{source:'calendar-matched state-sector average proxy',sector:'commercial',
+   rates:[{period:'2025-01',usdPerKWh:.1},{period:'2025-02',usdPerKWh:.2}]},
+  fuel:{source:'scenario input',usdPerKWh:.1},
+  water:{source:'scenario input',usdPerL:.01},
+ });
+ assert.deepEqual(basis.excluded,['installed capital','maintenance','labor','financing','taxes','demand charges','fixed charges','time-of-use effects','other unmodeled tariff components']);
+ assert.equal(basis.isQuote,false);
+ assert.equal(basis.isGuaranteedSavings,false);
 });

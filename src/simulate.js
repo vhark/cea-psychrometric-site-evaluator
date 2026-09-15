@@ -581,10 +581,12 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       controller=controlMode==='staged'?stagedController(s):null;
     }
     let compliant=0,maxEnergyResidual=0,maxMoistureResidual=0,failed=false;
-    const modeCounts={},controls={controlledACH:0,controlledM3s:0,totalOutdoorACH:0,totalOutdoorM3s:0,
+    const modeCounts={},controls={controlledACH:0,controlledM3s:0,controlledACHMin:null,controlledACHMax:null,controlledACHStages:[],
+      totalOutdoorACH:0,totalOutdoorM3s:0,totalOutdoorACHMin:null,totalOutdoorACHMax:null,
       recoveryCoreFraction:0,recoveryBypassFraction:0,recoveryDefrostFraction:0,preheatFraction:0,
       padFraction:0,indirectFraction:0,dxDuty:0,dehuDuty:0,desiccantDuty:0,doasConditionedFraction:0,doasTreatmentM3s:0,heaterDuty:0,humidifierFraction:0,lightFraction:0,enrichmentFraction:0,shadeFraction:0,thermalScreenFraction:0};
     const loads=emptyLoads(),startTempC=state.tempC,startW=state.w;
+    const controlledStageHours=new Map();
     const dayContributions=new Map();
     const hour=hourContext(outside,s,shade,thermal);
     for(let sub=0;sub<nSteps;sub++) {
@@ -667,6 +669,12 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       controls.controlledACH+=picked.air.controlledACH/nSteps;controls.controlledM3s+=picked.air.controlledM3s/nSteps;
       controls.totalOutdoorACH+=(ctx.infiltrationACH+picked.air.controlledACH)/nSteps;
       controls.totalOutdoorM3s+=(s.areaM2*s.heightM*ctx.infiltrationACH/3600+picked.air.controlledM3s)/nSteps;
+      const stageHours=dt/3600,totalOutdoorACH=ctx.infiltrationACH+picked.air.controlledACH;
+      controls.controlledACHMin=controls.controlledACHMin===null?picked.air.controlledACH:Math.min(controls.controlledACHMin,picked.air.controlledACH);
+      controls.controlledACHMax=controls.controlledACHMax===null?picked.air.controlledACH:Math.max(controls.controlledACHMax,picked.air.controlledACH);
+      controls.totalOutdoorACHMin=controls.totalOutdoorACHMin===null?totalOutdoorACH:Math.min(controls.totalOutdoorACHMin,totalOutdoorACH);
+      controls.totalOutdoorACHMax=controls.totalOutdoorACHMax===null?totalOutdoorACH:Math.max(controls.totalOutdoorACHMax,totalOutdoorACH);
+      controlledStageHours.set(picked.air.controlledACH,(controlledStageHours.get(picked.air.controlledACH)||0)+stageHours);
       controls.recoveryCoreFraction+=picked.air.recoveryCoreFraction/nSteps;
       controls.recoveryBypassFraction+=picked.air.recoveryBypassFraction/nSteps;
       controls.recoveryDefrostFraction+=picked.air.recovery.defrostFraction/nSteps;
@@ -695,6 +703,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       row.mode='NUMERICAL_FAILURE';row.energyResidualW=maxEnergyResidual;row.moistureResidualKgS=maxMoistureResidual;state=null;controller=null;
       for(const key of TOTALS)row[key]=null;
     }else{
+      controls.controlledACHStages=[...controlledStageHours].sort((a,b)=>a[0]-b[0]).map(([ach,hours])=>({ach,hours}));
       loads.storedKWh=state.capacity*(state.tempC-startTempC)/KWH;loads.latentKg.stored=state.mass*(state.w-startW);
       finishLoads(loads);
       row.dayContributions=[...dayContributions.values()];

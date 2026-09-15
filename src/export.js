@@ -39,6 +39,24 @@ export function designBasisHTML(results,snapshot,{aggregate=null,sites=null}={})
  const entry=r=>agg.byScenario[r.scenario.id];
  const attainment=r=>{const e=entry(r),s=r.summary||{};return aggregate&&e?`${f(e.median.compliancePct)}% median, ${f(e.worst?.compliancePct)}% worst (${e.worst?.label??'n/a'}) over ${e.years.length} years; this period ${f(s.compliancePct)}%`:`${f(s.compliancePct)}% (${f(s.compliantHours,0)} of ${f(s.eligibleHours,0)} eligible h)`;};
  const drying=r=>{const d=r.weatherSummary?.outdoorDrying;return d?`${f(d.coolDry.hours+d.coldDry.hours+d.hotDry.hours,0)} h (cool-dry ${f(d.coolDry.hours,0)}, cold-dry ${f(d.coldDry.hours,0)}, hot-dry ${f(d.hotDry.hours,0)}) at ${f(d.maxVentACH)} ACH`:'Not available';};
+ const airflowAt=(ach,s)=>{
+  if(typeof ach!=='number'||!Number.isFinite(ach)||!(s.areaM2>0)||!(s.heightM>0))return null;
+  const m3s=ach*s.areaM2*s.heightM/3600,cfm=m3s*2118.880003;
+  return {ach,m3s,cfm,m3sPerM2:m3s/s.areaM2,cfmPerFt2:cfm/(s.areaM2*10.7639104167)};
+ };
+ const airflowText=(air,time=null,outdoor=null)=>air?
+  `${f(air.ach,2)} ACH, ${f(air.m3s,3)} m³/s, ${f(air.cfm,0)} cfm, ${f(air.m3sPerM2,4)} m³/s/m², ${f(air.cfmPerFt2,3)} cfm/ft²${time===null?'':` at ${at(time,outdoor)}`}`:
+  'Not available';
+ const rateText=price=>{
+  if(Array.isArray(price?.rates)&&price.rates.length){
+   const rates=price.rates.map(rate=>`${rate.period}: ${f(rate.usdPerKWh,4)} USD/kWh`).join(', ');
+   return price.source?`${rates} (${price.source})`:rates;
+  }
+  return price?.usdPerKWh!==undefined?`${f(price.usdPerKWh,4)} USD/kWh`:price?.usdPerL!==undefined?`${f(price.usdPerL,4)} USD/L`:price?.source??'Not available';
+ };
+ const costBasisText=b=>b&&typeof b==='object'?
+  `${b.label}. Included: ${(b.included||[]).join(', ')}. Price basis: electricity ${rateText(b.priceBasis?.electricity)}, fuel ${rateText(b.priceBasis?.fuel)}, water ${rateText(b.priceBasis?.water)}. Excluded: ${(b.excluded||[]).join(', ')}. Quote: ${b.isQuote?'yes':'no'}. Guaranteed savings: ${b.isGuaranteedSavings?'yes':'no'}.`:
+  'Not available';
  const strategyRows=[
   ['Joint attainment',...per.map(({r})=>attainment(r))],
   ['Space sensible-heat ratio, period',...per.map(({loads})=>loads.hours?f(loads.total.shr,2):'No load terms')],
@@ -46,14 +64,16 @@ export function designBasisHTML(results,snapshot,{aggregate=null,sites=null}={})
   ['Peak latent hour',...per.map(({design:d})=>d.peakLatentHour?`${f(d.peakLatentHour.latentKg)} kg/h at ${at(d.peakLatentHour.time,d.peakLatentHour.outdoor)}`:'No load terms')],
   ['Worst joint-failure hour',...per.map(({design:d})=>d.jointFailure.worstHour?`${f(d.jointFailure.worstHour.tempDegreeHours,2)} K·h, ${f(d.jointFailure.worstHour.vpdKPaHours,3)} kPa·h at ${at(d.jointFailure.worstHour.time,d.jointFailure.worstHour.outdoor)}`:'No failures')],
   ['1 percent joint-failure hour',...per.map(({design:d})=>d.jointFailure.p99Violation?`${f(d.jointFailure.p99Violation.tempDegreeHours,2)} K·h, ${f(d.jointFailure.p99Violation.vpdKPaHours,3)} kPa·h at ${at(d.jointFailure.p99Violation.time,d.jointFailure.p99Violation.outdoor)}`:`Fewer than 1 percent of eligible hours fail (${f(d.jointFailure.failingHours,0)} of ${f(d.jointFailure.eligibleHours,0)})`)],
-  ['Ventilation air requirement',...per.map(({design:d})=>d.ventilationAirRequirement.maxACH===null?'Not available':`${f(d.ventilationAirRequirement.maxACH)} ACH, ${f(d.ventilationAirRequirement.m3s,2)} m³/s at ${at(d.ventilationAirRequirement.atHour,d.ventilationAirRequirement.outdoor)}`)],
+  ['Controlled outside air, actual maximum',...per.map(({design:d})=>airflowText(d.controlledOutdoorAirRequirement,d.controlledOutdoorAirRequirement.atHour,d.controlledOutdoorAirRequirement.outdoor))],
+  ['Total outside air, actual maximum',...per.map(({r})=>airflowText(airflowAt(r.summary?.outdoorAir?.totalACH?.max,r.scenario)))],
   ['Condensate peak',...per.map(({design:d})=>`${f(d.condensatePeakKgH)} kg/h`)],
   ['Pad water peak / runtime',...per.map(({design:d,r})=>`${f(d.padWaterPeakLH)} L/h; ${f(r.summary?.runtime?.pad?.hours,0)} h on ${f(r.summary?.runtime?.pad?.days,0)} days, ${f(r.summary?.padWaterL,0)} L`)],
   ['Outside-air drying hours, weather side',...per.map(({r})=>drying(r))],
   ['CO₂ enrichment window',...per.map(({co2})=>`${f(co2.equivalentHours,0)} equivalent h on ${f(co2.days,0)} days; weather-side ${f(co2.weatherSideHours,0)} h`)],
   ['Reheat after overcooling',...per.map(({r})=>`${f(r.summary?.reheatKWh,0)} kWh`)],
   ['Purchased electricity / fuel',...per.map(({r})=>`${f(r.summary?.electricKWh,0)} / ${f(r.summary?.fuelKWh,0)} kWh`)],
-  ['Operating cost, period',...per.map(({r})=>{const e=entry(r);return aggregate&&e?`$${f(r.summary?.cost,0)}; median year $${f(e.median.cost,0)}`:`$${f(r.summary?.cost,0)}`;})],
+  ['Operating cost',...per.map(({r})=>{const e=entry(r),label=r.summary?.costBasis?.label||'Model-estimated operating cost';return aggregate&&e?`${label}: $${f(r.summary?.cost,0)}; median year $${f(e.median.cost,0)}`:`${label}: $${f(r.summary?.cost,0)}`;})],
+  ['Operating cost basis',...per.map(({r})=>costBasisText(r.summary?.costBasis))],
   ['Installed capital assumption',...per.map(({r})=>`$${f(r.scenario.installedCost,0)}`)]];
  const constraintText=constraint.binding==='none'?'No weather-side constraint hours at this band: the climate alone holds the target in every valid hour.':`${constraint.binding} (mean per year: ${f(constraint.hours.moisture,0)} h moisture-limited, ${f(constraint.hours.temperature,0)} h temperature-limited, ${f(constraint.hours.heating,0)} h heating). ${constraint.basis}`;
  const verdict=frontier.best?`Cheapest non-dominated strategy by ${aggregate?'median-year':'period'} operating cost: ${frontier.best.name} at $${f(frontier.best.cost,0)} holding the band ${f(frontier.best.compliancePct)}% of eligible hours. Operating frontier: ${frontier.frontier.map(r=>`${r.name} ($${f(r.cost,0)}, ${f(r.compliancePct)}%)`).join('; ')}.${frontier.rows.some(r=>r.dominated)?` Operating-dominated: ${frontier.rows.filter(r=>r.dominated).map(r=>r.name).join(', ')}.`:''} Capital is separate and not ranked.`:'No priced strategy; operating-cost ranking is not available.';
@@ -75,9 +95,20 @@ export function downloadRun(results,snapshot,format='json',extras={}){
  if(format==='report'){download('cea-psychrometric-site-evaluator-report.html',reportHTML(results,snapshot,extras||{}),'text/html');return;}
  if(format==='design-basis'){download('cea-psychrometric-site-evaluator-design-basis.html',designBasisHTML(results,snapshot,extras||{}),'text/html');return;}
  if(format==='csv'){
- const keys=['time','valid','weatherMode','mode','reason','tempC','rh','vpd','compliantFraction','electricKWh','fuelKWh','waterL','condensateKg','lightKWh','solarDLI','lightDLI','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','regenerationKWh','cost','co2Kg','unmetSensibleKWh','unmetMoistureKg','energyResidualW','moistureResidualKgS'];
- const rows=[['scenario','source','sourceKind','timezone',...keys].map(csvValue).join(',')];
- for(const r of results)for(const h of r.hours)rows.push([r.scenario.name,snapshot.source,snapshot.sourceKind,snapshot.timezone,...keys.map(k=>k==='time'?new Date(h.time).toISOString():h[k])].map(csvValue).join(','));
+ const keys=['time','valid','weatherMode','mode','reason','tempC','rh','vpd','compliantFraction','electricKWh','fuelKWh','waterL','condensateKg',
+  'recoverySensibleKWh','recoveryLatentKWh','recoveryAuxKWh','recoveryCoreM3','recoveryBypassM3','recoveryDefrostHours',
+  'preheatDeliveredKWh','preheatElectricKWh','preheatFuelKWh','preheatInsufficientHours',
+  'doasCondensateKg','doasCoolingDeliveredKWh','doasCoolingElectricKWh','doasRecoveredReheatKWh','doasExternalHeatKWh','doasUnmetConditioningKWh',
+  'lightKWh','solarDLI','lightDLI','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','regenerationKWh','cost','co2Kg',
+  'unmetSensibleKWh','unmetMoistureKg','energyResidualW','moistureResidualKgS'];
+ const controlKeys=['controlledACH','controlledM3s','controlledACHMin','controlledACHMax','controlledACHStages',
+  'totalOutdoorACH','totalOutdoorM3s','totalOutdoorACHMin','totalOutdoorACHMax','recoveryCoreFraction','recoveryBypassFraction',
+  'recoveryDefrostFraction','preheatFraction','doasConditionedFraction','doasTreatmentM3s'];
+ const columns=[...keys,...controlKeys];
+ const rows=[['scenario','source','sourceKind','timezone',...columns].map(csvValue).join(',')];
+ for(const r of results)for(const h of r.hours)rows.push([r.scenario.name,snapshot.source,snapshot.sourceKind,snapshot.timezone,
+  ...keys.map(k=>k==='time'?new Date(h.time).toISOString():h[k]),
+  ...controlKeys.map(k=>k==='controlledACHStages'?JSON.stringify(h.controls?.[k]||[]):h.controls?.[k])].map(csvValue).join(','));
  download('cea-psychrometric-site-evaluator-hourly.csv',rows.join('\r\n'),'text/csv');return;
  }
  if(format!=='json')throw new Error('Unsupported export format.');

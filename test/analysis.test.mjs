@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {aggregateYears,compareSites,designHours,loadDecomposition,co2Window,LATENT_KWH_PER_KG} from '../src/metrics.js';
+import {aggregateYears,compareScenarios,compareSites,designHours,loadDecomposition,co2Window,summarizeHours,LATENT_KWH_PER_KG} from '../src/metrics.js';
 import {designBasisHTML} from '../src/export.js';
 import {wetBulb,dewPoint,humidityRatio} from '../src/physics.js';
 import {weatherSummary} from '../src/metrics.js';
 import {makeScenario} from '../src/config.js';
+import {applyEnergyContext} from '../src/energy.js';
 
 const scenario=(id,name,over={})=>({id,name,crop:'lettuce',facility:'greenhouse',timezone:'UTC',areaM2:1000,heightM:4,dayTargetC:22,nightTargetC:18,tempToleranceC:2,vpdMin:.6,vpdMax:1.2,maxDewPointC:18,dliTarget:14,photoperiod:16,dayStart:6,minVentACH:.5,installedCost:50000,...over});
 const summary=over=>({compliancePct:90,compliantHours:7800,cost:1000,electricKWh:5000,fuelKWh:100,eligibleHours:8700,runtime:{pad:{hours:400,days:60}},...over});
@@ -13,6 +14,142 @@ const run=(label,rows)=>({label,snapshot:{startDate:`${label}-01-01`,endDate:`${
 // One hour row in the current controlled-air contract shape.
 const hour=(i,over={})=>({time:Date.UTC(2025,0,1,i),valid:true,eligible:true,compliantFraction:1,tempDegreeHours:0,vpdKPaHours:0,condensateKg:0,padWaterL:0,weatherMode:'NEUTRAL_MIN_VENT',
   controls:{controlledACH:.5,controlledM3s:1000*4*.5/3600,totalOutdoorACH:.5,totalOutdoorM3s:1000*4*.5/3600,enrichmentFraction:1,doasConditionedFraction:0},loads:{solarKWh:0,lightKWh:0,envelopeKWh:0,infiltrationSensibleKWh:0,controlledOutdoorAirSensibleKWh:0,fanKWh:0,cropSensibleKWh:0,cropLatentKWh:0,latentKg:{crop:0,infiltration:0,controlledOutdoorAir:0,humidifier:0},sensibleKWh:0,shr:null},...over});
+
+test('hour summary duration-weights actual controlled and total outdoor-air stages',()=>{
+  const s=scenario('air','Actual air',{areaM2:100,heightM:3,outsideAirBasis:'projectInput',outsideAirReviewed:true,
+    electricityPrice:.14,fuelPrice:.05,waterPrice:.003,maintenanceYear:500,discountRate:.06,lifeYears:15});
+  const rows=[
+    hour(0,{durationHours:.25,eligible:false,controls:{controlledACH:.5,controlledM3s:.5*300/3600,totalOutdoorACH:.7,totalOutdoorM3s:.7*300/3600}}),
+    hour(1,{durationHours:.75,eligible:false,controls:{controlledACH:2,controlledM3s:2*300/3600,totalOutdoorACH:2.2,totalOutdoorM3s:2.2*300/3600}}),
+    hour(2,{durationHours:1.5,eligible:false,controls:{controlledACH:4,controlledM3s:4*300/3600,totalOutdoorACH:4.2,totalOutdoorM3s:4.2*300/3600}}),
+  ];
+  const air=summarizeHours(rows,s).outdoorAir;
+  assert.deepEqual(air.controlledACH,{min:.5,mean:3.05,max:4,stages:[{ach:.5,hours:.25},{ach:2,hours:.75},{ach:4,hours:1.5}]});
+  assert.deepEqual(air.totalACH,{min:.7,mean:3.25,max:4.2});
+  assert.equal(air.maximum.ach,4);
+  assert.ok(Math.abs(air.maximum.m3s-1/3)<1e-12);
+  assert.ok(Math.abs(air.maximum.cfm-(1/3)*2118.880003)<1e-9);
+  assert.ok(Math.abs(air.maximum.m3sPerM2-1/300)<1e-12);
+  assert.ok(Math.abs(air.maximum.cfmPerFt2-((1/3)*2118.880003/(100*10.7639104167)))<1e-12);
+  assert.equal(air.maximum.heightM,3);
+  assert.equal(air.basis,'projectInput');
+  assert.equal(air.reviewed,true);
+});
+
+test('mixed substeps retain selected stages instead of promoting the hourly average to a stage or design maximum',()=>{
+  const s=scenario('mixed','Mixed controls',{areaM2:100,heightM:3,maintenanceYear:500,discountRate:.06,lifeYears:15});
+  const mixed=hour(0,{eligible:false,controls:{
+    controlledACH:3.5,controlledM3s:3.5*300/3600,controlledACHMin:.5,controlledACHMax:4.5,
+    controlledACHStages:[{ach:.5,hours:.25},{ach:4.5,hours:.75}],
+    totalOutdoorACH:3.7,totalOutdoorM3s:3.7*300/3600,totalOutdoorACHMin:.7,totalOutdoorACHMax:4.7,
+  }});
+  const air=summarizeHours([mixed],s).outdoorAir;
+  assert.deepEqual(air.controlledACH.stages,[{ach:.5,hours:.25},{ach:4.5,hours:.75}]);
+  assert.equal(air.controlledACH.stages.some(stage=>stage.ach===3.5),false);
+  assert.equal(air.controlledACH.min,.5);
+  assert.equal(air.controlledACH.max,4.5);
+  assert.equal(air.totalACH.min,.7);
+  assert.equal(air.totalACH.max,4.7);
+  const design=designHours([{time:mixed.time,tempC:31,rh:.4,pressurePa:101325,ghiWm2:0}],[mixed],s);
+  assert.equal(design.controlledOutdoorAirRequirement.ach,4.5);
+  assert.ok(Math.abs(design.controlledOutdoorAirRequirement.m3s-.375)<1e-12);
+  assert.equal(design.controlledOutdoorAirRequirement.atHour,mixed.time);
+});
+
+test('cost basis distinguishes complete local calendar years from partial periods',()=>{
+  const s=scenario('cost','Cost basis',{timezone:'America/Chicago',electricityPrice:.14,fuelPrice:.05,waterPrice:.003,
+    priceMode:'manual',sector:'commercial',maintenanceYear:500,discountRate:.06,lifeYears:15});
+  const localYear=(year)=>{
+    const start=Date.UTC(year,0,1,6),end=Date.UTC(year+1,0,1,6);
+    return Array.from({length:(end-start)/3600000},(_,i)=>({time:start+i*3600000,valid:true,eligible:false,electricKWh:0,fuelKWh:0,waterL:0}));
+  };
+  for(const year of [2024,2025]){
+    const basis=summarizeHours(localYear(year),s).costBasis;
+    assert.equal(basis.scope,'annual');
+    assert.equal(basis.label,'Model-estimated annual operating cost');
+    assert.deepEqual(basis.period,{startDate:`${year}-01-01`,endDate:`${year}-12-31`});
+  }
+  const invalid=localYear(2025);invalid[100]={...invalid[100],valid:false};
+  assert.equal(summarizeHours(invalid,s).costBasis.scope,'period');
+  const gapped=localYear(2025);gapped.splice(100,1);
+  assert.equal(summarizeHours(gapped,s).costBasis.scope,'period');
+  const partial=summarizeHours(localYear(2025).slice(24,72),s).costBasis;
+  assert.equal(partial.scope,'period');
+  assert.equal(partial.label,'Model-estimated operating cost for the simulated period');
+  assert.deepEqual(partial.period,{startDate:'2025-01-02',endDate:'2025-01-03'});
+  assert.deepEqual(partial.included,['purchased electricity','purchased heating fuel','water represented by the scenario']);
+  assert.deepEqual(partial.priceBasis,{
+    electricity:{source:'manual scenario input',usdPerKWh:.14},
+    fuel:{source:'scenario input',usdPerKWh:.05},
+    water:{source:'scenario input',usdPerL:.003},
+  });
+  assert.deepEqual(partial.excluded,['installed capital','maintenance','labor','financing','taxes','demand charges','fixed charges','time-of-use effects','other unmodeled tariff components']);
+  assert.equal(partial.isQuote,false);
+  assert.equal(partial.isGuaranteedSavings,false);
+});
+
+test('scenario comparison exposes reductions only for a cheaper named alternative',()=>{
+  const comparisonResult=(id,name,cost,installedCost,installedCostBasis)=>({
+    scenario:scenario(id,name,{electricityPrice:1,fuelPrice:0,waterPrice:0,installedCost,installedCostBasis}),
+    hours:[hour(0,{electricKWh:cost,fuelKWh:0,waterL:0})],
+    summary:{numericalFailureHours:0},
+  });
+  const rows=compareScenarios([
+    comparisonResult('base','Named baseline',20,1000,'vendor budget'),
+    comparisonResult('lower','Lower alternative',12,1400,'screening assumption'),
+    comparisonResult('higher','Higher alternative',25,800,'historical allowance'),
+  ]);
+  assert.equal(rows[0].operatingCostReduction,undefined);
+  assert.equal(rows[2].operatingCostReduction,undefined);
+  assert.deepEqual(rows[1].operatingCostDifference,{
+    label:'Model-estimated operating-cost difference',
+    amount:-8,
+    baselineName:'Named baseline',
+    alternativeName:'Lower alternative',
+    basis:{isQuote:false,isGuaranteedSavings:false},
+  });
+  assert.deepEqual(rows[1].operatingCostReduction,{
+    label:'Model-estimated operating-cost reduction',
+    amount:8,
+    baselineName:'Named baseline',
+    alternativeName:'Lower alternative',
+    basis:{isQuote:false,isGuaranteedSavings:false},
+  });
+  assert.equal(rows[1].installedCost,1400);
+  assert.equal(rows[1].installedCostBasis,'screening assumption');
+  assert.deepEqual(rows[1].costBasis.period,{startDate:'2025-01-01',endDate:'2025-01-01'});
+  assert.deepEqual(rows[1].costBasis.included,['purchased electricity','purchased heating fuel','water represented by the scenario']);
+  assert.deepEqual(rows[1].costBasis.excluded,['installed capital','maintenance','labor','financing','taxes','demand charges','fixed charges','time-of-use effects','other unmodeled tariff components']);
+  assert.equal(rows[1].costBasis.isQuote,false);
+  assert.equal(rows[1].costBasis.isGuaranteedSavings,false);
+});
+
+test('comparison and design-basis data retain numeric rates for common state-priced periods',()=>{
+  const energyContext={sector:'commercial',prices:[
+    {period:'2025-01',usdPerKWh:.1,source:'state proxy'},
+    {period:'2025-02',usdPerKWh:.2,source:'state proxy'},
+  ],warnings:[]};
+  const times=[Date.UTC(2025,0,31,23),Date.UTC(2025,1,1,0)];
+  const pricedResult=(id,name,multiplier)=>{
+    const s=scenario(id,name,{timezone:'UTC',priceMode:'state',sector:'commercial',electricityPrice:.9,fuelPrice:.05,waterPrice:.003,
+      maintenanceYear:500,discountRate:.06,lifeYears:15,outsideAirBasis:'projectInput',outsideAirReviewed:true});
+    const hours=times.map((time,index)=>hour(index,{time,electricKWh:(index+1)*multiplier,fuelKWh:0,waterL:0}));
+    return applyEnergyContext({scenario:s,hours,summary:summarizeHours(hours,s),warnings:[],
+      weatherSummary:{modeCounts:{},padViability:{failureCauses:{moisture:0,temperature:0}},outdoorDrying:null},
+      assumptions:{evidenceTier:'test',stepMinutes:5}},energyContext);
+  };
+  const baseline=pricedResult('priced-base','Priced baseline',1),alternative=pricedResult('priced-alt','Priced alternative',.5);
+  const compared=compareScenarios([baseline,alternative])[1];
+  assert.deepEqual(compared.costBasis.period,{startDate:'2025-01-31',endDate:'2025-02-01'});
+  assert.deepEqual(compared.costBasis.priceBasis.electricity.rates,[
+    {period:'2025-01',usdPerKWh:.1},
+    {period:'2025-02',usdPerKWh:.2},
+  ]);
+  const snapshot={startDate:'2025-01-31',endDate:'2025-02-01',timezone:'UTC',source:'test',sourceKind:'synthetic',
+    latitude:36.15,longitude:-95.99,hours:times.map((time,index)=>({time,tempC:20+index,rh:.5,pressurePa:101325,ghiWm2:0}))};
+  const html=designBasisHTML([baseline],snapshot);
+  for(const value of ['2025-01','0.1 USD/kWh','2025-02','0.2 USD/kWh'])assert.ok(html.includes(value),`brief omits ${value}`);
+});
 
 test('multi-year aggregate selects median, worst and best years and fits a trend only with 5 or more numeric years',()=>{
   const pct=[80,95,70,85,90];
@@ -76,18 +213,24 @@ test('design conditions report coincident states of the selected hour, not indep
   assert.ok(d.dewPoint.p99.dewPointC>d.dryBulb.p99.dewPointC,'independent percentile would have paired the hot hour with a high dew point');
 });
 
-test('design peaks use the result hours with their outdoor state and the ventilation requirement scales with volume',()=>{
-  const weather=Array.from({length:200},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:30,rh:.4,pressurePa:101325,ghiWm2:0}));
+test('design peaks use result hours and size controlled outdoor air from the actual selected maximum',()=>{
+  const weather=Array.from({length:200},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:i===5?31:30,rh:.4,pressurePa:101325,ghiWm2:0}));
   const rows=Array.from({length:200},(_,i)=>hour(i,{controls:{controlledACH:i===5?12:1,enrichmentFraction:0},condensateKg:i,padWaterL:2*i,tempDegreeHours:i===7?3:i===8?1:0,compliantFraction:i===7?.5:i===8?.9:1,
     loads:{...hour(i).loads,solarKWh:i===10?50:5,cropSensibleKWh:-2,latentKg:{...hour(i).loads.latentKg,crop:i===14?9:1,controlledOutdoorAir:-3}}}));
-  const d=designHours(weather,rows,scenario('a','a',{areaM2:100,heightM:3}));
+  const d=designHours(weather,rows,scenario('a','a',{areaM2:100,heightM:3,maxVentACH:40}));
   assert.equal(d.peakSensibleHour.time,Date.UTC(2025,0,1,10));
   assert.equal(d.peakSensibleHour.sensibleKWh,50,'negative crop sensible does not offset the positive gains');
   assert.equal(d.peakLatentHour.time,Date.UTC(2025,0,1,14));
   assert.equal(d.peakLatentHour.latentKg,9,'drying controlled outdoor air is not a latent load');
   assert.equal(d.peakLatentHour.outdoor.tempC,30);
-  assert.equal(d.ventilationAirRequirement.maxACH,12);
-  assert.ok(Math.abs(d.ventilationAirRequirement.m3s-12*300/3600)<1e-12);
+  assert.equal(d.controlledOutdoorAirRequirement.ach,12);
+  assert.ok(Math.abs(d.controlledOutdoorAirRequirement.m3s-1)<1e-12);
+  assert.ok(Math.abs(d.controlledOutdoorAirRequirement.cfm-2118.880003)<1e-9);
+  assert.ok(Math.abs(d.controlledOutdoorAirRequirement.m3sPerM2-.01)<1e-12);
+  assert.ok(Math.abs(d.controlledOutdoorAirRequirement.cfmPerFt2-(2118.880003/(100*10.7639104167)))<1e-12);
+  assert.equal(d.controlledOutdoorAirRequirement.heightM,3);
+  assert.equal(d.controlledOutdoorAirRequirement.atHour,Date.UTC(2025,0,1,5));
+  assert.equal(d.controlledOutdoorAirRequirement.outdoor.tempC,31);
   assert.equal(d.condensatePeakKgH,199);assert.equal(d.padWaterPeakLH,398);
   assert.equal(d.jointFailure.worstHour.time,Date.UTC(2025,0,1,7));
   assert.equal(d.jointFailure.failingHours,2);
