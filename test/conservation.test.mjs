@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {makeScenario,applyTechnology} from '../src/config.js';
 import {simulateScenario} from '../src/simulate.js';
 import {compareScenarios} from '../src/metrics.js';
-import {CP_DRY_AIR as CP,LATENT_HEAT as L,dryAirDensity,humidityRatio,saturationPressure,vaporPressure,moistureBounds,padState} from '../src/physics.js';
+import {CP_DRY_AIR as CP,LATENT_HEAT as L,dryAirDensity,enthalpy,humidityRatio,saturationPressure,vaporPressure,moistureBounds,padState,saturationHumidityRatio} from '../src/physics.js';
 // Quantitative conservation regressions (AUDIT item 2). Each expectation is built from the scenario
 // inputs and the psychrometric primitives, never from the summary field under test. Fixtures are
 // closed zones with every exchange and device zeroed except the single path being measured, so the
@@ -247,6 +247,144 @@ test('integrated DX splits the coil total into sensible and latent and closes th
   assert.ok(Math.abs(h.reheatKWh+h.rejectedHeatKWh-condenserKWh)<=1e-6*condenserKWh,
    `hour ${h.time}: reheat ${h.reheatKWh} + rejected ${h.rejectedHeatKWh} vs condenser ${condenserKWh} kWh`);
   assert.ok(h.reheatKWh<=s.reheatFraction*condenserKWh+1e-9,`hour ${h.time}: reheat exceeds the recoverable fraction`);
+ }
+});
+test('recovery preheat, DOAS tempering, and zone heat share one finite configured heating source',()=>{
+ const outdoor={tempC:0,rh:.35,pressurePa:101325};
+ const base={controlMode:'staged',technology:'doas',minVentACH:9,maxVentACH:9,fanWPerM3s:0,
+  transpirationLDayM2:10,heaterKW:8,thermalMassKJm2K:20,
+  doasM3s:1,doasSupplyDewPointC:10,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:0,
+  heatRecovery:recovery('hrv',{auxiliaryW:0,frostControl:'preheat',minimumOutdoorOperatingC:null,frostThresholdC:5})};
+ const fixtures=[
+  {name:'fuel',scenario:closed(base),purchase:'fuelKWh',divisor:closed(base).heaterEfficiency},
+  {name:'heat pump',scenario:closed({...base,heatSource:'heatpump',heatPumpCopAt8C:2,heatPumpCopAtMinus8C:2,
+    heatPumpCopAtMinus15C:2,heatPumpCutoffC:-25,heatPumpCapacityDerate:1}),purchase:'electricKWh',divisor:2},
+ ];
+ for(const fixture of fixtures){
+  const result=simulateScenario(fixture.scenario,weather(6,outdoor),{stepMinutes:5});
+  const delivered=result.summary.preheatDeliveredKWh+result.summary.doasExternalHeatKWh+result.summary.heatingKWh;
+  const maximum=fixture.scenario.heaterKW*result.summary.validHours;
+  const outsideW=humidityRatio(outdoor.tempC,outdoor.rh,outdoor.pressurePa);
+  const preheatDemandW=dryAirDensity(outdoor.tempC,outsideW,outdoor.pressurePa)*
+    (enthalpy(5,outsideW)-enthalpy(outdoor.tempC,outsideW));
+  assert.ok(Math.abs(result.summary.preheatDeliveredKWh-preheatDemandW*result.summary.recoveryCoreM3/KWH)
+    <=1e-8*Math.max(1,result.summary.preheatDeliveredKWh),`${fixture.name} did not satisfy recovery preheat first`);
+  assert.ok(result.summary.doasExternalHeatKWh>0,`${fixture.name} did not allocate remaining heat to DOAS`);
+  assert.ok(result.summary.doasUnmetConditioningKWh>0,`${fixture.name} hid the conditioning shortfall`);
+  assert.ok(delivered<=maximum+1e-9,`${fixture.name} delivered ${delivered} kWh above ${maximum} kWh installed capacity`);
+  for(const row of result.hours.filter(h=>h.valid))
+    assert.ok(row.preheatDeliveredKWh+row.doasExternalHeatKWh+row.heatingKWh<=fixture.scenario.heaterKW+1e-9,
+      `${fixture.name} exceeded installed heat in hour ${row.time}`);
+  assert.ok(Math.abs(result.summary[fixture.purchase]-delivered/fixture.divisor)<=1e-8*Math.max(1,delivered),
+    `${fixture.name} booked ${result.summary[fixture.purchase]} kWh for ${delivered} kWh delivered`);
+  assert.equal(result.summary[fixture.purchase==='fuelKWh'?'electricKWh':'fuelKWh'],0);
+ }
+});
+
+test('a capacity-limited DOAS rejects adverse untreated excess and conditions one smaller controlled stream',()=>{
+ const s=closed({controlMode:'ideal',technology:'doas',minVentACH:9,maxVentACH:9,fanWPerM3s:0,
+  heaterKW:50,thermalMassKJm2K:20,doasM3s:.4,doasSupplyDewPointC:10,doasSupplyTempC:20,
+  doasCoolingCOP:3,doasReheatRecoveryFraction:.5});
+ const outdoor={tempC:35,rh:.7,pressurePa:101325};
+ const result=simulateScenario(s,weather(4,outdoor),{stepMinutes:5});
+ const inletW=humidityRatio(outdoor.tempC,outdoor.rh,outdoor.pressurePa);
+ const targetW=saturationHumidityRatio(s.doasSupplyDewPointC,outdoor.pressurePa);
+ const maximumCondensateKgS=dryAirDensity(outdoor.tempC,inletW,outdoor.pressurePa)*s.doasM3s*(inletW-targetW);
+ let conditionedSeconds=0;
+ for(const row of result.hours.filter(h=>h.valid)){
+  conditionedSeconds+=row.controls.doasConditionedFraction*3600;
+  assert.ok(Math.abs(row.controls.controlledM3s-s.doasM3s)<1e-12,
+    `adverse excess raised controlled flow to ${row.controls.controlledM3s} m3/s`);
+  assert.ok(Math.abs(row.controls.totalOutdoorM3s-s.doasM3s)<1e-12,
+    'capacity-only treatment must remain one controlled mass stream');
+  assert.ok(row.doasCondensateKg<=maximumCondensateKgS*row.controls.doasConditionedFraction*3600+1e-9);
+ }
+ assert.ok(conditionedSeconds>0,'the fixture must select the capacity-limited conditioned candidate');
+ assert.ok(Math.abs(result.summary.doasCondensateKg-maximumCondensateKgS*conditionedSeconds)
+  <=1e-8*Math.max(1,result.summary.doasCondensateKg));
+});
+
+test('a capacity-limited DOAS admits untreated excess only when that bypass helps the zone',()=>{
+ const s=closed({controlMode:'staged',technology:'doas',minVentACH:9,maxVentACH:9,fanWPerM3s:0,
+  cropSensibleWm2:100,transpirationLDayM2:10,heaterKW:50,thermalMassKJm2K:20,
+  doasM3s:.4,doasSupplyDewPointC:10,doasSupplyTempC:20,doasCoolingCOP:3,doasReheatRecoveryFraction:.5});
+ const result=simulateScenario(s,weather(12,{tempC:18,rh:.3,pressurePa:101325}),{stepMinutes:5});
+ const usefulBypass=result.hours.filter(h=>h.valid&&h.controls.doasConditionedFraction>0&&h.controls.controlledM3s>s.doasM3s+1e-9);
+ assert.ok(usefulBypass.length>0,'cool, dry excess air must remain available as a useful untreated bypass');
+ for(const row of usefulBypass)
+  assert.ok(Math.abs(row.controls.totalOutdoorM3s-row.controls.controlledM3s)<1e-12,
+    'admitted excess must stay within the selected controlled stream');
+});
+
+test('useful post-recovery expansion excess remains an explicit full-flow candidate',()=>{
+ const s=closed({controlMode:'staged',technology:'doas',minVentACH:9,maxVentACH:9,fanWPerM3s:0,
+  cropSensibleWm2:100,transpirationLDayM2:10,lightWm2:500,dliTarget:30,photoperiod:24,dayStart:0,
+  heaterKW:50,thermalMassKJm2K:20,
+  doasM3s:1,doasSupplyDewPointC:10,doasSupplyTempC:26,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,
+  heatRecovery:recovery('hrv',{auxiliaryW:0})});
+ const result=simulateScenario(s,weather(18,{tempC:20,rh:.3,pressurePa:101325}),{stepMinutes:5});
+ const working=result.hours.filter(h=>h.valid&&h.controls.doasConditionedFraction===1&&h.controls.recoveryCoreFraction>0);
+ assert.ok(working.length>0,'fixture must condition a recovery-warmed full outdoor stream');
+ assert.ok(working.some(row=>Math.abs(row.controls.controlledM3s-s.doasM3s)<1e-12),
+  'outdoor-reference flow equal to capacity must still offer useful post-recovery excess');
+ for(const row of working){
+  assert.ok(row.controls.doasTreatmentM3s<=s.doasM3s+1e-12);
+  assert.ok(Math.abs(row.controls.totalOutdoorM3s-row.controls.controlledM3s)<1e-12,
+    'the useful excess must remain inside the one selected outdoor-air stream');
+ }
+});
+
+test('capacity-only DOAS flow after recovery contains no hidden untreated expansion bypass',()=>{
+ const s=closed({controlMode:'staged',technology:'doas',minVentACH:9,maxVentACH:9,fanWPerM3s:0,
+  transpirationLDayM2:10,heaterKW:100,thermalMassKJm2K:20,
+  doasM3s:1,doasSupplyDewPointC:10,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,
+  heatRecovery:recovery('hrv',{auxiliaryW:0})});
+ const result=simulateScenario(s,weather(12,{tempC:0,rh:.35,pressurePa:101325}),{stepMinutes:5});
+ const working=result.hours.filter(h=>h.valid&&h.controls.doasConditionedFraction>0&&h.controls.recoveryCoreFraction>0);
+ assert.ok(working.length>0,'fixture must condition recovery-warmed air');
+ for(const row of working){
+  assert.ok(row.controls.controlledM3s<s.doasM3s-1e-6,
+    `post-recovery expansion left hidden excess at ${row.controls.controlledM3s} m3/s outdoor-reference flow`);
+  assert.ok(Math.abs(row.controls.totalOutdoorM3s-row.controls.controlledM3s)<1e-12);
+ }
+});
+
+test('DOAS inlet capacity remains feasible at the recovery support cutoff',()=>{
+ const s=closed({controlMode:'staged',technology:'doas',minVentACH:4.5,maxVentACH:4.5,fanWPerM3s:0,
+  transpirationLDayM2:10,heaterKW:100,thermalMassKJm2K:20,
+  doasM3s:.5,doasSupplyDewPointC:10,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,
+  heatRecovery:recovery('hrv',{auxiliaryW:0})});
+ const result=simulateScenario(s,weather(12,{tempC:0,rh:.35,pressurePa:101325}),{stepMinutes:5});
+ const working=result.hours.filter(h=>h.valid&&h.controls.doasConditionedFraction>0);
+ assert.ok(working.length>0,'fixture must request conditioning at the 50% recovery support cutoff');
+ for(const row of working){
+  assert.ok(Number.isFinite(row.controls.doasTreatmentM3s),'actual DOAS inlet treatment flow must remain visible');
+  assert.ok(row.controls.doasTreatmentM3s<=s.doasM3s*row.controls.doasConditionedFraction+1e-12,
+    `post-recovery treatment ${row.controls.doasTreatmentM3s} m3/s exceeded installed capacity`);
+  assert.ok(Math.abs(row.controls.controlledM3s-s.doasM3s)<1e-12,
+    'unsupported recovery must bypass instead of discarding requested feasible treatment flow');
+  assert.ok(Math.abs(row.controls.totalOutdoorM3s-row.controls.controlledM3s)<1e-12,
+    'capacity-only cutoff handling must not create a hidden second outdoor-air stream');
+ }
+});
+
+test('DOAS demand never clamps staged pad or indirect secondary-air candidates',()=>{
+ const base={controlMode:'staged',dayTargetC:26,nightTargetC:26,tempToleranceC:1,vpdMin:.5,vpdMax:1.5,maxDewPointC:19,
+  minVentACH:.3,maxVentACH:9,fanWPerM3s:0,cropSensibleWm2:100,transpirationLDayM2:15,heaterKW:100,
+  thermalMassKJm2K:20,padEnabled:true,uValue:5,doasM3s:.01,doasSupplyDewPointC:0,doasSupplyTempC:26,
+  doasCoolingCOP:3,doasReheatRecoveryFraction:.5};
+ const cases=[
+  {name:'pad',scenario:closed({...base,technology:'doas',padEffectiveness:.4}),field:'padFraction',rh:.02},
+  {name:'indirect',scenario:closed({...base,technology:'hybridDesiccant',desiccantKgH:50,padEffectiveness:.8}),field:'indirectFraction',rh:.4},
+ ];
+ for(const fixture of cases){
+  const result=simulateScenario(fixture.scenario,weather(12,{tempC:35,rh:fixture.rh,pressurePa:101325}),{stepMinutes:5});
+  const working=result.hours.filter(h=>h.valid&&h.controls[fixture.field]>0);
+  const requestedM3s=fixture.scenario.areaM2*fixture.scenario.heightM*fixture.scenario.maxVentACH/3600;
+  assert.ok(working.length>0,`${fixture.name} fixture must operate`);
+  for(const row of working)
+    assert.ok(row.controls.controlledM3s+1e-12>=requestedM3s*row.controls[fixture.field],
+      `${fixture.name} substeps contributed less than their requested ${requestedM3s} m3/s secondary-air flow`);
  }
 });
 

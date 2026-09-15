@@ -34,7 +34,6 @@ test('scenario version 2 carries explicit airflow, cost, recovery, and DOAS comp
  assert.equal(s.doasSupplyTempC,null);
  assert.equal(s.doasCoolingCOP,null);
  assert.equal(s.doasReheatRecoveryFraction,null);
- assert.equal(Object.hasOwn(s,'doasKWhPerKg'),false);
 });
 test('airflow evidence identifies source scope and height-dependent controlled-air context',()=>{
  assert.equal(Object.isFrozen(AIRFLOW_BASIS),true);
@@ -97,7 +96,9 @@ test('DOAS treatment capacity and performance must be complete and fit the contr
  assert.ok(base.doasM3s>maximumM3s);
  assert.match(validateScenario(base).join(' '),/DOAS.*maximum controlled.*1\.11 m3\/s/i);
  assert.match(validateScenario({...base,doasM3s:.5,doasSupplyDewPointC:20,doasSupplyTempC:10}).join(' '),/dew point.*supply temperature/i);
- const incomplete=migrateScenario({...base,schemaVersion:1,doasM3s:.5,doasKWhPerKg:.5});
+ const legacyCandidate={...base,schemaVersion:1,doasM3s:.5};
+ delete legacyCandidate.doasCoolingCOP;delete legacyCandidate.doasReheatRecoveryFraction;
+ const incomplete=migrateScenario(legacyCandidate);
  assert.match(validateScenario(incomplete).join(' '),/review/i);
  assert.match(validateScenario(incomplete).join(' '),/cooling COP/i);
  assert.match(validateScenario(incomplete).join(' '),/reheat recovery/i);
@@ -419,23 +420,39 @@ test('state-coupled crop moisture responds to zone humidity where a schedule can
  const scheduled=[.4,.9].map(rh=>simulateScenario({...s,transpirationModel:'schedule'},weather(24,{tempC:22,rh})).summary.cropWaterL);
  assert.ok(Math.abs(scheduled[0]-scheduled[1])<1e-6);
 });
-test('conditioned DOAS acts on the selected controlled stream and pays for the water it removes',()=>{
- const s={...applyTechnology(makeScenario('hybrid'),'doas'),timezone:'UTC',outsideAirReviewed:true,maxVentACH:6,
-  doasM3s:1,doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5};
- const hour={tempC:26,rh:.85,pressurePa:101325};
- const result=simulateScenario(s,weather(12,hour));
- const outside=weatherState({time:0,ghiWm2:0,...hour});
- const supplyW=Math.min(outside.w,saturationHumidityRatio(s.doasSupplyDewPointC,hour.pressurePa));
- const maxKgH=(outside.w-supplyW)*dryAirDensity(s.doasSupplyTempC,supplyW,hour.pressurePa)*s.doasM3s*3600;
- assert.ok(result.summary.doasRemovedKg>0,'humid outdoor air must produce DOAS removal');
+test('conditioned DOAS acts on the selected controlled stream and closes its cooling and condensate balances',()=>{
+ const s=closed({controlMode:'ideal',technology:'doas',minVentACH:9,maxVentACH:9,fanWPerM3s:0,
+  doasM3s:1,doasSupplyDewPointC:10,doasSupplyTempC:20,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,
+  heaterKW:50,thermalMassKJm2K:20});
+ const hour={tempC:35,rh:.7,pressurePa:101325};
+ const result=simulateScenario(s,weather(4,hour),{stepMinutes:5});
+ const inlet=weatherState({time:0,ghiWm2:0,...hour});
+ const coilW=saturationHumidityRatio(s.doasSupplyDewPointC,hour.pressurePa);
+ const massFlowKgS=dryAirDensity(inlet.tempC,inlet.w,hour.pressurePa)*s.doasM3s;
+ const coolingW=massFlowKgS*(enthalpy(inlet.tempC,inlet.w)-enthalpy(s.doasSupplyDewPointC,coilW));
+ const condensateKgS=massFlowKgS*(inlet.w-coilW);
+ const reheatDemandW=massFlowKgS*(enthalpy(s.doasSupplyTempC,coilW)-enthalpy(s.doasSupplyDewPointC,coilW));
+ const recoveredReheatW=Math.min(reheatDemandW,s.doasReheatRecoveryFraction*(coolingW+coolingW/s.doasCoolingCOP));
+ let treatedSeconds=0;
  for(const h of result.hours.filter(h=>h.valid)){
-  assert.ok(h.doasRemovedKg<=maxKgH*h.controls.doasConditionedFraction+1e-9,
-   `${h.doasRemovedKg} kg exceeds ${maxKgH*h.controls.doasConditionedFraction}`);
-  if(h.controls.doasConditionedFraction>0)assert.ok(h.controls.controlledACH>=s.minVentACH,
-   'DOAS conditions controlled outdoor air rather than creating a separate flow');
+  const seconds=h.controls.doasConditionedFraction*3600;
+  treatedSeconds+=seconds;
+  assert.ok(Math.abs(h.doasCondensateKg-condensateKgS*seconds)<=1e-8*Math.max(1,h.doasCondensateKg));
+  assert.ok(Math.abs(h.doasCoolingDeliveredKWh-coolingW*seconds/3600000)<=1e-8*Math.max(1,h.doasCoolingDeliveredKWh));
+  assert.ok(Math.abs(h.doasCoolingElectricKWh-h.doasCoolingDeliveredKWh/s.doasCoolingCOP)<=1e-10);
+  assert.ok(h.doasRecoveredReheatKWh<=reheatDemandW*seconds/3600000+1e-9);
+  assert.ok(h.doasRecoveredReheatKWh<=recoveredReheatW*seconds/3600000+1e-9);
+  assert.ok(Math.abs(h.controls.controlledM3s-h.controls.controlledACH*s.areaM2*s.heightM/3600)<1e-12);
  }
- assert.ok(result.summary.doasKWh>0,'conditioning humid outdoor air must consume energy');
- assert.ok(result.summary.electricKWh>=result.summary.doasKWh);
+ assert.ok(treatedSeconds>0,'humid outdoor air must operate the DOAS');
+ assert.ok(result.summary.doasCondensateKg>0);
+ assert.ok(result.summary.doasCoolingDeliveredKWh>0);
+ assert.ok(Math.abs(result.summary.doasCoolingElectricKWh-result.summary.doasCoolingDeliveredKWh/s.doasCoolingCOP)<1e-9);
+ assert.ok(result.summary.doasRecoveredReheatKWh>0);
+ assert.equal(result.summary.doasExternalHeatKWh,0);
+ assert.ok(Math.abs(result.summary.electricKWh-result.summary.doasCoolingElectricKWh)<1e-9,
+  'isolated DOAS cooling electricity must enter purchased electricity exactly once');
+ assert.equal(result.summary.fuelKWh,0);
 });
 test('per-hour load decomposition closes the zone heat and moisture balances',()=>{
  const s=closed({lightWm2:60,photoperiod:12,dayStart:6,dliTarget:20,transpirationLDayM2:3,dehuKgH:20,heaterKW:30,coolingKW:20,uValue:1,infiltrationACH:.5});
@@ -463,7 +480,6 @@ test('older scenario JSON without later keys migrates with crop-specific inert d
  assert.equal(migrated.transpirationModel,'schedule');assert.equal(migrated.lai,0);
  assert.equal(migrated.controlMode,'staged');assert.equal(migrated.doasM3s,0);
  assert.equal(migrated.doasSupplyDewPointC,null);assert.equal(migrated.doasSupplyTempC,null);
- assert.equal(Object.hasOwn(migrated,'doasKWhPerKg'),false);
  assert.equal(Object.hasOwn(legacy,'lai'),false,'migration must not mutate its input');
  const lettuce={...makeScenario('greenhouseDouble')};delete lettuce.lai;delete lettuce.transpirationModel;
  const migratedLettuce=migrateScenario(lettuce);
@@ -565,8 +581,6 @@ test('every facility template carries a sourced envelope and explicit airflow re
 // directions are pinned because the shape is non-monotonic and a naive model would make more air always better.
 const coldDry=(hours=48)=>({schemaVersion:1,source:'Synthetic cold-dry fixture',sourceKind:'test',latitude:64.84,longitude:-147.72,timezone:'UTC',startDate:'2025-01-01',endDate:'2025-01-02',
  hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:-22,rh:.7,pressurePa:99000,ghiWm2:0}))});
-const warmHumid=(hours=48)=>({schemaVersion:1,source:'Synthetic warm-humid fixture',sourceKind:'test',latitude:25.77,longitude:-80.19,timezone:'UTC',startDate:'2025-07-01',endDate:'2025-07-02',
- hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,6,1,i),tempC:29,rh:.85,pressurePa:101325,ghiWm2:0}))});
 const litBox=(over={})=>({...makeScenario('warehouseSip','bench','lettuce'),outsideAirReviewed:true,timezone:'UTC',areaM2:500,heightM:4,
  lightWm2:150,dliTarget:14,photoperiod:16,dayStart:6,coolingKW:150,dehuKgH:30,heaterKW:60,humidifierKgH:0,
  padEnabled:false,controlMode:'ideal',minVentACH:.3,...over});
@@ -639,7 +653,7 @@ test('DOAS capacity conditions one selected stream without increasing outdoor ai
 test('DOAS eligibility follows curtain-capped actual controlled flow rather than the requested stage',()=>{
  const s=closed({controlMode:'ideal',infiltrationACH:.7,minVentACH:40,maxVentACH:40,technology:'doas',
   doasM3s:.2,doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,
-  cropSensibleWm2:0,transpirationLDayM2:1,heaterKW:200,thermalMassKJm2K:50});
+  cropSensibleWm2:0,transpirationLDayM2:10,heaterKW:200,thermalMassKJm2K:50});
  s.thermalScreen={...s.thermalScreen,installed:true,uValueFactor:.8,nightDeploy:true,closedExchangeACH:2};
  const result=simulateScenario(s,weather(12,{tempC:15,rh:.8}));
  assert.ok(result.hours.some(h=>h.controls.doasConditionedFraction>0),'capped flow within DOAS capacity must be conditioned');
@@ -659,15 +673,27 @@ test('screen-open references validate declared airflow before applying the insec
 });
 
 
-test('a dry-neutral DOAS on a closed facility only removes water the controlled outdoor stream carries',()=>{
-  const box=litBox({maxVentACH:6,technology:'doas',doasM3s:1.2,dehuKgH:30,coolingKW:150,
-    doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5});
-  const humid=simulateScenario(box,warmHumid()).summary;
-  assert.ok(humid.doasRemovedKg>0,'a DOAS must remove moisture from a humid outdoor stream');
-  assert.ok(humid.doasKWh>0,'a running DOAS must cost energy');
-  assert.ok((humid.runtime?.doas?.hours??0)>0,'DOAS runtime must be attributed to its own component');
-  const dry=simulateScenario(box,coldDry()).summary;
-  assert.equal(dry.doasRemovedKg,0,'a DOAS cannot dry air that is already drier than its supply dew point');
+test('DOAS supply temperature and dew-point targets report finite cold-weather tempering rather than assigning the target for free',()=>{
+  const box=closed({controlMode:'staged',technology:'doas',minVentACH:9,maxVentACH:9,fanWPerM3s:0,
+    transpirationLDayM2:10,heaterKW:50,thermalMassKJm2K:20,
+    doasM3s:1,doasSupplyDewPointC:10,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5});
+  const result=simulateScenario(box,weather(12,{tempC:0,rh:.35}),{stepMinutes:5});
+  const working=result.hours.filter(h=>h.valid&&h.controls.doasConditionedFraction>0);
+  assert.ok(working.length>0,'fixture must call for conditioned controlled air');
+  assert.ok(working.every(h=>h.doasCondensateKg===0),'air below the declared dew point must not condense');
+  assert.ok(working.every(h=>h.doasCoolingDeliveredKWh===0&&h.doasCoolingElectricKWh===0));
+  assert.ok(result.summary.doasExternalHeatKWh>0,'warming cold controlled air to 21 C requires delivered heat');
+  assert.ok(result.summary.fuelKWh>=result.summary.doasExternalHeatKWh/result.scenario.heaterEfficiency-1e-9,
+    'DOAS external heat must be booked to the configured fuel source');
+  assert.ok(result.warnings.some(w=>/21 C.*10 C.*COP 3.*0\.5.*1(?:\.0)? m3\/s/i.test(w)));
+  assert.ok(result.warnings.some(w=>/combined controlled-air fan/i.test(w)));
+  assert.ok(result.warnings.some(w=>/exclud/i.test(w)));
+  assert.deepEqual(result.assumptions.airflow.doas,{
+    supplyTempC:21,supplyDewPointC:10,coolingCOP:3,reheatRecoveryFraction:.5,treatmentCapacityM3s:1,
+    treatmentOrder:'Outdoor air, optional heat recovery, optional DOAS, zone.',
+    fanBasis:'One combined controlled-air fan power basis; treatment does not add airflow.',
+    exclusions:'No cycling, frost, duct, drain, or separate process-fan performance beyond declared inputs.',
+  });
 });
 
 // Where a dehumidifier's heat lands is a topology choice, not a property of the machine, and it is the whole

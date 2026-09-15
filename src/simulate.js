@@ -1,17 +1,18 @@
 import {MODEL_VERSION,migrateScenario,validateScenario,FACILITY_TEMPLATES} from './config.js';
-import {CP_DRY_AIR as CP,LATENT_HEAT as L,clamp,humidityRatio,saturationHumidityRatio,saturationPressure,
+import {CP_DRY_AIR as CP,LATENT_HEAT as L,clamp,enthalpy,humidityRatio,saturationHumidityRatio,saturationPressure,
   vaporPressure,relativeHumidity,dewPoint,airVPD,dryAirDensity,padState,weatherState,schedule,moistureBounds,classifyWeather,outdoorDryingHour,
   stanghelliniTranspiration,canopyAbsorbedWm2,localClock} from './physics.js';
 import {resolveShadeScreen,resolveThermalScreen,resolveInsectScreen,shadeDeployed,thermalDeployed,heatSourceState,heatPumpConfigured,
   componentWarnings,componentAssumptions} from './screens.js';
 import {summarizeHours,weatherSummary} from './metrics.js';
-import {recoverSupplyState} from './airflow.js';
+import {conditionDoasSupply,recoverSupplyState} from './airflow.js';
 
 const HOUR=3600000,KWH=3600000;
 const TOTALS=['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','solarDLI','lightDLI','heatingKWh','heatPumpElectricKWh','coolingKWh',
   'dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','unmetSensibleKWh','unmetMoistureKg','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh',
   'desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg',
-  'cropWaterL','padWaterL','humidifierWaterL','tempDegreeHours','vpdKPaHours','doasKWh','doasRemovedKg',
+  'cropWaterL','padWaterL','humidifierWaterL','tempDegreeHours','vpdKPaHours',
+  'doasCondensateKg','doasCoolingDeliveredKWh','doasCoolingElectricKWh','doasRecoveredReheatKWh','doasExternalHeatKWh','doasUnmetConditioningKWh',
   'recoverySensibleKWh','recoveryLatentKWh','recoveryAuxKWh','recoveryCoreM3','recoveryBypassM3','recoveryDefrostHours',
   'preheatDeliveredKWh','preheatElectricKWh','preheatFuelKWh','preheatInsufficientHours'];
 const SENSIBLE_LOADS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','controlledOutdoorAirSensibleKWh','fanKWh','cropSensibleKWh','cropLatentKWh','humidifierKWh','equipmentHeatKWh'];
@@ -29,9 +30,8 @@ function coefficients(ctx,air) {
   const {state,outside,s,dt}=ctx;
   const volume=s.areaM2*s.heightM;
   const leak=dryAirDensity(outside.tempC,outside.w,outside.pressurePa)*volume*ctx.infiltrationACH/3600;
-  const recoveryFlow=air.recoveryConfigured&&air.kind==='outside';
-  const controlledFlow=(recoveryFlow?dryAirDensity(outside.tempC,outside.w,outside.pressurePa):
-    dryAirDensity(air.supply.tempC,air.supply.w,outside.pressurePa))*air.controlledM3s;
+  const controlledFlow=Number.isFinite(air.controlledMassFlowKgS)?air.controlledMassFlowKgS:
+    dryAirDensity(air.supply.tempC,air.supply.w,outside.pressurePa)*air.controlledM3s;
   const massFlow=leak+controlledFlow;
   const ua=ctx.ua;
   const conductance=ua+CP*massFlow;
@@ -63,6 +63,29 @@ function condense(tempC,w,state,pressurePa) {
 function duties(available,estimated) {
   if(available<=0)return [0];
   return [...new Set([0,clamp(estimated,0,1),.5,1].map(x=>Math.round(x*1000000)/1000000))];
+}
+
+// PsychroLib moist-air enthalpy is linear in dry-bulb temperature at fixed humidity ratio.
+function temperatureAtEnthalpy(enthalpyJkg,w) {
+  return (enthalpyJkg-2501000*w)/(CP+1860*w);
+}
+function mixSupplyStates(treated,treatedMassFlowKgS,bypass,bypassMassFlowKgS) {
+  const total=treatedMassFlowKgS+bypassMassFlowKgS;
+  if(total<=0)return {...bypass};
+  const w=(treated.w*treatedMassFlowKgS+bypass.w*bypassMassFlowKgS)/total;
+  const h=(enthalpy(treated.tempC,treated.w)*treatedMassFlowKgS+
+    enthalpy(bypass.tempC,bypass.w)*bypassMassFlowKgS)/total;
+  return {tempC:temperatureAtEnthalpy(h,w),w};
+}
+
+function untreatedSupplyUtility(ctx,untreated,treated) {
+  const tol=Math.max(.1,ctx.s.tempToleranceC);
+  const sensibleError=(ctx.state.tempC-ctx.target.targetC)/tol;
+  const bounds=moistureBounds(ctx.state.tempC,ctx.outside.pressurePa,ctx.s);
+  const half=Math.max(1e-7,(bounds.maxW-bounds.minW)/2);
+  const moistureError=(ctx.state.w-(bounds.minW+bounds.maxW)/2)/half;
+  return (-sensibleError)*(untreated.tempC-treated.tempC)/tol+
+    (-moistureError)*(untreated.w-treated.w)/half;
 }
 
 // Per-hour outdoor-dependent quantities shared by both controllers, including this hour's heating source:
@@ -99,42 +122,94 @@ function inactiveRecovery(outside,volumeFlowM3s,configured) {
     sensibleTransferW:0,latentTransferW:0,auxiliaryW:0,preheatDemandW:0,preheatDeliveredW:0,
     defrostFraction:0,preheatInsufficient:false};
 }
-function controlledAirOption(ctx,{controlledACH,kind='outside',doasMode='none',recoveryMode='none'}){
+function controlledAirOption(ctx,{controlledACH,kind='outside',doasMode='none',recoveryMode='none',doasExcessBypass=false}){
   const {outside,pad,s}=ctx;
-  const actualACH=ctx.ventCapACH===null?controlledACH:Math.min(controlledACH,ctx.ventCapACH);
-  const controlledM3s=s.areaM2*s.heightM*actualACH/3600;
+  const cappedACH=ctx.ventCapACH===null?controlledACH:Math.min(controlledACH,ctx.ventCapACH);
+  const requestedControlledM3s=s.areaM2*s.heightM*cappedACH/3600;
   const recoveryConfigured=s.heatRecovery.type!=='none';
-  const direct=kind==='outside';
-  let recovery=inactiveRecovery(outside,controlledM3s,recoveryConfigured);
-  if(direct&&recoveryConfigured&&recoveryMode==='active'){
+  const direct=kind==='outside',requestedDoas=doasMode==='conditioned';
+  const capacityOnly=requestedDoas&&direct&&!doasExcessBypass&&ctx.doasTempC!==null&&ctx.doasW!==null;
+  const outsideDensity=direct?dryAirDensity(outside.tempC,outside.w,outside.pressurePa):0;
+  const recoverAtFlow=volumeFlowM3s=>{
+    if(!direct||!recoveryConfigured||recoveryMode!=='active')
+      return inactiveRecovery(outside,volumeFlowM3s,recoveryConfigured);
     if(!ctx.recoveryExhaust)throw Error('Zone state cannot be reconciled to the current recovery pressure.');
-    recovery=recoverSupplyState({
+    return recoverSupplyState({
       outside:{tempC:outside.tempC,w:outside.w,pressurePa:outside.pressurePa},
       exhaust:{tempC:ctx.recoveryExhaust.tempC,w:ctx.recoveryExhaust.w,pressurePa:outside.pressurePa},
-      volumeFlowM3s:controlledM3s,recovery:s.heatRecovery,bypass:false,availablePreheatW:ctx.heatCapacityW,
+      volumeFlowM3s,recovery:s.heatRecovery,bypass:false,availablePreheatW:ctx.heatCapacityW,
     });
+  };
+  let controlledM3s=requestedControlledM3s;
+  let recovery=recoverAtFlow(controlledM3s);
+  if(capacityOnly&&controlledM3s>0){
+    // Capacity is stated at the DOAS inlet. Recovery and preheat can expand the outdoor-reference
+    // volume before it reaches that inlet. Reduce monotonically until the resulting inlet flow is
+    // feasible, never iterating upward across a discontinuous recovery support threshold.
+    let inletM3s=outsideDensity*controlledM3s/
+      dryAirDensity(recovery.supply.tempC,recovery.supply.w,outside.pressurePa);
+    for(let i=0;i<8&&inletM3s>s.doasM3s;i++){
+      controlledM3s*=s.doasM3s/inletM3s;
+      recovery=recoverAtFlow(controlledM3s);
+      inletM3s=outsideDensity*controlledM3s/
+        dryAirDensity(recovery.supply.tempC,recovery.supply.w,outside.pressurePa);
+    }
+    // A discontinuity, unsupported reduced core flow, or numerical plateau must never leak untreated
+    // air into a capacity-only candidate. Bypass recovery at the feasible outdoor-basis capacity.
+    if(inletM3s>s.doasM3s||recovery.unsupportedFlow){
+      const unsupportedFlow=Boolean(recovery.unsupportedFlow);
+      controlledM3s=Math.min(requestedControlledM3s,s.doasM3s);
+      recovery={...inactiveRecovery(outside,controlledM3s,recoveryConfigured),unsupportedFlow};
+    }
   }
+  const actualACH=controlledM3s*3600/(s.areaM2*s.heightM);
+  const controlledMassFlowKgS=direct?outsideDensity*controlledM3s:null;
   const recoveredSupply=direct?recovery.supply:{tempC:outside.tempC,w:outside.w};
-  const requestedDoas=doasMode==='conditioned';
-  const canCondition=direct&&controlledM3s>0&&controlledM3s<=s.doasM3s+1e-12&&ctx.doasTempC!==null&&ctx.doasW!==null;
-  const conditioned=requestedDoas&&canCondition;
-  const supply=conditioned?{tempC:ctx.doasTempC,w:Math.min(recoveredSupply.w,ctx.doasW)}:
+  const canCondition=requestedDoas&&direct&&controlledMassFlowKgS>0&&ctx.doasTempC!==null&&ctx.doasW!==null;
+  const doasInletDensity=canCondition?dryAirDensity(recoveredSupply.tempC,recoveredSupply.w,outside.pressurePa):0;
+  const doasInletM3s=canCondition?controlledMassFlowKgS/doasInletDensity:0;
+  const treatmentM3s=canCondition?Math.min(s.doasM3s,doasInletM3s):0;
+  const remainingHeatCapacityW=Math.max(0,ctx.heatCapacityW-recovery.preheatDeliveredW);
+  const treatment=treatmentM3s>0?conditionDoasSupply({
+    inlet:recoveredSupply,volumeFlowM3s:treatmentM3s,pressurePa:outside.pressurePa,
+    supplyTempC:s.doasSupplyTempC,supplyDewPointC:s.doasSupplyDewPointC,
+    coolingCOP:s.doasCoolingCOP,reheatRecoveryFraction:s.doasReheatRecoveryFraction,
+    availableHeatingW:remainingHeatCapacityW,
+  }):{
+    outlet:{...recoveredSupply},condensateKgS:0,coolingLoadW:0,coolingElectricW:0,
+    heatingDemandW:0,reheatDemandW:0,recoveredReheatW:0,externalHeatW:0,unmetConditioningW:0,
+  };
+  const treatedMassFlowKgS=doasInletDensity*treatmentM3s;
+  const untreatedRemainderKgS=direct?Math.max(0,controlledMassFlowKgS-treatedMassFlowKgS):0;
+  const untreatedMassFlowKgS=untreatedRemainderKgS<=1e-12*Math.max(1,controlledMassFlowKgS||0)?0:untreatedRemainderKgS;
+  const conditioned=treatmentM3s>0;
+  const supply=conditioned?mixSupplyStates(treatment.outlet,treatedMassFlowKgS,recoveredSupply,untreatedMassFlowKgS):
     kind==='pad'?{tempC:pad.tempC,w:pad.w}:kind==='indirect'?{tempC:ctx.indirectTempC,w:outside.w}:recoveredSupply;
-  const treatmentFlow=conditioned?dryAirDensity(supply.tempC,supply.w,outside.pressurePa)*controlledM3s:0;
   const coreActive=recoveryConfigured&&recovery.coreFlowM3s>0;
-  return {controlledACH:actualACH,controlledM3s,kind,recoveryConfigured,recoveryRequested:recoveryMode,
+  return {controlledACH:actualACH,controlledM3s,requestedControlledM3s,controlledMassFlowKgS,kind,recoveryConfigured,recoveryRequested:recoveryMode,
     recoveryMode:recoveryConfigured?(coreActive?'active':'bypass'):'none',
     recoveryCoreFraction:recoveryConfigured&&controlledM3s>0?recovery.coreFlowM3s/controlledM3s:0,
     recoveryBypassFraction:recoveryConfigured&&controlledM3s>0?recovery.bypassFlowM3s/controlledM3s:0,
     recovery,
-    doasMode:conditioned?'conditioned':'none',supply,
-    treatment:{doasRequested:requestedDoas,doasRemovedKgS:treatmentFlow*Math.max(0,recoveredSupply.w-supply.w),doasElectricW:0}};
+    doasMode:conditioned?'conditioned':'none',doasExcessBypass:doasExcessBypass&&untreatedMassFlowKgS>1e-12,supply,
+    treatment:{...treatment,doasRequested:requestedDoas,treatmentM3s,untreatedMassFlowKgS}};
 }
-function airVariants(ctx,args) {
+function recoveryVariants(ctx,args) {
   const actualACH=ctx.ventCapACH===null?args.controlledACH:Math.min(args.controlledACH,ctx.ventCapACH);
   if(args.kind==='pad'||args.kind==='indirect'||ctx.s.heatRecovery.type==='none'||actualACH<=0)
     return [controlledAirOption(ctx,{...args,recoveryMode:'bypass'})];
   return [controlledAirOption(ctx,{...args,recoveryMode:'active'}),controlledAirOption(ctx,{...args,recoveryMode:'bypass'})];
+}
+function airVariants(ctx,args) {
+  if(args.doasMode!=='conditioned'||(args.kind??'outside')!=='outside')return recoveryVariants(ctx,args);
+  const capacityOnly=recoveryVariants(ctx,{...args,doasExcessBypass:false});
+  const capacityByRecovery=new Map(capacityOnly.map(option=>[option.recoveryRequested,option]));
+  const usefulExcess=recoveryVariants(ctx,{...args,doasExcessBypass:true}).filter(option=>{
+    const capacity=capacityByRecovery.get(option.recoveryRequested);
+    return option.treatment.untreatedMassFlowKgS>1e-12&&capacity&&
+      untreatedSupplyUtility(ctx,option.supply,capacity.supply)>1e-12;
+  });
+  return [...capacityOnly,...usefulExcess];
 }
 function airOptions(ctx) {
   const {s,pad}=ctx;
@@ -193,9 +268,8 @@ function evaluate(ctx,air,dxDuty,dehuDuty,desiccantDuty,plan) {
   const humidifier=plan.humidifier(unheated,unhumidifiedW,k,recoverable);
   const heatNeed=Math.max(0,plan.heat(unheated-k.heatGain*L*humidifier,k,recoverable));
   const reheatW=Math.min(recoverable,heatNeed);
-  // Recovery preheat has first claim on this same finite source. Task 5 inserts DOAS external heat at the
-  // explicit boundary between this reservation and the remaining zone-heater capacity.
-  const remainingHeatCapacityW=Math.max(0,ctx.heatCapacityW-air.recovery.preheatDeliveredW);
+  // Recovery preheat has first claim on the finite source, followed by DOAS external heat, then zone heat.
+  const remainingHeatCapacityW=Math.max(0,ctx.heatCapacityW-air.recovery.preheatDeliveredW-air.treatment.externalHeatW);
   const heaterW=Math.min(remainingHeatCapacityW,Math.max(0,heatNeed-reheatW));
   const q=qBase+equipmentQ-L*humidifier+reheatW+heaterW;
   const rawT=k.heatDecay*state.tempC+k.heatGain*(k.heatSource+q);
@@ -211,18 +285,22 @@ function evaluate(ctx,air,dxDuty,dehuDuty,desiccantDuty,plan) {
   // Indirect evap rejects sensible heat through a separate wet secondary
   // stream. Its water is an ideal latent-equivalent estimate, not product data.
   const indirectKgS=air.kind==='indirect'?k.controlledFlow*CP*(outside.tempC-air.supply.tempC)/L:0;
-  // DOAS treatment changes the supply state of this controlled stream. Task 5 supplies its detailed
-  // thermodynamics and energy; this topology step intentionally carries only the removed-water quantity.
-  const doasKgS=air.treatment.doasRemovedKgS;
-  const doasW=air.treatment.doasElectricW;
+  const doasCondensateKgS=air.treatment.condensateKgS;
+  const doasCoolingDeliveredW=air.treatment.coolingLoadW;
+  const doasCoolingElectricW=air.treatment.coolingElectricW;
+  const doasRecoveredReheatW=air.treatment.recoveredReheatW;
+  const doasExternalHeatW=air.treatment.externalHeatW;
+  const doasUnmetConditioningW=air.treatment.unmetConditioningW;
   // A heat pump buys delivered heat as electricity at the interpolated COP; a fuel heater books it to fuel.
-  // Preheat and zone heat are separate delivered-energy rows but draw from one capacity and one purchase path.
+  // Recovery preheat, DOAS external heat, and zone heat draw from one capacity in that priority order.
   const heaterElectricW=ctx.heatCOP!==null?heaterW/ctx.heatCOP:0;
   const preheatElectricW=ctx.heatCOP!==null?air.recovery.preheatDeliveredW/ctx.heatCOP:0;
   const preheatFuelW=ctx.heatCOP!==null?0:air.recovery.preheatDeliveredW/s.heaterEfficiency;
-  const electricW=forcing.lightW+fanW+pumpW+dxW+dehuW+regenElectricW+doasW+heaterElectricW+
-    preheatElectricW+air.recovery.auxiliaryW;
-  const fuelW=(ctx.heatCOP!==null?0:heaterW/s.heaterEfficiency)+regenFuelW+preheatFuelW;
+  const doasExternalElectricW=ctx.heatCOP!==null?doasExternalHeatW/ctx.heatCOP:0;
+  const doasExternalFuelW=ctx.heatCOP!==null?0:doasExternalHeatW/s.heaterEfficiency;
+  const electricW=forcing.lightW+fanW+pumpW+dxW+dehuW+regenElectricW+doasCoolingElectricW+
+    doasExternalElectricW+heaterElectricW+preheatElectricW+air.recovery.auxiliaryW;
+  const fuelW=(ctx.heatCOP!==null?0:heaterW/s.heaterEfficiency)+regenFuelW+preheatFuelW+doasExternalFuelW;
   const waterKgS=forcing.cropKgS+humidifier+padKgS+indirectKgS;
   const costRate=electricW/1000*s.electricityPrice+fuelW/1000*s.fuelPrice+waterKgS*3600*s.waterPrice;
   // Unmet load = extra steady capacity (W, kg/s) needed to hold the violated bound
@@ -235,7 +313,8 @@ function evaluate(ctx,air,dxDuty,dehuDuty,desiccantDuty,plan) {
   return {...final,k,air,rawT,rawW,q,moistureSource:forcing.cropKgS+humidifier-removal,violation,costRate,temperatureMiss,moistureMiss,
     fanW,pumpW,dxDuty,dehuDuty,desiccantDuty,dxKgS,dehuKgS,desiccantKgS,dxSensibleW,dxTotalW,dxW,dehuW,dehuHeatW,sorptionW,
     regenW,regenElectricW,regenFuelW,reheatW,heaterW,heaterElectricW,preheatElectricW,preheatFuelW,electricW,fuelW,waterKgS,
-    padKgS:padKgS+indirectKgS,humidifier,doasKgS,doasW,
+    padKgS:padKgS+indirectKgS,humidifier,doasCondensateKgS,doasCoolingDeliveredW,doasCoolingElectricW,
+    doasRecoveredReheatW,doasExternalHeatW,doasUnmetConditioningW,doasExternalElectricW,doasExternalFuelW,
     rejectedW:dxTotalW+dxW-reheatW+dehuRejectedW,dehuRejectedW,desiccantExportedW:L*desiccantKgS*(1-s.desiccantHeatFraction)+regenW,
     unmetSensibleW,unmetMoistureKgS};
 }
@@ -363,15 +442,17 @@ function chooseStaged(ctx,c) {
     heat:(unheatedT,k,recoverable)=>clamp((heatSetC-state.tempC)/heatBand,0,1)*(ctx.heatCapacityW+recoverable)};
   const candidates=variants.map(air=>evaluate(ctx,air,Math.max(dxCool,dxMoist)/2,dehu/2,desiccant/2,plan)).filter(Boolean);
   if(candidates.length<2)return candidates[0]||null;
-  const active=candidates.find(candidate=>candidate.air.recoveryRequested==='active');
-  const bypass=candidates.find(candidate=>candidate.air.recoveryRequested!=='active');
-  // Compare the two supply states against both measured control errors. The dot product makes untreated air
-  // win for useful cooling, heating, drying, or humidification, while opposing sensible and moisture effects
-  // compete in their normalized control bands instead of either objective winning absolutely. Comparing supply
-  // states, not downstream heater outcomes, preserves a failed preheat attempt when untreated air itself is worse.
-  const untreatedUtility=(-e)*(bypass.air.supply.tempC-active.air.supply.tempC)/tol+
-    (-em)*(bypass.air.supply.w-active.air.supply.w)/half;
-  return untreatedUtility>1e-12?bypass:active;
+  const selectRecovery=group=>{
+    if(group.length<2)return group[0]||null;
+    const active=group.find(candidate=>candidate.air.recoveryRequested==='active');
+    const bypass=group.find(candidate=>candidate.air.recoveryRequested!=='active');
+    if(!active||!bypass)return group[0];
+    return untreatedSupplyUtility(ctx,bypass.air.supply,active.air.supply)>1e-12?bypass:active;
+  };
+  const capacityOnly=selectRecovery(candidates.filter(candidate=>!candidate.air.doasExcessBypass));
+  const withExcess=selectRecovery(candidates.filter(candidate=>candidate.air.doasExcessBypass));
+  if(!withExcess)return capacityOnly;
+  return untreatedSupplyUtility(ctx,withExcess.air.supply,capacityOnly.air.supply)>1e-12?withExcess:capacityOnly;
 }
 
 function canonicalHours(snapshot) {
@@ -469,7 +550,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
   ];
   if(s.desiccantKgH>0)warnings.push('Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.');
   if(insect.installed)warnings.push(`Insect screen derates the maximum outside-air exchange by a factor of ${insect.ventilationFactor} to ${s.maxVentACH.toFixed(2)} ACH${insect.clampedToMinimum?', clamped up to the declared minimum, so the screened capacity is below the ventilation the scenario requires':''}. The factor is ${insect.basis}, measured relative to a 40-mesh screened house and NOT to an unscreened one, so it cannot price the first screen. No optical or thermal effect of the mesh is modeled.`);
-  if(s.doasM3s>0)warnings.push('Generic dry-neutral DOAS treatment applies only to the selected controlled outdoor-air stream and never adds outdoor airflow. This topology stage reports the declared supply state and water removed; detailed coil, reheat, and purchased-energy thermodynamics are not included. Brand-agnostic assumption, not product data.');
+  if(s.doasM3s>0)warnings.push(`Generic DOAS conditions selected controlled outdoor air after optional recovery toward a ${s.doasSupplyTempC} C supply temperature and ${s.doasSupplyDewPointC} C dew point. Cooling uses moist-air enthalpy at COP ${s.doasCoolingCOP}; condenser reheat recovery is limited to fraction ${s.doasReheatRecoveryFraction}. Treatment capacity is ${s.doasM3s} m3/s, and any useful excess remains an untreated bypass within the same controlled-air stream. Fan power uses one combined controlled-air fan basis, so treatment never adds airflow or a second fan charge. Exclusions include cycling, frost, duct, drain, and separate process-fan performance beyond declared inputs. Finite heat can leave the achieved supply short of its target. Brand-agnostic assumption, not product data.`);
   warnings.push(...componentWarnings(s,shade,thermal,s.heatSource==='heatpump'&&!heatPumpConfigured(s)?'incomplete':'ok'));
   // Envelope provenance follows the template the scenario still matches. Two of the ladder entries have no
   // sourced PAR or total-shortwave transmission at all, so a run that keeps their placeholder optics says so.
@@ -502,7 +583,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     let compliant=0,maxEnergyResidual=0,maxMoistureResidual=0,failed=false;
     const modeCounts={},controls={controlledACH:0,controlledM3s:0,totalOutdoorACH:0,totalOutdoorM3s:0,
       recoveryCoreFraction:0,recoveryBypassFraction:0,recoveryDefrostFraction:0,preheatFraction:0,
-      padFraction:0,indirectFraction:0,dxDuty:0,dehuDuty:0,desiccantDuty:0,doasConditionedFraction:0,heaterDuty:0,humidifierFraction:0,lightFraction:0,enrichmentFraction:0,shadeFraction:0,thermalScreenFraction:0};
+      padFraction:0,indirectFraction:0,dxDuty:0,dehuDuty:0,desiccantDuty:0,doasConditionedFraction:0,doasTreatmentM3s:0,heaterDuty:0,humidifierFraction:0,lightFraction:0,enrichmentFraction:0,shadeFraction:0,thermalScreenFraction:0};
     const loads=emptyLoads(),startTempC=state.tempC,startW=state.w;
     const dayContributions=new Map();
     const hour=hourContext(outside,s,shade,thermal);
@@ -560,9 +641,13 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       row.regenerationKWh+=picked.regenW*scale;row.regenerationElectricKWh+=picked.regenElectricW*scale;row.regenerationFuelKWh+=picked.regenFuelW*scale;
       row.desiccantRemovedKg+=picked.desiccantKgS*dt;row.desiccantHeatKWh+=picked.sorptionW*scale;
       row.desiccantExportedHeatKWh+=picked.desiccantExportedW*scale;row.reheatKWh+=picked.reheatW*scale;row.rejectedHeatKWh+=picked.rejectedW*scale;
-      row.surfaceCondensateKg+=picked.condensate;row.condensateKg+=(picked.dxKgS+picked.dehuKgS)*dt+picked.condensate;
+      row.surfaceCondensateKg+=picked.condensate;
+      row.condensateKg+=(picked.dxKgS+picked.dehuKgS+picked.doasCondensateKgS)*dt+picked.condensate;
       row.cropWaterL+=cropKgS*dt;row.padWaterL+=picked.padKgS*dt;row.humidifierWaterL+=picked.humidifier*dt;
-      row.doasKWh+=picked.doasW*scale;row.doasRemovedKg+=picked.doasKgS*dt;
+      row.doasCondensateKg+=picked.doasCondensateKgS*dt;
+      row.doasCoolingDeliveredKWh+=picked.doasCoolingDeliveredW*scale;row.doasCoolingElectricKWh+=picked.doasCoolingElectricW*scale;
+      row.doasRecoveredReheatKWh+=picked.doasRecoveredReheatW*scale;row.doasExternalHeatKWh+=picked.doasExternalHeatW*scale;
+      row.doasUnmetConditioningKWh+=picked.doasUnmetConditioningW*scale;
       row.recoverySensibleKWh+=picked.air.recovery.sensibleTransferW*scale;
       row.recoveryLatentKWh+=picked.air.recovery.latentTransferW*scale;
       row.recoveryAuxKWh+=picked.air.recovery.auxiliaryW*scale;
@@ -577,7 +662,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       if(picked.air.recovery.unsupportedFlow)unsupportedRecoveryFlow=true;
       row.unmetSensibleKWh+=picked.unmetSensibleW*scale;row.unmetMoistureKg+=picked.unmetMoistureKgS*dt;
       row.tempDegreeHours+=picked.temperatureMiss*dt/3600;row.vpdKPaHours+=picked.moistureMiss*dt/3600;
-      row.peakCoolingKW=Math.max(row.peakCoolingKW||0,picked.dxTotalW/1000);row.peakElectricKW=Math.max(row.peakElectricKW||0,picked.electricW/1000);
+      row.peakCoolingKW=Math.max(row.peakCoolingKW||0,(picked.dxTotalW+picked.doasCoolingDeliveredW)/1000);row.peakElectricKW=Math.max(row.peakElectricKW||0,picked.electricW/1000);
       accumulateLoads(loads,picked,forcing,s,outside,averageT,averageW,dt);
       controls.controlledACH+=picked.air.controlledACH/nSteps;controls.controlledM3s+=picked.air.controlledM3s/nSteps;
       controls.totalOutdoorACH+=(ctx.infiltrationACH+picked.air.controlledACH)/nSteps;
@@ -588,12 +673,13 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       controls.preheatFraction+=(picked.air.recovery.preheatDeliveredW>0?1:0)/nSteps;
       controls.padFraction+=(picked.air.kind==='pad'?1:0)/nSteps;controls.indirectFraction+=(picked.air.kind==='indirect'?1:0)/nSteps;
       controls.dxDuty+=picked.dxDuty/nSteps;controls.dehuDuty+=picked.dehuDuty/nSteps;controls.desiccantDuty+=picked.desiccantDuty/nSteps;
-      controls.doasConditionedFraction+=(picked.air.doasMode==='conditioned'?1:0)/nSteps;
+      controls.doasConditionedFraction+=(picked.air.treatment.treatmentM3s>0?1:0)/nSteps;
+      controls.doasTreatmentM3s+=picked.air.treatment.treatmentM3s/nSteps;
       controls.heaterDuty+=(s.heaterKW>0?picked.heaterW/(s.heaterKW*1000):0)/nSteps;controls.humidifierFraction+=(picked.humidifier>0?1:0)/nSteps;controls.lightFraction+=(forcing.lightW>0?1:0)/nSteps;
       controls.enrichmentFraction+=(picked.air.controlledACH<=s.minVentACH+1e-9&&picked.air.kind==='outside'?1:0)/nSteps;
       controls.shadeFraction+=(shadeOn?1:0)/nSteps;controls.thermalScreenFraction+=(thermalOn?1:0)/nSteps;
-      const mode=picked.dxTotalW>0?'DX_COOL_DEHUMIDIFY':picked.desiccantKgS>0?'DESICCANT_REGENERATION':picked.dehuKgS>0?'CONDENSING_DEHUMIDIFY':picked.doasKgS>0?'DOAS_DEHUMIDIFY':
-        picked.heaterW>0?'HEATING':picked.air.kind==='indirect'?'INDIRECT_EVAP_COOL':picked.air.kind==='pad'?'PAD_COOLING':picked.humidifier>0?'HUMIDIFY':picked.air.controlledACH>s.minVentACH?'VENTILATION':'MINIMUM_AIR';
+      const mode=picked.dxTotalW>0?'DX_COOL_DEHUMIDIFY':picked.desiccantKgS>0?'DESICCANT_REGENERATION':picked.dehuKgS>0?'CONDENSING_DEHUMIDIFY':picked.doasCondensateKgS>0?'DOAS_DEHUMIDIFY':
+        picked.doasCoolingDeliveredW>0||picked.doasExternalHeatW>0?'DOAS_CONDITIONING':picked.heaterW>0?'HEATING':picked.air.kind==='indirect'?'INDIRECT_EVAP_COOL':picked.air.kind==='pad'?'PAD_COOLING':picked.humidifier>0?'HUMIDIFY':picked.air.controlledACH>s.minVentACH?'VENTILATION':'MINIMUM_AIR';
       modeCounts[mode]=(modeCounts[mode]||0)+1;
       if(picked.violation<=1e-7)compliant++;
       if(!dayContributions.has(target.date))dayContributions.set(target.date,{date:target.date,start:weather.time+sub*dt*1000,end:0,hours:0,solarDLI:0,lightDLI:0,compliantHours:0});
@@ -661,6 +747,13 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     supportedRecoveryFlowFraction:{minimum:.5,maximum:1.3},
     ratingInputs:'Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.',
     excessFlow:'Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.',
+    doas:s.doasM3s>0?{
+      supplyTempC:s.doasSupplyTempC,supplyDewPointC:s.doasSupplyDewPointC,coolingCOP:s.doasCoolingCOP,
+      reheatRecoveryFraction:s.doasReheatRecoveryFraction,treatmentCapacityM3s:s.doasM3s,
+      treatmentOrder:'Outdoor air, optional heat recovery, optional DOAS, zone.',
+      fanBasis:'One combined controlled-air fan power basis; treatment does not add airflow.',
+      exclusions:'No cycling, frost, duct, drain, or separate process-fan performance beyond declared inputs.',
+    }:null,
   };
   return {scenario:s,hours,summary,weatherSummary:weatherSummary(hours,s),warnings,modelVersion:MODEL_VERSION,controlModeUsed:controlMode,transpirationModelUsed:transpirationModel,
     assumptions:{evidenceTier:'Assumption-based component screening',stepMinutes,warmupHoursPerSegment:1,lightSolarConversionUmolJ:2.02,

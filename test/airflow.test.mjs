@@ -219,11 +219,12 @@ test('saturated enthalpy inversion is bounded and rejects invalid input', () => 
   assert.throws(() => saturatedStateAtEnthalpy(0, -1), /pressure/);
 });
 
-test('cold dry DOAS supply requires external heat to reach a warmer target', () => {
+test('cold dry DOAS supply charges the independently calculated heat needed for its warmer target', () => {
   const inlet = state(0, .35);
+  const volumeFlowM3s = 1;
   const result = conditionDoasSupply({
     inlet,
-    volumeFlowM3s:1,
+    volumeFlowM3s,
     pressurePa:PRESSURE,
     supplyTempC:21,
     supplyDewPointC:10,
@@ -231,10 +232,14 @@ test('cold dry DOAS supply requires external heat to reach a warmer target', () 
     reheatRecoveryFraction:.5,
     availableHeatingW:50000,
   });
+  const massFlowKgS = dryAirDensity(inlet.tempC, inlet.w, PRESSURE) * volumeFlowM3s;
+  const expectedHeatingW = massFlowKgS
+    * (enthalpy(21, inlet.w) - enthalpy(inlet.tempC, inlet.w));
   assert.equal(result.condensateKgS, 0);
   assert.equal(result.coolingLoadW, 0);
   assert.equal(result.recoveredReheatW, 0);
-  assert.ok(result.externalHeatW > 0);
+  close(result.heatingDemandW, expectedHeatingW, 1e-8);
+  close(result.externalHeatW, expectedHeatingW, 1e-8);
   assert.equal(result.unmetConditioningW, 0);
   close(result.outlet.tempC, 21, 1e-9);
   assert.equal(result.outlet.w, inlet.w);
@@ -263,19 +268,23 @@ test('hot humid DOAS supply reports explicit condensation, cooling, and reheat',
   close(result.coolingLoadW, expectedCoolingW, 1e-8);
   close(result.coolingElectricW, expectedCoolingW / coolingCOP, 1e-8);
   close(result.recoveredReheatW, expectedRecoveredW, 1e-8);
+  assert.ok(result.recoveredReheatW <= result.reheatDemandW + 1e-9);
+  assert.ok(result.recoveredReheatW
+    <= reheatRecoveryFraction * (result.coolingLoadW + result.coolingElectricW) + 1e-9);
   assert.equal(result.externalHeatW, 0);
   assert.equal(result.unmetConditioningW, 0);
   close(result.outlet.tempC, supplyTempC, 1e-9);
   close(result.outlet.w, targetW, 1e-12);
 });
 
-test('DOAS exposes unmet heat and rejects invalid physical inputs', () => {
-  const inlet = state(0, .35);
+test('DOAS uses only available external heat for remaining reheat and exposes the shortfall', () => {
+  const inlet = state(35, .7);
   const result = conditionDoasSupply({inlet, volumeFlowM3s:1, pressurePa:PRESSURE,
-    supplyTempC:21, supplyDewPointC:10, coolingCOP:3, reheatRecoveryFraction:0, availableHeatingW:1000});
+    supplyTempC:20, supplyDewPointC:10, coolingCOP:3, reheatRecoveryFraction:0, availableHeatingW:1000});
+  assert.ok(result.reheatDemandW > 1000);
   assert.equal(result.externalHeatW, 1000);
-  assert.ok(result.unmetConditioningW > 0);
-  assert.ok(result.outlet.tempC > inlet.tempC && result.outlet.tempC < 21);
+  close(result.unmetConditioningW, result.reheatDemandW - 1000, 1e-9);
+  assert.ok(result.outlet.tempC > result.coilLeaving.tempC && result.outlet.tempC < 20);
   assert.throws(() => conditionDoasSupply({inlet, volumeFlowM3s:1, pressurePa:PRESSURE,
     supplyTempC:5, supplyDewPointC:10, coolingCOP:3, reheatRecoveryFraction:0, availableHeatingW:0}), /dew point/);
   assert.throws(() => conditionDoasSupply({inlet, volumeFlowM3s:1, pressurePa:PRESSURE,

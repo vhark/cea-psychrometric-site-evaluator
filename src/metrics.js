@@ -29,7 +29,8 @@ function outdoorDrying(hours, scenario) {
     basis: 'Maximum ventilation rate, fan power and heating of ventilation air to the target at scenario prices; sensible import in hot-dry hours is not costed here.'};
 }
 
-const ENERGY_FIELDS = ['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh','desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg','cropWaterL','padWaterL','humidifierWaterL','unmetSensibleKWh','unmetMoistureKg','doasKWh','doasRemovedKg',
+const ENERGY_FIELDS = ['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh','desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg','cropWaterL','padWaterL','humidifierWaterL','unmetSensibleKWh','unmetMoistureKg',
+  'doasCondensateKg','doasCoolingDeliveredKWh','doasCoolingElectricKWh','doasRecoveredReheatKWh','doasExternalHeatKWh','doasUnmetConditioningKWh',
   'recoverySensibleKWh','recoveryLatentKWh','recoveryAuxKWh','recoveryCoreM3','recoveryBypassM3','recoveryDefrostHours',
   'preheatDeliveredKWh','preheatElectricKWh','preheatFuelKWh','preheatInsufficientHours'];
 const eligible = h => h.valid && h.eligible !== false && !h.warmup;
