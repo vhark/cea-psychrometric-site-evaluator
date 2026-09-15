@@ -1,7 +1,7 @@
 {
-  "exportedAt": "2026-09-15T20:56:18.181Z",
-  "verifiedAt": "2026-09-15T21:04:52.611Z",
-  "sourceCommit": "0534ff3fab9be07f6e94171b5dde89ec1c05bbf3",
+  "exportedAt": "2026-09-15T21:17:50.233Z",
+  "verifiedAt": "2026-09-15T21:20:39.298Z",
+  "sourceCommit": "501076ab79c9dbaabd8179e64d3a0767356e942c",
   "modelVersion": "0.3.0-screening",
   "schemaVersion": 2,
   "method": "Actual Chromium UI loaded bundled Tulsa 2025, imported docs/example-scenarios.json, ran all six, and invoked Run JSON, Hourly CSV, Printable report and Design-basis brief. Metrics below read from that genuine downloaded Run JSON, never copied from previous artifacts.",
@@ -180,9 +180,16 @@
       },
       "comparison": {
         "baseline": "Pad + vent baseline",
+        "matchedEligibleHours": 8759,
+        "matchedOperatingCostUSD": 22060.968289107044,
+        "matchedOperatingCostDifferenceUSD": 0,
+        "matchedCostPerAddedHour": null,
         "attainmentPercentagePointDifference": 0,
         "addedJointHours": 0,
-        "operatingCostDifferenceUSD": 0
+        "fullRunValidHours": 8760,
+        "fullRunOperatingCostUSD": 22064.28659607676,
+        "fullRunOperatingCostDifferenceUSD": 0,
+        "note": "Matched comparison uses common eligible hours and excludes warm-up. Full-run annual cost includes every valid hour, including warm-up. These are different populations."
       }
     },
     {
@@ -335,9 +342,16 @@
       },
       "comparison": {
         "baseline": "Pad + vent baseline",
+        "matchedEligibleHours": 8759,
+        "matchedOperatingCostUSD": 28489.98451317717,
+        "matchedOperatingCostDifferenceUSD": 6429.016224070125,
+        "matchedCostPerAddedHour": 5.061021982264139,
         "attainmentPercentagePointDifference": 14.502797122959219,
         "addedJointHours": 1270.299999999998,
-        "operatingCostDifferenceUSD": 6429.008436144093
+        "fullRunValidHours": 8760,
+        "fullRunOperatingCostUSD": 28493.295032220853,
+        "fullRunOperatingCostDifferenceUSD": 6429.008436144093,
+        "note": "Matched comparison uses common eligible hours and excludes warm-up. Full-run annual cost includes every valid hour, including warm-up. These are different populations."
       }
     },
     {
@@ -490,9 +504,16 @@
       },
       "comparison": {
         "baseline": "Pad + vent baseline",
+        "matchedEligibleHours": 8759,
+        "matchedOperatingCostUSD": 39912.06328686293,
+        "matchedOperatingCostDifferenceUSD": 17851.09499775589,
+        "matchedCostPerAddedHour": 4.437130830845733,
         "attainmentPercentagePointDifference": 45.93123263690654,
         "addedJointHours": 4023.1166666666454,
-        "operatingCostDifferenceUSD": 17851.087209829857
+        "fullRunValidHours": 8760,
+        "fullRunOperatingCostUSD": 39915.373805906616,
+        "fullRunOperatingCostDifferenceUSD": 17851.087209829857,
+        "note": "Matched comparison uses common eligible hours and excludes warm-up. Full-run annual cost includes every valid hour, including warm-up. These are different populations."
       }
     },
     {
@@ -645,9 +666,16 @@
       },
       "comparison": {
         "baseline": "Pad + vent baseline",
+        "matchedEligibleHours": 8759,
+        "matchedOperatingCostUSD": 47196.775310522375,
+        "matchedOperatingCostDifferenceUSD": 25135.80702141533,
+        "matchedCostPerAddedHour": 10.18991663255674,
         "attainmentPercentagePointDifference": 28.16227118773057,
         "addedJointHours": 2466.7333333333204,
-        "operatingCostDifferenceUSD": 25136.815618159344
+        "fullRunValidHours": 8760,
+        "fullRunOperatingCostUSD": 47201.1022142361,
+        "fullRunOperatingCostDifferenceUSD": 25136.815618159344,
+        "note": "Matched comparison uses common eligible hours and excludes warm-up. Full-run annual cost includes every valid hour, including warm-up. These are different populations."
       }
     },
     {
@@ -800,9 +828,16 @@
       },
       "comparison": {
         "baseline": "Pad + vent baseline",
+        "matchedEligibleHours": 8759,
+        "matchedOperatingCostUSD": 33823.78482503653,
+        "matchedOperatingCostDifferenceUSD": 11762.816535929484,
+        "matchedCostPerAddedHour": 5.428240644801249,
         "attainmentPercentagePointDifference": 24.739886592837852,
         "addedJointHours": 2166.9666666666676,
-        "operatingCostDifferenceUSD": 11763.017936636512
+        "fullRunValidHours": 8760,
+        "fullRunOperatingCostUSD": 33827.30453271327,
+        "fullRunOperatingCostDifferenceUSD": 11763.017936636512,
+        "note": "Matched comparison uses common eligible hours and excludes warm-up. Full-run annual cost includes every valid hour, including warm-up. These are different populations."
       }
     },
     {
@@ -955,9 +990,16 @@
       },
       "comparison": {
         "baseline": "Pad + vent baseline",
+        "matchedEligibleHours": 8759,
+        "matchedOperatingCostUSD": 47328.68656376133,
+        "matchedOperatingCostDifferenceUSD": 25267.718274654286,
+        "matchedCostPerAddedHour": 11.31981704233003,
         "attainmentPercentagePointDifference": 25.484263804848286,
         "addedJointHours": 2232.166666666661,
-        "operatingCostDifferenceUSD": 25268.597137674282
+        "fullRunValidHours": 8760,
+        "fullRunOperatingCostUSD": 47332.88373375104,
+        "fullRunOperatingCostDifferenceUSD": 25268.597137674282,
+        "note": "Matched comparison uses common eligible hours and excludes warm-up. Full-run annual cost includes every valid hour, including warm-up. These are different populations."
       }
     }
   ],
@@ -965,7 +1007,7 @@
     {
       "name": "cea-psychrometric-site-evaluator-run.json",
       "bytes": 207706978,
-      "sha256": "7b1a05402c72bbaad968a5a4730ea4fbe5c65c187d53b28d43faa72aa691321e",
+      "sha256": "9f4d84b660381e79141717b237af03dc9e02e678ade5d3ec3a8d295a5536e2cf",
       "retained": null
     },
     {
@@ -976,22 +1018,22 @@
     },
     {
       "name": "cea-psychrometric-site-evaluator-report.html",
-      "bytes": 242425,
-      "sha256": "f4dbb41f948016d8bfcf7f5f03eaad6fe1997d0873e550798bef3e59d2606478",
+      "bytes": 248881,
+      "sha256": "1278a721591b0a08ffdf3532b0967c55ec6fc104f427b5881eed5fef8f71149a",
       "retained": "docs/example-comparison.html"
     },
     {
       "name": "cea-psychrometric-site-evaluator-design-basis.html",
-      "bytes": 212042,
-      "sha256": "c55916c3d80c39e6e784ec3c89bc46cea663f11a254877b037d956032df2f257",
+      "bytes": 218456,
+      "sha256": "a5feca81be7e75a4b770effc3d54a2c59bcc376afef4d4de0656313b4869cd22",
       "retained": "docs/example-design-basis.html"
     }
   ],
   "reimport": {
     "staleNoticeObservedAfterImport": true,
     "staleNoticeClearedAfterRun": true,
-    "originalExportedAt": "2026-09-15T20:56:18.181Z",
-    "recomputedExportedAt": "2026-09-15T21:00:07.271Z",
+    "originalExportedAt": "2026-09-15T21:17:50.233Z",
+    "recomputedExportedAt": "2026-09-15T21:19:53.498Z",
     "sameSummaries": true,
     "sameHourlyResults": true
   },
@@ -1270,7 +1312,7 @@
           "grade": null,
           "ventilationFactor": null
         },
-        "notes": "Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval."
+        "notes": "Smoke-only illustrative ERV declaration, not manufacturer ratings or equipment selection: 0.3 ACH independent uncontrolled infiltration; controlled outdoor air 0.3 ACH minimum and 40 ACH installed maximum; combined controlled-air fan specific power 180 W/(m3/s). ERV nominal 0.2222222222 m3/s, auxiliary 45 W; sensible heating/cooling effectiveness 0.7 and latent heating/cooling effectiveness 0.5 at both 75% and 100% nominal flow. Economizer bypass enabled. Frost control none with declared minimum outdoor operating temperature -30 C. No DOAS. Existing installed-cost allowance is not repriced for this smoke configuration, is not a quote and is not an investment estimate. This declaration authorizes synthetic screening smoke only, not project approval."
       },
       {
         "schemaVersion": 2,
@@ -1402,7 +1444,7 @@
           "grade": null,
           "ventilationFactor": null
         },
-        "notes": "Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval."
+        "notes": "Smoke-only illustrative DOAS declaration, not manufacturer ratings or equipment selection: 0.3 ACH independent uncontrolled infiltration; controlled outdoor air fixed at 1.8 ACH minimum and maximum, 1 m3/s for the declared geometry; combined controlled-air fan specific power 180 W/(m3/s). No heat recovery; pad disabled. DOAS conditions the selected controlled stream only, with 1 m3/s treatment capacity, 10 C supply dew-point target, 21 C supply dry-bulb target, cooling COP 3 and reheat recovery fraction 0.5. Existing installed-cost allowance is not repriced for this smoke configuration, is not a quote and is not an investment estimate. This declaration authorizes synthetic screening smoke only, not project approval."
       }
     ],
     "weather": "Same bundled Tulsa 2025 full year. Each smoke scenario returned 8760 valid hours, 0 numerical failures.",
@@ -1617,7 +1659,9 @@
       "ervBypass": "FOLLOW THE ASSUMPTIONS\nHourly inspector\n2 / 8,760 H\n←\n→\n\nHour 1 of 8,760. Jan 1, 2025, 12:00 AM America/Chicago. Heating. Joint band: invalid, warm-up, ineligible or unavailable.\n\nJan 1, 2025, 1:00:00 AM CST · 2025-01-01T07:00:00.000Z\n\nHeating. Finite installed controls cannot meet the joint target in every sampled substep.\n\nOUTDOOR DRY BULB\n-1.6 °C\nOUTDOOR DEW POINT\n-3.1 °C\nOUTDOOR RELATIVE HUMIDITY\n89.8 %\nSTATION PRESSURE\n99,680 Pa\nSOLAR IRRADIANCE\n0 W/m²\nWIND SPEED\n2 m/s\nPAD LEAVING DRY BULB\n-2 °C\nPAD LEAVING DEW POINT\n-2.2 °C\nESTIMATED ZONE TEMPERATURE\n16.8 °C\nESTIMATED ZONE RH\n87.6 %\nESTIMATED AIR VPD\n0.24 kPa\nJOINT-TARGET FRACTION\n0 %\nELECTRICITY\n0.03 kWh\nPURCHASED FUEL\n91.38 kWh\nWATER\n12.2 L\nCONDENSATE\n0 kg\nDX COOLING DELIVERED\n0 kWh\nDEHU HEAT INDOORS\n0 kWh\nREGENERATION ENERGY\n0 kWh\nDESICCANT REMOVAL\n0 kg\nUNMET SENSIBLE LOAD\n0 kWh\nUNMET MOISTURE\n4.11 kg\nENERGY RESIDUAL\n0 W\nMOISTURE RESIDUAL\n0 kg/s\nSENSIBLE GAINS\n-0.09 kWh\nCROP LATENT\n12.2 kg\nSENSIBLE-HEAT RATIO\n0\nCONTROLLED OUTDOOR AIR\n0.3 ACH\nENRICHMENT-COMPATIBLE FRACTION\n100 %\nINSTALLED CONTROLLED MAXIMUM\n40 ACH\nTOTAL OUTDOOR AIR INCLUDING INFILTRATION\n0.6 ACH\nCONTROLLED / TOTAL OUTDOOR FLOW\n0.167 m³/s / 0.333 m³/s\nACTUAL CONTROLLED STAGES\n0.3 ACH: 1 h\nRECOVERY CORE VOLUME\n0 m³\nRECOVERY BYPASS VOLUME\n600 m³\nSENSIBLE RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nLATENT RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nRECOVERY AUXILIARY ELECTRICITY\n0 kWh\nRECOVERY FROST/DEFROST EXPOSURE\n0 h\nPREHEAT DELIVERED\n0 kWh\nPREHEAT PURCHASED ELECTRICITY\n0 kWh\nPREHEAT PURCHASED FUEL\n0 kWh\nPREHEAT INSUFFICIENT\n0 h\nDOAS CONDENSATE\n0 kg\nDOAS COOLING DELIVERED\n0 kWh\nDOAS COOLING ELECTRICITY\n0 kWh\nDOAS RECOVERED REHEAT\n0 kWh\nDOAS EXTERNAL HEAT\n0 kWh\nDOAS UNMET CONDITIONING\n0 kWh\n\nSelected targets: day 22 °C / night 18 °C ± 2 °C; air VPD 0.6–1 kPa; dew point ≤ 19 °C. Stanghellini transpiration at LAI 3, canopy temperature taken as air temperature.\n\nSource quality: No flags supplied for this hour. Source: NASA POWER.",
       "doasColdDry": "FOLLOW THE ASSUMPTIONS\nHourly inspector\n111 / 8,760 H\n←\n→\n\nHour 1 of 8,760. Jan 1, 2025, 12:00 AM America/Chicago. Heating. Joint band: invalid, warm-up, ineligible or unavailable.\n\nJan 5, 2025, 2:00:00 PM CST · 2025-01-05T20:00:00.000Z\n\nDoas conditioning. Finite installed controls cannot meet the joint target in every sampled substep.\n\nOUTDOOR DRY BULB\n-2.5 °C\nOUTDOOR DEW POINT\n-9 °C\nOUTDOOR RELATIVE HUMIDITY\n59.9 %\nSTATION PRESSURE\n98,570 Pa\nSOLAR IRRADIANCE\n138 W/m²\nWIND SPEED\n9.6 m/s\nPAD LEAVING DRY BULB\n-4.2 °C\nPAD LEAVING DEW POINT\n-4.9 °C\nESTIMATED ZONE TEMPERATURE\n20.9 °C\nESTIMATED ZONE RH\n80.7 %\nESTIMATED AIR VPD\n0.48 kPa\nJOINT-TARGET FRACTION\n0 %\nELECTRICITY\n20.05 kWh\nPURCHASED FUEL\n115.59 kWh\nWATER\n58 L\nCONDENSATE\n0 kg\nDX COOLING DELIVERED\n0 kWh\nDEHU HEAT INDOORS\n0 kWh\nREGENERATION ENERGY\n0 kWh\nDESICCANT REMOVAL\n0 kg\nUNMET SENSIBLE LOAD\n0 kWh\nUNMET MOISTURE\n4.1 kg\nENERGY RESIDUAL\n0 W\nMOISTURE RESIDUAL\n0 kg/s\nSENSIBLE GAINS\n-0.62 kWh\nCROP LATENT\n57.98 kg\nSENSIBLE-HEAT RATIO\n0.58\nCONTROLLED OUTDOOR AIR\n1.8 ACH\nENRICHMENT-COMPATIBLE FRACTION\n100 %\nINSTALLED CONTROLLED MAXIMUM\n1.8 ACH\nTOTAL OUTDOOR AIR INCLUDING INFILTRATION\n2.1 ACH\nCONTROLLED / TOTAL OUTDOOR FLOW\n1 m³/s / 1.167 m³/s\nACTUAL CONTROLLED STAGES\n1.8 ACH: 1 h\nRECOVERY CORE VOLUME\n0 m³\nRECOVERY BYPASS VOLUME\n0 m³\nSENSIBLE RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nLATENT RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nRECOVERY AUXILIARY ELECTRICITY\n0 kWh\nRECOVERY FROST/DEFROST EXPOSURE\n0 h\nPREHEAT DELIVERED\n0 kWh\nPREHEAT PURCHASED ELECTRICITY\n0 kWh\nPREHEAT PURCHASED FUEL\n0 kWh\nPREHEAT INSUFFICIENT\n0 h\nDOAS CONDENSATE\n0 kg\nDOAS COOLING DELIVERED\n0 kWh\nDOAS COOLING ELECTRICITY\n0 kWh\nDOAS RECOVERED REHEAT\n0 kWh\nDOAS EXTERNAL HEAT\n30.01 kWh\nDOAS UNMET CONDITIONING\n0 kWh\n\nSelected targets: day 22 °C / night 18 °C ± 2 °C; air VPD 0.6–1 kPa; dew point ≤ 19 °C. Stanghellini transpiration at LAI 3, canopy temperature taken as air temperature.\n\nSource quality: No flags supplied for this hour. Source: NASA POWER.",
       "doasHotHumid": "FOLLOW THE ASSUMPTIONS\nHourly inspector\n3,209 / 8,760 H\n←\n→\n\nHour 1 of 8,760. Jan 1, 2025, 12:00 AM America/Chicago. Heating. Joint band: invalid, warm-up, ineligible or unavailable.\n\nMay 14, 2025, 5:00:00 PM CDT · 2025-05-14T22:00:00.000Z\n\nDoas dehumidify. Finite installed controls cannot meet the joint target in every sampled substep.\n\nOUTDOOR DRY BULB\n31.1 °C\nOUTDOOR DEW POINT\n23.5 °C\nOUTDOOR RELATIVE HUMIDITY\n64.3 %\nSTATION PRESSURE\n96,940 Pa\nSOLAR IRRADIANCE\n455 W/m²\nWIND SPEED\n3.7 m/s\nPAD LEAVING DRY BULB\n26.5 °C\nPAD LEAVING DEW POINT\n25 °C\nESTIMATED ZONE TEMPERATURE\n40.3 °C\nESTIMATED ZONE RH\n74.6 %\nESTIMATED AIR VPD\n1.9 kPa\nJOINT-TARGET FRACTION\n0 %\nELECTRICITY\n18.17 kWh\nPURCHASED FUEL\n0 kWh\nWATER\n128 L\nCONDENSATE\n43.37 kg\nDX COOLING DELIVERED\n0 kWh\nDEHU HEAT INDOORS\n0 kWh\nREGENERATION ENERGY\n0 kWh\nDESICCANT REMOVAL\n0 kg\nUNMET SENSIBLE LOAD\n47.4 kWh\nUNMET MOISTURE\n106.1 kg\nENERGY RESIDUAL\n0 W\nMOISTURE RESIDUAL\n0 kg/s\nSENSIBLE GAINS\n-37.24 kWh\nCROP LATENT\n128.04 kg\nSENSIBLE-HEAT RATIO\n0.56\nCONTROLLED OUTDOOR AIR\n1.8 ACH\nENRICHMENT-COMPATIBLE FRACTION\n100 %\nINSTALLED CONTROLLED MAXIMUM\n1.8 ACH\nTOTAL OUTDOOR AIR INCLUDING INFILTRATION\n2.1 ACH\nCONTROLLED / TOTAL OUTDOOR FLOW\n1 m³/s / 1.167 m³/s\nACTUAL CONTROLLED STAGES\n1.8 ACH: 1 h\nRECOVERY CORE VOLUME\n0 m³\nRECOVERY BYPASS VOLUME\n0 m³\nSENSIBLE RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nLATENT RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nRECOVERY AUXILIARY ELECTRICITY\n0 kWh\nRECOVERY FROST/DEFROST EXPOSURE\n0 h\nPREHEAT DELIVERED\n0 kWh\nPREHEAT PURCHASED ELECTRICITY\n0 kWh\nPREHEAT PURCHASED FUEL\n0 kWh\nPREHEAT INSUFFICIENT\n0 h\nDOAS CONDENSATE\n43.37 kg\nDOAS COOLING DELIVERED\n53.97 kWh\nDOAS COOLING ELECTRICITY\n17.99 kWh\nDOAS RECOVERED REHEAT\n12.09 kWh\nDOAS EXTERNAL HEAT\n0 kWh\nDOAS UNMET CONDITIONING\n0 kWh\n\nSelected targets: day 22 °C / night 18 °C ± 2 °C; air VPD 0.6–1 kPa; dew point ≤ 19 °C. Stanghellini transpiration at LAI 3, canopy temperature taken as air temperature.\n\nSource quality: No flags supplied for this hour. Source: NASA POWER."
-    }
+    },
+    "exportedAt": "2026-09-15T21:18:51.503Z",
+    "notesAudit": "Smoke scenarios rerun after replacing inherited canonical notes with exact ERV and DOAS declarations. Exported hourly physics unchanged, notes now correctly state configured recovery and fixed 1.8/1.8 ACH DOAS airflow."
   },
   "visual": {
     "desktop": {
@@ -1690,6 +1734,15 @@
         "errors": [],
         "viewport": 390,
         "scrollWidth": 390
+      },
+      "conditionedCompletion": {
+        "errors": [],
+        "busy": false
+      },
+      "reimportCompletion": {
+        "errors": [],
+        "busy": false,
+        "stale": false
       }
     },
     "screenshots": [
@@ -1704,26 +1757,6 @@
         "sha256": "78df0581bcf631c8f49268f6295f724ca8e582a7d940c4c8cf7e1b1d4731a28f"
       },
       {
-        "path": "/tmp/osf-airflow-evidence/report-field-os-dark.png",
-        "bytes": 221488,
-        "sha256": "187e0b39ea4aeb587807a5a045e73dc83f58ff0df6fa6d4ed8796ea68494fb9b"
-      },
-      {
-        "path": "/tmp/osf-airflow-evidence/report-mobile.png",
-        "bytes": 79593,
-        "sha256": "b8a14de3fe9766cef71cffe3ed8bcb763c0517cabc83a0600a56f321ffbe7fb9"
-      },
-      {
-        "path": "/tmp/osf-airflow-evidence/brief-mobile-field-os-dark.png",
-        "bytes": 82513,
-        "sha256": "ff043d010b71640c8682d3b17c3c18228da9a4da30451101685c2fe1140ebe8e"
-      },
-      {
-        "path": "/tmp/osf-airflow-evidence/brief-desktop-field-os-dark.png",
-        "bytes": 166495,
-        "sha256": "6ea72614803809f26cbd865db9a8f3ad11e9c600dc07e33ad7cc6199ece5513c"
-      },
-      {
         "path": "/tmp/osf-airflow-evidence/conditioned-doas-hot-humid.png",
         "bytes": 128637,
         "sha256": "2c4a6bcd70f2fe63b3a720011162bc91869fa88e3f7af039962d326ca096c3fa"
@@ -1732,13 +1765,144 @@
         "path": "/tmp/osf-airflow-evidence/conditioned-mobile.png",
         "bytes": 65495,
         "sha256": "733a95999f951f99a0fa3d5c7abe24723d155ada0cd4e76952d93e622894d84d"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/final-brief-1440-field-os-dark.png",
+        "bytes": 167247,
+        "sha256": "e5a8acb276fda6bc7a19a622457aa71fc8bcd6afe30d742fdbfa7f5560e495b7"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/final-brief-390-field-os-dark.png",
+        "bytes": 82513,
+        "sha256": "ff043d010b71640c8682d3b17c3c18228da9a4da30451101685c2fe1140ebe8e"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/final-report-1440-field-os-dark.png",
+        "bytes": 169306,
+        "sha256": "300e90a529ed0a509f2f472f004f7c2b39971b24741dd1604952668d4460ea18"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/final-report-390-field-os-dark.png",
+        "bytes": 79742,
+        "sha256": "a972311b8fff292c3a04fa661c234709d5940ca378c04782f74924d1758b73c9"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/final-cost-populations.png",
+        "bytes": 303790,
+        "sha256": "ceab2810a05d93698cdc3c63cf4a701c5ae80b7fe85b5cd1a0b246122d406d1f"
       }
     ],
-    "note": "Screenshots inspected visually, retained outside repository as task evidence. Temporary JSON/CSV exports and smoke input removed after hashing. Report and brief are the exact browser-download bytes."
+    "note": "Screenshots inspected visually, retained outside repository as task evidence. Temporary JSON/CSV exports and smoke input removed after hashing. Report and brief are the exact browser-download bytes.",
+    "correctedDocumentChecks": [
+      {
+        "kind": "brief",
+        "errors": [],
+        "viewport": 1440,
+        "scrollWidth": 1440,
+        "darkOS": true,
+        "ground": "#F7FAF6",
+        "fonts": [
+          {
+            "family": "Young Serif",
+            "loaded": true
+          },
+          {
+            "family": "Hanken Grotesk",
+            "loaded": true
+          },
+          {
+            "family": "Spline Sans Mono",
+            "loaded": true
+          }
+        ]
+      },
+      {
+        "kind": "brief",
+        "errors": [],
+        "viewport": 390,
+        "scrollWidth": 390,
+        "darkOS": true,
+        "ground": "#F7FAF6",
+        "fonts": [
+          {
+            "family": "Young Serif",
+            "loaded": true
+          },
+          {
+            "family": "Hanken Grotesk",
+            "loaded": true
+          },
+          {
+            "family": "Spline Sans Mono",
+            "loaded": true
+          }
+        ]
+      },
+      {
+        "kind": "report",
+        "errors": [],
+        "viewport": 1440,
+        "scrollWidth": 1440,
+        "darkOS": true,
+        "ground": "#F7FAF6",
+        "fonts": [
+          {
+            "family": "Young Serif",
+            "loaded": true
+          },
+          {
+            "family": "Hanken Grotesk",
+            "loaded": true
+          },
+          {
+            "family": "Spline Sans Mono",
+            "loaded": true
+          }
+        ]
+      },
+      {
+        "kind": "report",
+        "errors": [],
+        "viewport": 390,
+        "scrollWidth": 390,
+        "darkOS": true,
+        "ground": "#F7FAF6",
+        "fonts": [
+          {
+            "family": "Young Serif",
+            "loaded": true
+          },
+          {
+            "family": "Hanken Grotesk",
+            "loaded": true
+          },
+          {
+            "family": "Spline Sans Mono",
+            "loaded": true
+          }
+        ]
+      }
+    ]
   },
   "releaseIdentity": {
     "previousObserved": "0.2.0-screening",
     "current": "0.3.0-screening",
     "note": "Parent advanced release before canonical run. Browser cache explicitly disabled and modules refreshed; preliminary cached 0.2.0/48-hour smoke run discarded."
+  },
+  "documentPopulationProof": {
+    "localCalendarYears": [
+      2025
+    ],
+    "validHours": 8760,
+    "commonEligibleHours": 8759,
+    "warmupHours": 1,
+    "baselineMatchedOperatingCostUSD": 22060.968289107044,
+    "baselineFullRunAnnualOperatingCostUSD": 22064.28659607676,
+    "observedBriefText": [
+      "8,760 valid weather hours. Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record. This ranked-hour statistic uses the supplied valid weather spanning 1 local calendar year (2025), which may be partial records, not an assumed multi-year climate normal (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single-hour maxima and do not include a safety factor.",
+      "Pad + vent baseline: matched modeled operating cost $22,060.97 over 8,759 common eligible hours across all compared scenarios. This excludes 1 valid hour, including 1 warm-up hour; any remainder is non-common or otherwise ineligible. Full-run modeled operating cost $22,064.29 covers 8,760 valid hours, including warm-up. Operating-cost differences and cost per added hour use the matched population, not subtraction of full-run totals. Full-run basis: Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.",
+      "Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record. This ranked-hour statistic uses the supplied valid weather spanning 1 local calendar year (2025), which may be partial records, not an assumed multi-year climate normal (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single-hour maxima and do not include a safety factor."
+    ],
+    "sourceCorrectionVerification": "Parent reported 19/19 focused analysis tests and syntax after presentation-source correction; six-file121-pass suite above was not repeated."
   }
 }
