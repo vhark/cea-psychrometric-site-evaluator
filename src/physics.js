@@ -20,6 +20,43 @@ export const airVPD = (t, w, p) => (saturationPressure(t) - vaporPressure(w, p))
 export const dryAirDensity = (t, w, p) => p / (287.042 * (t + 273.15) * (1 + 1.607858 * w));
 export const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
 
+export function saturatedStateAtEnthalpy(enthalpyJkg, pressurePa) {
+  if (!Number.isFinite(enthalpyJkg)) throw Error('Saturated-state enthalpy must be finite.');
+  if (!Number.isFinite(pressurePa) || pressurePa <= 0) throw Error('Saturated-state pressure must be positive and finite.');
+  const minimumTempC = -100;
+  const maximumTempC = 200;
+  if (saturationPressure(minimumTempC) >= pressurePa) throw Error('Pressure is outside the saturated-state domain.');
+  let upperTempC = maximumTempC;
+  if (saturationPressure(upperTempC) >= pressurePa) {
+    let lower = minimumTempC;
+    let upper = maximumTempC;
+    for (let i = 0; i < 100; i += 1) {
+      const candidate = (lower + upper) / 2;
+      if (saturationPressure(candidate) < pressurePa * (1 - 1e-6)) lower = candidate;
+      else upper = candidate;
+    }
+    upperTempC = lower;
+  }
+  const saturated = tempC => {
+    const w = saturationHumidityRatio(tempC, pressurePa);
+    return {tempC, w, enthalpyJkg:enthalpy(tempC, w)};
+  };
+  const minimum = saturated(minimumTempC);
+  const maximum = saturated(upperTempC);
+  if (enthalpyJkg < minimum.enthalpyJkg || enthalpyJkg > maximum.enthalpyJkg) {
+    throw Error('Enthalpy is outside the saturated-state domain.');
+  }
+  let lower = minimumTempC;
+  let upper = upperTempC;
+  for (let i = 0; i < 100; i += 1) {
+    const candidate = (lower + upper) / 2;
+    if (saturated(candidate).enthalpyJkg < enthalpyJkg) lower = candidate;
+    else upper = candidate;
+  }
+  const tempC = (lower + upper) / 2;
+  return {tempC, w:saturationHumidityRatio(tempC, pressurePa)};
+}
+
 export function padState(tempC, w, pressurePa, effectiveness = 0.8) {
   const wetBulbC = wetBulb(tempC, w, pressurePa);
   const padTempC = tempC - clamp(effectiveness, 0, 1) * (tempC - wetBulbC);
