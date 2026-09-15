@@ -74,6 +74,14 @@ test('effectiveness follows the 75 and 100 percent ratings only within supported
   assert.equal(effectivenessAtFlow(.6, .7, 1), .7);
   close(effectivenessAtFlow(.6, .7, .5), .5);
   close(effectivenessAtFlow(.6, .7, 1.3), .82);
+  assert.equal(effectivenessAtFlow(.1, 0, 1.3), 0);
+  assert.equal(effectivenessAtFlow(.9, 1, 1.3), 1);
+  const outside = state(0, .5);
+  const exhaust = state(20, .5);
+  const capped = recoverSupplyState({outside, exhaust, volumeFlowM3s:1.3,
+    recovery:recovery('hrv', {sensibleHeating75:.9, sensibleHeating100:1}),
+    bypass:false, availablePreheatW:0});
+  close(capped.supply.tempC, exhaust.tempC);
   assert.throws(() => effectivenessAtFlow(.6, .7, .49), /flow ratio/);
   assert.throws(() => effectivenessAtFlow(.6, .7, 1.31), /flow ratio/);
 });
@@ -131,8 +139,15 @@ test('unsupported low flow bypasses and high flow recovers only capped core flow
   const recoveredCoreW = outside.w + latent * (exhaust.w - outside.w);
   assert.equal(high.coreFlowM3s, 1.3);
   close(high.bypassFlowM3s, .7);
-  close(high.supply.tempC, (1.3 * recoveredCoreTempC + .7 * outside.tempC) / 2);
-  close(high.supply.w, (1.3 * recoveredCoreW + .7 * outside.w) / 2);
+  const outsideDryAirDensityKgM3 = dryAirDensity(outside.tempC, outside.w, PRESSURE);
+  const coreMassFlowKgS = outsideDryAirDensityKgM3 * high.coreFlowM3s;
+  const bypassMassFlowKgS = outsideDryAirDensityKgM3 * high.bypassFlowM3s;
+  const totalMassFlowKgS = coreMassFlowKgS + bypassMassFlowKgS;
+  const expectedW = (coreMassFlowKgS * recoveredCoreW + bypassMassFlowKgS * outside.w) / totalMassFlowKgS;
+  const expectedEnthalpyJkg = (coreMassFlowKgS * enthalpy(recoveredCoreTempC, recoveredCoreW)
+    + bypassMassFlowKgS * enthalpy(outside.tempC, outside.w)) / totalMassFlowKgS;
+  close(high.supply.w, expectedW, 1e-12);
+  close(enthalpy(high.supply.tempC, high.supply.w), expectedEnthalpyJkg, 1e-8);
 });
 
 test('exhaust-only frost bypasses the declared fraction without reducing supply flow', () => {
@@ -153,7 +168,7 @@ test('exhaust-only frost bypasses the declared fraction without reducing supply 
   close(result.coreFlowM3s + result.bypassFlowM3s, 1);
 });
 
-test('preheat exposes delivered capacity and bypasses an unprotected core when insufficient', () => {
+test('preheat preserves outdoor-referenced dry-air flow and exposes insufficient protection', () => {
   const configured = recovery('hrv', {frostControl:'preheat', frostThresholdC:-5});
   const outside = state(-15, .4);
   const exhaust = state(22, .5);
@@ -165,6 +180,15 @@ test('preheat exposes delivered capacity and bypasses an unprotected core when i
   assert.equal(limited.coreFlowM3s, 0);
   assert.equal(limited.bypassFlowM3s, 1);
   assert.ok(limited.supply.tempC > outside.tempC);
+  const sufficient = recoverSupplyState({outside, exhaust, volumeFlowM3s:1, recovery:configured,
+    bypass:false, availablePreheatW:100000});
+  const originalMassFlowKgS = dryAirDensity(outside.tempC, outside.w, PRESSURE);
+  const effectiveness = effectivenessAtFlow(configured.sensibleHeating75, configured.sensibleHeating100, 1);
+  const expectedTransferW = originalMassFlowKgS * CP_DRY_AIR * effectiveness
+    * (exhaust.tempC - configured.frostThresholdC);
+  assert.equal(sufficient.preheatInsufficient, false);
+  close(sufficient.preheatDeliveredW, sufficient.preheatDemandW);
+  close(sufficient.sensibleTransferW, expectedTransferW, 1e-8);
 });
 
 test('supersaturated recovery resolves to saturation at unchanged moist-air enthalpy', () => {

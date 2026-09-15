@@ -127,13 +127,13 @@ function saturatedIfNeeded(candidate, pressurePa) {
   return saturatedStateAtEnthalpy(enthalpy(candidate.tempC, candidate.w), pressurePa);
 }
 
-function mixStates(core, coreFlowM3s, bypass, bypassFlowM3s, pressurePa) {
-  const totalFlowM3s = coreFlowM3s + bypassFlowM3s;
-  if (totalFlowM3s === 0) return {...bypass};
-  return saturatedIfNeeded({
-    tempC:(core.tempC * coreFlowM3s + bypass.tempC * bypassFlowM3s) / totalFlowM3s,
-    w:(core.w * coreFlowM3s + bypass.w * bypassFlowM3s) / totalFlowM3s,
-  }, pressurePa);
+function mixStates(core, coreMassFlowKgS, bypass, bypassMassFlowKgS, pressurePa) {
+  const totalMassFlowKgS = coreMassFlowKgS + bypassMassFlowKgS;
+  if (totalMassFlowKgS === 0) return {...bypass};
+  const w = (core.w * coreMassFlowKgS + bypass.w * bypassMassFlowKgS) / totalMassFlowKgS;
+  const enthalpyJkg = (enthalpy(core.tempC, core.w) * coreMassFlowKgS
+    + enthalpy(bypass.tempC, bypass.w) * bypassMassFlowKgS) / totalMassFlowKgS;
+  return saturatedIfNeeded({tempC:temperatureAtEnthalpy(enthalpyJkg, w), w}, pressurePa);
 }
 
 export function airflowConversions(scenario, ach) {
@@ -157,7 +157,7 @@ export function effectivenessAtFlow(at75, at100, flowRatio) {
   if (at75 < 0 || at75 > 1 || at100 < 0 || at100 > 1) throw Error('Effectiveness ratings must be fractions from 0 to 1.');
   finite('Recovery flow ratio', flowRatio);
   if (flowRatio < .5 || flowRatio > 1.3) throw Error('Recovery flow ratio must be from 0.5 to 1.3.');
-  return at75 + (at100 - at75) * (flowRatio - .75) / .25;
+  return clamp(at75 + (at100 - at75) * (flowRatio - .75) / .25, 0, 1);
 }
 
 export function frostDefrostFraction(recovery, outdoorTempC) {
@@ -206,13 +206,14 @@ export function recoverSupplyState({outside, exhaust, volumeFlowM3s, recovery, b
   const attemptedCoreFlowM3s = Math.min(volumeFlowM3s, 1.3 * configured.nominalM3s);
   const flowRatio = attemptedCoreFlowM3s / configured.nominalM3s;
   if (flowRatio < .5) return inactiveRecovery(outsideState, volumeFlowM3s, {unsupportedFlow:true});
+  const outsideDryAirDensityKgM3 = dryAirDensity(outsideState.tempC, outsideState.w, pressurePa);
 
   let coreInlet = outsideState;
   let preheatDemandW = 0;
   let preheatDeliveredW = 0;
   let preheatInsufficient = false;
   if (configured.frostControl === 'preheat' && outsideState.tempC < configured.frostThresholdC) {
-    const massFlowKgS = dryAirDensity(outsideState.tempC, outsideState.w, pressurePa) * attemptedCoreFlowM3s;
+    const massFlowKgS = outsideDryAirDensityKgM3 * attemptedCoreFlowM3s;
     preheatDemandW = massFlowKgS * (enthalpy(configured.frostThresholdC, outsideState.w)
       - enthalpy(outsideState.tempC, outsideState.w));
     preheatDeliveredW = Math.min(preheatDemandW, availablePreheatW);
@@ -222,8 +223,8 @@ export function recoverSupplyState({outside, exhaust, volumeFlowM3s, recovery, b
       w:outsideState.w,
     };
     if (preheatInsufficient) {
-      const supply = mixStates(coreInlet, attemptedCoreFlowM3s, outsideState,
-        volumeFlowM3s - attemptedCoreFlowM3s, pressurePa);
+      const supply = mixStates(coreInlet, outsideDryAirDensityKgM3 * attemptedCoreFlowM3s, outsideState,
+        outsideDryAirDensityKgM3 * (volumeFlowM3s - attemptedCoreFlowM3s), pressurePa);
       return inactiveRecovery(supply, volumeFlowM3s, {
         preheatDemandW,
         preheatDeliveredW,
@@ -255,11 +256,12 @@ export function recoverSupplyState({outside, exhaust, volumeFlowM3s, recovery, b
     tempC:coreInlet.tempC + sensibleEffectiveness * (exhaustState.tempC - coreInlet.tempC),
     w:coreInlet.w + latentEffectiveness * (exhaustState.w - coreInlet.w),
   }, pressurePa);
-  const coreMassFlowKgS = dryAirDensity(coreInlet.tempC, coreInlet.w, pressurePa) * coreFlowM3s;
+  const coreMassFlowKgS = outsideDryAirDensityKgM3 * coreFlowM3s;
   const sensibleTransferW = coreMassFlowKgS * CP_DRY_AIR * (coreSupply.tempC - coreInlet.tempC);
   const latentTransferW = configured.type === 'hrv' ? 0
     : coreMassFlowKgS * LATENT_HEAT * (coreSupply.w - coreInlet.w);
-  const supply = mixStates(coreSupply, coreFlowM3s, outsideState, bypassFlowM3s, pressurePa);
+  const supply = mixStates(coreSupply, coreMassFlowKgS, outsideState,
+    outsideDryAirDensityKgM3 * bypassFlowM3s, pressurePa);
   return {
     supply,
     coreFlowM3s,
