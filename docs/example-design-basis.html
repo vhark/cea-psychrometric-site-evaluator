@@ -1,10 +1,25 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CEA Psychrometric Site Evaluator | design-basis brief | Grownetics</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;600&display=swap" rel="stylesheet"><style>:root{color-scheme:light}body{background:#F3F0ED;color:#2B2C2E;font:15px/1.6 'Inter',system-ui,sans-serif;max-width:1000px;margin:auto;padding:40px 32px}.mark{font:700 13px 'DM Sans',sans-serif;letter-spacing:.28em;text-transform:uppercase;margin-bottom:40px}.mark em{font-style:normal;color:#4DB405}.cat{display:block;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#9A8860;margin-bottom:8px}h1,h2{font-family:'DM Sans',sans-serif;font-weight:700;letter-spacing:-.025em;margin:0}h1{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:14px}h2{font-size:1.5rem;margin-bottom:20px}h3{font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:#9A8860;margin:28px 0 8px}p{max-width:68ch;margin:0 0 14px}section{margin:56px 0;padding-top:28px;border-top:1px solid rgba(43,44,46,.15)}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid rgba(43,44,46,.15);vertical-align:top}th{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7);width:34%}td,pre{font-family:'IBM Plex Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}ul{padding-left:18px;font-size:13px;max-width:68ch}summary{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(43,44,46,.7);cursor:pointer;padding:10px 0}.notice{border:1px solid rgba(43,44,46,.3);padding:16px 18px;font-size:13px;max-width:none}.meta{font:11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:rgba(43,44,46,.7)}.foot{font:10px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(43,44,46,.55);margin-top:48px}@media print{body{padding:0}details{display:block}section{break-inside:avoid}}.brief table{font-size:12px}.brief th,.brief td{padding:5px 6px}.brief th{width:auto}.brief td.k{font:500 11px 'Inter',sans-serif;color:rgba(43,44,46,.7);white-space:nowrap}.brief section{margin:24px 0;padding-top:16px}.brief h2{font-size:1.15rem;margin-bottom:10px}.brief p{font-size:13px}.verdict{border:1px solid rgba(43,44,46,.3);padding:12px 16px;font-size:13px;max-width:none}.appendix{break-before:page}@media print{.brief section{margin:14px 0;padding-top:10px}.brief table{font-size:10px}.brief p{font-size:11px}}</style><div class="mark">Grownetics<em>.</em></div><span class="cat">Design-basis brief</span><h1>CEA Psychrometric Site Evaluator</h1><div class="brief"><p class="meta">36.15, -95.99 · America/Chicago · 2021-01-01 to 2021-12-31 · weather years 2021, 2022, 2023, 2024, 2025 · NASA POWER (gridded reanalysis + satellite solar)</p><p class="notice"><strong>Evidence tier: Assumption-based component screening.</strong> Assumption-based screening, not a calibrated greenhouse digital twin, guaranteed indoor condition, equipment selection certificate or crop-yield forecast. Hourly source weather does not establish minute-scale or canopy-level precision. Installed costs and component efficiencies are editable assumptions unless separately sourced. Regional grid mix is not utility procurement or marginal emissions. Model 0.2.0-screening, 1 minute dispatch step, staged control, stanghellini transpiration.</p>
-<section><h2><span class="cat">§ 001</span>Climate design conditions</h2><table><thead><tr><th>Condition</th><th>0.4 %</th><th>1 %</th><th>2 %</th></tr></thead><tbody><tr><td class="k">Dry bulb, 0.4 / 1 / 2 percent exceeded</td><td>37.5 C</td><td>36.3 C</td><td>35.3 C</td></tr><tr><td class="k">  coincident wet bulb</td><td>24.1 C</td><td>21.9 C</td><td>22.8 C</td></tr><tr><td class="k">  coincident dew point</td><td>18.7 C</td><td>15.2 C</td><td>17.5 C</td></tr><tr><td class="k">Dew point, 0.4 / 1 / 2 percent exceeded</td><td>25.2 C</td><td>24.6 C</td><td>24.1 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>28.2 C</td><td>27.3 C</td><td>30.3 C</td></tr><tr><td class="k">Wet bulb, 0.4 / 1 / 2 percent exceeded</td><td>26.5 C</td><td>26 C</td><td>25.6 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>30.6 C</td><td>29.6 C</td><td>29.5 C</td></tr></tbody></table><p>8,760 valid weather hours. Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record, so a ranked-hour coincidence is a different and noisier statistic computed here from ten reanalysis years (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single result hours under the assumed strategy; sensible = positive solar, light, envelope, infiltration, fan and crop gains; latent = crop transpiration plus positive infiltration and ventilation moisture import.</p></section>
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CEA Psychrometric Site Evaluator | design-basis brief | One Season Farmers</title><link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>:root{color-scheme:light;--ground:#F7FAF6;--panel:#FDFEFD;--panel-2:#EDF2EC;--panel-3:#E5EBE3;--ink:#23271E;--ink-2:#5C6759;--ink-3:#838E80;--line:#E2E7E0;--line-2:#D2DACF;--accent:#2E6B43;--leaf:#5E9643;--spring:#5E9643;--summer:#E3A237;--autumn:#9B6FA8;--winter:#869A3A;--ok:#2E7D46;--warn:#B0721A;--bad:#C0392B;--paper:var(--panel);--pine:var(--accent)}:root[data-theme="dark"]{color-scheme:dark;--ground:#10130D;--panel:#191E15;--panel-2:#212819;--panel-3:#2A3222;--ink:#E9EDE1;--ink-2:#A7B098;--ink-3:#7C8770;--line:#2C3323;--line-2:#3A4230;--accent:#57A46C;--leaf:#6FB24A;--spring:#6FB24A;--summer:#E6AE4F;--autumn:#B892C8;--winter:#A6B94F;--ok:#57A46C;--warn:#E6AE4F;--bad:#C0392B;}*{box-sizing:border-box}body{background:var(--ground);color:var(--ink);font:15px/1.6 "Hanken Grotesk",sans-serif;max-width:1100px;margin:auto;padding:40px 32px}.mark{display:flex;align-items:center;gap:12px;font:800 16px/1.2 "Hanken Grotesk",sans-serif;margin-bottom:32px}.mark small{display:block;font-weight:500;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}h1,h2,h3{font-family:"Young Serif",serif;font-weight:400;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.3rem)}h2{font-size:1.5rem}.cat,.meta,.foot,summary{font:12px/1.6 "Spline Sans Mono",monospace;color:var(--ink-2)}.cat{display:block;margin-bottom:8px}p{max-width:80ch}section{margin:36px 0;padding-top:24px;border-top:1px solid var(--line)}table{width:100%;border-collapse:collapse}th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere}th{font:500 12px "Hanken Grotesk",sans-serif}td,pre{font:12px/1.6 "Spline Sans Mono",monospace;font-variant-numeric:tabular-nums}pre{white-space:pre-wrap;overflow-wrap:anywhere}.notice,.verdict{border:1px solid var(--line-2);background:var(--panel-2);padding:16px;border-radius:10px}a{color:var(--accent)}.foot{margin-top:40px}@media(max-width:600px){body{padding:24px 16px}table{display:block;overflow-x:auto}}.brief table{font-size:12px}.brief th,.brief td{padding:5px 6px}.brief th{width:auto}.brief td.k{font:500 11px 'Hanken Grotesk',sans-serif;color:var(--ink-2);white-space:nowrap}.brief section{margin:24px 0;padding-top:16px}.brief h2{font-size:1.15rem;margin-bottom:10px}.brief p{font-size:13px}.verdict{border:1px solid var(--line-2);padding:12px 16px;font-size:13px;max-width:none}.appendix{break-before:page}@media print{.brief section{margin:14px 0;padding-top:10px}.brief table{font-size:10px}.brief p{font-size:11px}}</style><svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="pw" viewBox="0 0 100 100">
+    <g>
+      <path class="p" fill="var(--spring)" d="M50,50 C41,33 45,15 58,7 C63,21 60,37 50,50 Z"/>
+      <path class="p" fill="var(--summer)" d="M50,50 C67,41 85,45 93,58 C79,63 63,60 50,50 Z"/>
+      <path class="p" fill="var(--autumn)" d="M50,50 C59,67 55,85 42,93 C37,79 40,63 50,50 Z"/>
+      <path class="p" fill="var(--winter)" d="M50,50 C33,59 15,55 7,42 C21,37 37,40 50,50 Z"/>
+      <path class="p" fill="var(--spring)" opacity=".55" d="M50,50 C50,32 63,20 79,20 C77,36 66,48 50,50 Z"/>
+      <path class="p" fill="var(--summer)" opacity=".55" d="M50,50 C68,50 80,63 80,79 C64,77 52,66 50,50 Z"/>
+      <path class="p" fill="var(--autumn)" opacity=".55" d="M50,50 C50,68 37,80 21,80 C23,64 34,52 50,50 Z"/>
+      <path class="p" fill="var(--winter)" opacity=".55" d="M50,50 C32,50 20,37 20,21 C36,23 48,34 50,50 Z"/>
+      <circle cx="50" cy="50" r="5.4" fill="var(--paper)"/>
+      <circle cx="50" cy="50" r="2.6" fill="var(--pine)"/>
+    </g>
+  </symbol>
+</svg><div class="mark"><svg class="pinwheel" width="36" height="36" aria-hidden="true"><use href="#pw"/></svg><span>One Season Farmers<small>Climate screening</small></span></div><span class="cat">Design-basis brief</span><h1>CEA Psychrometric Site Evaluator</h1><div class="brief"><p class="meta">36.15, -95.99 · America/Chicago · 2025-01-01 to 2025-12-31 · NASA POWER (gridded reanalysis + satellite solar)</p><p class="notice"><strong>Evidence tier: Assumption-based component screening.</strong> Assumption-based screening, not a calibrated greenhouse digital twin, guaranteed indoor condition, equipment selection certificate or crop-yield forecast. Hourly source weather does not establish minute-scale or canopy-level precision. Installed costs and component efficiencies are editable assumptions unless separately sourced. Regional grid mix is not utility procurement or marginal emissions. Model 0.3.0-screening, 1 minute dispatch step, staged control, stanghellini transpiration.</p>
+<section><h2><span class="cat">§ 001</span>Climate design conditions</h2><table><thead><tr><th>Condition</th><th>0.4 %</th><th>1 %</th><th>2 %</th></tr></thead><tbody><tr><td class="k">Dry bulb, 0.4 / 1 / 2 percent exceeded</td><td>36 C</td><td>35 C</td><td>33.4 C</td></tr><tr><td class="k">  coincident wet bulb</td><td>25.2 C</td><td>21.4 C</td><td>20.5 C</td></tr><tr><td class="k">  coincident dew point</td><td>21.2 C</td><td>14.7 C</td><td>14 C</td></tr><tr><td class="k">Dew point, 0.4 / 1 / 2 percent exceeded</td><td>25.6 C</td><td>25 C</td><td>24.6 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>28.4 C</td><td>27 C</td><td>30.2 C</td></tr><tr><td class="k">Wet bulb, 0.4 / 1 / 2 percent exceeded</td><td>26.7 C</td><td>26.2 C</td><td>25.9 C</td></tr><tr><td class="k">  coincident dry bulb</td><td>31 C</td><td>34.5 C</td><td>28.7 C</td></tr></tbody></table><p>8,760 valid weather hours. Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record, so a ranked-hour coincidence is a different and noisier statistic computed here from ten reanalysis years (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single-hour maxima and do not include a safety factor.</p></section>
 <section><h2><span class="cat">§ 002</span>Crop band</h2><p>lettuce: 22 C day / 18 C night, tolerance 2 K; VPD 0.6 to 1 kPa; dew-point cap 19 C; DLI target 14 mol/m²/d over 16 h from 6:00</p></section>
-<section><h2><span class="cat">§ 003</span>Strategies</h2><table><thead><tr><th>Quantity</th><th>Pad + vent baseline</th><th>Pads + condensing dehumidifier</th><th>DX / mini-split + dehumidifier</th><th>Integrated HVAC + reheat</th><th>Desiccant + evaporative cooling</th><th>Liquid-desiccant hybrid (generic)</th></tr></thead><tbody><tr><td class="k">Joint attainment</td><td>28.9% median, 27.1% worst (2025) over 5 years; this period 29.8%</td><td>42.7% median, 41.6% worst (2025) over 5 years; this period 43.8%</td><td>71.2% median, 68.9% worst (2022) over 5 years; this period 71.2%</td><td>55.4% median, 55.3% worst (2021) over 5 years; this period 55.3%</td><td>52.5% median, 51.2% worst (2024) over 5 years; this period 53%</td><td>52.6% median, 51.8% worst (2024) over 5 years; this period 53.8%</td></tr><tr><td class="k">Space sensible-heat ratio, period</td><td>0.61</td><td>0.57</td><td>0.6</td><td>0.64</td><td>0.56</td><td>0.6</td></tr><tr><td class="k">Peak sensible hour</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>261.6 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>265.1 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>253.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td><td>255.9 kWh/h at 2021-06-22 13:00; outdoor 28.3 C DB, 19.1 C WB, 14.2 C DP</td></tr><tr><td class="k">Peak latent hour</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>220.8 kg/h at 2021-08-25 13:00; outdoor 38.3 C DB, 24.7 C WB, 19.4 C DP</td><td>172 kg/h at 2021-06-15 14:00; outdoor 32.9 C DB, 24.1 C WB, 20.7 C DP</td><td>294.3 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>166.7 kg/h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td></tr><tr><td class="k">Worst joint-failure hour</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>15.3 K·h, 2.628 kPa·h at 2021-08-25 15:00; outdoor 39.1 C DB, 24.7 C WB, 19 C DP</td><td>14.82 K·h, 3.118 kPa·h at 2021-08-25 15:00; outdoor 39.1 C DB, 24.7 C WB, 19 C DP</td><td>15.39 K·h, 3.412 kPa·h at 2021-08-25 14:00; outdoor 38.9 C DB, 24.8 C WB, 19.2 C DP</td><td>9.75 K·h, 1.096 kPa·h at 2021-07-24 14:00; outdoor 35.4 C DB, 26.6 C WB, 23.6 C DP</td></tr><tr><td class="k">1 percent joint-failure hour</td><td>13.14 K·h, 2.372 kPa·h at 2021-08-10 12:00; outdoor 35.5 C DB, 25.3 C WB, 21.5 C DP</td><td>13.04 K·h, 2.455 kPa·h at 2021-08-07 15:00; outdoor 35.6 C DB, 24.8 C WB, 20.7 C DP</td><td>11.8 K·h, 2.025 kPa·h at 2021-08-07 13:00; outdoor 35.4 C DB, 24.6 C WB, 20.4 C DP</td><td>10.38 K·h, 2.121 kPa·h at 2021-07-23 16:00; outdoor 34 C DB, 25.2 C WB, 22 C DP</td><td>13.04 K·h, 2.455 kPa·h at 2021-08-07 15:00; outdoor 35.6 C DB, 24.8 C WB, 20.7 C DP</td><td>8.04 K·h, 1.123 kPa·h at 2021-08-07 13:00; outdoor 35.4 C DB, 24.6 C WB, 20.4 C DP</td></tr><tr><td class="k">Ventilation air requirement</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td><td>40 ACH, 22.22 m³/s at 2021-02-23 14:00; outdoor 20.1 C DB, 12.6 C WB, 6.7 C DP</td></tr><tr><td class="k">Condensate peak</td><td>0 kg/h</td><td>40 kg/h</td><td>76.7 kg/h</td><td>51.4 kg/h</td><td>0 kg/h</td><td>0 kg/h</td></tr><tr><td class="k">Pad water peak / runtime</td><td>524 L/h; 691 h on 130 days, 111,737 L</td><td>524 L/h; 759 h on 161 days, 117,225 L</td><td>524 L/h; 633 h on 138 days, 100,329 L</td><td>524 L/h; 602 h on 115 days, 92,396 L</td><td>524 L/h; 736 h on 148 days, 115,832 L</td><td>542.7 L/h; 0 h on 0 days, 446,041 L</td></tr><tr><td class="k">Outside-air drying hours, weather side</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td><td>5,525 h (cool-dry 478, cold-dry 4,570, hot-dry 477) at 40 ACH</td></tr><tr><td class="k">CO₂ enrichment window</td><td>4,460 equivalent h on 365 days; weather-side 5,477 h</td><td>3,349 equivalent h on 344 days; weather-side 5,477 h</td><td>5,723 equivalent h on 365 days; weather-side 5,477 h</td><td>6,149 equivalent h on 365 days; weather-side 5,477 h</td><td>3,434 equivalent h on 347 days; weather-side 5,477 h</td><td>3,924 equivalent h on 364 days; weather-side 5,477 h</td></tr><tr><td class="k">Reheat after overcooling</td><td>0 kWh</td><td>0 kWh</td><td>0 kWh</td><td>203,632 kWh</td><td>0 kWh</td><td>0 kWh</td></tr><tr><td class="k">Purchased electricity / fuel</td><td>58,665 / 313,276 kWh</td><td>123,544 / 264,057 kWh</td><td>198,703 / 312,180 kWh</td><td>231,791 / 372,825 kWh</td><td>62,874 / 534,204 kWh</td><td>240,265 / 325,946 kWh</td></tr><tr><td class="k">Operating cost, period</td><td>$22,235; median year $22,064</td><td>$27,966; median year $27,177</td><td>$39,057; median year $38,817</td><td>$45,617; median year $45,617</td><td>$32,866; median year $31,590</td><td>$45,332; median year $43,907</td></tr><tr><td class="k">Installed capital assumption</td><td>$15,000</td><td>$35,000</td><td>$85,000</td><td>$110,000</td><td>$90,000</td><td>$125,000</td></tr></tbody></table><p>Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record, so a ranked-hour coincidence is a different and noisier statistic computed here from ten reanalysis years (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single result hours under the assumed strategy; sensible = positive solar, light, envelope, infiltration, fan and crop gains; latent = crop transpiration plus positive infiltration and ventilation moisture import.</p></section>
-<section><h2><span class="cat">§ 004</span>Binding constraint</h2><p class="verdict">heating (mean per year: 1,765 h moisture-limited, 1,173 h temperature-limited, 4,570 h heating). Weather-side screen at the target band: moisture = pad moisture-limited, cool-humid and heat-humid hours; temperature = pad temperature-limited and marginal hours; heating = heating hours without a moisture problem. Mean hours per year.</p></section>
-<section><h2><span class="cat">§ 005</span>Strategy verdict</h2><p class="verdict">Cheapest non-dominated strategy by median-year operating cost: Pad + vent baseline at $22,064 holding the band 28.9% of eligible hours. Operating frontier: Pad + vent baseline ($22,064, 28.9%); Pads + condensing dehumidifier ($27,177, 42.7%); Desiccant + evaporative cooling ($31,590, 52.5%); DX / mini-split + dehumidifier ($38,817, 71.2%). Operating-dominated: Integrated HVAC + reheat, Liquid-desiccant hybrid (generic). Capital is separate and not ranked.</p><p>Ranking across years: Operating-cost order of strategies differs between years (2 distinct orders over 5 years); the verdict is year-dependent.</p></section></div><div class="appendix"><h2><span class="cat">Appendix</span>Reproducible assumptions</h2><section><h2><span class="cat">§ A01</span>Pad + vent baseline</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
-  &quot;schemaVersion&quot;: 1,
+<section><h2><span class="cat">§ 003</span>Strategies</h2><table><thead><tr><th>Quantity</th><th>Pad + vent baseline</th><th>Pads + condensing dehumidifier</th><th>DX / mini-split + dehumidifier</th><th>Integrated HVAC + reheat</th><th>Desiccant + evaporative cooling</th><th>Liquid-desiccant hybrid (generic)</th></tr></thead><tbody><tr><td class="k">Joint temperature-and-moisture target attainment</td><td>27.1% (2,377 of 8,759 eligible h)</td><td>41.6% (3,647 of 8,759 eligible h)</td><td>73.1% (6,400 of 8,759 eligible h)</td><td>55.3% (4,843 of 8,759 eligible h)</td><td>51.9% (4,544 of 8,759 eligible h)</td><td>52.6% (4,609 of 8,759 eligible h)</td></tr><tr><td class="k">Space sensible-heat ratio, period</td><td>0.62</td><td>0.58</td><td>0.6</td><td>0.64</td><td>0.57</td><td>0.6</td></tr><tr><td class="k">Peak sensible hour</td><td>248 kWh/h at 2025-05-04 13:00; outdoor 20.9 C DB, 14 C WB, 9.2 C DP</td><td>248 kWh/h at 2025-05-04 13:00; outdoor 20.9 C DB, 14 C WB, 9.2 C DP</td><td>255.4 kWh/h at 2025-05-16 13:00; outdoor 27.5 C DB, 18.6 C WB, 14 C DP</td><td>259.1 kWh/h at 2025-05-16 13:00; outdoor 27.5 C DB, 18.6 C WB, 14 C DP</td><td>248 kWh/h at 2025-05-04 13:00; outdoor 20.9 C DB, 14 C WB, 9.2 C DP</td><td>249.4 kWh/h at 2025-05-16 13:00; outdoor 27.5 C DB, 18.6 C WB, 14 C DP</td></tr><tr><td class="k">Peak latent hour</td><td>288 kg/h at 2025-08-18 14:00; outdoor 38.7 C DB, 25 C WB, 19.6 C DP</td><td>288 kg/h at 2025-08-18 14:00; outdoor 38.7 C DB, 25 C WB, 19.6 C DP</td><td>215.6 kg/h at 2025-08-18 13:00; outdoor 38.1 C DB, 24.9 C WB, 19.9 C DP</td><td>165.8 kg/h at 2025-07-30 13:00; outdoor 36.3 C DB, 25.7 C WB, 21.9 C DP</td><td>288 kg/h at 2025-08-18 14:00; outdoor 38.7 C DB, 25 C WB, 19.6 C DP</td><td>164.4 kg/h at 2025-08-18 14:00; outdoor 38.7 C DB, 25 C WB, 19.6 C DP</td></tr><tr><td class="k">Worst joint-failure hour</td><td>15.3 K·h, 3.324 kPa·h at 2025-08-18 14:00; outdoor 38.7 C DB, 25 C WB, 19.6 C DP</td><td>15.3 K·h, 3.324 kPa·h at 2025-08-18 14:00; outdoor 38.7 C DB, 25 C WB, 19.6 C DP</td><td>15.13 K·h, 2.571 kPa·h at 2025-08-18 15:00; outdoor 39 C DB, 24.9 C WB, 19.5 C DP</td><td>14.72 K·h, 3.133 kPa·h at 2025-08-18 15:00; outdoor 39 C DB, 24.9 C WB, 19.5 C DP</td><td>15.3 K·h, 3.324 kPa·h at 2025-08-18 14:00; outdoor 38.7 C DB, 25 C WB, 19.6 C DP</td><td>10 K·h, 1.263 kPa·h at 2025-06-20 13:00; outdoor 31.9 C DB, 27.4 C WB, 25.9 C DP</td></tr><tr><td class="k">1 percent joint-failure hour</td><td>12.5 K·h, 1.756 kPa·h at 2025-09-17 15:00; outdoor 36.2 C DB, 21.5 C WB, 14.4 C DP</td><td>12.51 K·h, 1.751 kPa·h at 2025-07-24 13:00; outdoor 33 C DB, 26.5 C WB, 24.4 C DP</td><td>10.61 K·h, 1.73 kPa·h at 2025-08-17 17:00; outdoor 34.8 C DB, 24.4 C WB, 20.3 C DP</td><td>9.35 K·h, 1.246 kPa·h at 2025-06-20 14:00; outdoor 32 C DB, 27.3 C WB, 25.9 C DP</td><td>12.51 K·h, 1.751 kPa·h at 2025-07-24 13:00; outdoor 33 C DB, 26.5 C WB, 24.4 C DP</td><td>8.37 K·h, 0.872 kPa·h at 2025-07-27 12:00; outdoor 32 C DB, 25.9 C WB, 23.9 C DP</td></tr><tr><td class="k">Controlled outside air, actual maximum</td><td>40 ACH, 22.222 m³/s, 47,086 cfm, 0.0444 m³/s/m², 8.749 cfm/ft² at 2025-01-02 22:00; outdoor 2.4 C DB, 1.8 C WB, 1 C DP</td><td>40 ACH, 22.222 m³/s, 47,086 cfm, 0.0444 m³/s/m², 8.749 cfm/ft² at 2025-01-01 22:00; outdoor 0.5 C DB, -1.1 C WB, -3.2 C DP</td><td>40 ACH, 22.222 m³/s, 47,086 cfm, 0.0444 m³/s/m², 8.749 cfm/ft² at 2025-01-02 22:00; outdoor 2.4 C DB, 1.8 C WB, 1 C DP</td><td>40 ACH, 22.222 m³/s, 47,086 cfm, 0.0444 m³/s/m², 8.749 cfm/ft² at 2025-01-04 22:00; outdoor 7 C DB, 6.5 C WB, 5.9 C DP</td><td>40 ACH, 22.222 m³/s, 47,086 cfm, 0.0444 m³/s/m², 8.749 cfm/ft² at 2025-01-02 22:00; outdoor 2.4 C DB, 1.8 C WB, 1 C DP</td><td>40 ACH, 22.222 m³/s, 47,086 cfm, 0.0444 m³/s/m², 8.749 cfm/ft² at 2025-01-02 22:00; outdoor 2.4 C DB, 1.8 C WB, 1 C DP</td></tr><tr><td class="k">Total outside air, actual maximum</td><td>40.3 ACH, 22.389 m³/s, 47,439 cfm, 0.0448 m³/s/m², 8.815 cfm/ft²</td><td>40.3 ACH, 22.389 m³/s, 47,439 cfm, 0.0448 m³/s/m², 8.815 cfm/ft²</td><td>40.3 ACH, 22.389 m³/s, 47,439 cfm, 0.0448 m³/s/m², 8.815 cfm/ft²</td><td>40.3 ACH, 22.389 m³/s, 47,439 cfm, 0.0448 m³/s/m², 8.815 cfm/ft²</td><td>40.3 ACH, 22.389 m³/s, 47,439 cfm, 0.0448 m³/s/m², 8.815 cfm/ft²</td><td>40.3 ACH, 22.389 m³/s, 47,439 cfm, 0.0448 m³/s/m², 8.815 cfm/ft²</td></tr><tr><td class="k">Condensate peak</td><td>0.2 kg/h</td><td>40 kg/h</td><td>76.7 kg/h</td><td>51.4 kg/h</td><td>0 kg/h</td><td>0 kg/h</td></tr><tr><td class="k">Pad water peak / runtime</td><td>437.7 L/h; 843 h on 145 days, 126,314 L</td><td>437.7 L/h; 952 h on 177 days, 133,296 L</td><td>437.7 L/h; 784 h on 154 days, 118,329 L</td><td>437.7 L/h; 721 h on 127 days, 106,047 L</td><td>437.7 L/h; 908 h on 172 days, 131,530 L</td><td>451.1 L/h; 0 h on 0 days, 417,394 L</td></tr><tr><td class="k">Outside-air drying hours, weather side</td><td>5,266 h (cool-dry 536, cold-dry 4,142, hot-dry 588) at 40 ACH</td><td>5,266 h (cool-dry 536, cold-dry 4,142, hot-dry 588) at 40 ACH</td><td>5,266 h (cool-dry 536, cold-dry 4,142, hot-dry 588) at 40 ACH</td><td>5,266 h (cool-dry 536, cold-dry 4,142, hot-dry 588) at 40 ACH</td><td>5,266 h (cool-dry 536, cold-dry 4,142, hot-dry 588) at 40 ACH</td><td>5,266 h (cool-dry 536, cold-dry 4,142, hot-dry 588) at 40 ACH</td></tr><tr><td class="k">CO₂ enrichment window</td><td>4,357 equivalent h on 365 days; weather-side 5,215 h</td><td>3,083 equivalent h on 337 days; weather-side 5,215 h</td><td>5,634 equivalent h on 365 days; weather-side 5,215 h</td><td>6,159 equivalent h on 365 days; weather-side 5,215 h</td><td>3,191 equivalent h on 343 days; weather-side 5,215 h</td><td>3,988 equivalent h on 364 days; weather-side 5,215 h</td></tr><tr><td class="k">Reheat after overcooling</td><td>0 kWh</td><td>0 kWh</td><td>0 kWh</td><td>225,029 kWh</td><td>0 kWh</td><td>0 kWh</td></tr><tr><td class="k">Purchased electricity / fuel</td><td>61,123 / 303,230 kWh</td><td>132,966 / 250,637 kWh</td><td>210,077 / 300,557 kWh</td><td>246,957 / 367,295 kWh</td><td>65,609 / 548,267 kWh</td><td>261,246 / 316,103 kWh</td></tr><tr><td class="k">Operating cost</td><td>Model-estimated annual operating cost: $22,064</td><td>Model-estimated annual operating cost: $28,493</td><td>Model-estimated annual operating cost: $39,915</td><td>Model-estimated annual operating cost: $47,201</td><td>Model-estimated annual operating cost: $33,827</td><td>Model-estimated annual operating cost: $47,333</td></tr><tr><td class="k">Operating cost basis</td><td>Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</td><td>Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</td><td>Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</td><td>Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</td><td>Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</td><td>Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</td></tr><tr><td class="k">Installed capital assumption</td><td>Estimated screening installed capital: $15,000. Separate from modeled operating cost; not a quote.</td><td>Estimated screening installed capital: $35,000. Separate from modeled operating cost; not a quote.</td><td>Estimated screening installed capital: $85,000. Separate from modeled operating cost; not a quote.</td><td>Estimated screening installed capital: $110,000. Separate from modeled operating cost; not a quote.</td><td>Estimated screening installed capital: $90,000. Separate from modeled operating cost; not a quote.</td><td>Estimated screening installed capital: $125,000. Separate from modeled operating cost; not a quote.</td></tr></tbody></table><p>Joint temperature-and-moisture target attainment: Pads + condensing dehumidifier minus baseline Pad + vent baseline, 14.5 percentage points (pp), from 27.1% (2,376.77 / 8,759 eligible h) to 41.6% (3,647.07 / 8,759 eligible h). Not a relative percent change. Model-estimated operating-cost difference: $6,429.02 for Pads + condensing dehumidifier versus Pad + vent baseline. Model-estimated operating cost for the simulated period. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Joint temperature-and-moisture target attainment: DX / mini-split + dehumidifier minus baseline Pad + vent baseline, 45.93 percentage points (pp), from 27.1% (2,376.77 / 8,759 eligible h) to 73.1% (6,399.88 / 8,759 eligible h). Not a relative percent change. Model-estimated operating-cost difference: $17,851.09 for DX / mini-split + dehumidifier versus Pad + vent baseline. Model-estimated operating cost for the simulated period. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Joint temperature-and-moisture target attainment: Integrated HVAC + reheat minus baseline Pad + vent baseline, 28.16 percentage points (pp), from 27.1% (2,376.77 / 8,759 eligible h) to 55.3% (4,843.5 / 8,759 eligible h). Not a relative percent change. Model-estimated operating-cost difference: $25,135.81 for Integrated HVAC + reheat versus Pad + vent baseline. Model-estimated operating cost for the simulated period. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Joint temperature-and-moisture target attainment: Desiccant + evaporative cooling minus baseline Pad + vent baseline, 24.74 percentage points (pp), from 27.1% (2,376.77 / 8,759 eligible h) to 51.9% (4,543.73 / 8,759 eligible h). Not a relative percent change. Model-estimated operating-cost difference: $11,762.82 for Desiccant + evaporative cooling versus Pad + vent baseline. Model-estimated operating cost for the simulated period. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Joint temperature-and-moisture target attainment: Liquid-desiccant hybrid (generic) minus baseline Pad + vent baseline, 25.48 percentage points (pp), from 27.1% (2,376.77 / 8,759 eligible h) to 52.6% (4,608.93 / 8,759 eligible h). Not a relative percent change. Model-estimated operating-cost difference: $25,267.72 for Liquid-desiccant hybrid (generic) versus Pad + vent baseline. Model-estimated operating cost for the simulated period. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><h3>Pad + vent baseline</h3><table><thead><tr><th>Period quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Installed controlled outdoor-air maximum</td><td>40 ACH, 22.222 m³/s</td></tr><tr><td class="k">Controlled outdoor air, actual</td><td>0.3 / 14.28 / 40 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Total outdoor air including infiltration, actual</td><td>0.6 / 14.58 / 40.3 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Controlled outdoor-air stages, actual dispatch</td><td>0.3 ACH, 0.167 m³/s: 4,356.68 h; 10.23 ACH, 5.681 m³/s: 1,284.57 h; 20.15 ACH, 11.194 m³/s: 510.02 h; 30.08 ACH, 16.708 m³/s: 403.23 h; 40 ACH, 22.222 m³/s: 2,205.5 h</td></tr><tr><td class="k">Actual maximum controlled outdoor-air flow</td><td>22.222 m³/s, 47,086.2 cfm</td></tr><tr><td class="k">Recovery core volume</td><td>0 m³</td></tr><tr><td class="k">Recovery bypass volume</td><td>0 m³</td></tr><tr><td class="k">Sensible recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Latent recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Recovery auxiliary electricity</td><td>0 kWh</td></tr><tr><td class="k">Recovery frost/defrost exposure</td><td>0 h</td></tr><tr><td class="k">Preheat delivered</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased electricity</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased fuel</td><td>0 kWh</td></tr><tr><td class="k">Preheat insufficient</td><td>0 h</td></tr><tr><td class="k">DOAS condensate</td><td>0 kg</td></tr><tr><td class="k">DOAS cooling delivered</td><td>0 kWh</td></tr><tr><td class="k">DOAS cooling electricity</td><td>0 kWh</td></tr><tr><td class="k">DOAS recovered reheat</td><td>0 kWh</td></tr><tr><td class="k">DOAS external heat</td><td>0 kWh</td></tr><tr><td class="k">DOAS unmet conditioning</td><td>0 kWh</td></tr></tbody></table><h3>Pads + condensing dehumidifier</h3><table><thead><tr><th>Period quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Installed controlled outdoor-air maximum</td><td>40 ACH, 22.222 m³/s</td></tr><tr><td class="k">Controlled outdoor air, actual</td><td>0.3 / 19.9 / 40 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Total outdoor air including infiltration, actual</td><td>0.6 / 20.2 / 40.3 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Controlled outdoor-air stages, actual dispatch</td><td>0.3 ACH, 0.167 m³/s: 3,083.15 h; 10.23 ACH, 5.681 m³/s: 1,330.25 h; 20.15 ACH, 11.194 m³/s: 514.43 h; 30.08 ACH, 16.708 m³/s: 385.2 h; 40 ACH, 22.222 m³/s: 3,446.97 h</td></tr><tr><td class="k">Actual maximum controlled outdoor-air flow</td><td>22.222 m³/s, 47,086.2 cfm</td></tr><tr><td class="k">Recovery core volume</td><td>0 m³</td></tr><tr><td class="k">Recovery bypass volume</td><td>0 m³</td></tr><tr><td class="k">Sensible recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Latent recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Recovery auxiliary electricity</td><td>0 kWh</td></tr><tr><td class="k">Recovery frost/defrost exposure</td><td>0 h</td></tr><tr><td class="k">Preheat delivered</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased electricity</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased fuel</td><td>0 kWh</td></tr><tr><td class="k">Preheat insufficient</td><td>0 h</td></tr><tr><td class="k">DOAS condensate</td><td>0 kg</td></tr><tr><td class="k">DOAS cooling delivered</td><td>0 kWh</td></tr><tr><td class="k">DOAS cooling electricity</td><td>0 kWh</td></tr><tr><td class="k">DOAS recovered reheat</td><td>0 kWh</td></tr><tr><td class="k">DOAS external heat</td><td>0 kWh</td></tr><tr><td class="k">DOAS unmet conditioning</td><td>0 kWh</td></tr></tbody></table><h3>DX / mini-split + dehumidifier</h3><table><thead><tr><th>Period quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Installed controlled outdoor-air maximum</td><td>40 ACH, 22.222 m³/s</td></tr><tr><td class="k">Controlled outdoor air, actual</td><td>0.3 / 8.85 / 40 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Total outdoor air including infiltration, actual</td><td>0.6 / 9.15 / 40.3 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Controlled outdoor-air stages, actual dispatch</td><td>0.3 ACH, 0.167 m³/s: 5,634.47 h; 10.23 ACH, 5.681 m³/s: 1,289.28 h; 20.15 ACH, 11.194 m³/s: 400.33 h; 30.08 ACH, 16.708 m³/s: 290.97 h; 40 ACH, 22.222 m³/s: 1,144.95 h</td></tr><tr><td class="k">Actual maximum controlled outdoor-air flow</td><td>22.222 m³/s, 47,086.2 cfm</td></tr><tr><td class="k">Recovery core volume</td><td>0 m³</td></tr><tr><td class="k">Recovery bypass volume</td><td>0 m³</td></tr><tr><td class="k">Sensible recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Latent recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Recovery auxiliary electricity</td><td>0 kWh</td></tr><tr><td class="k">Recovery frost/defrost exposure</td><td>0 h</td></tr><tr><td class="k">Preheat delivered</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased electricity</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased fuel</td><td>0 kWh</td></tr><tr><td class="k">Preheat insufficient</td><td>0 h</td></tr><tr><td class="k">DOAS condensate</td><td>0 kg</td></tr><tr><td class="k">DOAS cooling delivered</td><td>0 kWh</td></tr><tr><td class="k">DOAS cooling electricity</td><td>0 kWh</td></tr><tr><td class="k">DOAS recovered reheat</td><td>0 kWh</td></tr><tr><td class="k">DOAS external heat</td><td>0 kWh</td></tr><tr><td class="k">DOAS unmet conditioning</td><td>0 kWh</td></tr></tbody></table><h3>Integrated HVAC + reheat</h3><table><thead><tr><th>Period quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Installed controlled outdoor-air maximum</td><td>40 ACH, 22.222 m³/s</td></tr><tr><td class="k">Controlled outdoor air, actual</td><td>0.3 / 6.92 / 40 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Total outdoor air including infiltration, actual</td><td>0.6 / 7.22 / 40.3 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Controlled outdoor-air stages, actual dispatch</td><td>0.3 ACH, 0.167 m³/s: 6,159 h; 10.23 ACH, 5.681 m³/s: 1,177.2 h; 20.15 ACH, 11.194 m³/s: 375.88 h; 30.08 ACH, 16.708 m³/s: 278.72 h; 40 ACH, 22.222 m³/s: 769.2 h</td></tr><tr><td class="k">Actual maximum controlled outdoor-air flow</td><td>22.222 m³/s, 47,086.2 cfm</td></tr><tr><td class="k">Recovery core volume</td><td>0 m³</td></tr><tr><td class="k">Recovery bypass volume</td><td>0 m³</td></tr><tr><td class="k">Sensible recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Latent recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Recovery auxiliary electricity</td><td>0 kWh</td></tr><tr><td class="k">Recovery frost/defrost exposure</td><td>0 h</td></tr><tr><td class="k">Preheat delivered</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased electricity</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased fuel</td><td>0 kWh</td></tr><tr><td class="k">Preheat insufficient</td><td>0 h</td></tr><tr><td class="k">DOAS condensate</td><td>0 kg</td></tr><tr><td class="k">DOAS cooling delivered</td><td>0 kWh</td></tr><tr><td class="k">DOAS cooling electricity</td><td>0 kWh</td></tr><tr><td class="k">DOAS recovered reheat</td><td>0 kWh</td></tr><tr><td class="k">DOAS external heat</td><td>0 kWh</td></tr><tr><td class="k">DOAS unmet conditioning</td><td>0 kWh</td></tr></tbody></table><h3>Desiccant + evaporative cooling</h3><table><thead><tr><th>Period quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Installed controlled outdoor-air maximum</td><td>40 ACH, 22.222 m³/s</td></tr><tr><td class="k">Controlled outdoor air, actual</td><td>0.3 / 19.39 / 40 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Total outdoor air including infiltration, actual</td><td>0.6 / 19.69 / 40.3 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Controlled outdoor-air stages, actual dispatch</td><td>0.3 ACH, 0.167 m³/s: 3,191.47 h; 10.23 ACH, 5.681 m³/s: 1,322.1 h; 20.15 ACH, 11.194 m³/s: 545.05 h; 30.08 ACH, 16.708 m³/s: 370.35 h; 40 ACH, 22.222 m³/s: 3,331.03 h</td></tr><tr><td class="k">Actual maximum controlled outdoor-air flow</td><td>22.222 m³/s, 47,086.2 cfm</td></tr><tr><td class="k">Recovery core volume</td><td>0 m³</td></tr><tr><td class="k">Recovery bypass volume</td><td>0 m³</td></tr><tr><td class="k">Sensible recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Latent recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Recovery auxiliary electricity</td><td>0 kWh</td></tr><tr><td class="k">Recovery frost/defrost exposure</td><td>0 h</td></tr><tr><td class="k">Preheat delivered</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased electricity</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased fuel</td><td>0 kWh</td></tr><tr><td class="k">Preheat insufficient</td><td>0 h</td></tr><tr><td class="k">DOAS condensate</td><td>0 kg</td></tr><tr><td class="k">DOAS cooling delivered</td><td>0 kWh</td></tr><tr><td class="k">DOAS cooling electricity</td><td>0 kWh</td></tr><tr><td class="k">DOAS recovered reheat</td><td>0 kWh</td></tr><tr><td class="k">DOAS external heat</td><td>0 kWh</td></tr><tr><td class="k">DOAS unmet conditioning</td><td>0 kWh</td></tr></tbody></table><h3>Liquid-desiccant hybrid (generic)</h3><table><thead><tr><th>Period quantity</th><th>Value</th></tr></thead><tbody><tr><td class="k">Installed controlled outdoor-air maximum</td><td>40 ACH, 22.222 m³/s</td></tr><tr><td class="k">Controlled outdoor air, actual</td><td>0.3 / 16.84 / 40 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Total outdoor air including infiltration, actual</td><td>0.6 / 17.14 / 40.3 ACH (minimum / time-weighted mean / actual maximum)</td></tr><tr><td class="k">Controlled outdoor-air stages, actual dispatch</td><td>0.3 ACH, 0.167 m³/s: 3,987.87 h; 10.23 ACH, 5.681 m³/s: 1,158.82 h; 20.15 ACH, 11.194 m³/s: 384.03 h; 30.08 ACH, 16.708 m³/s: 244.32 h; 40 ACH, 22.222 m³/s: 2,984.97 h</td></tr><tr><td class="k">Actual maximum controlled outdoor-air flow</td><td>22.222 m³/s, 47,086.2 cfm</td></tr><tr><td class="k">Recovery core volume</td><td>0 m³</td></tr><tr><td class="k">Recovery bypass volume</td><td>0 m³</td></tr><tr><td class="k">Sensible recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Latent recovery transfer (not purchased energy or savings)</td><td>0 kWh</td></tr><tr><td class="k">Recovery auxiliary electricity</td><td>0 kWh</td></tr><tr><td class="k">Recovery frost/defrost exposure</td><td>0 h</td></tr><tr><td class="k">Preheat delivered</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased electricity</td><td>0 kWh</td></tr><tr><td class="k">Preheat purchased fuel</td><td>0 kWh</td></tr><tr><td class="k">Preheat insufficient</td><td>0 h</td></tr><tr><td class="k">DOAS condensate</td><td>0 kg</td></tr><tr><td class="k">DOAS cooling delivered</td><td>0 kWh</td></tr><tr><td class="k">DOAS cooling electricity</td><td>0 kWh</td></tr><tr><td class="k">DOAS recovered reheat</td><td>0 kWh</td></tr><tr><td class="k">DOAS external heat</td><td>0 kWh</td></tr><tr><td class="k">DOAS unmet conditioning</td><td>0 kWh</td></tr></tbody></table><p>Exceedance conditions: 0.4, 1 and 2 percent of valid weather hours exceed the stated value. Coincident values are the state of that same single ranked hour. They are NOT ASHRAE mean coincident values: ASHRAE obtains MCDB and MCWB by double-binning hourly data into joint frequency matrices and taking the conditional mean at the design condition, over a nominal 25-year station record, so a ranked-hour coincidence is a different and noisier statistic computed here from ten reanalysis years (see docs/EVIDENCE-HOT-HUMID.md). Latent equipment belongs to the dew-point family of design conditions, not to dry bulb with coincident wet bulb. Joint failure ranks eligible hours by temperature degree-hours plus VPD kPa-hours outside the band. Peak loads are single-hour maxima and do not include a safety factor.</p></section>
+<section><h2><span class="cat">§ 004</span>Binding constraint</h2><p class="verdict">heating (mean per year: 1,963 h moisture-limited, 1,181 h temperature-limited, 4,142 h heating). Weather-side screen at the target band: moisture = pad moisture-limited, cool-humid and heat-humid hours; temperature = pad temperature-limited and marginal hours; heating = heating hours without a moisture problem. Mean hours per year.</p></section>
+<section><h2><span class="cat">§ 005</span>Strategy verdict</h2><p class="verdict">Cheapest non-dominated strategy by period operating cost: Pad + vent baseline at $22,064 holding the band 27.1% of eligible hours. Operating frontier: Pad + vent baseline ($22,064, 27.1%); Pads + condensing dehumidifier ($28,493, 41.6%); Desiccant + evaporative cooling ($33,827, 51.9%); DX / mini-split + dehumidifier ($39,915, 73.1%). Operating-dominated: Integrated HVAC + reheat, Liquid-desiccant hybrid (generic). Capital is separate and not ranked.</p><p>Ranking across years: Operating-cost order of strategies is identical in all 1 years. Single weather period; run bundled years for a distribution.</p></section><section><h2>All site and year price bases</h2><p>Tulsa, 2025, Pad + vent baseline: Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Tulsa, 2025, Pads + condensing dehumidifier: Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Tulsa, 2025, DX / mini-split + dehumidifier: Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Tulsa, 2025, Integrated HVAC + reheat: Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Tulsa, 2025, Desiccant + evaporative cooling: Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p><p>Tulsa, 2025, Liquid-desiccant hybrid (generic): Model-estimated annual operating cost. Period: 2025-01-01 to 2025-12-31. Included: purchased electricity, purchased heating fuel, water represented by the scenario. Applied prices: electricity 0.12 USD/kWh (manual scenario input); fuel 0.045 USD/kWh (scenario input); water 0.002 USD/L (scenario input). Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects, other unmodeled tariff components. Not an equipment quote or guaranteed savings.</p></section></div><div class="appendix"><h2><span class="cat">Appendix</span>Reproducible assumptions</h2><section><h2><span class="cat">§ A01</span>Pad + vent baseline</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, condensate reuse, or frost behavior beyond the declared heat-recovery control is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
+  &quot;schemaVersion&quot;: 2,
   &quot;id&quot;: &quot;2d74ad0b-6724-4d1f-bfdd-faaf2a94996c&quot;,
   &quot;name&quot;: &quot;Pad + vent baseline&quot;,
   &quot;facility&quot;: &quot;greenhouse&quot;,
@@ -76,16 +91,40 @@
   &quot;controlMode&quot;: &quot;staged&quot;,
   &quot;transpirationModel&quot;: &quot;stanghellini&quot;,
   &quot;lai&quot;: 3,
-  &quot;doasM3s&quot;: 0,
-  &quot;doasSupplyDewPointC&quot;: 8,
-  &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5,
   &quot;heatSource&quot;: &quot;fuel&quot;,
   &quot;heatPumpCopAt8C&quot;: null,
   &quot;heatPumpCopAtMinus8C&quot;: null,
   &quot;heatPumpCopAtMinus15C&quot;: null,
   &quot;heatPumpCutoffC&quot;: null,
   &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;dehuHeatFraction&quot;: 1,
+  &quot;doasM3s&quot;: 0,
+  &quot;doasSupplyDewPointC&quot;: null,
+  &quot;doasSupplyTempC&quot;: null,
+  &quot;doasCoolingCOP&quot;: null,
+  &quot;doasReheatRecoveryFraction&quot;: null,
+  &quot;outsideAirBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;outsideAirReviewed&quot;: true,
+  &quot;installedCostBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;heatRecovery&quot;: {
+    &quot;type&quot;: &quot;none&quot;,
+    &quot;nominalM3s&quot;: null,
+    &quot;auxiliaryW&quot;: null,
+    &quot;sensibleHeating75&quot;: null,
+    &quot;sensibleHeating100&quot;: null,
+    &quot;sensibleCooling75&quot;: null,
+    &quot;sensibleCooling100&quot;: null,
+    &quot;latentHeating75&quot;: null,
+    &quot;latentHeating100&quot;: null,
+    &quot;latentCooling75&quot;: null,
+    &quot;latentCooling100&quot;: null,
+    &quot;economizerBypass&quot;: true,
+    &quot;frostControl&quot;: &quot;none&quot;,
+    &quot;minimumOutdoorOperatingC&quot;: null,
+    &quot;frostThresholdC&quot;: null,
+    &quot;initialDefrostFraction&quot;: null,
+    &quot;defrostRatePerK&quot;: null
+  },
   &quot;shadeScreen&quot;: {
     &quot;installed&quot;: false,
     &quot;shadeFraction&quot;: 0.5,
@@ -108,7 +147,8 @@
     &quot;installed&quot;: false,
     &quot;grade&quot;: null,
     &quot;ventilationFactor&quot;: null
-  }
+  },
+  &quot;notes&quot;: &quot;Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval.&quot;
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -136,6 +176,17 @@
     &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
     &quot;matchesTemplate&quot;: true
   },
+  &quot;airflow&quot;: {
+    &quot;controlledOutdoorAir&quot;: &quot;One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.&quot;,
+    &quot;balancedRecoveryFlow&quot;: true,
+    &quot;supportedRecoveryFlowFraction&quot;: {
+      &quot;minimum&quot;: 0.5,
+      &quot;maximum&quot;: 1.3
+    },
+    &quot;ratingInputs&quot;: &quot;Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.&quot;,
+    &quot;excessFlow&quot;: &quot;Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.&quot;,
+    &quot;doas&quot;: null
+  },
   &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
@@ -145,8 +196,8 @@
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2021-01-01&quot;,
-  &quot;endDate&quot;: &quot;2021-12-31&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -160,8 +211,8 @@
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2020-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0731,
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -169,117 +220,117 @@
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0773,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0848,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0643,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0793,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0799,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0915,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0934,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-08&quot;,
-      &quot;usdPerKWh&quot;: 0.0936,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-09&quot;,
-      &quot;usdPerKWh&quot;: 0.0964,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0985,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-11&quot;,
-      &quot;usdPerKWh&quot;: 0.088,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0862,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2022-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0875,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -528,8 +579,8 @@
   &quot;timezone&quot;: &quot;America/Chicago&quot;,
   &quot;fuelPrice&quot;: 0.045,
   &quot;waterPrice&quot;: 0.002
-}</pre></details></section><section><h2><span class="cat">§ A02</span>Pads + condensing dehumidifier</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
-  &quot;schemaVersion&quot;: 1,
+}</pre></details></section><section><h2><span class="cat">§ A02</span>Pads + condensing dehumidifier</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, condensate reuse, or frost behavior beyond the declared heat-recovery control is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
+  &quot;schemaVersion&quot;: 2,
   &quot;id&quot;: &quot;a66b0673-51bc-4c82-b4b3-365ca0031dcb&quot;,
   &quot;name&quot;: &quot;Pads + condensing dehumidifier&quot;,
   &quot;facility&quot;: &quot;greenhouse&quot;,
@@ -601,16 +652,40 @@
   &quot;controlMode&quot;: &quot;staged&quot;,
   &quot;transpirationModel&quot;: &quot;stanghellini&quot;,
   &quot;lai&quot;: 3,
-  &quot;doasM3s&quot;: 0,
-  &quot;doasSupplyDewPointC&quot;: 8,
-  &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5,
   &quot;heatSource&quot;: &quot;fuel&quot;,
   &quot;heatPumpCopAt8C&quot;: null,
   &quot;heatPumpCopAtMinus8C&quot;: null,
   &quot;heatPumpCopAtMinus15C&quot;: null,
   &quot;heatPumpCutoffC&quot;: null,
   &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;dehuHeatFraction&quot;: 1,
+  &quot;doasM3s&quot;: 0,
+  &quot;doasSupplyDewPointC&quot;: null,
+  &quot;doasSupplyTempC&quot;: null,
+  &quot;doasCoolingCOP&quot;: null,
+  &quot;doasReheatRecoveryFraction&quot;: null,
+  &quot;outsideAirBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;outsideAirReviewed&quot;: true,
+  &quot;installedCostBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;heatRecovery&quot;: {
+    &quot;type&quot;: &quot;none&quot;,
+    &quot;nominalM3s&quot;: null,
+    &quot;auxiliaryW&quot;: null,
+    &quot;sensibleHeating75&quot;: null,
+    &quot;sensibleHeating100&quot;: null,
+    &quot;sensibleCooling75&quot;: null,
+    &quot;sensibleCooling100&quot;: null,
+    &quot;latentHeating75&quot;: null,
+    &quot;latentHeating100&quot;: null,
+    &quot;latentCooling75&quot;: null,
+    &quot;latentCooling100&quot;: null,
+    &quot;economizerBypass&quot;: true,
+    &quot;frostControl&quot;: &quot;none&quot;,
+    &quot;minimumOutdoorOperatingC&quot;: null,
+    &quot;frostThresholdC&quot;: null,
+    &quot;initialDefrostFraction&quot;: null,
+    &quot;defrostRatePerK&quot;: null
+  },
   &quot;shadeScreen&quot;: {
     &quot;installed&quot;: false,
     &quot;shadeFraction&quot;: 0.5,
@@ -633,7 +708,8 @@
     &quot;installed&quot;: false,
     &quot;grade&quot;: null,
     &quot;ventilationFactor&quot;: null
-  }
+  },
+  &quot;notes&quot;: &quot;Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval.&quot;
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -661,6 +737,17 @@
     &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
     &quot;matchesTemplate&quot;: true
   },
+  &quot;airflow&quot;: {
+    &quot;controlledOutdoorAir&quot;: &quot;One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.&quot;,
+    &quot;balancedRecoveryFlow&quot;: true,
+    &quot;supportedRecoveryFlowFraction&quot;: {
+      &quot;minimum&quot;: 0.5,
+      &quot;maximum&quot;: 1.3
+    },
+    &quot;ratingInputs&quot;: &quot;Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.&quot;,
+    &quot;excessFlow&quot;: &quot;Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.&quot;,
+    &quot;doas&quot;: null
+  },
   &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
@@ -670,8 +757,8 @@
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2021-01-01&quot;,
-  &quot;endDate&quot;: &quot;2021-12-31&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -685,8 +772,8 @@
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2020-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0731,
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -694,117 +781,117 @@
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0773,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0848,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0643,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0793,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0799,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0915,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0934,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-08&quot;,
-      &quot;usdPerKWh&quot;: 0.0936,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-09&quot;,
-      &quot;usdPerKWh&quot;: 0.0964,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0985,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-11&quot;,
-      &quot;usdPerKWh&quot;: 0.088,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0862,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2022-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0875,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -1053,8 +1140,8 @@
   &quot;timezone&quot;: &quot;America/Chicago&quot;,
   &quot;fuelPrice&quot;: 0.045,
   &quot;waterPrice&quot;: 0.002
-}</pre></details></section><section><h2><span class="cat">§ A03</span>DX / mini-split + dehumidifier</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
-  &quot;schemaVersion&quot;: 1,
+}</pre></details></section><section><h2><span class="cat">§ A03</span>DX / mini-split + dehumidifier</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, condensate reuse, or frost behavior beyond the declared heat-recovery control is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
+  &quot;schemaVersion&quot;: 2,
   &quot;id&quot;: &quot;fd190fa2-ffba-4423-88ff-b474c81a8015&quot;,
   &quot;name&quot;: &quot;DX / mini-split + dehumidifier&quot;,
   &quot;facility&quot;: &quot;greenhouse&quot;,
@@ -1126,16 +1213,40 @@
   &quot;controlMode&quot;: &quot;staged&quot;,
   &quot;transpirationModel&quot;: &quot;stanghellini&quot;,
   &quot;lai&quot;: 3,
-  &quot;doasM3s&quot;: 0,
-  &quot;doasSupplyDewPointC&quot;: 8,
-  &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5,
   &quot;heatSource&quot;: &quot;fuel&quot;,
   &quot;heatPumpCopAt8C&quot;: null,
   &quot;heatPumpCopAtMinus8C&quot;: null,
   &quot;heatPumpCopAtMinus15C&quot;: null,
   &quot;heatPumpCutoffC&quot;: null,
   &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;dehuHeatFraction&quot;: 1,
+  &quot;doasM3s&quot;: 0,
+  &quot;doasSupplyDewPointC&quot;: null,
+  &quot;doasSupplyTempC&quot;: null,
+  &quot;doasCoolingCOP&quot;: null,
+  &quot;doasReheatRecoveryFraction&quot;: null,
+  &quot;outsideAirBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;outsideAirReviewed&quot;: true,
+  &quot;installedCostBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;heatRecovery&quot;: {
+    &quot;type&quot;: &quot;none&quot;,
+    &quot;nominalM3s&quot;: null,
+    &quot;auxiliaryW&quot;: null,
+    &quot;sensibleHeating75&quot;: null,
+    &quot;sensibleHeating100&quot;: null,
+    &quot;sensibleCooling75&quot;: null,
+    &quot;sensibleCooling100&quot;: null,
+    &quot;latentHeating75&quot;: null,
+    &quot;latentHeating100&quot;: null,
+    &quot;latentCooling75&quot;: null,
+    &quot;latentCooling100&quot;: null,
+    &quot;economizerBypass&quot;: true,
+    &quot;frostControl&quot;: &quot;none&quot;,
+    &quot;minimumOutdoorOperatingC&quot;: null,
+    &quot;frostThresholdC&quot;: null,
+    &quot;initialDefrostFraction&quot;: null,
+    &quot;defrostRatePerK&quot;: null
+  },
   &quot;shadeScreen&quot;: {
     &quot;installed&quot;: false,
     &quot;shadeFraction&quot;: 0.5,
@@ -1158,7 +1269,8 @@
     &quot;installed&quot;: false,
     &quot;grade&quot;: null,
     &quot;ventilationFactor&quot;: null
-  }
+  },
+  &quot;notes&quot;: &quot;Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval.&quot;
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -1186,6 +1298,17 @@
     &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
     &quot;matchesTemplate&quot;: true
   },
+  &quot;airflow&quot;: {
+    &quot;controlledOutdoorAir&quot;: &quot;One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.&quot;,
+    &quot;balancedRecoveryFlow&quot;: true,
+    &quot;supportedRecoveryFlowFraction&quot;: {
+      &quot;minimum&quot;: 0.5,
+      &quot;maximum&quot;: 1.3
+    },
+    &quot;ratingInputs&quot;: &quot;Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.&quot;,
+    &quot;excessFlow&quot;: &quot;Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.&quot;,
+    &quot;doas&quot;: null
+  },
   &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
@@ -1195,8 +1318,8 @@
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2021-01-01&quot;,
-  &quot;endDate&quot;: &quot;2021-12-31&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -1210,8 +1333,8 @@
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2020-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0731,
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -1219,117 +1342,117 @@
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0773,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0848,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0643,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0793,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0799,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0915,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0934,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-08&quot;,
-      &quot;usdPerKWh&quot;: 0.0936,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-09&quot;,
-      &quot;usdPerKWh&quot;: 0.0964,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0985,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-11&quot;,
-      &quot;usdPerKWh&quot;: 0.088,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0862,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2022-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0875,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -1578,8 +1701,8 @@
   &quot;timezone&quot;: &quot;America/Chicago&quot;,
   &quot;fuelPrice&quot;: 0.045,
   &quot;waterPrice&quot;: 0.002
-}</pre></details></section><section><h2><span class="cat">§ A04</span>Integrated HVAC + reheat</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
-  &quot;schemaVersion&quot;: 1,
+}</pre></details></section><section><h2><span class="cat">§ A04</span>Integrated HVAC + reheat</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, condensate reuse, or frost behavior beyond the declared heat-recovery control is modeled.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
+  &quot;schemaVersion&quot;: 2,
   &quot;id&quot;: &quot;9aeac14e-4e37-46d6-8ec5-caabc4e02351&quot;,
   &quot;name&quot;: &quot;Integrated HVAC + reheat&quot;,
   &quot;facility&quot;: &quot;greenhouse&quot;,
@@ -1651,16 +1774,40 @@
   &quot;controlMode&quot;: &quot;staged&quot;,
   &quot;transpirationModel&quot;: &quot;stanghellini&quot;,
   &quot;lai&quot;: 3,
-  &quot;doasM3s&quot;: 0,
-  &quot;doasSupplyDewPointC&quot;: 8,
-  &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5,
   &quot;heatSource&quot;: &quot;fuel&quot;,
   &quot;heatPumpCopAt8C&quot;: null,
   &quot;heatPumpCopAtMinus8C&quot;: null,
   &quot;heatPumpCopAtMinus15C&quot;: null,
   &quot;heatPumpCutoffC&quot;: null,
   &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;dehuHeatFraction&quot;: 1,
+  &quot;doasM3s&quot;: 0,
+  &quot;doasSupplyDewPointC&quot;: null,
+  &quot;doasSupplyTempC&quot;: null,
+  &quot;doasCoolingCOP&quot;: null,
+  &quot;doasReheatRecoveryFraction&quot;: null,
+  &quot;outsideAirBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;outsideAirReviewed&quot;: true,
+  &quot;installedCostBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;heatRecovery&quot;: {
+    &quot;type&quot;: &quot;none&quot;,
+    &quot;nominalM3s&quot;: null,
+    &quot;auxiliaryW&quot;: null,
+    &quot;sensibleHeating75&quot;: null,
+    &quot;sensibleHeating100&quot;: null,
+    &quot;sensibleCooling75&quot;: null,
+    &quot;sensibleCooling100&quot;: null,
+    &quot;latentHeating75&quot;: null,
+    &quot;latentHeating100&quot;: null,
+    &quot;latentCooling75&quot;: null,
+    &quot;latentCooling100&quot;: null,
+    &quot;economizerBypass&quot;: true,
+    &quot;frostControl&quot;: &quot;none&quot;,
+    &quot;minimumOutdoorOperatingC&quot;: null,
+    &quot;frostThresholdC&quot;: null,
+    &quot;initialDefrostFraction&quot;: null,
+    &quot;defrostRatePerK&quot;: null
+  },
   &quot;shadeScreen&quot;: {
     &quot;installed&quot;: false,
     &quot;shadeFraction&quot;: 0.5,
@@ -1683,7 +1830,8 @@
     &quot;installed&quot;: false,
     &quot;grade&quot;: null,
     &quot;ventilationFactor&quot;: null
-  }
+  },
+  &quot;notes&quot;: &quot;Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval.&quot;
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -1711,6 +1859,17 @@
     &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
     &quot;matchesTemplate&quot;: true
   },
+  &quot;airflow&quot;: {
+    &quot;controlledOutdoorAir&quot;: &quot;One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.&quot;,
+    &quot;balancedRecoveryFlow&quot;: true,
+    &quot;supportedRecoveryFlowFraction&quot;: {
+      &quot;minimum&quot;: 0.5,
+      &quot;maximum&quot;: 1.3
+    },
+    &quot;ratingInputs&quot;: &quot;Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.&quot;,
+    &quot;excessFlow&quot;: &quot;Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.&quot;,
+    &quot;doas&quot;: null
+  },
   &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
@@ -1720,8 +1879,8 @@
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2021-01-01&quot;,
-  &quot;endDate&quot;: &quot;2021-12-31&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -1735,8 +1894,8 @@
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2020-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0731,
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -1744,117 +1903,117 @@
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0773,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0848,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0643,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0793,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0799,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0915,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0934,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-08&quot;,
-      &quot;usdPerKWh&quot;: 0.0936,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-09&quot;,
-      &quot;usdPerKWh&quot;: 0.0964,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0985,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-11&quot;,
-      &quot;usdPerKWh&quot;: 0.088,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0862,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2022-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0875,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -2103,8 +2262,8 @@
   &quot;timezone&quot;: &quot;America/Chicago&quot;,
   &quot;fuelPrice&quot;: 0.045,
   &quot;waterPrice&quot;: 0.002
-}</pre></details></section><section><h2><span class="cat">§ A05</span>Desiccant + evaporative cooling</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
-  &quot;schemaVersion&quot;: 1,
+}</pre></details></section><section><h2><span class="cat">§ A05</span>Desiccant + evaporative cooling</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, condensate reuse, or frost behavior beyond the declared heat-recovery control is modeled.</li><li>Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
+  &quot;schemaVersion&quot;: 2,
   &quot;id&quot;: &quot;3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed&quot;,
   &quot;name&quot;: &quot;Desiccant + evaporative cooling&quot;,
   &quot;facility&quot;: &quot;greenhouse&quot;,
@@ -2176,16 +2335,40 @@
   &quot;controlMode&quot;: &quot;staged&quot;,
   &quot;transpirationModel&quot;: &quot;stanghellini&quot;,
   &quot;lai&quot;: 3,
-  &quot;doasM3s&quot;: 0,
-  &quot;doasSupplyDewPointC&quot;: 8,
-  &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5,
   &quot;heatSource&quot;: &quot;fuel&quot;,
   &quot;heatPumpCopAt8C&quot;: null,
   &quot;heatPumpCopAtMinus8C&quot;: null,
   &quot;heatPumpCopAtMinus15C&quot;: null,
   &quot;heatPumpCutoffC&quot;: null,
   &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;dehuHeatFraction&quot;: 1,
+  &quot;doasM3s&quot;: 0,
+  &quot;doasSupplyDewPointC&quot;: null,
+  &quot;doasSupplyTempC&quot;: null,
+  &quot;doasCoolingCOP&quot;: null,
+  &quot;doasReheatRecoveryFraction&quot;: null,
+  &quot;outsideAirBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;outsideAirReviewed&quot;: true,
+  &quot;installedCostBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;heatRecovery&quot;: {
+    &quot;type&quot;: &quot;none&quot;,
+    &quot;nominalM3s&quot;: null,
+    &quot;auxiliaryW&quot;: null,
+    &quot;sensibleHeating75&quot;: null,
+    &quot;sensibleHeating100&quot;: null,
+    &quot;sensibleCooling75&quot;: null,
+    &quot;sensibleCooling100&quot;: null,
+    &quot;latentHeating75&quot;: null,
+    &quot;latentHeating100&quot;: null,
+    &quot;latentCooling75&quot;: null,
+    &quot;latentCooling100&quot;: null,
+    &quot;economizerBypass&quot;: true,
+    &quot;frostControl&quot;: &quot;none&quot;,
+    &quot;minimumOutdoorOperatingC&quot;: null,
+    &quot;frostThresholdC&quot;: null,
+    &quot;initialDefrostFraction&quot;: null,
+    &quot;defrostRatePerK&quot;: null
+  },
   &quot;shadeScreen&quot;: {
     &quot;installed&quot;: false,
     &quot;shadeFraction&quot;: 0.5,
@@ -2208,7 +2391,8 @@
     &quot;installed&quot;: false,
     &quot;grade&quot;: null,
     &quot;ventilationFactor&quot;: null
-  }
+  },
+  &quot;notes&quot;: &quot;Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval.&quot;
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -2236,6 +2420,17 @@
     &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
     &quot;matchesTemplate&quot;: true
   },
+  &quot;airflow&quot;: {
+    &quot;controlledOutdoorAir&quot;: &quot;One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.&quot;,
+    &quot;balancedRecoveryFlow&quot;: true,
+    &quot;supportedRecoveryFlowFraction&quot;: {
+      &quot;minimum&quot;: 0.5,
+      &quot;maximum&quot;: 1.3
+    },
+    &quot;ratingInputs&quot;: &quot;Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.&quot;,
+    &quot;excessFlow&quot;: &quot;Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.&quot;,
+    &quot;doas&quot;: null
+  },
   &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
@@ -2245,8 +2440,8 @@
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2021-01-01&quot;,
-  &quot;endDate&quot;: &quot;2021-12-31&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -2260,8 +2455,8 @@
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2020-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0731,
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -2269,117 +2464,117 @@
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0773,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0848,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0643,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0793,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0799,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0915,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0934,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-08&quot;,
-      &quot;usdPerKWh&quot;: 0.0936,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-09&quot;,
-      &quot;usdPerKWh&quot;: 0.0964,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0985,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-11&quot;,
-      &quot;usdPerKWh&quot;: 0.088,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0862,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2022-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0875,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -2628,8 +2823,8 @@
   &quot;timezone&quot;: &quot;America/Chicago&quot;,
   &quot;fuelPrice&quot;: 0.045,
   &quot;waterPrice&quot;: 0.002
-}</pre></details></section><section><h2><span class="cat">§ A06</span>Liquid-desiccant hybrid (generic)</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, frost, condensate reuse or crop response is modeled.</li><li>Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
-  &quot;schemaVersion&quot;: 1,
+}</pre></details></section><section><h2><span class="cat">§ A06</span>Liquid-desiccant hybrid (generic)</h2><h3>Warnings & assumptions</h3><ul><li>Coarse component-based statistical screening, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</li><li>1-minute internal control steps with hourly source weather and analytic linear exchange, frozen dry-air inventory per segment. Constant cp=1006 J/kg K and latent heat=2.45 MJ/kg; liquid sensible heat and vapor heat capacity are omitted.</li><li>Capacity, COP, SHR and ideal part-load scaling are declared assumptions, not manufacturer performance maps. DX assumes a 7 C coil moisture floor and a 10 C indoor cutoff; condensing dehu operates only from 10 to 40 C.</li><li>Crop moisture follows the Stanghellini transpiration model (Vanthoor 2011 §8.9 form, GreenLight implementation) from zone VPD, leaf area index and shortwave absorbed by the canopy, with canopy temperature taken equal to zone air temperature. No leaf energy balance, CO2 response or crop stage dynamics. All fixture electricity becomes indoor heat; crop evaporation subtracts latent energy, including when this creates heating demand.</li><li>Pad supply uses approximately conserved PsychroLib enthalpy; pad liquid-water enthalpy is neglected. Fan heat is assigned indoors; pad pump heat is assigned outside. Humidifier is ideal adiabatic, with no auxiliary electrical power.</li><li>Each continuous weather segment initializes at its current temperature target and midpoint target moisture. Its first hour is warm-up, excluded from comparative compliance. Gaps end the trajectory; no missing forcing is fabricated.</li><li>Staged causal controller: each loop acts on the measured zone state with ordered stages (ventilation, evaporative, DX; ventilation, DOAS, dehumidifier, desiccant, DX for moisture), a deadband per stage and minimum on/off times (ventilation 2 min, pad 5 min, DX/dehumidifier/desiccant/DOAS 10 min, humidifier 5 min), proportional heating. It is not cost-optimized; the ideal modulation dispatcher is available as an upper bound.</li><li>Control cadence check, six Tulsa example strategies on synthetic diurnal fixtures: halving 1-minute control steps to 30 seconds changed purchased electricity by at most 1% and attainment by at most 0.6 percentage points over 48 hours (1.0 point for the integrated case on the hottest fixture), and by at most 0.8% and 0.4 points over 10 days. Deadband control keeps a phase sensitivity at setpoint transitions; these sample differences are not universal error bars.</li><li>DLI lighting is causal from current sunlight and accumulated local-day photons. Solar assumes 2.02 µmol/J GHI before optical transmission, with finite footprint photons shared across stacked canopy; benches receive local irradiance without a concentrator. No future weather is used. DST days retain actual elapsed hours.</li><li>Compliance samples substep-end states, not continuous canopy conditions. Surface condensation is an ideal instantaneous equilibrium drain; no spatial surfaces, condensate reuse, or frost behavior beyond the declared heat-recovery control is modeled.</li><li>Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.</li><li>Public ZIP coverage is not an authoritative active USPS inventory. Coordinates are approximate.</li><li>Utility associations are possible providers from 2021, not verified street-level service or current tariffs.</li><li>State-sector monthly average prices are screening proxies, not utility tariffs; no demand, fixed-charge or time-of-use bill is reconstructed.</li><li>Tariff schedules are not ingested. URDB is an external research source with unverified location/date eligibility.</li><li>Grid mix is annual 2023 eGRID-subregion generation, not utility procurement, hourly marginal emissions, or lifecycle carbon. CO2 is distinct from CO2e; no grid-loss adjustment is applied.</li><li>Emissions are unavailable outside 2023; the displayed grid snapshot is not silently applied to other calendar years.</li><li>8760 valid hours lack a matching-year regional CO2 factor. Total CO2 is unknown; knownCo2Kg is a covered-hours subtotal.</li></ul><details open><summary>Scenario JSON</summary><pre>{
+  &quot;schemaVersion&quot;: 2,
   &quot;id&quot;: &quot;5bb76a09-13e9-45c8-bd29-c0ba9826e384&quot;,
   &quot;name&quot;: &quot;Liquid-desiccant hybrid (generic)&quot;,
   &quot;facility&quot;: &quot;greenhouse&quot;,
@@ -2701,16 +2896,40 @@
   &quot;controlMode&quot;: &quot;staged&quot;,
   &quot;transpirationModel&quot;: &quot;stanghellini&quot;,
   &quot;lai&quot;: 3,
-  &quot;doasM3s&quot;: 0,
-  &quot;doasSupplyDewPointC&quot;: 8,
-  &quot;doasSupplyTempC&quot;: 21,
-  &quot;doasKWhPerKg&quot;: 0.5,
   &quot;heatSource&quot;: &quot;fuel&quot;,
   &quot;heatPumpCopAt8C&quot;: null,
   &quot;heatPumpCopAtMinus8C&quot;: null,
   &quot;heatPumpCopAtMinus15C&quot;: null,
   &quot;heatPumpCutoffC&quot;: null,
   &quot;heatPumpCapacityDerate&quot;: null,
+  &quot;dehuHeatFraction&quot;: 1,
+  &quot;doasM3s&quot;: 0,
+  &quot;doasSupplyDewPointC&quot;: null,
+  &quot;doasSupplyTempC&quot;: null,
+  &quot;doasCoolingCOP&quot;: null,
+  &quot;doasReheatRecoveryFraction&quot;: null,
+  &quot;outsideAirBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;outsideAirReviewed&quot;: true,
+  &quot;installedCostBasis&quot;: &quot;screeningAssumption&quot;,
+  &quot;heatRecovery&quot;: {
+    &quot;type&quot;: &quot;none&quot;,
+    &quot;nominalM3s&quot;: null,
+    &quot;auxiliaryW&quot;: null,
+    &quot;sensibleHeating75&quot;: null,
+    &quot;sensibleHeating100&quot;: null,
+    &quot;sensibleCooling75&quot;: null,
+    &quot;sensibleCooling100&quot;: null,
+    &quot;latentHeating75&quot;: null,
+    &quot;latentHeating100&quot;: null,
+    &quot;latentCooling75&quot;: null,
+    &quot;latentCooling100&quot;: null,
+    &quot;economizerBypass&quot;: true,
+    &quot;frostControl&quot;: &quot;none&quot;,
+    &quot;minimumOutdoorOperatingC&quot;: null,
+    &quot;frostThresholdC&quot;: null,
+    &quot;initialDefrostFraction&quot;: null,
+    &quot;defrostRatePerK&quot;: null
+  },
   &quot;shadeScreen&quot;: {
     &quot;installed&quot;: false,
     &quot;shadeFraction&quot;: 0.5,
@@ -2733,7 +2952,8 @@
     &quot;installed&quot;: false,
     &quot;grade&quot;: null,
     &quot;ventilationFactor&quot;: null
-  }
+  },
+  &quot;notes&quot;: &quot;Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval.&quot;
 }</pre></details><details open><summary>Model assumptions</summary><pre>{
   &quot;evidenceTier&quot;: &quot;Assumption-based component screening&quot;,
   &quot;stepMinutes&quot;: 1,
@@ -2761,6 +2981,17 @@
     &quot;opticalBasis&quot;: &quot;generic screening default, retained&quot;,
     &quot;matchesTemplate&quot;: true
   },
+  &quot;airflow&quot;: {
+    &quot;controlledOutdoorAir&quot;: &quot;One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.&quot;,
+    &quot;balancedRecoveryFlow&quot;: true,
+    &quot;supportedRecoveryFlowFraction&quot;: {
+      &quot;minimum&quot;: 0.5,
+      &quot;maximum&quot;: 1.3
+    },
+    &quot;ratingInputs&quot;: &quot;Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.&quot;,
+    &quot;excessFlow&quot;: &quot;Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.&quot;,
+    &quot;doas&quot;: null
+  },
   &quot;screenAttribution&quot;: &quot;Differenced against an otherwise identical run with that screen forced open.&quot;,
   &quot;cpJkgK&quot;: 1006,
   &quot;latentHeatJkg&quot;: 2450000,
@@ -2770,8 +3001,8 @@
   &quot;zip&quot;: &quot;74103&quot;,
   &quot;state&quot;: &quot;OK&quot;,
   &quot;sector&quot;: &quot;commercial&quot;,
-  &quot;startDate&quot;: &quot;2021-01-01&quot;,
-  &quot;endDate&quot;: &quot;2021-12-31&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
   &quot;utilities&quot;: [
     {
       &quot;id&quot;: &quot;15474&quot;,
@@ -2785,8 +3016,8 @@
   ],
   &quot;prices&quot;: [
     {
-      &quot;period&quot;: &quot;2020-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0731,
+      &quot;period&quot;: &quot;2024-12&quot;,
+      &quot;usdPerKWh&quot;: 0.0845,
       &quot;status&quot;: &quot;Final&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
@@ -2794,117 +3025,117 @@
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0773,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-01&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-02&quot;,
-      &quot;usdPerKWh&quot;: 0.0848,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-02&quot;,
+      &quot;usdPerKWh&quot;: 0.0842,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-03&quot;,
-      &quot;usdPerKWh&quot;: 0.0643,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-03&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-04&quot;,
-      &quot;usdPerKWh&quot;: 0.0793,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-04&quot;,
+      &quot;usdPerKWh&quot;: 0.0812,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-05&quot;,
-      &quot;usdPerKWh&quot;: 0.0799,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-05&quot;,
+      &quot;usdPerKWh&quot;: 0.0846,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-06&quot;,
-      &quot;usdPerKWh&quot;: 0.0915,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-06&quot;,
+      &quot;usdPerKWh&quot;: 0.0978,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-07&quot;,
-      &quot;usdPerKWh&quot;: 0.0934,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-07&quot;,
+      &quot;usdPerKWh&quot;: 0.0992,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-08&quot;,
-      &quot;usdPerKWh&quot;: 0.0936,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-08&quot;,
+      &quot;usdPerKWh&quot;: 0.1,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-09&quot;,
-      &quot;usdPerKWh&quot;: 0.0964,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-09&quot;,
+      &quot;usdPerKWh&quot;: 0.1018,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-10&quot;,
-      &quot;usdPerKWh&quot;: 0.0985,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-10&quot;,
+      &quot;usdPerKWh&quot;: 0.0917,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-11&quot;,
-      &quot;usdPerKWh&quot;: 0.088,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-11&quot;,
+      &quot;usdPerKWh&quot;: 0.0865,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2021-12&quot;,
-      &quot;usdPerKWh&quot;: 0.0862,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2025-12&quot;,
+      &quot;usdPerKWh&quot;: 0.086,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
       &quot;basis&quot;: &quot;state-sector-average-proxy&quot;
     },
     {
-      &quot;period&quot;: &quot;2022-01&quot;,
-      &quot;usdPerKWh&quot;: 0.0875,
-      &quot;status&quot;: &quot;Final&quot;,
+      &quot;period&quot;: &quot;2026-01&quot;,
+      &quot;usdPerKWh&quot;: 0.0988,
+      &quot;status&quot;: &quot;Preliminary&quot;,
       &quot;source&quot;: &quot;eia861m&quot;,
       &quot;geography&quot;: &quot;OK&quot;,
       &quot;sector&quot;: &quot;commercial&quot;,
@@ -3161,14 +3392,14 @@
   &quot;longitude&quot;: -95.99,
   &quot;timezone&quot;: &quot;America/Chicago&quot;,
   &quot;zip&quot;: &quot;74103&quot;,
-  &quot;startDate&quot;: &quot;2021-01-01&quot;,
-  &quot;endDate&quot;: &quot;2021-12-31&quot;,
-  &quot;retrievedAt&quot;: &quot;2026-09-13T23:37:37.177251+00:00&quot;,
-  &quot;sourceUrl&quot;: &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20201231&amp;end=20201231&amp;format=JSON&amp;time-standard=UTC&quot;,
+  &quot;startDate&quot;: &quot;2025-01-01&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31&quot;,
+  &quot;retrievedAt&quot;: &quot;2026-09-11T21:12:17.231016+00:00&quot;,
+  &quot;sourceUrl&quot;: &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20241231&amp;end=20241231&amp;format=JSON&amp;time-standard=UTC&quot;,
   &quot;sourceUrls&quot;: [
-    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20201231&amp;end=20201231&amp;format=JSON&amp;time-standard=UTC&quot;,
-    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20210101&amp;end=20211231&amp;format=JSON&amp;time-standard=UTC&quot;,
-    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20220101&amp;end=20220101&amp;format=JSON&amp;time-standard=UTC&quot;
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20241231&amp;end=20241231&amp;format=JSON&amp;time-standard=UTC&quot;,
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20250101&amp;end=20251231&amp;format=JSON&amp;time-standard=UTC&quot;,
+    &quot;https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&amp;community=RE&amp;longitude=-95.99&amp;latitude=36.15&amp;start=20260101&amp;end=20260101&amp;format=JSON&amp;time-standard=UTC&quot;
   ],
   &quot;units&quot;: {
     &quot;time&quot;: &quot;UTC epoch milliseconds&quot;,
@@ -3194,8 +3425,8 @@
       ],
       &quot;fill_value&quot;: -999,
       &quot;time_standard&quot;: &quot;UTC&quot;,
-      &quot;start&quot;: &quot;20201231&quot;,
-      &quot;end&quot;: &quot;20201231&quot;
+      &quot;start&quot;: &quot;20241231&quot;,
+      &quot;end&quot;: &quot;20241231&quot;
     },
     {
       &quot;title&quot;: &quot;NASA/POWER Source Native Resolution Hourly Data&quot;,
@@ -3210,8 +3441,8 @@
       ],
       &quot;fill_value&quot;: -999,
       &quot;time_standard&quot;: &quot;UTC&quot;,
-      &quot;start&quot;: &quot;20210101&quot;,
-      &quot;end&quot;: &quot;20211231&quot;
+      &quot;start&quot;: &quot;20250101&quot;,
+      &quot;end&quot;: &quot;20251231&quot;
     },
     {
       &quot;title&quot;: &quot;NASA/POWER Source Native Resolution Hourly Data&quot;,
@@ -3226,8 +3457,8 @@
       ],
       &quot;fill_value&quot;: -999,
       &quot;time_standard&quot;: &quot;UTC&quot;,
-      &quot;start&quot;: &quot;20220101&quot;,
-      &quot;end&quot;: &quot;20220101&quot;
+      &quot;start&quot;: &quot;20260101&quot;,
+      &quot;end&quot;: &quot;20260101&quot;
     }
   ],
   &quot;coordinateNotes&quot;: &quot;Requested 36.15,-95.99 is not an airport station. POWER returns source-native grids: MERRA-2 meteorology 0.5° latitude × 0.625° longitude; SYN1deg solar 1° × 1°. Returned point coordinates do not identify grid-cell centers. Elevation from source geometry, not measured site elevation.&quot;,
@@ -3235,13 +3466,13 @@
     &quot;expectedHours&quot;: 8760,
     &quot;weatherHours&quot;: 8760,
     &quot;solarHours&quot;: 8760,
-    &quot;startUTC&quot;: &quot;2021-01-01T06:00:00.000Z&quot;,
-    &quot;endExclusiveUTC&quot;: &quot;2022-01-01T06:00:00.000Z&quot;,
+    &quot;startUTC&quot;: &quot;2025-01-01T06:00:00.000Z&quot;,
+    &quot;endExclusiveUTC&quot;: &quot;2026-01-01T06:00:00.000Z&quot;,
     &quot;sourceQueryPadding&quot;: &quot;One UTC day before first local day, through UTC date of exclusive local end&quot;,
-    &quot;actualWeatherCutoffUTC&quot;: &quot;2022-01-01T05:00:00.000Z&quot;,
-    &quot;actualSolarCutoffUTC&quot;: &quot;2022-01-01T05:00:00.000Z&quot;,
+    &quot;actualWeatherCutoffUTC&quot;: &quot;2026-01-01T05:00:00.000Z&quot;,
+    &quot;actualSolarCutoffUTC&quot;: &quot;2026-01-01T05:00:00.000Z&quot;,
     &quot;incompleteTrailingHours&quot;: 0
   },
-  &quot;startUTC&quot;: &quot;2021-01-01T06:00:00.000Z&quot;,
-  &quot;endExclusiveUTC&quot;: &quot;2022-01-01T06:00:00.000Z&quot;
-}</pre><p>Export JSON alongside this document to retain raw weather, hourly results and all configuration values. This document alone is not the complete reproducibility bundle.</p></section></div><p class="foot">Grownetics · CEA Psychrometric Site Evaluator · Model 0.2.0-screening · Generated 2026-09-14T19:45:16.532Z</p></html>
+  &quot;startUTC&quot;: &quot;2025-01-01T06:00:00.000Z&quot;,
+  &quot;endExclusiveUTC&quot;: &quot;2026-01-01T06:00:00.000Z&quot;
+}</pre><p>Export JSON alongside this document to retain raw weather, hourly results and all configuration values. This document alone is not the complete reproducibility bundle.</p></section></div><p class="foot">One Season Farmers · Model 0.3.0-screening · Generated 2026-09-15T20:56:20.622Z</p></html>

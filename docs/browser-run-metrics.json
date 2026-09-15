@@ -1,268 +1,1744 @@
 {
-  "exportedAt": "2026-09-11T21:55:34.695Z",
-  "modelVersion": "0.1.0-screening",
+  "exportedAt": "2026-09-15T20:56:18.181Z",
+  "verifiedAt": "2026-09-15T21:04:52.611Z",
+  "sourceCommit": "0534ff3fab9be07f6e94171b5dde89ec1c05bbf3",
+  "modelVersion": "0.3.0-screening",
+  "schemaVersion": 2,
+  "method": "Actual Chromium UI loaded bundled Tulsa 2025, imported docs/example-scenarios.json, ran all six, and invoked Run JSON, Hourly CSV, Printable report and Design-basis brief. Metrics below read from that genuine downloaded Run JSON, never copied from previous artifacts.",
   "weather": {
     "source": "NASA POWER",
+    "sourceKind": "gridded reanalysis + satellite solar",
     "startDate": "2025-01-01",
     "endDate": "2025-12-31",
+    "timezone": "America/Chicago",
     "hours": 8760
+  },
+  "inputs": {
+    "path": "docs/example-scenarios.json",
+    "bytes": 27193,
+    "sha256": "8fe07d21e7e3d2b5029582dc8b750714ea0f2f32cd087586aaf7db0236f60b87"
+  },
+  "focusedTests": {
+    "command": "node --test test/airflow.test.mjs test/model.test.mjs test/conservation.test.mjs test/data.test.mjs test/analysis.test.mjs test/examples.test.mjs",
+    "tests": 121,
+    "pass": 121,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "durationMs": 9751.137583,
+    "note": "Executed once before release-only model/package version bump; 0 failures. Full command output observed in task transcript."
   },
   "results": [
     {
       "name": "Pad + vent baseline",
+      "id": "2d74ad0b-6724-4d1f-bfdd-faaf2a94996c",
       "zip": "74103",
       "assumptions": {
         "evidenceTier": "Assumption-based component screening",
         "stepMinutes": 1,
         "warmupHoursPerSegment": 1,
         "lightSolarConversionUmolJ": 2.02,
+        "controlModeUsed": "staged",
+        "transpirationModelUsed": "stanghellini",
+        "canopyTemperature": "Equal to zone air temperature (declared simplification, no leaf energy balance).",
+        "leafAreaIndex": 3,
+        "shadeScreen": null,
+        "thermalScreen": null,
+        "heatSource": {
+          "type": "Fuel-fired heater",
+          "efficiency": 0.9,
+          "basis": "Declared combustion efficiency on delivered heat."
+        },
+        "envelope": {
+          "facility": "greenhouse",
+          "uValue": 4,
+          "envelopeRatio": 1.8,
+          "infiltrationACH": 0.3,
+          "parTransmission": 0.65,
+          "solarTransmission": 0.65,
+          "templateSource": "Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.",
+          "opticalBasis": "generic screening default, retained",
+          "matchesTemplate": true
+        },
+        "airflow": {
+          "controlledOutdoorAir": "One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.",
+          "balancedRecoveryFlow": true,
+          "supportedRecoveryFlowFraction": {
+            "minimum": 0.5,
+            "maximum": 1.3
+          },
+          "ratingInputs": "Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.",
+          "excessFlow": "Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.",
+          "doas": null
+        },
+        "screenAttribution": "Differenced against an otherwise identical run with that screen forced open.",
         "cpJkgK": 1006,
         "latentHeatJkg": 2450000,
         "psychrolibVersion": "2.5.0",
         "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
       },
+      "installedCostBasis": "screeningAssumption",
       "expectedHours": 8760,
       "validHours": 8760,
       "eligibleHours": 8759,
       "warmupHours": 1,
       "missingHours": 0,
       "numericalFailureHours": 0,
-      "compliancePct": 33.54150017125244,
-      "electricKWh": 64842.545061005316,
-      "fuelKWh": 236493.08217382367,
-      "waterL": 430953.60096938553,
-      "cost": 19285.201307082072,
+      "compliantHours": 2376.766666666668,
+      "compliancePct": 27.135137192221347,
+      "electricKWh": 61122.97449687599,
+      "fuelKWh": 303229.82895827614,
+      "waterL": 542093.6766645578,
+      "cost": 22064.28659607676,
       "annualOwnershipCost": 2044.4414593296897,
-      "maxEnergyResidualW": 9.033828973770141e-09,
-      "maxMoistureResidualKgS": 3.373458919616231e-16,
-      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+      "maxEnergyResidualW": 8.059820781151454e-9,
+      "maxMoistureResidualKgS": 4.736951571734001e-16,
+      "costBasis": {
+        "scope": "annual",
+        "label": "Model-estimated annual operating cost",
+        "period": {
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31"
+        },
+        "included": [
+          "purchased electricity",
+          "purchased heating fuel",
+          "water represented by the scenario"
+        ],
+        "priceBasis": {
+          "electricity": {
+            "source": "manual scenario input",
+            "usdPerKWh": 0.12
+          },
+          "fuel": {
+            "source": "scenario input",
+            "usdPerKWh": 0.045
+          },
+          "water": {
+            "source": "scenario input",
+            "usdPerL": 0.002
+          }
+        },
+        "excluded": [
+          "installed capital",
+          "maintenance",
+          "labor",
+          "financing",
+          "taxes",
+          "demand charges",
+          "fixed charges",
+          "time-of-use effects",
+          "other unmodeled tariff components"
+        ],
+        "isQuote": false,
+        "isGuaranteedSavings": false
+      },
+      "outdoorAir": {
+        "controlledACH": {
+          "min": 0.3,
+          "mean": 14.276915239726472,
+          "max": 40,
+          "stages": [
+            {
+              "ach": 0.3,
+              "hours": 4356.683333333342
+            },
+            {
+              "ach": 10.225000000000001,
+              "hours": 1284.5666666666434
+            },
+            {
+              "ach": 20.150000000000002,
+              "hours": 510.01666666667865
+            },
+            {
+              "ach": 30.075000000000003,
+              "hours": 403.23333333334523
+            },
+            {
+              "ach": 40,
+              "hours": 2205.4999999999955
+            }
+          ]
+        },
+        "totalACH": {
+          "min": 0.6,
+          "mean": 14.576915239726992,
+          "max": 40.3
+        },
+        "maximum": {
+          "ach": 40,
+          "m3s": 22.22222222222222,
+          "cfm": 47086.222288888894,
+          "m3sPerM2": 0.044444444444444446,
+          "cfmPerFt2": 8.748906385514974,
+          "heightM": 4
+        },
+        "basis": "screeningAssumption",
+        "reviewed": true
+      },
+      "comparison": {
+        "baseline": "Pad + vent baseline",
+        "attainmentPercentagePointDifference": 0,
+        "addedJointHours": 0,
+        "operatingCostDifferenceUSD": 0
+      }
     },
     {
       "name": "Pads + condensing dehumidifier",
+      "id": "a66b0673-51bc-4c82-b4b3-365ca0031dcb",
       "zip": "74103",
       "assumptions": {
         "evidenceTier": "Assumption-based component screening",
         "stepMinutes": 1,
         "warmupHoursPerSegment": 1,
         "lightSolarConversionUmolJ": 2.02,
+        "controlModeUsed": "staged",
+        "transpirationModelUsed": "stanghellini",
+        "canopyTemperature": "Equal to zone air temperature (declared simplification, no leaf energy balance).",
+        "leafAreaIndex": 3,
+        "shadeScreen": null,
+        "thermalScreen": null,
+        "heatSource": {
+          "type": "Fuel-fired heater",
+          "efficiency": 0.9,
+          "basis": "Declared combustion efficiency on delivered heat."
+        },
+        "envelope": {
+          "facility": "greenhouse",
+          "uValue": 4,
+          "envelopeRatio": 1.8,
+          "infiltrationACH": 0.3,
+          "parTransmission": 0.65,
+          "solarTransmission": 0.65,
+          "templateSource": "Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.",
+          "opticalBasis": "generic screening default, retained",
+          "matchesTemplate": true
+        },
+        "airflow": {
+          "controlledOutdoorAir": "One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.",
+          "balancedRecoveryFlow": true,
+          "supportedRecoveryFlowFraction": {
+            "minimum": 0.5,
+            "maximum": 1.3
+          },
+          "ratingInputs": "Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.",
+          "excessFlow": "Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.",
+          "doas": null
+        },
+        "screenAttribution": "Differenced against an otherwise identical run with that screen forced open.",
         "cpJkgK": 1006,
         "latentHeatJkg": 2450000,
         "psychrolibVersion": "2.5.0",
         "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
       },
+      "installedCostBasis": "screeningAssumption",
       "expectedHours": 8760,
       "validHours": 8760,
       "eligibleHours": 8759,
       "warmupHours": 1,
       "missingHours": 0,
       "numericalFailureHours": 0,
-      "compliancePct": 45.74266468774975,
-      "electricKWh": 106276.11071388013,
-      "fuelKWh": 121701.45462752682,
-      "waterL": 454549.00833294046,
-      "cost": 19138.79676057035,
+      "compliantHours": 3647.0666666666657,
+      "compliancePct": 41.637934315180566,
+      "electricKWh": 132966.17149869533,
+      "fuelKWh": 250636.9621941565,
+      "waterL": 629345.5768201273,
+      "cost": 28493.295032220853,
       "annualOwnershipCost": 4103.696738435943,
-      "maxEnergyResidualW": 9.12696123123169e-09,
-      "maxMoistureResidualKgS": 3.3237301799715623e-16,
-      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+      "maxEnergyResidualW": 7.894171479468545e-9,
+      "maxMoistureResidualKgS": 4.070817756958907e-16,
+      "costBasis": {
+        "scope": "annual",
+        "label": "Model-estimated annual operating cost",
+        "period": {
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31"
+        },
+        "included": [
+          "purchased electricity",
+          "purchased heating fuel",
+          "water represented by the scenario"
+        ],
+        "priceBasis": {
+          "electricity": {
+            "source": "manual scenario input",
+            "usdPerKWh": 0.12
+          },
+          "fuel": {
+            "source": "scenario input",
+            "usdPerKWh": 0.045
+          },
+          "water": {
+            "source": "scenario input",
+            "usdPerL": 0.002
+          }
+        },
+        "excluded": [
+          "installed capital",
+          "maintenance",
+          "labor",
+          "financing",
+          "taxes",
+          "demand charges",
+          "fixed charges",
+          "time-of-use effects",
+          "other unmodeled tariff components"
+        ],
+        "isQuote": false,
+        "isGuaranteedSavings": false
+      },
+      "outdoorAir": {
+        "controlledACH": {
+          "min": 0.3,
+          "mean": 19.90366890220651,
+          "max": 40,
+          "stages": [
+            {
+              "ach": 0.3,
+              "hours": 3083.1499999999924
+            },
+            {
+              "ach": 10.225000000000001,
+              "hours": 1330.2499999999875
+            },
+            {
+              "ach": 20.150000000000002,
+              "hours": 514.4333333333386
+            },
+            {
+              "ach": 30.075000000000003,
+              "hours": 385.20000000000647
+            },
+            {
+              "ach": 40,
+              "hours": 3446.9666666666644
+            }
+          ]
+        },
+        "totalACH": {
+          "min": 0.6,
+          "mean": 20.203668902207475,
+          "max": 40.3
+        },
+        "maximum": {
+          "ach": 40,
+          "m3s": 22.22222222222222,
+          "cfm": 47086.222288888894,
+          "m3sPerM2": 0.044444444444444446,
+          "cfmPerFt2": 8.748906385514974,
+          "heightM": 4
+        },
+        "basis": "screeningAssumption",
+        "reviewed": true
+      },
+      "comparison": {
+        "baseline": "Pad + vent baseline",
+        "attainmentPercentagePointDifference": 14.502797122959219,
+        "addedJointHours": 1270.299999999998,
+        "operatingCostDifferenceUSD": 6429.008436144093
+      }
     },
     {
       "name": "DX / mini-split + dehumidifier",
+      "id": "fd190fa2-ffba-4423-88ff-b474c81a8015",
       "zip": "74103",
       "assumptions": {
         "evidenceTier": "Assumption-based component screening",
         "stepMinutes": 1,
         "warmupHoursPerSegment": 1,
         "lightSolarConversionUmolJ": 2.02,
+        "controlModeUsed": "staged",
+        "transpirationModelUsed": "stanghellini",
+        "canopyTemperature": "Equal to zone air temperature (declared simplification, no leaf energy balance).",
+        "leafAreaIndex": 3,
+        "shadeScreen": null,
+        "thermalScreen": null,
+        "heatSource": {
+          "type": "Fuel-fired heater",
+          "efficiency": 0.9,
+          "basis": "Declared combustion efficiency on delivered heat."
+        },
+        "envelope": {
+          "facility": "greenhouse",
+          "uValue": 4,
+          "envelopeRatio": 1.8,
+          "infiltrationACH": 0.3,
+          "parTransmission": 0.65,
+          "solarTransmission": 0.65,
+          "templateSource": "Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.",
+          "opticalBasis": "generic screening default, retained",
+          "matchesTemplate": true
+        },
+        "airflow": {
+          "controlledOutdoorAir": "One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.",
+          "balancedRecoveryFlow": true,
+          "supportedRecoveryFlowFraction": {
+            "minimum": 0.5,
+            "maximum": 1.3
+          },
+          "ratingInputs": "Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.",
+          "excessFlow": "Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.",
+          "doas": null
+        },
+        "screenAttribution": "Differenced against an otherwise identical run with that screen forced open.",
         "cpJkgK": 1006,
         "latentHeatJkg": 2450000,
         "psychrolibVersion": "2.5.0",
         "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
       },
+      "installedCostBasis": "screeningAssumption",
       "expectedHours": 8760,
       "validHours": 8760,
       "eligibleHours": 8759,
       "warmupHours": 1,
       "missingHours": 0,
       "numericalFailureHours": 0,
-      "compliancePct": 74.67538151234916,
-      "electricKWh": 167775.77626417694,
-      "fuelKWh": 127068.42575168618,
-      "waterL": 451505.55237337516,
-      "cost": 26754.18341527372,
+      "compliantHours": 6399.883333333313,
+      "compliancePct": 73.0663698291279,
+      "electricKWh": 210077.03984162206,
+      "fuelKWh": 300556.9297315891,
+      "waterL": 590533.593495084,
+      "cost": 39915.373805906616,
       "annualOwnershipCost": 9251.834936201574,
-      "maxEnergyResidualW": 7.74549941221873e-09,
-      "maxMoistureResidualKgS": 3.518019209280965e-16,
-      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+      "maxEnergyResidualW": 7.962808012962342e-9,
+      "maxMoistureResidualKgS": 4.662936703425658e-16,
+      "costBasis": {
+        "scope": "annual",
+        "label": "Model-estimated annual operating cost",
+        "period": {
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31"
+        },
+        "included": [
+          "purchased electricity",
+          "purchased heating fuel",
+          "water represented by the scenario"
+        ],
+        "priceBasis": {
+          "electricity": {
+            "source": "manual scenario input",
+            "usdPerKWh": 0.12
+          },
+          "fuel": {
+            "source": "scenario input",
+            "usdPerKWh": 0.045
+          },
+          "water": {
+            "source": "scenario input",
+            "usdPerL": 0.002
+          }
+        },
+        "excluded": [
+          "installed capital",
+          "maintenance",
+          "labor",
+          "financing",
+          "taxes",
+          "demand charges",
+          "fixed charges",
+          "time-of-use effects",
+          "other unmodeled tariff components"
+        ],
+        "isQuote": false,
+        "isGuaranteedSavings": false
+      },
+      "outdoorAir": {
+        "controlledACH": {
+          "min": 0.3,
+          "mean": 8.845753567352345,
+          "max": 40,
+          "stages": [
+            {
+              "ach": 0.3,
+              "hours": 5634.466666666694
+            },
+            {
+              "ach": 10.225000000000001,
+              "hours": 1289.2833333333208
+            },
+            {
+              "ach": 20.150000000000002,
+              "hours": 400.33333333333974
+            },
+            {
+              "ach": 30.075000000000003,
+              "hours": 290.96666666667124
+            },
+            {
+              "ach": 40,
+              "hours": 1144.9500000000005
+            }
+          ]
+        },
+        "totalACH": {
+          "min": 0.6,
+          "mean": 9.14575356735188,
+          "max": 40.3
+        },
+        "maximum": {
+          "ach": 40,
+          "m3s": 22.22222222222222,
+          "cfm": 47086.222288888894,
+          "m3sPerM2": 0.044444444444444446,
+          "cfmPerFt2": 8.748906385514974,
+          "heightM": 4
+        },
+        "basis": "screeningAssumption",
+        "reviewed": true
+      },
+      "comparison": {
+        "baseline": "Pad + vent baseline",
+        "attainmentPercentagePointDifference": 45.93123263690654,
+        "addedJointHours": 4023.1166666666454,
+        "operatingCostDifferenceUSD": 17851.087209829857
+      }
     },
     {
       "name": "Integrated HVAC + reheat",
+      "id": "9aeac14e-4e37-46d6-8ec5-caabc4e02351",
       "zip": "74103",
       "assumptions": {
         "evidenceTier": "Assumption-based component screening",
         "stepMinutes": 1,
         "warmupHoursPerSegment": 1,
         "lightSolarConversionUmolJ": 2.02,
+        "controlModeUsed": "staged",
+        "transpirationModelUsed": "stanghellini",
+        "canopyTemperature": "Equal to zone air temperature (declared simplification, no leaf energy balance).",
+        "leafAreaIndex": 3,
+        "shadeScreen": null,
+        "thermalScreen": null,
+        "heatSource": {
+          "type": "Fuel-fired heater",
+          "efficiency": 0.9,
+          "basis": "Declared combustion efficiency on delivered heat."
+        },
+        "envelope": {
+          "facility": "greenhouse",
+          "uValue": 4,
+          "envelopeRatio": 1.8,
+          "infiltrationACH": 0.3,
+          "parTransmission": 0.65,
+          "solarTransmission": 0.65,
+          "templateSource": "Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.",
+          "opticalBasis": "generic screening default, retained",
+          "matchesTemplate": true
+        },
+        "airflow": {
+          "controlledOutdoorAir": "One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.",
+          "balancedRecoveryFlow": true,
+          "supportedRecoveryFlowFraction": {
+            "minimum": 0.5,
+            "maximum": 1.3
+          },
+          "ratingInputs": "Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.",
+          "excessFlow": "Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.",
+          "doas": null
+        },
+        "screenAttribution": "Differenced against an otherwise identical run with that screen forced open.",
         "cpJkgK": 1006,
         "latentHeatJkg": 2450000,
         "psychrolibVersion": "2.5.0",
         "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
       },
+      "installedCostBasis": "screeningAssumption",
       "expectedHours": 8760,
       "validHours": 8760,
       "eligibleHours": 8759,
       "warmupHours": 1,
       "missingHours": 0,
       "numericalFailureHours": 0,
-      "compliancePct": 75.64524108535988,
-      "electricKWh": 212231.79255725534,
-      "fuelKWh": 210890.8024693235,
-      "waterL": 397840.2843535465,
-      "cost": 35753.58178669742,
+      "compliantHours": 4843.499999999988,
+      "compliancePct": 55.29740837995192,
+      "electricKWh": 246956.566846172,
+      "fuelKWh": 367295.4724706088,
+      "waterL": 519008.96575861116,
+      "cost": 47201.1022142361,
       "annualOwnershipCost": 11825.904035084392,
-      "maxEnergyResidualW": 7.376850893100103e-09,
-      "maxMoistureResidualKgS": 2.98835030794938e-16,
-      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+      "maxEnergyResidualW": 8.133550484975178e-9,
+      "maxMoistureResidualKgS": 4.440892098500626e-16,
+      "costBasis": {
+        "scope": "annual",
+        "label": "Model-estimated annual operating cost",
+        "period": {
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31"
+        },
+        "included": [
+          "purchased electricity",
+          "purchased heating fuel",
+          "water represented by the scenario"
+        ],
+        "priceBasis": {
+          "electricity": {
+            "source": "manual scenario input",
+            "usdPerKWh": 0.12
+          },
+          "fuel": {
+            "source": "scenario input",
+            "usdPerKWh": 0.045
+          },
+          "water": {
+            "source": "scenario input",
+            "usdPerL": 0.002
+          }
+        },
+        "excluded": [
+          "installed capital",
+          "maintenance",
+          "labor",
+          "financing",
+          "taxes",
+          "demand charges",
+          "fixed charges",
+          "time-of-use effects",
+          "other unmodeled tariff components"
+        ],
+        "isQuote": false,
+        "isGuaranteedSavings": false
+      },
+      "outdoorAir": {
+        "controlledACH": {
+          "min": 0.3,
+          "mean": 6.918838232496778,
+          "max": 40,
+          "stages": [
+            {
+              "ach": 0.3,
+              "hours": 6159.0000000000255
+            },
+            {
+              "ach": 10.225000000000001,
+              "hours": 1177.1999999999953
+            },
+            {
+              "ach": 20.150000000000002,
+              "hours": 375.88333333333804
+            },
+            {
+              "ach": 30.075000000000003,
+              "hours": 278.7166666666699
+            },
+            {
+              "ach": 40,
+              "hours": 769.1999999999999
+            }
+          ]
+        },
+        "totalACH": {
+          "min": 0.6,
+          "mean": 7.218838232495667,
+          "max": 40.3
+        },
+        "maximum": {
+          "ach": 40,
+          "m3s": 22.22222222222222,
+          "cfm": 47086.222288888894,
+          "m3sPerM2": 0.044444444444444446,
+          "cfmPerFt2": 8.748906385514974,
+          "heightM": 4
+        },
+        "basis": "screeningAssumption",
+        "reviewed": true
+      },
+      "comparison": {
+        "baseline": "Pad + vent baseline",
+        "attainmentPercentagePointDifference": 28.16227118773057,
+        "addedJointHours": 2466.7333333333204,
+        "operatingCostDifferenceUSD": 25136.815618159344
+      }
     },
     {
       "name": "Desiccant + evaporative cooling",
+      "id": "3f70bb4b-a60d-4026-a4e7-aa9b54e1e6ed",
       "zip": "74103",
       "assumptions": {
         "evidenceTier": "Assumption-based component screening",
         "stepMinutes": 1,
         "warmupHoursPerSegment": 1,
         "lightSolarConversionUmolJ": 2.02,
+        "controlModeUsed": "staged",
+        "transpirationModelUsed": "stanghellini",
+        "canopyTemperature": "Equal to zone air temperature (declared simplification, no leaf energy balance).",
+        "leafAreaIndex": 3,
+        "shadeScreen": null,
+        "thermalScreen": null,
+        "heatSource": {
+          "type": "Fuel-fired heater",
+          "efficiency": 0.9,
+          "basis": "Declared combustion efficiency on delivered heat."
+        },
+        "envelope": {
+          "facility": "greenhouse",
+          "uValue": 4,
+          "envelopeRatio": 1.8,
+          "infiltrationACH": 0.3,
+          "parTransmission": 0.65,
+          "solarTransmission": 0.65,
+          "templateSource": "Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.",
+          "opticalBasis": "generic screening default, retained",
+          "matchesTemplate": true
+        },
+        "airflow": {
+          "controlledOutdoorAir": "One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.",
+          "balancedRecoveryFlow": true,
+          "supportedRecoveryFlowFraction": {
+            "minimum": 0.5,
+            "maximum": 1.3
+          },
+          "ratingInputs": "Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.",
+          "excessFlow": "Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.",
+          "doas": null
+        },
+        "screenAttribution": "Differenced against an otherwise identical run with that screen forced open.",
         "cpJkgK": 1006,
         "latentHeatJkg": 2450000,
         "psychrolibVersion": "2.5.0",
         "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
       },
+      "installedCostBasis": "screeningAssumption",
       "expectedHours": 8760,
       "validHours": 8760,
       "eligibleHours": 8759,
       "warmupHours": 1,
       "missingHours": 0,
       "numericalFailureHours": 0,
-      "compliancePct": 47.17071964075049,
-      "electricKWh": 57557.015394338145,
-      "fuelKWh": 315258.81000350456,
-      "waterL": 460837.3991403694,
-      "cost": 22015.16309575895,
+      "compliantHours": 4543.733333333335,
+      "compliancePct": 51.8750237850592,
+      "electricKWh": 65609.46220521032,
+      "fuelKWh": 548267.0759724238,
+      "waterL": 641075.3246644104,
+      "cost": 33827.30453271327,
       "annualOwnershipCost": 9766.648755978138,
-      "maxEnergyResidualW": 9.111439188321431e-09,
-      "maxMoistureResidualKgS": 3.515706244646329e-16,
-      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+      "maxEnergyResidualW": 7.962808012962342e-9,
+      "maxMoistureResidualKgS": 5.255055649892408e-16,
+      "costBasis": {
+        "scope": "annual",
+        "label": "Model-estimated annual operating cost",
+        "period": {
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31"
+        },
+        "included": [
+          "purchased electricity",
+          "purchased heating fuel",
+          "water represented by the scenario"
+        ],
+        "priceBasis": {
+          "electricity": {
+            "source": "manual scenario input",
+            "usdPerKWh": 0.12
+          },
+          "fuel": {
+            "source": "scenario input",
+            "usdPerKWh": 0.045
+          },
+          "water": {
+            "source": "scenario input",
+            "usdPerL": 0.002
+          }
+        },
+        "excluded": [
+          "installed capital",
+          "maintenance",
+          "labor",
+          "financing",
+          "taxes",
+          "demand charges",
+          "fixed charges",
+          "time-of-use effects",
+          "other unmodeled tariff components"
+        ],
+        "isQuote": false,
+        "isGuaranteedSavings": false
+      },
+      "outdoorAir": {
+        "controlledACH": {
+          "min": 0.3,
+          "mean": 19.387931459284093,
+          "max": 40,
+          "stages": [
+            {
+              "ach": 0.3,
+              "hours": 3191.4666666666662
+            },
+            {
+              "ach": 10.225000000000001,
+              "hours": 1322.0999999999906
+            },
+            {
+              "ach": 20.150000000000002,
+              "hours": 545.050000000003
+            },
+            {
+              "ach": 30.075000000000003,
+              "hours": 370.3500000000066
+            },
+            {
+              "ach": 40,
+              "hours": 3331.033333333323
+            }
+          ]
+        },
+        "totalACH": {
+          "min": 0.6,
+          "mean": 19.687931459285135,
+          "max": 40.3
+        },
+        "maximum": {
+          "ach": 40,
+          "m3s": 22.22222222222222,
+          "cfm": 47086.222288888894,
+          "m3sPerM2": 0.044444444444444446,
+          "cfmPerFt2": 8.748906385514974,
+          "heightM": 4
+        },
+        "basis": "screeningAssumption",
+        "reviewed": true
+      },
+      "comparison": {
+        "baseline": "Pad + vent baseline",
+        "attainmentPercentagePointDifference": 24.739886592837852,
+        "addedJointHours": 2166.9666666666676,
+        "operatingCostDifferenceUSD": 11763.017936636512
+      }
     },
     {
       "name": "Liquid-desiccant hybrid (generic)",
+      "id": "5bb76a09-13e9-45c8-bd29-c0ba9826e384",
       "zip": "74103",
       "assumptions": {
         "evidenceTier": "Assumption-based component screening",
         "stepMinutes": 1,
         "warmupHoursPerSegment": 1,
         "lightSolarConversionUmolJ": 2.02,
+        "controlModeUsed": "staged",
+        "transpirationModelUsed": "stanghellini",
+        "canopyTemperature": "Equal to zone air temperature (declared simplification, no leaf energy balance).",
+        "leafAreaIndex": 3,
+        "shadeScreen": null,
+        "thermalScreen": null,
+        "heatSource": {
+          "type": "Fuel-fired heater",
+          "efficiency": 0.9,
+          "basis": "Declared combustion efficiency on delivered heat."
+        },
+        "envelope": {
+          "facility": "greenhouse",
+          "uValue": 4,
+          "envelopeRatio": 1.8,
+          "infiltrationACH": 0.3,
+          "parTransmission": 0.65,
+          "solarTransmission": 0.65,
+          "templateSource": "Generic screening placeholder retained from 0.1.0 so existing scenarios keep their numbers. Not a sourced envelope; pick a ladder entry for values traceable to docs/COMPONENT-PARAMETERS.md.",
+          "opticalBasis": "generic screening default, retained",
+          "matchesTemplate": true
+        },
+        "airflow": {
+          "controlledOutdoorAir": "One controlled supply stream; infiltration is separate and no treatment adds outdoor airflow.",
+          "balancedRecoveryFlow": true,
+          "supportedRecoveryFlowFraction": {
+            "minimum": 0.5,
+            "maximum": 1.3
+          },
+          "ratingInputs": "Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.",
+          "excessFlow": "Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.",
+          "doas": null
+        },
+        "screenAttribution": "Differenced against an otherwise identical run with that screen forced open.",
         "cpJkgK": 1006,
         "latentHeatJkg": 2450000,
         "psychrolibVersion": "2.5.0",
         "psychrolibCommit": "a42717d24ed08534642d6caf7dcbbf72b9510bea"
       },
+      "installedCostBasis": "screeningAssumption",
       "expectedHours": 8760,
       "validHours": 8760,
       "eligibleHours": 8759,
       "warmupHours": 1,
       "missingHours": 0,
       "numericalFailureHours": 0,
-      "compliancePct": 51.57342923469194,
-      "electricKWh": 172680.9413555372,
-      "fuelKWh": 166602.2304058137,
-      "waterL": 481148.5914475469,
-      "cost": 29181.11051382125,
+      "compliantHours": 4608.933333333329,
+      "compliancePct": 52.61940099706963,
+      "electricKWh": 261245.66149687622,
+      "fuelKWh": 316102.7396761725,
+      "waterL": 879390.5343489584,
+      "cost": 47332.88373375104,
       "annualOwnershipCost": 13370.345494414081,
-      "maxEnergyResidualW": 9.12696123123169e-09,
-      "maxMoistureResidualKgS": 3.867276869110962e-16,
-      "costBasis": "Deliberate manual electricity override plus scenario fuel and water; observed valid-hour costs only. Capital and maintenance remain separate."
+      "maxEnergyResidualW": 7.62520357966423e-9,
+      "maxMoistureResidualKgS": 3.645159984041098e-16,
+      "costBasis": {
+        "scope": "annual",
+        "label": "Model-estimated annual operating cost",
+        "period": {
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31"
+        },
+        "included": [
+          "purchased electricity",
+          "purchased heating fuel",
+          "water represented by the scenario"
+        ],
+        "priceBasis": {
+          "electricity": {
+            "source": "manual scenario input",
+            "usdPerKWh": 0.12
+          },
+          "fuel": {
+            "source": "scenario input",
+            "usdPerKWh": 0.045
+          },
+          "water": {
+            "source": "scenario input",
+            "usdPerL": 0.002
+          }
+        },
+        "excluded": [
+          "installed capital",
+          "maintenance",
+          "labor",
+          "financing",
+          "taxes",
+          "demand charges",
+          "fixed charges",
+          "time-of-use effects",
+          "other unmodeled tariff components"
+        ],
+        "isQuote": false,
+        "isGuaranteedSavings": false
+      },
+      "outdoorAir": {
+        "controlledACH": {
+          "min": 0.3,
+          "mean": 16.84132676940559,
+          "max": 40,
+          "stages": [
+            {
+              "ach": 0.3,
+              "hours": 3987.866666666671
+            },
+            {
+              "ach": 10.225000000000001,
+              "hours": 1158.816666666664
+            },
+            {
+              "ach": 20.150000000000002,
+              "hours": 384.033333333336
+            },
+            {
+              "ach": 30.075000000000003,
+              "hours": 244.31666666666746
+            },
+            {
+              "ach": 40,
+              "hours": 2984.966666666663
+            }
+          ]
+        },
+        "totalACH": {
+          "min": 0.6,
+          "mean": 17.141326769407627,
+          "max": 40.3
+        },
+        "maximum": {
+          "ach": 40,
+          "m3s": 22.22222222222222,
+          "cfm": 47086.222288888894,
+          "m3sPerM2": 0.044444444444444446,
+          "cfmPerFt2": 8.748906385514974,
+          "heightM": 4
+        },
+        "basis": "screeningAssumption",
+        "reviewed": true
+      },
+      "comparison": {
+        "baseline": "Pad + vent baseline",
+        "attainmentPercentagePointDifference": 25.484263804848286,
+        "addedJointHours": 2232.166666666661,
+        "operatingCostDifferenceUSD": 25268.597137674282
+      }
     }
   ],
   "exports": [
     {
-      "name": "control-window-hourly.csv",
-      "bytes": 29059399,
-      "sha256": "306da05e93d84c2ea8256f51dad09f34f66cea6321cc54ca18d652045e84bc45"
+      "name": "cea-psychrometric-site-evaluator-run.json",
+      "bytes": 207706978,
+      "sha256": "7b1a05402c72bbaad968a5a4730ea4fbe5c65c187d53b28d43faa72aa691321e",
+      "retained": null
     },
     {
-      "name": "control-window-report.html",
-      "bytes": 143575,
-      "sha256": "ced0227048a220c8a7adbedb5811242a1c137d00ef67ca1c30a35e442bb2f29c"
+      "name": "cea-psychrometric-site-evaluator-hourly.csv",
+      "bytes": 82871684,
+      "sha256": "84975c427cd40b1f4dccb2be09c914878bee260d5c08f3d007aa19410d59ef04",
+      "retained": null
     },
     {
-      "name": "control-window-run.json",
-      "bytes": 113692669,
-      "sha256": "0e35db9b15bbea3739784309abb8f1cd60bca236a07816e7a4600e0d89da1e36"
+      "name": "cea-psychrometric-site-evaluator-report.html",
+      "bytes": 242425,
+      "sha256": "f4dbb41f948016d8bfcf7f5f03eaad6fe1997d0873e550798bef3e59d2606478",
+      "retained": "docs/example-comparison.html"
+    },
+    {
+      "name": "cea-psychrometric-site-evaluator-design-basis.html",
+      "bytes": 212042,
+      "sha256": "c55916c3d80c39e6e784ec3c89bc46cea663f11a254877b037d956032df2f257",
+      "retained": "docs/example-design-basis.html"
     }
   ],
-  "retainedReport": {
-    "path": "example-comparison.html",
-    "bytes": 148893,
-    "sha256": "9389475fba6437a3ff7755cfe45fb3e7a9bee74eb396f80a9753dcfc596a9b34",
-    "note": "Regenerated 2026-09-12 after the audit fixes (cadence-invariant unmet loads, unsaturable-candidate guard) and the equipment-runtime rows. Comparison cost/attainment figures unchanged from the 09-11 run."
+  "reimport": {
+    "staleNoticeObservedAfterImport": true,
+    "staleNoticeClearedAfterRun": true,
+    "originalExportedAt": "2026-09-15T20:56:18.181Z",
+    "recomputedExportedAt": "2026-09-15T21:00:07.271Z",
+    "sameSummaries": true,
+    "sameHourlyResults": true
   },
-  "audit_2026_09_12": {
-    "padRuntime": {
-      "Pad + vent baseline": {
-        "hours": 2772,
-        "equivalentHours": 1830.0999999999951,
-        "days": 296
+  "airflowInspector": {
+    "minimumAir": {
+      "index": 131,
+      "time": 1736182800000,
+      "mode": "MINIMUM_AIR",
+      "outdoorTempC": -3.7,
+      "outdoorRH": 0.45170000000000005,
+      "controls": {
+        "controlledACH": 0.30000000000000016,
+        "controlledM3s": 0.16666666666666657,
+        "controlledACHMin": 0.3,
+        "controlledACHMax": 0.3,
+        "controlledACHStages": [
+          {
+            "ach": 0.3,
+            "hours": 1.0000000000000013
+          }
+        ],
+        "totalOutdoorACH": 0.6000000000000003,
+        "totalOutdoorM3s": 0.33333333333333315,
+        "totalOutdoorACHMin": 0.6,
+        "totalOutdoorACHMax": 0.6,
+        "recoveryCoreFraction": 0,
+        "recoveryBypassFraction": 0,
+        "recoveryDefrostFraction": 0,
+        "preheatFraction": 0,
+        "padFraction": 0,
+        "indirectFraction": 0,
+        "dxDuty": 0,
+        "dehuDuty": 0,
+        "desiccantDuty": 0,
+        "doasConditionedFraction": 0,
+        "doasTreatmentM3s": 0,
+        "heaterDuty": 0.00574161592084792,
+        "humidifierFraction": 0,
+        "lightFraction": 0,
+        "enrichmentFraction": 1.0000000000000013,
+        "shadeFraction": 0,
+        "thermalScreenFraction": 0
       },
-      "Pads + condensing dehumidifier": {
-        "hours": 4708,
-        "equivalentHours": 2452.9833333333436,
-        "days": 347
+      "recoveryCoreM3": 0,
+      "recoveryBypassM3": 0,
+      "recoverySensibleKWh": 0,
+      "recoveryLatentKWh": 0,
+      "recoveryAuxKWh": 0,
+      "doasCondensateKg": 0,
+      "doasCoolingDeliveredKWh": 0,
+      "doasCoolingElectricKWh": 0,
+      "doasRecoveredReheatKWh": 0,
+      "doasExternalHeatKWh": 0,
+      "doasUnmetConditioningKWh": 0
+    },
+    "higherFlow": {
+      "index": 98,
+      "time": 1736064000000,
+      "mode": "HEATING",
+      "outdoorTempC": 7.83,
+      "outdoorRH": 0.9581999999999999,
+      "controls": {
+        "controlledACH": 10.225000000000005,
+        "controlledM3s": 5.680555555555551,
+        "controlledACHMin": 10.225000000000001,
+        "controlledACHMax": 10.225000000000001,
+        "controlledACHStages": [
+          {
+            "ach": 10.225000000000001,
+            "hours": 1.0000000000000013
+          }
+        ],
+        "totalOutdoorACH": 10.525000000000011,
+        "totalOutdoorM3s": 5.847222222222225,
+        "totalOutdoorACHMin": 10.525000000000002,
+        "totalOutdoorACHMax": 10.525000000000002,
+        "recoveryCoreFraction": 0,
+        "recoveryBypassFraction": 0,
+        "recoveryDefrostFraction": 0,
+        "preheatFraction": 0,
+        "padFraction": 0,
+        "indirectFraction": 0,
+        "dxDuty": 0,
+        "dehuDuty": 0,
+        "desiccantDuty": 0,
+        "doasConditionedFraction": 0,
+        "doasTreatmentM3s": 0,
+        "heaterDuty": 0.8408694487029206,
+        "humidifierFraction": 0,
+        "lightFraction": 0,
+        "enrichmentFraction": 0,
+        "shadeFraction": 0,
+        "thermalScreenFraction": 0
       },
-      "DX / mini-split + dehumidifier": {
-        "hours": 3951,
-        "equivalentHours": 2160.1333333333396,
-        "days": 347
+      "recoveryCoreM3": 0,
+      "recoveryBypassM3": 0,
+      "recoverySensibleKWh": 0,
+      "recoveryLatentKWh": 0,
+      "recoveryAuxKWh": 0,
+      "doasCondensateKg": 0,
+      "doasCoolingDeliveredKWh": 0,
+      "doasCoolingElectricKWh": 0,
+      "doasRecoveredReheatKWh": 0,
+      "doasExternalHeatKWh": 0,
+      "doasUnmetConditioningKWh": 0
+    },
+    "note": "Actual hourly inspector displays controlled / total ACH and flow, installed maximum separately, stage durations and explicit recovery/DOAS quantities. Canonical six have no recovery or DOAS installed."
+  },
+  "incompleteBlocking": {
+    "mushroom": {
+      "blocked": true,
+      "requirements": [
+        "project-specific finite minimum ACH",
+        "project-specific maximum ACH greater than zero",
+        "species, growth stage, substrate loading, CO2 target, and equipment review"
+      ]
+    },
+    "hrv": {
+      "blocked": true,
+      "requirements": [
+        "nominal flow",
+        "auxiliary watts",
+        "four sensible effectiveness ratings",
+        "minimum outdoor operating temperature when frost control is none"
+      ]
+    },
+    "erv": {
+      "blocked": true,
+      "requirements": [
+        "HRV requirements",
+        "four latent effectiveness ratings"
+      ]
+    },
+    "doas": {
+      "blocked": true,
+      "requirements": [
+        "reviewed controlled outdoor air",
+        "positive treatment capacity",
+        "supply dew point and temperature",
+        "cooling COP",
+        "reheat recovery fraction"
+      ]
+    },
+    "method": "Selected each option in actual browser scenario form and read Run blocked configuration panel and disabled Run all state."
+  },
+  "conditionedSmoke": {
+    "ratingsDeclaration": "Smoke-only illustrative declared ratings, not manufacturer data or equipment recommendations.",
+    "scenarios": [
+      {
+        "schemaVersion": 2,
+        "id": "browser-smoke-erv",
+        "name": "Declared smoke ERV ratings, not equipment selection",
+        "facility": "greenhouse",
+        "system": "bench",
+        "crop": "lettuce",
+        "technology": "pad",
+        "areaM2": 500,
+        "canopyM2": 350,
+        "heightM": 4,
+        "envelopeRatio": 1.8,
+        "uValue": 4,
+        "thermalMassKJm2K": 100,
+        "infiltrationACH": 0.3,
+        "solarTransmission": 0.65,
+        "parTransmission": 0.65,
+        "shadeFraction": 0.25,
+        "solarHeatFraction": 1,
+        "minVentACH": 0.3,
+        "maxVentACH": 40,
+        "fanWPerM3s": 180,
+        "padEnabled": true,
+        "padEffectiveness": 0.8,
+        "padPumpW": 250,
+        "heaterKW": 120,
+        "heaterEfficiency": 0.9,
+        "coolingKW": 0,
+        "coolingCOP": 3,
+        "coolingSHR": 0.75,
+        "coolingMinOutdoorC": -5,
+        "coolingMaxOutdoorC": 46,
+        "dehuKgH": 0,
+        "dehuLPerKWh": 2.5,
+        "integratedHVAC": false,
+        "reheatFraction": 0.5,
+        "humidifierKgH": 0,
+        "desiccantKgH": 0,
+        "regenerationKWhPerKg": 1.2,
+        "regenerationElectricFraction": 0,
+        "desiccantHeatFraction": 1,
+        "hybridEvapEffectiveness": 0.8,
+        "lightWm2": 80,
+        "efficacy": 2.5,
+        "lightDelivery": 0.85,
+        "dayStart": 6,
+        "photoperiod": 16,
+        "dayTargetC": 22,
+        "nightTargetC": 18,
+        "tempToleranceC": 2,
+        "vpdMin": 0.6,
+        "vpdMax": 1,
+        "maxDewPointC": 19,
+        "dliTarget": 14,
+        "transpirationLDayM2": 1.6714285714285715,
+        "darkTranspirationFraction": 0.15,
+        "cropSensibleWm2": 0,
+        "electricityPrice": 0.12,
+        "fuelPrice": 0.045,
+        "waterPrice": 0.002,
+        "installedCost": 15000,
+        "maintenanceYear": 500,
+        "lifeYears": 15,
+        "discountRate": 0.06,
+        "latitude": 36.15,
+        "longitude": -95.99,
+        "timezone": "America/Chicago",
+        "zip": "74103",
+        "priceMode": "manual",
+        "sector": "commercial",
+        "controlMode": "staged",
+        "transpirationModel": "stanghellini",
+        "lai": 3,
+        "heatSource": "fuel",
+        "heatPumpCopAt8C": null,
+        "heatPumpCopAtMinus8C": null,
+        "heatPumpCopAtMinus15C": null,
+        "heatPumpCutoffC": null,
+        "heatPumpCapacityDerate": null,
+        "dehuHeatFraction": 1,
+        "doasM3s": 0,
+        "doasSupplyDewPointC": null,
+        "doasSupplyTempC": null,
+        "doasCoolingCOP": null,
+        "doasReheatRecoveryFraction": null,
+        "outsideAirBasis": "screeningAssumption",
+        "outsideAirReviewed": true,
+        "installedCostBasis": "screeningAssumption",
+        "heatRecovery": {
+          "type": "erv",
+          "nominalM3s": 0.2222222222,
+          "auxiliaryW": 45,
+          "sensibleHeating75": 0.7,
+          "sensibleHeating100": 0.7,
+          "sensibleCooling75": 0.7,
+          "sensibleCooling100": 0.7,
+          "latentHeating75": 0.5,
+          "latentHeating100": 0.5,
+          "latentCooling75": 0.5,
+          "latentCooling100": 0.5,
+          "economizerBypass": true,
+          "frostControl": "none",
+          "minimumOutdoorOperatingC": -30,
+          "frostThresholdC": null,
+          "initialDefrostFraction": null,
+          "defrostRatePerK": null
+        },
+        "shadeScreen": {
+          "installed": false,
+          "shadeFraction": 0.5,
+          "parTransmission": null,
+          "solarTransmission": null,
+          "deployAboveWm2": null,
+          "deployAboveC": null,
+          "maxDeployDliDeficit": null
+        },
+        "thermalScreen": {
+          "installed": false,
+          "uValueFactor": null,
+          "parTransmission": null,
+          "solarTransmission": null,
+          "deployAboveC": null,
+          "nightDeploy": true,
+          "closedExchangeACH": null
+        },
+        "insectScreen": {
+          "installed": false,
+          "grade": null,
+          "ventilationFactor": null
+        },
+        "notes": "Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval."
       },
-      "Integrated HVAC + reheat": {
-        "hours": 4012,
-        "equivalentHours": 2164.166666666674,
-        "days": 342
+      {
+        "schemaVersion": 2,
+        "id": "browser-smoke-doas",
+        "name": "Declared smoke DOAS, not equipment selection",
+        "facility": "greenhouse",
+        "system": "bench",
+        "crop": "lettuce",
+        "technology": "doas",
+        "areaM2": 500,
+        "canopyM2": 350,
+        "heightM": 4,
+        "envelopeRatio": 1.8,
+        "uValue": 4,
+        "thermalMassKJm2K": 100,
+        "infiltrationACH": 0.3,
+        "solarTransmission": 0.65,
+        "parTransmission": 0.65,
+        "shadeFraction": 0.25,
+        "solarHeatFraction": 1,
+        "minVentACH": 1.8,
+        "maxVentACH": 1.8,
+        "fanWPerM3s": 180,
+        "padEnabled": false,
+        "padEffectiveness": 0.8,
+        "padPumpW": 250,
+        "heaterKW": 120,
+        "heaterEfficiency": 0.9,
+        "coolingKW": 0,
+        "coolingCOP": 3,
+        "coolingSHR": 0.75,
+        "coolingMinOutdoorC": -5,
+        "coolingMaxOutdoorC": 46,
+        "dehuKgH": 0,
+        "dehuLPerKWh": 2.5,
+        "integratedHVAC": false,
+        "reheatFraction": 0.5,
+        "humidifierKgH": 0,
+        "desiccantKgH": 0,
+        "regenerationKWhPerKg": 1.2,
+        "regenerationElectricFraction": 0,
+        "desiccantHeatFraction": 1,
+        "hybridEvapEffectiveness": 0.8,
+        "lightWm2": 80,
+        "efficacy": 2.5,
+        "lightDelivery": 0.85,
+        "dayStart": 6,
+        "photoperiod": 16,
+        "dayTargetC": 22,
+        "nightTargetC": 18,
+        "tempToleranceC": 2,
+        "vpdMin": 0.6,
+        "vpdMax": 1,
+        "maxDewPointC": 19,
+        "dliTarget": 14,
+        "transpirationLDayM2": 1.6714285714285715,
+        "darkTranspirationFraction": 0.15,
+        "cropSensibleWm2": 0,
+        "electricityPrice": 0.12,
+        "fuelPrice": 0.045,
+        "waterPrice": 0.002,
+        "installedCost": 15000,
+        "maintenanceYear": 500,
+        "lifeYears": 15,
+        "discountRate": 0.06,
+        "latitude": 36.15,
+        "longitude": -95.99,
+        "timezone": "America/Chicago",
+        "zip": "74103",
+        "priceMode": "manual",
+        "sector": "commercial",
+        "controlMode": "staged",
+        "transpirationModel": "stanghellini",
+        "lai": 3,
+        "heatSource": "fuel",
+        "heatPumpCopAt8C": null,
+        "heatPumpCopAtMinus8C": null,
+        "heatPumpCopAtMinus15C": null,
+        "heatPumpCutoffC": null,
+        "heatPumpCapacityDerate": null,
+        "dehuHeatFraction": 1,
+        "doasM3s": 1,
+        "doasSupplyDewPointC": 10,
+        "doasSupplyTempC": 21,
+        "doasCoolingCOP": 3,
+        "doasReheatRecoveryFraction": 0.5,
+        "outsideAirBasis": "screeningAssumption",
+        "outsideAirReviewed": true,
+        "installedCostBasis": "screeningAssumption",
+        "heatRecovery": {
+          "type": "none",
+          "nominalM3s": null,
+          "auxiliaryW": null,
+          "sensibleHeating75": null,
+          "sensibleHeating100": null,
+          "sensibleCooling75": null,
+          "sensibleCooling100": null,
+          "latentHeating75": null,
+          "latentHeating100": null,
+          "latentCooling75": null,
+          "latentCooling100": null,
+          "economizerBypass": true,
+          "frostControl": "none",
+          "minimumOutdoorOperatingC": null,
+          "frostThresholdC": null,
+          "initialDefrostFraction": null,
+          "defrostRatePerK": null
+        },
+        "shadeScreen": {
+          "installed": false,
+          "shadeFraction": 0.5,
+          "parTransmission": null,
+          "solarTransmission": null,
+          "deployAboveWm2": null,
+          "deployAboveC": null,
+          "maxDeployDliDeficit": null
+        },
+        "thermalScreen": {
+          "installed": false,
+          "uValueFactor": null,
+          "parTransmission": null,
+          "solarTransmission": null,
+          "deployAboveC": null,
+          "nightDeploy": true,
+          "closedExchangeACH": null
+        },
+        "insectScreen": {
+          "installed": false,
+          "grade": null,
+          "ventilationFactor": null
+        },
+        "notes": "Example-only airflow review: 0.3 ACH is modeled uncontrolled infiltration, separate from one controlled outdoor-air stream with 0.3 ACH minimum and 40 ACH installed maximum. Fan specific power 180 W/(m3/s) is an illustrative screening input, not a selected fan rating. This generic greenhouse envelope and its airflow bounds are screening assumptions, not a construction-specific literature range or measured leakage. Heat recovery is not installed. Installed cost is an unchanged screening allowance, not a quote; equipment and airflow changes are not priced automatically. Review here authorizes running the example only and is not project approval."
+      }
+    ],
+    "weather": "Same bundled Tulsa 2025 full year. Each smoke scenario returned 8760 valid hours, 0 numerical failures.",
+    "hours": {
+      "ervActive": {
+        "index": 174,
+        "time": 1736337600000,
+        "mode": "HEATING",
+        "outdoorTempC": -8.06,
+        "outdoorRH": 0.9061,
+        "controls": {
+          "controlledACH": 0.30000000000000016,
+          "controlledM3s": 0.16666666666666657,
+          "controlledACHMin": 0.3,
+          "controlledACHMax": 0.3,
+          "controlledACHStages": [
+            {
+              "ach": 0.3,
+              "hours": 1.0000000000000013
+            }
+          ],
+          "totalOutdoorACH": 0.6000000000000003,
+          "totalOutdoorM3s": 0.33333333333333315,
+          "totalOutdoorACHMin": 0.6,
+          "totalOutdoorACHMax": 0.6,
+          "recoveryCoreFraction": 0.9166666666666679,
+          "recoveryBypassFraction": 0.08333333333333333,
+          "recoveryDefrostFraction": 0,
+          "preheatFraction": 0,
+          "padFraction": 0,
+          "indirectFraction": 0,
+          "dxDuty": 0,
+          "dehuDuty": 0,
+          "desiccantDuty": 0,
+          "doasConditionedFraction": 0,
+          "doasTreatmentM3s": 0,
+          "heaterDuty": 1.0000000000000013,
+          "humidifierFraction": 0,
+          "lightFraction": 1.0000000000000013,
+          "enrichmentFraction": 1.0000000000000013,
+          "shadeFraction": 0,
+          "thermalScreenFraction": 0
+        },
+        "recoveryCoreM3": 550,
+        "recoveryBypassM3": 50,
+        "recoverySensibleKWh": 3.650716465675911,
+        "recoveryLatentKWh": 2.5219467511540543,
+        "recoveryAuxKWh": 0.04125000000000002,
+        "doasCondensateKg": 0,
+        "doasCoolingDeliveredKWh": 0,
+        "doasCoolingElectricKWh": 0,
+        "doasRecoveredReheatKWh": 0,
+        "doasExternalHeatKWh": 0,
+        "doasUnmetConditioningKWh": 0
       },
-      "Desiccant + evaporative cooling": {
-        "hours": 5396,
-        "equivalentHours": 2906.033333333349,
-        "days": 349
+      "ervBypass": {
+        "index": 1,
+        "time": 1735714800000,
+        "mode": "HEATING",
+        "outdoorTempC": -1.58,
+        "outdoorRH": 0.898,
+        "controls": {
+          "controlledACH": 0.30000000000000016,
+          "controlledM3s": 0.16666666666666657,
+          "controlledACHMin": 0.3,
+          "controlledACHMax": 0.3,
+          "controlledACHStages": [
+            {
+              "ach": 0.3,
+              "hours": 1.0000000000000013
+            }
+          ],
+          "totalOutdoorACH": 0.6000000000000003,
+          "totalOutdoorM3s": 0.33333333333333315,
+          "totalOutdoorACHMin": 0.6,
+          "totalOutdoorACHMax": 0.6,
+          "recoveryCoreFraction": 0,
+          "recoveryBypassFraction": 1.0000000000000013,
+          "recoveryDefrostFraction": 0,
+          "preheatFraction": 0,
+          "padFraction": 0,
+          "indirectFraction": 0,
+          "dxDuty": 0,
+          "dehuDuty": 0,
+          "desiccantDuty": 0,
+          "doasConditionedFraction": 0,
+          "doasTreatmentM3s": 0,
+          "heaterDuty": 0.6853874162840627,
+          "humidifierFraction": 0,
+          "lightFraction": 0,
+          "enrichmentFraction": 1.0000000000000013,
+          "shadeFraction": 0,
+          "thermalScreenFraction": 0
+        },
+        "recoveryCoreM3": 0,
+        "recoveryBypassM3": 600,
+        "recoverySensibleKWh": 0,
+        "recoveryLatentKWh": 0,
+        "recoveryAuxKWh": 0,
+        "doasCondensateKg": 0,
+        "doasCoolingDeliveredKWh": 0,
+        "doasCoolingElectricKWh": 0,
+        "doasRecoveredReheatKWh": 0,
+        "doasExternalHeatKWh": 0,
+        "doasUnmetConditioningKWh": 0
       },
-      "Liquid-desiccant hybrid (generic)": {
-        "hours": 4193,
-        "equivalentHours": 2153.300000000016,
-        "days": 349
+      "doasColdDry": {
+        "index": 110,
+        "time": 1736107200000,
+        "mode": "DOAS_CONDITIONING",
+        "outdoorTempC": -2.5,
+        "outdoorRH": 0.5994,
+        "controls": {
+          "controlledACH": 1.8000000000000014,
+          "controlledM3s": 1.0000000000000013,
+          "controlledACHMin": 1.8,
+          "controlledACHMax": 1.8,
+          "controlledACHStages": [
+            {
+              "ach": 1.8,
+              "hours": 1.0000000000000013
+            }
+          ],
+          "totalOutdoorACH": 2.0999999999999988,
+          "totalOutdoorM3s": 1.166666666666667,
+          "totalOutdoorACHMin": 2.1,
+          "totalOutdoorACHMax": 2.1,
+          "recoveryCoreFraction": 0,
+          "recoveryBypassFraction": 0,
+          "recoveryDefrostFraction": 0,
+          "preheatFraction": 0,
+          "padFraction": 0,
+          "indirectFraction": 0,
+          "dxDuty": 0,
+          "dehuDuty": 0,
+          "desiccantDuty": 0,
+          "doasConditionedFraction": 1.0000000000000013,
+          "doasTreatmentM3s": 1.0000000000000013,
+          "heaterDuty": 0.616869357693086,
+          "humidifierFraction": 0,
+          "lightFraction": 1.0000000000000013,
+          "enrichmentFraction": 1.0000000000000013,
+          "shadeFraction": 0,
+          "thermalScreenFraction": 0
+        },
+        "recoveryCoreM3": 0,
+        "recoveryBypassM3": 0,
+        "recoverySensibleKWh": 0,
+        "recoveryLatentKWh": 0,
+        "recoveryAuxKWh": 0,
+        "doasCondensateKg": 0,
+        "doasCoolingDeliveredKWh": 0,
+        "doasCoolingElectricKWh": 0,
+        "doasRecoveredReheatKWh": 0,
+        "doasExternalHeatKWh": 30.00914684493097,
+        "doasUnmetConditioningKWh": 0
+      },
+      "doasHotHumid": {
+        "index": 3208,
+        "time": 1747260000000,
+        "mode": "DOAS_DEHUMIDIFY",
+        "outdoorTempC": 31.05,
+        "outdoorRH": 0.6426999999999999,
+        "controls": {
+          "controlledACH": 1.8000000000000014,
+          "controlledM3s": 1.0000000000000013,
+          "controlledACHMin": 1.8,
+          "controlledACHMax": 1.8,
+          "controlledACHStages": [
+            {
+              "ach": 1.8,
+              "hours": 1.0000000000000013
+            }
+          ],
+          "totalOutdoorACH": 2.0999999999999988,
+          "totalOutdoorM3s": 1.166666666666667,
+          "totalOutdoorACHMin": 2.1,
+          "totalOutdoorACHMax": 2.1,
+          "recoveryCoreFraction": 0,
+          "recoveryBypassFraction": 0,
+          "recoveryDefrostFraction": 0,
+          "preheatFraction": 0,
+          "padFraction": 0,
+          "indirectFraction": 0,
+          "dxDuty": 0,
+          "dehuDuty": 0,
+          "desiccantDuty": 0,
+          "doasConditionedFraction": 1.0000000000000013,
+          "doasTreatmentM3s": 1.0000000000000013,
+          "heaterDuty": 0,
+          "humidifierFraction": 0,
+          "lightFraction": 0,
+          "enrichmentFraction": 1.0000000000000013,
+          "shadeFraction": 0,
+          "thermalScreenFraction": 0
+        },
+        "recoveryCoreM3": 0,
+        "recoveryBypassM3": 0,
+        "recoverySensibleKWh": 0,
+        "recoveryLatentKWh": 0,
+        "recoveryAuxKWh": 0,
+        "doasCondensateKg": 43.365846080880615,
+        "doasCoolingDeliveredKWh": 53.9664051030559,
+        "doasCoolingElectricKWh": 17.98880170101861,
+        "doasRecoveredReheatKWh": 12.093986088072135,
+        "doasExternalHeatKWh": 0,
+        "doasUnmetConditioningKWh": 0
       }
     },
-    "padViabilityWeatherOnly": {
-      "effectiveHours": 244,
-      "marginalHours": 18,
-      "ineffectiveHours": 2680,
-      "effectiveDays": {
-        "atLeast1": 65,
-        "atLeast4": 30,
-        "atLeast8": 6
-      },
-      "marginalDays": {
-        "atLeast1": 7,
-        "atLeast4": 2,
-        "atLeast8": 0
-      },
-      "ineffectiveDays": {
-        "atLeast1": 171,
-        "atLeast4": 161,
-        "atLeast8": 138
-      },
-      "coolingDemandHours": 2942,
-      "failureCauses": {
-        "temperature": 2952,
-        "moisture": 3851
-      }
+    "inspectorText": {
+      "ervActive": "FOLLOW THE ASSUMPTIONS\nHourly inspector\n175 / 8,760 H\n←\n→\n\nHour 1 of 8,760. Jan 1, 2025, 12:00 AM America/Chicago. Heating. Joint band: invalid, warm-up, ineligible or unavailable.\n\nJan 8, 2025, 6:00:00 AM CST · 2025-01-08T12:00:00.000Z\n\nHeating. Finite installed controls cannot meet the joint target in every sampled substep.\n\nOUTDOOR DRY BULB\n-8.1 °C\nOUTDOOR DEW POINT\n-9.8 °C\nOUTDOOR RELATIVE HUMIDITY\n90.6 %\nSTATION PRESSURE\n100,560 Pa\nSOLAR IRRADIANCE\n0 W/m²\nWIND SPEED\n2.3 m/s\nPAD LEAVING DRY BULB\n-8.3 °C\nPAD LEAVING DEW POINT\n-8.5 °C\nESTIMATED ZONE TEMPERATURE\n18.9 °C\nESTIMATED ZONE RH\n94 %\nESTIMATED AIR VPD\n0.13 kPa\nJOINT-TARGET FRACTION\n0 %\nELECTRICITY\n28.07 kWh\nPURCHASED FUEL\n133.33 kWh\nWATER\n19.4 L\nCONDENSATE\n0 kg\nDX COOLING DELIVERED\n0 kWh\nDEHU HEAT INDOORS\n0 kWh\nREGENERATION ENERGY\n0 kWh\nDESICCANT REMOVAL\n0 kg\nUNMET SENSIBLE LOAD\n0 kWh\nUNMET MOISTURE\n11.48 kg\nENERGY RESIDUAL\n0 W\nMOISTURE RESIDUAL\n0 kg/s\nSENSIBLE GAINS\n33.96 kWh\nCROP LATENT\n19.36 kg\nSENSIBLE-HEAT RATIO\n0.68\nCONTROLLED OUTDOOR AIR\n0.3 ACH\nENRICHMENT-COMPATIBLE FRACTION\n100 %\nINSTALLED CONTROLLED MAXIMUM\n40 ACH\nTOTAL OUTDOOR AIR INCLUDING INFILTRATION\n0.6 ACH\nCONTROLLED / TOTAL OUTDOOR FLOW\n0.167 m³/s / 0.333 m³/s\nACTUAL CONTROLLED STAGES\n0.3 ACH: 1 h\nRECOVERY CORE VOLUME\n550 m³\nRECOVERY BYPASS VOLUME\n50 m³\nSENSIBLE RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n3.65 kWh\nLATENT RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n2.52 kWh\nRECOVERY AUXILIARY ELECTRICITY\n0.04 kWh\nRECOVERY FROST/DEFROST EXPOSURE\n0 h\nPREHEAT DELIVERED\n0 kWh\nPREHEAT PURCHASED ELECTRICITY\n0 kWh\nPREHEAT PURCHASED FUEL\n0 kWh\nPREHEAT INSUFFICIENT\n0 h\nDOAS CONDENSATE\n0 kg\nDOAS COOLING DELIVERED\n0 kWh\nDOAS COOLING ELECTRICITY\n0 kWh\nDOAS RECOVERED REHEAT\n0 kWh\nDOAS EXTERNAL HEAT\n0 kWh\nDOAS UNMET CONDITIONING\n0 kWh\n\nSelected targets: day 22 °C / night 18 °C ± 2 °C; air VPD 0.6–1 kPa; dew point ≤ 19 °C. Stanghellini transpiration at LAI 3, canopy temperature taken as air temperature.\n\nSource quality: No flags supplied for this hour. Source: NASA POWER.",
+      "ervBypass": "FOLLOW THE ASSUMPTIONS\nHourly inspector\n2 / 8,760 H\n←\n→\n\nHour 1 of 8,760. Jan 1, 2025, 12:00 AM America/Chicago. Heating. Joint band: invalid, warm-up, ineligible or unavailable.\n\nJan 1, 2025, 1:00:00 AM CST · 2025-01-01T07:00:00.000Z\n\nHeating. Finite installed controls cannot meet the joint target in every sampled substep.\n\nOUTDOOR DRY BULB\n-1.6 °C\nOUTDOOR DEW POINT\n-3.1 °C\nOUTDOOR RELATIVE HUMIDITY\n89.8 %\nSTATION PRESSURE\n99,680 Pa\nSOLAR IRRADIANCE\n0 W/m²\nWIND SPEED\n2 m/s\nPAD LEAVING DRY BULB\n-2 °C\nPAD LEAVING DEW POINT\n-2.2 °C\nESTIMATED ZONE TEMPERATURE\n16.8 °C\nESTIMATED ZONE RH\n87.6 %\nESTIMATED AIR VPD\n0.24 kPa\nJOINT-TARGET FRACTION\n0 %\nELECTRICITY\n0.03 kWh\nPURCHASED FUEL\n91.38 kWh\nWATER\n12.2 L\nCONDENSATE\n0 kg\nDX COOLING DELIVERED\n0 kWh\nDEHU HEAT INDOORS\n0 kWh\nREGENERATION ENERGY\n0 kWh\nDESICCANT REMOVAL\n0 kg\nUNMET SENSIBLE LOAD\n0 kWh\nUNMET MOISTURE\n4.11 kg\nENERGY RESIDUAL\n0 W\nMOISTURE RESIDUAL\n0 kg/s\nSENSIBLE GAINS\n-0.09 kWh\nCROP LATENT\n12.2 kg\nSENSIBLE-HEAT RATIO\n0\nCONTROLLED OUTDOOR AIR\n0.3 ACH\nENRICHMENT-COMPATIBLE FRACTION\n100 %\nINSTALLED CONTROLLED MAXIMUM\n40 ACH\nTOTAL OUTDOOR AIR INCLUDING INFILTRATION\n0.6 ACH\nCONTROLLED / TOTAL OUTDOOR FLOW\n0.167 m³/s / 0.333 m³/s\nACTUAL CONTROLLED STAGES\n0.3 ACH: 1 h\nRECOVERY CORE VOLUME\n0 m³\nRECOVERY BYPASS VOLUME\n600 m³\nSENSIBLE RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nLATENT RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nRECOVERY AUXILIARY ELECTRICITY\n0 kWh\nRECOVERY FROST/DEFROST EXPOSURE\n0 h\nPREHEAT DELIVERED\n0 kWh\nPREHEAT PURCHASED ELECTRICITY\n0 kWh\nPREHEAT PURCHASED FUEL\n0 kWh\nPREHEAT INSUFFICIENT\n0 h\nDOAS CONDENSATE\n0 kg\nDOAS COOLING DELIVERED\n0 kWh\nDOAS COOLING ELECTRICITY\n0 kWh\nDOAS RECOVERED REHEAT\n0 kWh\nDOAS EXTERNAL HEAT\n0 kWh\nDOAS UNMET CONDITIONING\n0 kWh\n\nSelected targets: day 22 °C / night 18 °C ± 2 °C; air VPD 0.6–1 kPa; dew point ≤ 19 °C. Stanghellini transpiration at LAI 3, canopy temperature taken as air temperature.\n\nSource quality: No flags supplied for this hour. Source: NASA POWER.",
+      "doasColdDry": "FOLLOW THE ASSUMPTIONS\nHourly inspector\n111 / 8,760 H\n←\n→\n\nHour 1 of 8,760. Jan 1, 2025, 12:00 AM America/Chicago. Heating. Joint band: invalid, warm-up, ineligible or unavailable.\n\nJan 5, 2025, 2:00:00 PM CST · 2025-01-05T20:00:00.000Z\n\nDoas conditioning. Finite installed controls cannot meet the joint target in every sampled substep.\n\nOUTDOOR DRY BULB\n-2.5 °C\nOUTDOOR DEW POINT\n-9 °C\nOUTDOOR RELATIVE HUMIDITY\n59.9 %\nSTATION PRESSURE\n98,570 Pa\nSOLAR IRRADIANCE\n138 W/m²\nWIND SPEED\n9.6 m/s\nPAD LEAVING DRY BULB\n-4.2 °C\nPAD LEAVING DEW POINT\n-4.9 °C\nESTIMATED ZONE TEMPERATURE\n20.9 °C\nESTIMATED ZONE RH\n80.7 %\nESTIMATED AIR VPD\n0.48 kPa\nJOINT-TARGET FRACTION\n0 %\nELECTRICITY\n20.05 kWh\nPURCHASED FUEL\n115.59 kWh\nWATER\n58 L\nCONDENSATE\n0 kg\nDX COOLING DELIVERED\n0 kWh\nDEHU HEAT INDOORS\n0 kWh\nREGENERATION ENERGY\n0 kWh\nDESICCANT REMOVAL\n0 kg\nUNMET SENSIBLE LOAD\n0 kWh\nUNMET MOISTURE\n4.1 kg\nENERGY RESIDUAL\n0 W\nMOISTURE RESIDUAL\n0 kg/s\nSENSIBLE GAINS\n-0.62 kWh\nCROP LATENT\n57.98 kg\nSENSIBLE-HEAT RATIO\n0.58\nCONTROLLED OUTDOOR AIR\n1.8 ACH\nENRICHMENT-COMPATIBLE FRACTION\n100 %\nINSTALLED CONTROLLED MAXIMUM\n1.8 ACH\nTOTAL OUTDOOR AIR INCLUDING INFILTRATION\n2.1 ACH\nCONTROLLED / TOTAL OUTDOOR FLOW\n1 m³/s / 1.167 m³/s\nACTUAL CONTROLLED STAGES\n1.8 ACH: 1 h\nRECOVERY CORE VOLUME\n0 m³\nRECOVERY BYPASS VOLUME\n0 m³\nSENSIBLE RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nLATENT RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nRECOVERY AUXILIARY ELECTRICITY\n0 kWh\nRECOVERY FROST/DEFROST EXPOSURE\n0 h\nPREHEAT DELIVERED\n0 kWh\nPREHEAT PURCHASED ELECTRICITY\n0 kWh\nPREHEAT PURCHASED FUEL\n0 kWh\nPREHEAT INSUFFICIENT\n0 h\nDOAS CONDENSATE\n0 kg\nDOAS COOLING DELIVERED\n0 kWh\nDOAS COOLING ELECTRICITY\n0 kWh\nDOAS RECOVERED REHEAT\n0 kWh\nDOAS EXTERNAL HEAT\n30.01 kWh\nDOAS UNMET CONDITIONING\n0 kWh\n\nSelected targets: day 22 °C / night 18 °C ± 2 °C; air VPD 0.6–1 kPa; dew point ≤ 19 °C. Stanghellini transpiration at LAI 3, canopy temperature taken as air temperature.\n\nSource quality: No flags supplied for this hour. Source: NASA POWER.",
+      "doasHotHumid": "FOLLOW THE ASSUMPTIONS\nHourly inspector\n3,209 / 8,760 H\n←\n→\n\nHour 1 of 8,760. Jan 1, 2025, 12:00 AM America/Chicago. Heating. Joint band: invalid, warm-up, ineligible or unavailable.\n\nMay 14, 2025, 5:00:00 PM CDT · 2025-05-14T22:00:00.000Z\n\nDoas dehumidify. Finite installed controls cannot meet the joint target in every sampled substep.\n\nOUTDOOR DRY BULB\n31.1 °C\nOUTDOOR DEW POINT\n23.5 °C\nOUTDOOR RELATIVE HUMIDITY\n64.3 %\nSTATION PRESSURE\n96,940 Pa\nSOLAR IRRADIANCE\n455 W/m²\nWIND SPEED\n3.7 m/s\nPAD LEAVING DRY BULB\n26.5 °C\nPAD LEAVING DEW POINT\n25 °C\nESTIMATED ZONE TEMPERATURE\n40.3 °C\nESTIMATED ZONE RH\n74.6 %\nESTIMATED AIR VPD\n1.9 kPa\nJOINT-TARGET FRACTION\n0 %\nELECTRICITY\n18.17 kWh\nPURCHASED FUEL\n0 kWh\nWATER\n128 L\nCONDENSATE\n43.37 kg\nDX COOLING DELIVERED\n0 kWh\nDEHU HEAT INDOORS\n0 kWh\nREGENERATION ENERGY\n0 kWh\nDESICCANT REMOVAL\n0 kg\nUNMET SENSIBLE LOAD\n47.4 kWh\nUNMET MOISTURE\n106.1 kg\nENERGY RESIDUAL\n0 W\nMOISTURE RESIDUAL\n0 kg/s\nSENSIBLE GAINS\n-37.24 kWh\nCROP LATENT\n128.04 kg\nSENSIBLE-HEAT RATIO\n0.56\nCONTROLLED OUTDOOR AIR\n1.8 ACH\nENRICHMENT-COMPATIBLE FRACTION\n100 %\nINSTALLED CONTROLLED MAXIMUM\n1.8 ACH\nTOTAL OUTDOOR AIR INCLUDING INFILTRATION\n2.1 ACH\nCONTROLLED / TOTAL OUTDOOR FLOW\n1 m³/s / 1.167 m³/s\nACTUAL CONTROLLED STAGES\n1.8 ACH: 1 h\nRECOVERY CORE VOLUME\n0 m³\nRECOVERY BYPASS VOLUME\n0 m³\nSENSIBLE RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nLATENT RECOVERY TRANSFER (NOT PURCHASED ENERGY OR SAVINGS)\n0 kWh\nRECOVERY AUXILIARY ELECTRICITY\n0 kWh\nRECOVERY FROST/DEFROST EXPOSURE\n0 h\nPREHEAT DELIVERED\n0 kWh\nPREHEAT PURCHASED ELECTRICITY\n0 kWh\nPREHEAT PURCHASED FUEL\n0 kWh\nPREHEAT INSUFFICIENT\n0 h\nDOAS CONDENSATE\n43.37 kg\nDOAS COOLING DELIVERED\n53.97 kWh\nDOAS COOLING ELECTRICITY\n17.99 kWh\nDOAS RECOVERED REHEAT\n12.09 kWh\nDOAS EXTERNAL HEAT\n0 kWh\nDOAS UNMET CONDITIONING\n0 kWh\n\nSelected targets: day 22 °C / night 18 °C ± 2 °C; air VPD 0.6–1 kPa; dew point ≤ 19 °C. Stanghellini transpiration at LAI 3, canopy temperature taken as air temperature.\n\nSource quality: No flags supplied for this hour. Source: NASA POWER."
     }
+  },
+  "visual": {
+    "desktop": {
+      "width": 1440,
+      "documentScrollWidth": 1440,
+      "ground": "#10130D"
+    },
+    "mobile": {
+      "width": 390,
+      "documentScrollWidth": 390
+    },
+    "requiredFonts": [
+      {
+        "family": "Young Serif",
+        "loaded": true
+      },
+      {
+        "family": "Hanken Grotesk",
+        "loaded": true
+      },
+      {
+        "family": "Spline Sans Mono",
+        "loaded": true
+      }
+    ],
+    "report": {
+      "desktopWidth": 1440,
+      "desktopScrollWidth": 1440,
+      "mobileWidth": 390,
+      "mobileScrollWidth": 390,
+      "osPrefersDark": true,
+      "ground": "#F7FAF6"
+    },
+    "brief": {
+      "desktop": {
+        "errors": [],
+        "viewport": 1440,
+        "scrollWidth": 1440,
+        "ground": "#F7FAF6"
+      },
+      "mobile": {
+        "viewport": 390,
+        "scrollWidth": 390,
+        "darkOS": true,
+        "ground": "#F7FAF6",
+        "fonts": [
+          {
+            "family": "Young Serif",
+            "loaded": true
+          },
+          {
+            "family": "Hanken Grotesk",
+            "loaded": true
+          },
+          {
+            "family": "Spline Sans Mono",
+            "loaded": true
+          }
+        ]
+      }
+    },
+    "console": {
+      "canonicalCompletion": {
+        "errors": [],
+        "busy": false,
+        "manifest": "Model 0.3.0-screening · 2025-01-01 to 2025-12-31 · NASA POWER · America/Chicago. Controller: staged deadband; crop moisture: Stanghellini. Every chart and export remains tied to this run's saved inputs."
+      },
+      "conditionedCompletionErrors": [],
+      "conditionedViewport": {
+        "errors": [],
+        "viewport": 390,
+        "scrollWidth": 390
+      }
+    },
+    "screenshots": [
+      {
+        "path": "/tmp/osf-airflow-evidence/desktop-inspector.png",
+        "bytes": 142848,
+        "sha256": "0d139d164f4a193fff7b3c97a3ba2eea61d2cb327982ae25697368dc5b970759"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/mobile-inspector.png",
+        "bytes": 60722,
+        "sha256": "78df0581bcf631c8f49268f6295f724ca8e582a7d940c4c8cf7e1b1d4731a28f"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/report-field-os-dark.png",
+        "bytes": 221488,
+        "sha256": "187e0b39ea4aeb587807a5a045e73dc83f58ff0df6fa6d4ed8796ea68494fb9b"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/report-mobile.png",
+        "bytes": 79593,
+        "sha256": "b8a14de3fe9766cef71cffe3ed8bcb763c0517cabc83a0600a56f321ffbe7fb9"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/brief-mobile-field-os-dark.png",
+        "bytes": 82513,
+        "sha256": "ff043d010b71640c8682d3b17c3c18228da9a4da30451101685c2fe1140ebe8e"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/brief-desktop-field-os-dark.png",
+        "bytes": 166495,
+        "sha256": "6ea72614803809f26cbd865db9a8f3ad11e9c600dc07e33ad7cc6199ece5513c"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/conditioned-doas-hot-humid.png",
+        "bytes": 128637,
+        "sha256": "2c4a6bcd70f2fe63b3a720011162bc91869fa88e3f7af039962d326ca096c3fa"
+      },
+      {
+        "path": "/tmp/osf-airflow-evidence/conditioned-mobile.png",
+        "bytes": 65495,
+        "sha256": "733a95999f951f99a0fa3d5c7abe24723d155ada0cd4e76952d93e622894d84d"
+      }
+    ],
+    "note": "Screenshots inspected visually, retained outside repository as task evidence. Temporary JSON/CSV exports and smoke input removed after hashing. Report and brief are the exact browser-download bytes."
+  },
+  "releaseIdentity": {
+    "previousObserved": "0.2.0-screening",
+    "current": "0.3.0-screening",
+    "note": "Parent advanced release before canonical run. Browser cache explicitly disabled and modules refreshed; preliminary cached 0.2.0/48-hour smoke run discarded."
   }
 }
