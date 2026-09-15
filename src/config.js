@@ -181,13 +181,14 @@ export function migrateScenario(input){
   s[key]=(key==='lai'||key==='transpirationModel')&&crop&&Object.hasOwn(crop,key)?crop[key]:DEFAULT_SCENARIO[key];
  for(const key of COMPONENT_INERT_KEYS)if(!Object.hasOwn(s,key))s[key]=DEFAULT_SCENARIO[key];
  if(!Object.hasOwn(s,'doasM3s'))s.doasM3s=0;
- for(const key of ['doasSupplyDewPointC','doasSupplyTempC'])if(!Object.hasOwn(s,key))s[key]=null;
  if(sourceVersion===1){
+  s.doasSupplyDewPointC=null;
+  s.doasSupplyTempC=null;
   s.doasCoolingCOP=null;
   s.doasReheatRecoveryFraction=null;
  }else{
-  if(!Object.hasOwn(s,'doasCoolingCOP'))s.doasCoolingCOP=null;
-  if(!Object.hasOwn(s,'doasReheatRecoveryFraction'))s.doasReheatRecoveryFraction=null;
+  for(const key of ['doasSupplyDewPointC','doasSupplyTempC','doasCoolingCOP','doasReheatRecoveryFraction'])
+   if(!Object.hasOwn(s,key))s[key]=null;
  }
  const template=FACILITY_TEMPLATES[s.facility];
  if(sourceVersion===1||!Object.hasOwn(s,'outsideAirBasis'))s.outsideAirBasis=template?.outsideAirBasis??'screeningAssumption';
@@ -195,7 +196,7 @@ export function migrateScenario(input){
  const explicitReview=s.system==='mushroom'||s.technology==='doas'||s.doasM3s>0||s.outsideAirBasis!=='literatureRange';
  if(sourceVersion===1){
   s.outsideAirReviewed=template?.outsideAirReviewed??false;
-  if(s.doasM3s>0||s.system==='mushroom')s.outsideAirReviewed=false;
+  if(s.technology==='doas'||s.doasM3s>0||s.system==='mushroom')s.outsideAirReviewed=false;
  }else if(!Object.hasOwn(s,'outsideAirReviewed')){
   s.outsideAirReviewed=!explicitReview&&template?.outsideAirBasis==='literatureRange'&&template.outsideAirReviewed===true;
  }
