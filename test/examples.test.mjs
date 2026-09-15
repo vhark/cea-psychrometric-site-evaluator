@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync, readdirSync} from 'node:fs';
-import {validateScenario, SYSTEMS, TECHNOLOGIES, CROPS, FACILITIES} from '../src/config.js';
+import {validateScenario, DEFAULT_SCENARIO, SYSTEMS, TECHNOLOGIES, CROPS, FACILITIES} from '../src/config.js';
 import {simulateScenario} from '../src/simulate.js';
 
 // Shipped example sets are the first thing a new user runs. A config change that invalidates one
@@ -10,6 +10,7 @@ const setPath = name => `docs/examples/${name}`;
 const sets = readdirSync('docs/examples').filter(name => name.endsWith('.json'));
 const canonical = JSON.parse(readFileSync('docs/example-scenarios.json', 'utf8'));
 const load = name => JSON.parse(readFileSync(setPath(name), 'utf8'));
+const allSets = [['docs/example-scenarios.json', canonical], ...sets.map(name => [name, load(name)])];
 // One representative week keeps the suite fast while still exercising a real record end to end.
 const weekOf = (site, year) => {
   const snapshot = JSON.parse(readFileSync(`data/weather/${site}-${year}.json`, 'utf8'));
@@ -21,17 +22,38 @@ const weekOf = (site, year) => {
 const week = weekOf('tulsa', 2025);
 const bundled = JSON.parse(readFileSync('data/weather/index.json', 'utf8')).sites;
 
-test('every shipped example set carries a note and valid scenarios', () => {
-  assert.ok(sets.length >= 5, `expected the example library, found ${sets.length} sets`);
-  for (const name of sets) {
-    const set = load(name);
-    assert.equal(set.schemaVersion, 1, `${name} must declare schemaVersion 1`);
-    assert.ok(typeof set.note === 'string' && set.note.length > 40, `${name} must explain what it demonstrates`);
+test('every shipped example is a complete, reviewed schema-two portable scenario', () => {
+  assert.equal(canonical.scenarios.length, 6, 'the canonical browser comparison must retain its six scenarios');
+  for (const [name, set] of allSets) {
+    assert.equal(set.schemaVersion, 2, `${name} must declare schemaVersion 2`);
+    assert.ok(typeof set.note === 'string' && set.note.trim(), `${name} must explain what it demonstrates`);
     assert.ok(Array.isArray(set.scenarios) && set.scenarios.length >= 2, `${name} must compare at least two scenarios`);
     for (const scenario of set.scenarios) {
-      assert.deepEqual(validateScenario(scenario), [], `${name}: ${scenario.name}`);
+      const label = `${name}: ${scenario.name}`;
+      assert.equal(scenario.schemaVersion, 2, `${label} must declare schemaVersion 2`);
+      assert.equal(Object.hasOwn(scenario, 'doasKWhPerKg'), false, `${label} retains obsolete DOAS energy semantics`);
+      for (const [key, value] of Object.entries(DEFAULT_SCENARIO)) {
+        assert.ok(Object.hasOwn(scenario, key), `${label} is missing required input ${key}`);
+        if (value && typeof value === 'object') {
+          assert.ok(scenario[key] && typeof scenario[key] === 'object', `${label}: ${key} must be an object`);
+          for (const field of Object.keys(value)) {
+            assert.ok(Object.hasOwn(scenario[key], field), `${label} is missing ${key}.${field}`);
+          }
+        }
+      }
+      assert.ok(typeof scenario.outsideAirBasis === 'string', `${label} must declare its airflow evidence basis`);
+      assert.equal(scenario.outsideAirReviewed, true, `${label} requires explicit example-only airflow review`);
+      assert.ok(typeof scenario.notes === 'string' && scenario.notes.trim(), `${label} must carry its screening caveats`);
+      assert.deepEqual(validateScenario(scenario), [], label);
+      if (scenario.technology === 'doas' || scenario.doasM3s > 0) {
+        for (const key of ['doasM3s', 'doasSupplyTempC', 'doasSupplyDewPointC', 'doasCoolingCOP', 'doasReheatRecoveryFraction']) {
+          assert.ok(Number.isFinite(scenario[key]), `${label} must explicitly declare ${key}`);
+        }
+        assert.ok(scenario.doasM3s <= scenario.maxVentACH * scenario.areaM2 * scenario.heightM / 3600,
+          `${label} treatment capacity must fit within its single controlled outdoor-air stream`);
+      }
       assert.ok(Object.hasOwn(FACILITIES, scenario.facility) && Object.hasOwn(SYSTEMS, scenario.system)
-        && Object.hasOwn(CROPS, scenario.crop) && Object.hasOwn(TECHNOLOGIES, scenario.technology), `${name}: ${scenario.name} uses a retired option`);
+        && Object.hasOwn(CROPS, scenario.crop) && Object.hasOwn(TECHNOLOGIES, scenario.technology), `${label} uses a retired option`);
     }
     const names = set.scenarios.map(s => s.name);
     assert.equal(new Set(names).size, names.length, `${name} has duplicate scenario names`);
@@ -49,8 +71,8 @@ test('the example library exercises every shipped technology and cultivation sys
 });
 
 test('every shipped example simulates a real week without numerical failure', () => {
-  for (const name of sets) {
-    for (const scenario of load(name).scenarios) {
+  for (const [name, set] of allSets) {
+    for (const scenario of set.scenarios) {
       const result = simulateScenario(scenario, week);
       const summary = result.summary;
       assert.equal(summary.numericalFailureHours, 0, `${name}: ${scenario.name} produced numerical failures`);
