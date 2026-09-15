@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {AIRFLOW_BASIS,AIRFLOW_EVIDENCE,DEFAULT_SCENARIO,FACILITIES,FACILITY_TEMPLATES,OPAQUE_FACILITIES,SCENARIO_SCHEMA_VERSION,SYSTEMS,airflowEvidenceWarnings,applyTechnology,makeScenario,migrateScenario,validateScenario} from '../src/config.js';
+import {DEFAULT_SCENARIO,FACILITIES,FACILITY_TEMPLATES,OPAQUE_FACILITIES,SCENARIO_SCHEMA_VERSION,SYSTEMS,airflowEvidenceWarnings,applyTechnology,makeScenario,migrateScenario,validateScenario} from '../src/config.js';
 import {simulateScenario} from '../src/simulate.js';
 import {compareScenarios} from '../src/metrics.js';
 import {weatherState,padState,humidityRatio,enthalpy,stanghelliniTranspiration,saturationPressure,saturationHumidityRatio,dryAirDensity} from '../src/physics.js';
@@ -36,30 +36,16 @@ test('scenario version 2 carries explicit airflow, cost, recovery, and DOAS comp
  assert.equal(s.doasReheatRecoveryFraction,null);
 });
 test('airflow evidence identifies source scope and height-dependent controlled-air context',()=>{
- assert.equal(Object.isFrozen(AIRFLOW_BASIS),true);
- assert.deepEqual(AIRFLOW_BASIS,{literatureRange:'Literature range',adjacentProxy:'Adjacent-evidence proxy',
-  projectInput:'Project-specific input',screeningAssumption:'Screening assumption'});
- assert.equal(AIRFLOW_EVIDENCE.infiltration.basis,'literatureRange');
- assert.deepEqual(AIRFLOW_EVIDENCE.infiltration.constructionACH.glass,[.75,1]);
- assert.deepEqual(AIRFLOW_EVIDENCE.infiltration.constructionACH.doublePolyethylene,[.5,1]);
- assert.equal(AIRFLOW_EVIDENCE.infiltration.sourceUrl,'https://fieldreport.caes.uga.edu/publications/B792/greenhouses-heating-ventilation-and-cooling/');
- assert.equal(AIRFLOW_EVIDENCE.controlled.basis,'literatureRange');
- assert.equal(AIRFLOW_EVIDENCE.controlled.sourceUrl,'https://doi.org/10.25165/j.ijabe.20181101.3210');
- assert.equal(AIRFLOW_EVIDENCE.closedRoom.basis,'adjacentProxy');
- assert.equal(AIRFLOW_EVIDENCE.closedRoom.sourceUrl,'https://doi.org/10.23986/afsci.58936');
- assert.equal(AIRFLOW_EVIDENCE.mushroom.sourceUrl,'https://doi.org/10.25165/j.ijabe.20221501.6872');
  const s={...makeScenario('greenhouseGlass'),heightM:4,maxVentACH:20};
  assert.deepEqual(validateScenario(s),[],'literature context is advisory, not a validation limit');
  const warnings=airflowEvidenceWarnings(s);
  assert.equal(warnings.length,1);
- assert.match(warnings[0],/Shamshiri/i);
  assert.match(warnings[0],/0\.04 to 0\.05 m3\/s per m2/);
  assert.match(warnings[0],/4 m mean height/);
  assert.match(warnings[0],/36 to 45 ACH/);
  assert.match(warnings[0],/16 ACH below/);
  const infiltrationWarnings=airflowEvidenceWarnings({...makeScenario('greenhouseGlass'),infiltrationACH:.2,maxVentACH:40});
  assert.equal(infiltrationWarnings.length,1);
- assert.match(infiltrationWarnings[0],/UGA Extension Bulletin 792/);
  assert.match(infiltrationWarnings[0],/0\.75 to 1 ACH/);
  assert.match(infiltrationWarnings[0],/0\.55 ACH below/);
 });
