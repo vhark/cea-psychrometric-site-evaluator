@@ -2,7 +2,7 @@
 
 Purpose: record the deployment decision, the module boundaries, the canonical data contracts and the controller design, so an implementer can change one part without breaking the others.
 
-Status: current for model `0.2.0-screening`. Written 2026-09-11, reviewed 2026-09-14. The static coarse-screen implementation exists; this document also preserves the design constraints for the next calibrated-model iteration. Runtime evidence and limits are in [VERIFICATION.md](VERIFICATION.md). No public production deployment or site calibration is claimed.
+Status: current for model `0.3.0-screening`, scenario schema 2, reviewed 2026-09-15. Runtime evidence and limits are in [VERIFICATION.md](VERIFICATION.md). No site calibration is claimed; future design constraints below are not manufacturer performance.
 
 Read this if: you are implementing or reviewing code in `src/`, or deciding where a new capability belongs.
 
@@ -57,7 +57,7 @@ Every file in `src/` and the boundary it holds. Concrete per-person ownership is
 | `worker.js` | The off-thread simulate and parse protocol, progress, cancellation and run identity | Render, or repair invalid physics |
 | `app.js` | The Analyze view: inputs, run lifecycle, panel rendering, weather and energy selection | Embed an equation, or hide a model failure |
 | `charts.js` | SVG charts and their accessible table equivalents, from the same arrays the tables use | Compute a separate approximate series |
-| `report.js` | The standalone printable results document, Archive register, generated from one run | Compute a metric of its own |
+| `report.js` | Standalone printable One Season Farmers Field document generated from one run | Compute a metric of its own |
 | `export.js` | JSON, CSV and report downloads, scenario export and `parseImport` | Export a claim a run did not produce |
 | `tour.js` | The guided tour steps, the spotlight and the dimmed backdrop | Quote a figure not already committed in this repository |
 | `learn.js` | The Learn view: the curriculum, the regional findings section, the two-view switch and the hash routes | Compute a number, or substitute an example for an absent study |
@@ -123,6 +123,9 @@ Bundle a dated US GeoNames postal-code index with attribution for a small, keyle
 - Control policy, outdoor-air constraints, heat-rejection destination and reheat permissions.
 - Tariff, installed prices, component lives, maintenance and discount rate.
 - Display units are separate from canonical numeric values. Do not serialize display strings as model numbers.
+- Current scenario schema is 2. `migrateScenario` preserves legacy airflow numbers, removes obsolete DOAS energy-per-water semantics, sets inert recovery and applies evidence/review gates. Weather snapshot schema remains 1.
+- Airflow source, review and installed capital basis travel with the scenario. `outsideAirBasis` has four values: `literatureRange`, `adjacentProxy`, `projectInput`, `screeningAssumption`; `outsideAirReviewed` records explicit review of controlled flow and fan power.
+- `heatRecovery` is a nested component owned by `airflow.js`; DOAS uses `doasM3s`, `doasSupplyDewPointC`, `doasSupplyTempC`, `doasCoolingCOP`, `doasReheatRecoveryFraction`. No treatment creates another outdoor-air stream.
 
 ### HourResult
 
@@ -131,6 +134,7 @@ Bundle a dated US GeoNames postal-code index with attribution for a small, keyle
 - In equipment mode: simulated state statistics, duration in target, actuator runtimes/actions, heat/moisture fluxes, electrical/fuel/water use, condensate, DLI contribution, capacity shortfalls and failure causes.
 - Per-hour min/max and compliance duration if integration is subhourly; hourly means cannot prove the whole hour was in band.
 - Conservation residuals, convergence state, warm-up/initialization flags and validity. Missing data is never a successful control mode.
+- `controls.controlledOutdoorAirACH` and the outdoor-air/treatment ledger replace ambiguous ventilation aliases. Sensible load uses `controlledOutdoorAirSensibleKWh`; moisture uses `latentKg.controlledOutdoorAir`. Recovery transfer, bypass, preheat, conditioning electricity, condensate and unmet conditioning are separately observable.
 
 ### AnalysisRun
 
@@ -156,11 +160,21 @@ At each substep, construct only physically admissible strategies: minimum ventil
 
 Find feasible actuator levels subject to sensible/moisture coupling, installed capacity, minimum outdoor air and operating envelopes. Prefer target-feasible actions according to a declared policy. For a cost-aware policy, minimize modeled instantaneous purchased cost among feasible actions, including ventilation's downstream heating/cooling penalty. This is a causal local dispatch policy, not a proof of annual global optimality. If infeasible, report the limiting constraints and use a declared priority (temperature safety, moisture band, then cost), not an unexplained blended score.
 
-As shipped in `0.2.0-screening`, the default realization of that policy is a staged deadband controller (per-device hysteresis, minimum on and off times, ordered stages) dispatched on a one-minute step, because the enumerating per-substep dispatcher described above does not converge with cadence. The enumerating dispatcher is retained and selectable as a labeled "ideal modulation upper bound". Measured convergence for both is in [VERIFICATION.md](VERIFICATION.md).
+The `0.3.0-screening` default is a staged deadband controller with hysteresis, dwell times and one-minute dispatch. The 0.3 to 40 ACH example's commanded levels are 0.30, 10.23, 20.15, 30.08 and 40.00 ACH. Screens, treatment capacity and useful-supply checks constrain actual delivery. Maximum ACH is installed capacity, not continuous hourly flow. Ideal modulation remains a labeled, resolution-limited experiment, not continuous economizer optimization; historical cadence evidence is explicitly dated in [VERIFICATION.md](VERIFICATION.md).
 
 A DX/dehu/reheat loop must converge as a coupled calculation. Adding latent removal can change sensible demand and runtime, which changes latent capability again. Use bounded iteration/convergence reporting or a simultaneous solution, never a one-pass subtraction that grants full capacity twice. Performance maps are interpolated within their documented domain; assumed curves and out-of-domain operation remain visible.
 
 Reject supersaturated states or explicitly model condensation with matching latent release; do not clip RH at 100% and lose water/energy. No negative energy use or impossible airflow mixing fractions.
+
+### Single-stream airflow and finite heat
+
+Uncontrolled infiltration enters separately. The controlled stream passes through optional recovery or explicit bypass, then optional DOAS, then the zone, once. Internal recirculation, wind/stack pressure flow and canopy velocity remain unmodeled. Direct outside air must be useful for sensible cooling or moisture removal; cold-weather drying is constrained by available heating. Pad operation bypasses recovery.
+
+Recovery assumes balanced supply/exhaust and requires declared sensible/latent ratings at 75% and 100% nominal flow. HRV latent effectiveness is zero; ERV requires latent ratings. Below 50% nominal the core bypasses with warning; above 130% only the supported flow passes the core and excess mixes as bypass. Economizer bypass is fixed model behavior. Frost modes require a manufacturer-qualified minimum temperature, exhaust-only bypass/defrost parameters, or preheat threshold. Unsupported cold operation is invalid; insufficient preheat is reported and the core bypasses. Supersaturation is resolved at conserved moist-air enthalpy, not by clipping RH.
+
+DOAS cooling is entering-to-leaving moist-air enthalpy reduction divided by declared COP. Cooling to the supply dew point can condense water; recovered condenser heat meets reheat only up to the declared fraction, and unmet sensible heating remains explicit. No humidification is invented. Shared finite heater priority is recovery preheat, DOAS external heat, then zone heat. The configured fuel efficiency or heat-pump COP prices actual delivered heat, and fans are charged on actual controlled flow. Recovery energy transfer is not purchased energy or cash savings.
+
+Sources, conversions and applicability are maintained in [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md#outdoor-air-recovery-and-doas-model-030). A numerical capacity sweep changes available discrete stages, so it cannot establish an optimal economizer size.
 
 ### Upgrades
 
@@ -178,13 +192,15 @@ Compare explicit scenario clones. Compute the marginal effect of one upgrade fir
 - `#learn` and `#learn/<module-key>` are routes into the Learn view and `#analyze` is the route back; every other fragment stays an ordinary in-page anchor, so an existing deep link still works. Opening a curriculum section rewrites the hash with `replaceState`, which keeps the back button meaningful.
 - The Learn view's regional section reads `docs/regional-study.json` at run time and renders only what that file contains. An absent or unreadable study renders as an absent study, naming the file and the command that regenerates it, and never falls back to an example.
 - The highlight a Learn section uses to point at a panel is the guided tour's `spotlight()`, exported from `tour.js` and imported by `learn.js`. There is one highlight implementation, and it is a no-op while a tour owns the screen. If the panel a section refers to does not exist yet, the highlight lands on the first visible fallback, which is the control that would produce it.
-- Brand tokens are Grownetics (see PRD §5 Brand): app in Carbon register, exported documents in Archive register. Chart colors resolve through CSS custom properties (`--chart-1..8`, `--ok/--warn/--bad`) so palette changes never touch chart code.
+- Brand tokens are One Season Farmers: interactive tools use Instrument, exported documents default to Field regardless of OS theme, with dark mode opt-in only. Young Serif titles use weight 400; Hanken Grotesk is body/UI and Spline Sans Mono is data. Full-border tinted callouts replace side-stripe accents. Chart colors resolve through CSS variables.
 
 ## 7. Open-source and reproducibility
 
 Proposed application license: MIT, with separate third-party notices. Do not apply this license to weather, benchmark data, logos or manufacturer literature owned by others.
 
 - PsychroLib: MIT, preserve notice and pin version/commit.
+
+Operating-cost and pp wording comes from shared presentation helpers exported by `report.js`. A cost carries period/population, purchased electricity/fuel/water, applied manual or dated historical prices, exclusions and no-quote/no-guarantee status. Capital stays estimated or user-entered separately. Attainment differences name both joint-target endpoints; Morris influence instead names pp per full screened range.
 - GreenLight: BSD-3-Clause-Clear, if code is reused rather than only referenced, preserve notices and assess model-specific files too.
 - GreenLight measured benchmark dataset: CC BY-SA 4.0, keep its attribution/license distinct.
 - Open-Meteo server: AGPLv3; using an HTTP API is distinct from copying/modifying server code. Service terms remain independently applicable.

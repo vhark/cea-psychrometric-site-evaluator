@@ -23,7 +23,7 @@ export const MORRIS_PARAMETERS=[
  {key:'uValue',label:'Envelope U-value',unit:'W/m²K',low:.7,high:1.4,kind:'factor',
   rationale:'Nominal glazing U-values are quoted for clean, still, new assemblies. Aged, dirty, wind-exposed envelopes with unaccounted thermal bridges run higher; a tight double layer runs lower. Roughly 3 to 6 W/m²K around the 4 W/m²K default.'},
  {key:'infiltrationACH',label:'Air leakage',unit:'ACH',low:.5,high:2,kind:'factor',
-  rationale:'Greenhouse leakage is almost never blower-door measured. Published envelope leakage for film and polycarbonate houses spans about half to twice a nominal 0.3 ACH, and rises with wind.'},
+  rationale:'Screening span of 0.5 to 2 times the scenario infiltration input, not a published universal range. UGA construction-specific guidance is contextual; measured site leakage should replace the generic assumption.'},
  {key:'lai',label:'Crop transpiration scale (LAI and the L/m²/day fallback)',unit:'×',low:.7,high:1.3,kind:'factor',alsoScales:['transpirationLDayM2'],
   rationale:'Leaf area index moves through the crop cycle, between cultivars and with plant density; Stanghellini transpiration scales with it. The declared L/m²/day schedule is scaled by the same factor so scheduled scenarios respond identically.'},
  {key:'padEffectiveness',label:'Pad saturation effectiveness',unit:'fraction',low:.70,high:.90,kind:'absolute',

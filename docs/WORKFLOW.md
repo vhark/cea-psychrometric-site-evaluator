@@ -2,7 +2,7 @@
 
 Purpose: the step-by-step working procedure, from picking a site to exporting a result, including the import formats and what each export does and does not contain.
 
-Status: current for model `0.2.0-screening`, 2026-09-14.
+Status: current for model `0.3.0-screening`, scenario schema 2, 2026-09-15.
 
 Read this if: you are running the evaluator, or you received an export from someone who did and need to know what it is worth.
 
@@ -47,6 +47,18 @@ Choose facility (greenhouse, hybrid, indoor), cultivation system (greenhouse ben
 
 Terms used on these fields are defined in [GLOSSARY.md](GLOSSARY.md). To start from a worked comparison instead of the defaults, import one of the sets in [examples/](examples/README.md).
 
+### Review the outdoor-air path before running
+
+`infiltrationACH` is uncontrolled envelope leakage. `minVentACH` and `maxVentACH` are the minimum command and maximum installed capacity of one controlled outdoor-air stream, not infiltration or internal circulation. Review the displayed ACH, m³/s, m³/s per m² floor and cfm/ft² conversions at the entered mean height. Internal recirculation and canopy air velocity are not modeled.
+
+Select an evidence status: literature range, adjacent-evidence proxy, project-specific input or screening assumption. Editing controlled airflow marks it project input but does not acknowledge review. Explicitly review both capacities and `fanWPerM3s`, which covers combined supply/exhaust fans and declared pressure drops. Unsupported defaults, DOAS and recovery configurations require review. Literature warnings are construction/context comparisons, not universal design limits.
+
+Mushroom systems start with null controlled-air minimum and maximum. Enter finite, ordered project-specific values with a positive maximum and acknowledge review, based on species, stage, substrate loading, CO2 target and equipment. There is no universal 6 to 15 ACH mushroom default or CO2 solver.
+
+Optional HRV/ERV acts before optional DOAS on the same stream. Supply balanced-flow ratings at 75% and 100% nominal flow, auxiliary power and a complete frost strategy. HRV transfers sensible heat only; ERV also requires latent ratings. No generic product performance is filled in. DOAS needs treatment capacity, supply dew point and temperature, cooling COP and recoverable reheat fraction. Targets are not guaranteed supply states when the finite heating source is exhausted. See [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md#outdoor-air-recovery-and-doas-model-030).
+
+Read actual commanded and delivered flow, the stage list, bypass/core flow, conditioning electricity and heat, condensate and unmet load in the results, not the maximum capacity as if it ran all year. The default 0.3 to 40 ACH staged example commands 0.30, 10.23, 20.15, 30.08 and 40.00 ACH before applicable path limitations.
+
 Screens are configured through an imported scenario rather than a form control, the same as the shade and
 thermal screens: `shadeScreen`, `thermalScreen` and `insectScreen` are scenario fields, so a screened house
 starts from an edited or imported scenario JSON. An installed insect screen multiplies the achievable maximum
@@ -82,6 +94,10 @@ Press Run. Results include:
 
 The first hour of every continuous weather segment is a warm-up hour, excluded from comparative compliance. Editing an input marks existing results stale rather than silently mixing old and new. Cancel terminates the worker; a canceled run is never displayed as complete.
 
+Operating cost includes purchased electricity, fuel and modeled water. Read the exported `costBasis` for the actual dates and numeric manual or historical state-sector electricity proxy and fuel/water inputs. Capital, maintenance, labor, financing, taxes, demand/fixed charges, time-of-use effects and other unmodeled tariff components are excluded. Installed capital is estimated or user-entered separately. Differences or reductions are model estimates, not quotes or guarantees. A pp comparison is joint target attainment B minus A with both endpoints, not a percent change.
+
+The verified Tulsa 2025 run has 8,760 valid hours but 8,759 common eligible hours. Full-run annual costs include warm-up energy and water; matched comparison costs exclude that hour. Label matched costs as simulated-period costs and never silently substitute them for annual totals.
+
 ![Sensible and latent load decomposition, with losses drawn below the axis](screenshots/loads.png)
 
 ![Attainment and cost across ten weather years, with the ranking-stability verdict](screenshots/across-years.png)
@@ -95,12 +111,12 @@ The first hour of every continuous weather segment is a warm-up hour, excluded f
 | Scenario JSON | One scenario's inputs and provenance | Weather, results |
 | Run JSON | Scenarios, normalized weather, results, assumptions, provenance | Nothing needed to recompute; this is the reproducibility bundle |
 | Hourly CSV | Every result hour for every scenario | Assumption text beyond the header block |
-| Report HTML | A standalone printable document in the Archive register, with assumptions and provenance sections open by default | The full reproducibility bundle; keep the run JSON as well |
+| Report HTML | A standalone printable One Season Farmers Field document, with assumptions and provenance sections open by default | The full reproducibility bundle; keep the run JSON as well |
 | Design-basis brief | Peak sensible and latent hours with coincident outdoor state and frequency, ventilation air requirement, condensate, pad water, free-cooling hours, binding constraint, strategy verdict, evidence tier | A stamped design, equipment selection, or safety margin |
 
-![The design-basis brief, exported in the Archive register](screenshots/design-basis.png)
+![The design-basis brief, exported in Field mode](screenshots/design-basis.png)
 
-Imported run outputs are recomputed, never trusted. Large comparisons produce large files: a full year of six strategies exported as JSON was 113,692,669 bytes and 52,560 CSV rows. Imports parse in a Web Worker, so the ceiling is the memory the tab can allocate rather than a fixed limit.
+Imported result claims are discarded and inputs must be rerun. The actual model-0.3.0 browser export was 207,706,978 bytes for six strategies and 8,760 hours; memory remains the practical limit, and parsing runs in a Web Worker. Export hashes and population proof are in [browser-run-metrics.json](browser-run-metrics.json).
 
 ## Weather CSV import schema
 
@@ -113,6 +129,10 @@ time,tempC,rh,pressurePa,ghiWm2
 Those two rows illustrate the schema; they are not bundled observations. Units are °C, RH as a fraction, Pa and W/m². Optional columns: `dewPointC` and `windMs` (m/s). Supply RH or dew point. Timestamps must be explicit UTC ISO strings ending `Z`, which is also what disambiguates the autumn daylight-saving fold. Headers must match exactly. Blank values stay missing and are never interpolated.
 
 JSON imports carry `schemaVersion`, explicit units, source and time-zone metadata and the hourly array. An exported run JSON is the easiest full template.
+
+### Scenario schema 2 migration
+
+`migrateScenario` returns a copy; imported outputs are not trusted. Version-1 airflow numbers are preserved, not silently resized, with template-specific evidence status and review gates. Recovery is initialized to `type: 'none'`. Old DOAS supply settings are reset to null, obsolete `doasKWhPerKg` is discarded, and `doasCoolingCOP` plus `doasReheatRecoveryFraction` must be supplied. Active DOAS and mushroom imports remain blocked until reviewed; unsupported generic, hybrid and opaque defaults are screening assumptions requiring review. Inert component defaults may be supplied without inventing performance. Unsupported future schema versions fail explicitly. Weather snapshots remain schema 1.
 
 ## Reproducible example
 

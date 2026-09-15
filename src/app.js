@@ -633,7 +633,7 @@ function renderRuntime(r) {
     row('Shade screen', 'shadeScreen', finite(s.screens?.dliCostMol) ? `${format(s.screens.dliCostMol)} mol/m² of crop light given up while deployed` : 'Deployed hours; light cost not attributed'),
     row('Thermal curtain', 'thermalScreen', finite(s.screens?.heatingSavedKWh) ? `${format(s.screens.heatingSavedKWh)} kWh of delivered heat saved against the same run with it open` : 'Deployed hours; heating saving not attributed'),
     row('Desiccant', 'desiccant', `${format(s.desiccantRemovedKg)} kg removed; ${format(s.regenerationKWh)} kWh regeneration`),
-    row('Dry-neutral DOAS', 'doas', conditioningRows(s).filter(([label]) => label.startsWith('DOAS')).map(([label, value]) => `${label}: ${value}`).join('; ')),
+    row('DOAS conditioning', 'doas', conditioningRows(s).filter(([label]) => label.startsWith('DOAS')).map(([label, value]) => `${label}: ${value}`).join('; ')),
     row('Recovery core', 'recoveryActive', `${format(s.recoveryCoreM3)} m³ through core; ${format(s.recoverySensibleKWh)} kWh sensible and ${format(s.recoveryLatentKWh)} kWh latent transfer, not purchased energy or savings`),
     row('Recovery bypass', 'recoveryBypass', `${format(s.recoveryBypassM3)} m³ bypassed`),
     row('Frost / defrost', 'recoveryDefrost', `${format(s.recoveryDefrostHours, 2)} equivalent h`),

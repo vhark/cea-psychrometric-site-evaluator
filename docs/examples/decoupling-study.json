@@ -137,7 +137,7 @@
     {
       "schemaVersion": 2,
       "id": "02142aa1-1354-456a-b00f-83b7b6249c24",
-      "name": "Dry-neutral DOAS + DX sensible",
+      "name": "DOAS conditioning + DX sensible",
       "facility": "greenhouse",
       "system": "bench",
       "crop": "lettuce",

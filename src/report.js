@@ -94,7 +94,7 @@ export function localStamp(time, timezone) {
 const REPO_EVIDENCE = {
   cadence: 'Historical repository cadence evidence (not recomputed by this report): staged controller cadence check on the full Tulsa 2025 year, 1 minute against 0.5 minute dispatch: 0.004, 0.383 and 0.091 percentage points (pp) of joint temperature-and-moisture target attainment and at most 0.31 percent of electricity (docs/VERIFICATION.md). The older ideal optimizer does not converge, at 1.5 percentage points (pp) and 1.95 percent, and remains selectable only as a labeled upper bound.',
   residuals: 'Hourly conservation identities close between 1e-16 and 5e-13 relative in the bundled checks (test/conservation.test.mjs).',
-  morris: 'Historical repository Morris elementary-effects screening of 12 assumptions, 104 points, 1,872 simulations (docs/SENSITIVITY.md, docs/morris-screening.json): crop leaf area and transpiration lead every metric at 9.10 percentage points (pp) of joint temperature-and-moisture target attainment, envelope U-value follows at 5.89 and shade fraction at 3.43. The cost ranking as a whole is not stable, taking 3 distinct orders, while the three cheapest positions are identical in 104 of 104 screened points and the instability is confined to strategies whose median costs sit within 16 percent of each other.',
+  morris: 'Regenerated model 0.3.0-screening Morris study: 12 assumptions, 104 design points, 1,872 simulations and zero numerical-failure hours (docs/morris-screening.json). Aggregate joint-attainment mu* is 9.098627 pp per full screened range for leaf area/transpiration and 2.164460 pp for maximum controlled outdoor-air capacity. These are mean absolute elementary effects, not paired scenario endpoint differences or confidence bounds. The operating-cost ranking has three orders, the most common in 61.5% of design points. The regional 5 pp capability tier and 16% operating-cost band are retained methodological rules, not calibrated by this run.',
   notClaimed: 'Five things are absent from the evidence behind this document, and none of them can be inferred from it: measured-site calibration, a benchmark against an independent greenhouse model, manufacturer performance maps, equipment sizing, and any yield or revenue forecast.'};
 
 const REPORT_STYLE = `.report h2{font-size:1.3rem}.report section{margin:44px 0;padding-top:22px}.lede{font:400 18px/1.5 'Hanken Grotesk',sans-serif;max-width:60ch}
@@ -145,7 +145,7 @@ const figure = (spec, caption) => `<figure>${chartSVG(spec)}<figcaption>${escape
   spec.empty ? '' : `${legendList(spec.legend)}${table(spec.table.head, spec.table.rows)}`}</figure>`;
 
 const RUNTIME_LABELS = [['pad', 'Evaporative pad'], ['indirect', 'Indirect evaporative'], ['dx', 'DX cooling'], ['dehu', 'Condensing dehumidifier'],
-  ['desiccant', 'Desiccant'], ['doas', 'Dry-neutral DOAS'], ['heating', 'Heating'], ['humidifier', 'Humidification'], ['light', 'Supplemental light'],
+  ['desiccant', 'Desiccant'], ['doas', 'DOAS conditioning'], ['heating', 'Heating'], ['humidifier', 'Humidification'], ['light', 'Supplemental light'],
   ['recoveryActive', 'Recovery core'], ['recoveryBypass', 'Recovery bypass'], ['recoveryDefrost', 'Recovery defrost'], ['preheat', 'Preheat'], ['shadeScreen', 'Shade screen'], ['thermalScreen', 'Thermal curtain']];
 function runtimeRows(result) {
   const runtime = result.summary?.runtime || {};
@@ -255,15 +255,15 @@ function loadSentences(loads, scenario) {
   const latentKWh = total.cropLatentKg * loads.latentKWhPerKg;
   out.push(`Across ${int(loads.hours)} valid hours the space sensible-heat ratio is ${finite(total.shr) ? num(total.shr, 2) : 'not defined'}: ${int(total.sensibleGainKWh)} kWh of positive sensible gain against ${int(latentKWh)} kWh of crop transpiration (${int(total.cropLatentKg)} kg of water).`);
   if (finite(total.shr)) out.push(total.shr < .7
-    ? `A ratio of ${num(total.shr, 2)} is latent-dominated, so a coupled cooling coil has to overcool to reach the moisture target, and a decoupled latent stage (dry-neutral DOAS or desiccant) deserves screening against the ${int(latentKWh)} kWh of latent load.`
-    : `A ratio of ${num(total.shr, 2)} is sensible-dominated, so sensible capacity rather than moisture removal sets the equipment in most hours, and the ${int(latentKWh)} kWh of latent load can ride on a coupled coil.`);
+    ? `A ratio of ${num(total.shr, 2)} is latent-dominated under this definition. Compare moisture-removal capacity and reheat demand against the ${int(latentKWh)} kWh of crop latent load. DOAS treatment acts on outdoor air, not a separate zone-recirculation stream, and cannot promise a dry or neutral supply when capacity is insufficient.`
+    : `A ratio of ${num(total.shr, 2)} is sensible-dominated under this definition. The ${int(latentKWh)} kWh of crop latent load still needs a capacity check; this aggregate ratio alone does not establish that a coupled coil can meet the moisture target.`);
   const scored = loads.monthly.filter(m => finite(m.shr));
   if (scored.length > 1) {
     const low = scored.reduce((a, b) => b.shr < a.shr ? b : a), high = scored.reduce((a, b) => b.shr > a.shr ? b : a);
     out.push(`The ratio moves through the year from ${num(low.shr, 2)} in ${low.month} to ${num(high.shr, 2)} in ${high.month}, so a single design-day ratio matches at most 1 of the ${int(scored.length)} months in this record.`);
   }
   if (loads.noGainHours) out.push(`${int(loads.noGainHours)} hours carry no positive sensible gain at all and so carry no ratio; they are the heating hours, excluded from the ${int(loads.hours - loads.noGainHours)} hours in the ratio histogram rather than counted as zero.`);
-  out.push(`The ratio is defined here as positive sensible gains over those gains plus the latent heat of crop transpiration at ${num(loads.latentKWhPerKg, 3)} kWh/kg, with transpiration itself the single most influential assumption in the screening at 9.10 percentage points (pp) of joint temperature-and-moisture target attainment, so treat ${finite(total.shr) ? num(total.shr, 2) : 'this ratio'} as a range, not a constant.`);
+  out.push(`The ratio is positive sensible gains divided by those gains plus crop latent heat at ${num(loads.latentKWhPerKg, 3)} kWh/kg. Crop leaf area/transpiration has aggregate Morris mu* 9.098627 pp of joint target attainment per full screened range in docs/morris-screening.json. That sensitivity is not an uncertainty interval for this run's SHR.`);
   return out;
 }
 

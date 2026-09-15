@@ -3,15 +3,14 @@
 Screen a controlled-environment agriculture site against real historical weather: how many hours the climate gives you for free, what constraint binds, and which class of equipment closes the gap at what running cost.
 
 [![tests](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml/badge.svg)](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml)
-[![regression suite](https://img.shields.io/badge/regression%20suite-91%20tests-4DB405)](#testing)
-[![model](https://img.shields.io/badge/model-0.2.0--screening-4DB405)](docs/VERIFICATION.md)
+[![model](https://img.shields.io/badge/model-0.3.0--screening-5E9643)](docs/VERIFICATION.md)
 [![runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-none-4DB405)](#quick-start)
 [![licence](https://img.shields.io/badge/licence-MIT-4DB405)](LICENSE)
 [![demo](https://img.shields.io/badge/demo-GitHub%20Pages-4DB405)](https://vhark.github.io/cea-psychrometric-site-evaluator/)
 
 ![The site evaluator running the bundled Tulsa 2025 example](docs/screenshots/app-overview.png)
 
-A Grownetics tool. Static HTML and JavaScript, no build step, no backend, no account. Everything computes in your browser.
+A One Season Farmers tool. Static HTML and JavaScript, no build step, no backend, no account. Everything computes in your browser. Interactive tools use Instrument; exported documents use Field by default regardless of operating-system theme.
 
 > **Evidence tier: assumption-based screening.** This is a coarse planning screen. It is not a calibrated greenhouse digital twin, not equipment sizing, not a manufacturer comparison, and not a guarantee of indoor conditions. See [Evidence tiers](#evidence-tiers) and [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md).
 
@@ -59,10 +58,10 @@ Full workflow, including ZIP selection, live weather retrieval, CSV import and e
 | Coupled single-zone sensible and moisture balance with finite equipment capacity, analytic linear exchange and physical equilibrium condensation | Spatial gradients, multi-zone or 3-D air movement, canopy-to-air temperature difference |
 | Staged deadband controller on a one-minute dispatch step (ideal per-substep optimizer retained as a labeled upper bound) | Real control hardware behaviour, commissioning, sensor placement, failure resilience |
 | Stanghellini transpiration from leaf area, absorbed radiation and zone VPD (fixed L/m²/day schedule kept as a fallback) | Crop physiology, growth stages, yield, CO2 feedback on stomata |
-| Condensing dehumidification returning latent plus compressor heat; DX with coupled sensible and latent capacity; integrated reheat with recovered and rejected heat | Manufacturer performance maps, part-load curves, cycling, defrost, minimum run times for specific products |
+| Condensing dehumidification, coupled DX, recovered reheat, balanced HRV/ERV with explicit frost strategy, DOAS enthalpy/COP conditioning on one controlled outdoor-air stream | Manufacturer performance maps, pressure-network natural ventilation, internal recirculation and canopy air velocity |
 | Generic desiccant with finite removal, regeneration energy, purchased electric and fuel split, explicit sorption heat; hybrid indirect evaporation with a separate wet secondary stream | Any named product (no Blue Frontier or AGronomic IQ map is claimed), desiccant storage scheduling, water quality and bleed |
 | Evaporative pad as an approximately isoenthalpic process at a stated saturation effectiveness | Face-velocity-dependent effectiveness, fouling, uneven wetting |
-| Historical solar driving optical DLI separately from thermal gain, footprint photons shared over stacked canopy, causal supplemental lighting | Detailed glazing optics, movable screens, incidence-angle models, real natural-vent pressure flow |
+| Historical solar driving optical DLI separately from thermal gain, footprint photons shared over stacked canopy, causal supplemental lighting, declared movable screens | Detailed glazing optics, incidence-angle models, real natural-vent pressure flow |
 | Historical state and sector average electricity prices applied to the resulting dispatch | Utility tariffs, demand charges, riders, time-of-use optimization, hourly marginal emissions |
 
 Constant-property and ideal-modulation assumptions are exported with every result, so a reader can see which of the above applied to a given number.
@@ -80,25 +79,22 @@ The full ladder, with the output each tier permits and the implication each tier
 
 ## Key results from the bundled example
 
-Everything below is measured output from this repository, not illustration. Sources are linked per row.
+Current evidence is model `0.3.0-screening`, scenario schema 2. The actual browser run used Tulsa 2025, 8,760 valid hours and 8,759 eligible hours after one warm-up hour. Its full-run totals include warm-up; matched comparison costs cover only the common eligible set. These populations must not be mixed.
 
-| Result | Value | Source |
+| Current result | Value | Source |
 |---|---|---|
-| Controller cadence convergence, Tulsa 2025 full year, 1 min vs 0.5 min | 0.004 / 0.383 / 0.091 pp attainment; 0.31% electricity at most | [VERIFICATION.md](docs/VERIFICATION.md) |
-| Ideal optimizer on the same test | Does not converge: 1.5 pp attainment, 1.95% electricity | [VERIFICATION.md](docs/VERIFICATION.md) |
-| Bundled Tulsa weather years | Ten years, 2016 to 2025, complete coverage (8,760 or 8,784 h each) | [VERIFICATION.md](docs/VERIFICATION.md) |
-| Baseline attainment across five years, six strategies | Median 28.9%, worst year 2025 at 27.1%, spread 2.7 pts | [VERIFICATION.md](docs/VERIFICATION.md) |
-| Cost ranking stability across those years | **Not stable**: 2 distinct orders over 5 years | [VERIFICATION.md](docs/VERIFICATION.md) |
-| Tulsa vs Phoenix, pad-effective hours | 244 vs 2,334 h | [VERIFICATION.md](docs/VERIFICATION.md) |
-| Tulsa vs Phoenix, free-cooling hours | 401 vs 2,636 h | [VERIFICATION.md](docs/VERIFICATION.md) |
-| Tulsa pad runtime vs weather-side pad viability | Pad ran 2,772 h on 296 days; the weather screen clears both limits in only 244 h on 65 days | [AUDIT.md](docs/AUDIT.md) |
-| Binding limit at Tulsa | Moisture ceiling binds 3,851 h, temperature margin 2,952 h | [AUDIT.md](docs/AUDIT.md) |
-| Outside air vs a 2.5 L/kWh dehumidifier | Outside air wins on cost per kg in 4,970 h and on energy per kg in 1,752 h | [AUDIT.md](docs/AUDIT.md) |
-| Most influential assumption (Morris mu\*) | Leaf area and transpiration: 9.10 pp attainment, ahead of envelope U (5.89) and shade fraction (3.43) | [SENSITIVITY.md](docs/SENSITIVITY.md) |
-| Strategy ranking under the screened ranges | Unstable: 3 orders, most common 61.5%. The three cheapest positions are identical in 104 of 104 points | [SENSITIVITY.md](docs/SENSITIVITY.md) |
-| Conservation identities | Close between 1e-16 and 5e-13 relative | [AUDIT.md](docs/AUDIT.md) |
+| Joint temperature-and-moisture target attainment, pad baseline versus DX plus dehumidifier | 27.135% versus 73.066%, an increase of 45.931 percentage points (pp) of eligible hours | [Browser run](docs/browser-run-metrics.json) |
+| Baseline model-estimated annual operating cost, all 8,760 valid hours | $22,064.29 | [Browser run](docs/browser-run-metrics.json) |
+| Baseline model-estimated operating cost on 8,759 common eligible hours | $22,060.97, not the full-year total | [Browser run](docs/browser-run-metrics.json) |
+| Regional evidence | 360 full-year simulations, zero numerical-failure hours | [REGIONS.md](docs/REGIONS.md) |
+| Morris aggregate joint-attainment mu* per full screened range | LAI/transpiration 9.098627 pp; maximum controlled outdoor-air capacity 2.164460 pp | [SENSITIVITY.md](docs/SENSITIVITY.md) |
+| Morris evidence | 1,872 simulations, 104 design points, zero numerical-failure hours | [Morris artifact](docs/morris-screening.json) |
 
-Not claimed: no independent model benchmark, no site calibration, no equipment performance maps.
+Operating costs include purchased electricity, purchased heating fuel and modeled water at manual $0.12/kWh electricity, $0.045/kWh fuel and $0.002/L water. They exclude installed capital, maintenance, labor, financing, taxes, demand/fixed charges, time-of-use effects and other unmodeled tariff components. They are not quotes or guaranteed savings. Estimated or user-entered installed capital is reported separately.
+
+**Withdrawn:** the old $39,517 DOAS result and every operating-cost reduction derived from it omitted sensible conditioning energy. No general recommendation to close a hybrid greenhouse follows from the earlier comparisons. A 6 ACH case is a capacity experiment, not a recommended rate; 15 ACH is constrained semi-closed operation, not a conventional open-greenhouse benchmark.
+
+See [COMPONENT-PARAMETERS.md](docs/COMPONENT-PARAMETERS.md) for construction-specific infiltration and controlled-air guidance, [WORKFLOW.md](docs/WORKFLOW.md) for explicit airflow review and migration, and [VERIFICATION.md](docs/VERIFICATION.md) for executed checks. No site calibration, independent model benchmark or product-performance validation is claimed.
 
 ## Example scenarios
 
@@ -172,7 +168,7 @@ node scripts/morris-screening.mjs       # Morris elementary-effects screening
 
 `build-energy.py` uses openpyxl for the source workbooks: `python3 -m pip install openpyxl` in a virtual environment if it is unavailable. Downloaded source files and SHA-256 manifests are retained, and `--refresh` re-downloads and verifies against them. Source updates can legitimately change data and cutoff dates.
 
-The committed Morris run is 1,872 simulations over 104 design points (8 trajectories, 12 parameters, three years, 120 sampled days each), seed 1, 290 s on 8 threads. Same seed and inputs give byte-identical output apart from `generatedAt` and `runtimeSeconds`. Faster variant:
+The committed Morris run is 1,872 simulations over 104 design points (8 trajectories, 12 parameters, three years, 120 sampled local days per year), seed 1. Its costs are sampled-period totals, not annual cost. Same seed and inputs reproduce numerical results; timestamps and elapsed time are provenance, not numerical outputs. Faster variant:
 
 ```sh
 node scripts/morris-screening.mjs --years 2016,2025 --trajectories 4 --days 60 --out /tmp/quick.json
@@ -183,11 +179,11 @@ The observed study in [reference-study/](reference-study/) keeps the weather-onl
 ## Testing
 
 ```sh
-npm test                      # node --test test/*.test.mjs, 91 tests
+npm test                      # node --test test/*.test.mjs
 node --test test/model.test.mjs
 ```
 
-91 tests pass. They defend physical and data boundaries that a plausible bug would break: no photon creation on stacked canopy, finite control authority, dehumidifier and regeneration energy, cadence-invariant unmet loads, exact and step-invariant daily light-target delivery with sufficient fixture capacity, unsaturable-candidate exclusion, pad runtime attribution, insect-screen ventilation derating in the measured direction for a vent-limited humid house, shade and thermal-screen effects, heat-pump rating limits, missingness, DST and fractional-offset DLI days, bounded import ranges, temporal billing, manual versus historical pricing, six closed-form conservation identities, Morris design reproducibility, regional verdict consistency, dataset staleness budgets, and executable examples.
+The tests defend observable physical and data boundaries: conservation, finite control authority, one-stream airflow treatment, migration and review gates, incomplete treatment performance, frost and heating limits, screen effects, temporal billing and missing data. Current executed evidence and the scope of the final integration run are recorded in [VERIFICATION.md](docs/VERIFICATION.md), not a fixed badge count.
 
 They are **not empirical greenhouse validation**. A passing suite says the code does what the model says, not that the model matches a real greenhouse.
 

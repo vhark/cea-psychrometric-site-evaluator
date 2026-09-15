@@ -653,7 +653,7 @@ export const MODULES = [
     formula: 'compliancePct = 100 * compliantHours / eligibleHours,   eligible = valid && eligible !== false && !warmup',
     formulaNote: 'summarizeHours in src/metrics.js. compliantHours accumulates compliantFraction, the share of an hour\u2019s sampled control substeps inside the band, so an hour that fails for ten minutes contributes a partial hour and not a zero. Cross-scenario comparisons intersect the eligible sets of every compared scenario, so two strategies are always scored over identical hours.',
     worked: [
-      {label: 'Pad-and-vent baseline across five Tulsa years, six strategies', value: 'joint temperature-and-moisture target attainment: median 28.9% of eligible hours, worst year 2025 at 27.1%; compare the best and worst endpoints in the study for its percentage-point spread', source: 'docs/VERIFICATION.md'},
+      {label: 'Pad-and-vent baseline across ten Tulsa years', value: 'joint temperature-and-moisture target attainment: median 28.038% of eligible hours; observed worst 22.589% and best 30.315%, a 7.726 percentage-point (pp) difference', source: 'docs/regional-study.json'},
     ],
     caveat: 'A wider band raises attainment without changing the building. That makes attainment comparable between strategies on one band and not comparable between two different bands. Warm-up hours keep their energy and water in the individual totals, because that energy really was spent, but they carry no compliance at all.',
     show: {target: 'headline-metrics', label: 'Show me the four headline numbers', needsRun: true, first: 'In the Analyze view: press Load Tulsa 2025 example, then Run all scenarios. Attainment is shown as equivalent compliant hours over eligible hours, with valid hours beside it.'}
@@ -669,12 +669,10 @@ export const MODULES = [
     formula: 'padTempC = tempC - effectiveness * (tempC - wetBulbC),   depression = tempC - wetBulbC',
     formulaNote: 'padState in src/physics.js, an approximately isoenthalpic process clamped at saturation. The weather screen calls an hour PAD_EFFECTIVE only when pad leaving air clears both the temperature margin and the moisture ceiling; clearing the ceiling but not the margin is PAD_MARGINAL, and neither is PAD_INEFFECTIVE_DEHU_NEEDED, with the failing limit recorded. FREE_COOLING_MODES in src/metrics.js is PASSIVE_VENT_COOL_DRY plus PAD_EFFECTIVE.',
     worked: [
-      {label: 'Free-cooling hours, Tulsa against Phoenix', value: '401 h against 2,636 h', source: 'docs/VERIFICATION.md'},
-      {label: 'Pad-effective hours on the same screen', value: '244 h against 2,334 h', source: 'docs/VERIFICATION.md'},
-      {label: 'The same greenhouse at five sites, 2025 record, pad-effective hours', value: 'Tulsa 244 h, Phoenix 2,334 h, Miami 33 h, Denver 1,065 h, Seattle 12 h', source: 'docs/examples/README.md'},
-      {label: 'Tulsa pad runtime against weather-side viability', value: 'the pad ran 2,772 h on 296 days, 1,830 equivalent full-load hours; the weather screen clears both limits in 244 h on 65 days', source: 'docs/AUDIT.md, docs/GLOSSARY.md'}
+      {label: 'Median weather-side free-cooling hours, 2016 to 2025', value: 'Tulsa 342 h against Phoenix 2,577.5 h, not simulated indoor attainment', source: 'docs/regional-study.json'},
+      {label: 'Median pad-effective hours over those same ten weather years', value: 'Tulsa 205 h against Phoenix 2,274 h; actual runtime is a separate coupled-model output', source: 'docs/regional-study.json'}
     ],
-    caveat: 'Free cooling is a capability count for the outside air, not a claim that fans are free: powered ventilation still consumes energy in the coupled run. And a low pad count never means the same thing twice. Miami\u2019s 33 hours and Seattle\u2019s 12 hours have opposite causes, no wet-bulb depression left against almost no cooling demand at all.',
+    caveat: 'Free cooling is an outside-air capability count, not a claim that fans or tempering are free. A small pad opportunity count can mean humid supply, little cooling demand or prolonged cold weather; inspect the active constraint rather than assigning one cause to every climate.',
     show: {target: 'runtime-table', label: 'Show me the pad-viability screen', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: run scenarios, then switch the evidence tier to Weather only. The runtime table becomes the pad-viability screen, splitting cooling-demand hours into effective, marginal and ineffective with the limit that bound.'}
   },
   {
@@ -683,14 +681,12 @@ export const MODULES = [
     meta: 'Sensible-heat ratio, overcooling, reheat',
     lede: [
       'Two loads arrive together. Sensible load is heat: solar through the glazing, fixture power, envelope conduction, infiltration, ventilation and fans. Latent load is water: crop transpiration plus whatever moisture the air you admit brings with it. Equipment does not get to choose which of the two it meets.',
-      'A cooling coil removes water only by driving air below its own dew point, so hitting a moisture target with a coil usually means overshooting the temperature target downward and then buying sensible heat back. That is the reheat penalty, and it is the whole argument for decoupling: take the water out somewhere the air is not first made cold, and leave a smaller sensible device to hold temperature.'
+      'A cooling coil removes water by cooling air below its dew point, which can require reheat to meet a sensible supply target. A DOAS separates outdoor-air conditioning from zone sensible cooling, but still buys cooling and any unrecovered heat. It is not automatically dry or neutral: actual supply conditions depend on inlet air and finite heating capacity.',
     ],
     formula: 'SHR = sensibleGainKWh / (sensibleGainKWh + LATENT_KWH_PER_KG * cropLatentKg)',
     formulaNote: 'Space sensible-heat ratio in src/metrics.js, where the latent conversion is the latent heat of vaporization in kWh/kg. A low SHR is the physical argument for decoupled moisture control over coupled cooling with reheat. Hours with no positive gain produce no SHR rather than a zero. The DX input named coolingSHR is a different quantity, the coil\u2019s own split, screened 0.65 to 0.85.',
     worked: [
-      {label: 'Dry-neutral DOAS against a coupled coil with reheat (decoupling-study.json)', value: '56.2% against 55.3% attainment, on 211,807 against 246,930 kWh of purchased electricity, with fuel moving the other way, 417,992 against 367,321 kWh', source: 'docs/examples/README.md'},
-      {label: 'Binding limit at Tulsa', value: 'the moisture ceiling binds 3,851 h against 2,952 h for the temperature margin', source: 'docs/AUDIT.md'},
-      {label: 'Moisture-bound band with a moisture-adding stage (propagation-nursery.json)', value: 'decoupled latent removal reached 52.7% against 28.2% for pad and vent', source: 'docs/examples/README.md'}
+      {label: 'DOAS comparison withdrawn', value: 'Earlier decoupling results omitted sensible supply-conditioning energy. Configure reviewed treatment flow, dew point, temperature, COP and reheat recovery, then compare a new run; no earlier DOAS savings claim remains valid.', source: 'docs/examples/README.md'},
     ],
     caveat: 'The decoupling verdict is a price ratio, not a property of the equipment. Moving purchased energy between electricity and fuel can improve modeled operating cost at one price ratio and worsen it at another; any attainment difference needs both eligible-hour endpoints, and the electricity-to-fuel ratio is an editable input here, not a measured quantity.',
     show: {target: 'loads-panel', label: 'Show me the sensible and latent decomposition', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: run scenarios and stay on the Equipment estimate tier. The load decomposition is a model balance, so it is hidden in the Weather only view.'}
@@ -706,7 +702,7 @@ export const MODULES = [
     formula: 'removalKgPerH = massFlowKgPerH * (w_ceiling - w_outdoor),   costPerKg = (fanKWh + temperingKWh) * price / removalKg',
     formulaNote: 'outdoorDryingHour in src/physics.js, evaluated at the scenario\u2019s maximum ventilation rate. It is a weather-side screen, not a dispatch decision: the coupled controller still decides what runs in the hour.',
     worked: [
-      {label: 'Outside air against a 2.5 L/kWh dehumidifier at Tulsa', value: 'cheaper per kilogram of water in 4,970 h, and less energy per kilogram in 1,752 h', source: 'docs/AUDIT.md'}
+      {label: 'Outside-air drying is conditional', value: 'The earlier Tulsa per-kilogram advantage count is historical. Read actual fan, conditioning and finite heating inputs before comparing a current run; low outdoor humidity alone does not establish an operating-cost reduction.', source: 'docs/COMPONENT-PARAMETERS.md'}
     ],
     caveat: 'The hot-and-dry hours import sensible heat that this table does not cost, so they are cheap only in the moisture account: read them against a separate cooling plan, or ventilation becomes the reason the temperature bound fails. A removal potential is also what the installed fans could move, not what the controller chose to do, so it is an upper bound on the opportunity and not a saving already banked.',
     show: {target: 'drying-table', label: 'Show me the outside-air screen', needsRun: true, first: 'In the Analyze view: press Load Tulsa 2025 example, then Run all scenarios. The outside-air table gives hours, days, mean removal potential and energy and cost per kilogram.'}
@@ -723,9 +719,9 @@ export const MODULES = [
     formulaNote: 'compareScenarios in src/metrics.js, scored on the common eligible hour set; strategyFrontier applies the same rule to median cost and median attainment across weather years. A scenario with missing prices or numerical-failure hours is not comparable and is excluded rather than assumed.',
     worked: [
       {label: 'Cheapest non-dominated strategy', value: 'the pad baseline, in 100% of the 104 points', source: 'docs/SENSITIVITY.md'},
-      {label: 'Highest attainment anywhere in the example library (indoor-microgreen-racks.json)', value: '93.0% for DX with a dehumidifier in an opaque rack farm, at 344,528 kWh, the most electricity-hungry set in the library', source: 'docs/examples/README.md'}
+      {label: 'Current canonical Tulsa 2025 comparison', value: 'DX plus dehumidifier reaches 73.066% joint attainment against the pad baseline at 27.135%, a 45.931 pp increase on the same 8,759 eligible hours. This is not an opaque-room or full-library ranking.', source: 'docs/browser-run-metrics.json'}
     ],
-    caveat: 'Cheapest on the frontier is a position on the cost axis, not a recommendation: the pad baseline holds the band in a median 28.9% of eligible hours against 66.4% for DX. Two strategies within a few percent are a tie at screening resolution. And the 93.0% rack-farm figure is bought with installed capacity and purchased light, not with a better design.',
+    caveat: 'Cheapest on the frontier is a position on the operating-cost axis, not a recommendation. Capacity and target attainment still matter. Close modeled rankings require project measurements, capital, maintenance and redundancy review; the retained regional decision bands are methodological choices, not calibrated ties.',
     show: {target: 'comparison-table', label: 'Show me the investment screen and the frontier', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: add a second strategy, run, and stay on the Equipment estimate tier. The frontier column marks which strategies are operating-dominated, capital excluded.'}
   },
   {
@@ -739,12 +735,10 @@ export const MODULES = [
     formula: 'curtain shut: U_effective = U * curtainFactor, and the outside-air path falls to the declared closed-gap air exchange (per hour)',
     formulaNote: 'Both screens are scheduled inputs in the grouped assumption fields, so their effect appears as an hour count rather than a rating. The heat-pump alternative in the same example replaces fuel with electricity at a temperature-dependent COP, so it trades one bill for another plus a cold-hour capacity derate.',
     worked: [
-      {label: 'Baseline, no screens, fuel heat (screens-and-heat-source.json, Tulsa 2025, pad and vent, staged control)', value: '27.14% attainment, 61,098 kWh electricity, 303,246 kWh fuel', source: 'docs/examples/README.md'},
-      {label: 'Light-guarded shade screen', value: '28.89% attainment for essentially no energy change, 970 screen hours, giving up 1,051 mol/m² of crop light', source: 'docs/examples/README.md'},
-      {label: 'Thermal curtain, 0.1 per hour declared gap', value: '22.24% attainment, fuel down 22% to 236,672 kWh, which is 59,917 kWh of delivered heat saved, over 1,179 curtain hours', source: 'docs/examples/README.md'},
-      {label: 'The same shade screen with the light guard removed', value: 'closes for 1,867 h and pushes lighting energy up by 17,817 kWh to replace the photons it blocked', source: 'docs/examples/README.md'}
+      {label: 'Screen comparison evidence status', value: 'Earlier annual screen savings and attainment values are withdrawn as current-model findings. Import the reviewed schema-2 screen set, run matching weather and inspect lost light, delivered heat and joint attainment together.', source: 'docs/examples/README.md'},
+      {label: 'Focused physical checks', value: 'The screen and heat-pump checks preserve finite capacity, energy and moisture closure on the one-stream airflow contract; they are not product-performance validation.', source: 'docs/VERIFICATION.md'}
     ],
-    caveat: 'The curtain cut fuel by 22% and reduced joint temperature-and-moisture target attainment in the same run, because restricting the outside-air path while the crop transpires traps moisture in the zone. Schedule a curtain by outdoor moisture, not by outdoor temperature alone. The 0.1 per hour closed-gap exchange is a user input and is recorded as UNSOURCED in docs/COMPONENT-PARAMETERS.md: leave it null and the run warns that the moisture case is optimistic.',
+    caveat: 'Restricting the outside-air path while the crop transpires can trap moisture even when a curtain reduces envelope heat loss. Review moisture as well as temperature and light. Closed-gap exchange is a project input, not a sourced generic value: leaving it null produces an optimistic-moisture warning.',
     show: {target: 'advanced-fields', label: 'Show me the envelope and screen assumptions', needsRun: false, first: null}
   },
   {
@@ -758,11 +752,11 @@ export const MODULES = [
     formula: 'spreadPts = bestYearPct - worstYearPct,   rankingStable = one identical operating-cost order in every year',
     formulaNote: 'aggregateYears in src/metrics.js. A least-squares trend is reported only once five or more calendar years exist. The tolerant variant of the same rule, used for the Morris design points, calls a ranking stable when the most common order holds in at least 90% of points. Read a stable ranking narrowly: it says the cost order repeated across those weather years, not that the choice survives the assumptions behind it, which is the separate question § 09 asks. A ranking can be reproducible in every year and the decision still unresolved.',
     worked: [
-      {label: 'Baseline across five Tulsa years, six strategies', value: 'joint temperature-and-moisture target attainment: median 28.9% of eligible hours, worst year 2025 at 27.1%; compare the best and worst endpoints in the study for its percentage-point spread', source: 'docs/VERIFICATION.md'},
-      {label: 'Cost ranking across those same years', value: 'not stable: 2 distinct orders over 5 years', source: 'docs/VERIFICATION.md'},
+      {label: 'Baseline across ten Tulsa years', value: 'joint temperature-and-moisture target attainment: median 28.038%, worst 22.589%, best 30.315%; observed best-minus-worst difference 7.726 pp', source: 'docs/regional-study.json'},
+      {label: 'Operating-cost order across those years', value: 'not stable under the regional 90% rule: two orders, most common in eight of ten years', source: 'docs/regional-study.json'},
       {label: 'Tulsa hours above 30 °C in 2023, 2024, 2025', value: '982, then 1,117, then 634: a 483-hour swing between two neighbouring years at one site', source: 'docs/CLIMATES.md'}
     ],
-    caveat: 'Ten bundled years are ten actual years, not a sample drawn from a stationary distribution. The spread between them is an observed range: it is not a forecast, not a confidence interval and not a design year. A climatological normal is 30 years, and the current standard period is 1991 to 2020, so the three-year sites here measure three particular years and carry no ten-year risk claim at all.',
+    caveat: 'Ten bundled years are ten particular weather years, not a stationary probability distribution. Their observed spread is not a forecast, confidence interval or design year. A climatological normal is 30 years, not this ten-year screening record.',
     show: {target: 'years-panel', label: 'Show me the across-years panel', needsRun: true, first: 'In the Analyze view: select two or more weather years under Weather years, then run. Ten complete Tulsa years, 2016 through 2025, ship with the tool.'}
   },
   {
@@ -776,8 +770,8 @@ export const MODULES = [
     formula: 'EE = ( y(step j) - y(step j-1) ) / delta,   delta = p / (2 * (p - 1)) = 2/3 in unit-cube space',
     formulaNote: 'mu* is the mean absolute effect, which is the influence ranking; mu is the mean signed effect, which gives the direction; sigma is the spread, where a sigma comparable to mu* flags interaction or non-linearity rather than sampling noise. Eight trajectories over twelve parameters gives n = 8 usable step pairs per parameter and metric, and a pair with a missing metric is dropped rather than zero-filled.',
     worked: [
-      {label: 'Top of the attainment ranking, mu* in percentage points', value: 'crop leaf area and transpiration 9.10, envelope U-value 5.89, shade fraction 3.43, DX coil SHR 2.34, solar transmission 2.26', source: 'docs/SENSITIVITY.md'},
-      {label: 'Bottom of the same ranking', value: 'pad effectiveness 0.96, dehumidifier L/kWh 0.08, cooling COP 0.07', source: 'docs/SENSITIVITY.md'},
+      {label: 'Aggregate attainment influence, mu* per full screened range', value: 'crop leaf area and transpiration 9.098627 pp; envelope U-value 5.891623 pp; shade fraction 3.426230 pp; maximum controlled outdoor-air capacity 2.164460 pp', source: 'docs/morris-screening.json'},
+      {label: 'Screening population', value: '1,872 simulations across 104 design points, zero numerical-failure hours. These are elementary effects, not paired scenario endpoint differences or uncertainty bounds.', source: 'docs/morris-screening.json'},
     ],
     caveat: 'Screening is not uncertainty quantification. There is no distribution here, no confidence interval and no probability that one strategy beats another: the ranges are engineering spans with stated reasons, and the design is space-filling rather than a Monte Carlo draw. The most influential parameter, crop transpiration, is a client assumption rather than a measurement. Only twelve continuous parameters are screened, so structural choices such as the single-zone assumption are not bounded by any of these effects, and the largest remaining errors are probably structural.',
     show: {target: 'sensitivity-controls', label: 'Show me the one-at-a-time sensitivity controls', needsRun: false, first: null}
@@ -990,7 +984,7 @@ function strategyTable(strategies, yearCount, basis) {
   }
   table.append(head, body);
   wrap.append(table);
-  wrap.append(node('p', `Spread is best minus worst over ${span}: the spread between the years that happened, not an interval, not a range of likely outcomes and not a confidence bound. A strategy marked operating-dominated can still sit in the capability tier, because inside that tier the attainment difference is below the resolution of this evidence: the Morris screening moves attainment by 9.10 percentage points over the leaf-area range alone (docs/SENSITIVITY.md). Dominance does not rule a tier member out.`, 'help'));
+  wrap.append(node('p', `Spread is best minus worst over ${span}: observed weather-year endpoints, not a probability interval or confidence bound. A strategy marked operating-dominated can still sit in the capability tier. The 5 pp joint-attainment tier and 16% operating-cost band are retained methodological decision rules, not thresholds calibrated by the current Morris run. Dominance does not rule a tier member out.`, 'help'));
   return wrap;
 }
 
@@ -1030,10 +1024,10 @@ function verdictBlock(verdict, strategies) {
   if (finite(verdict.indistinguishableThresholdPct)) facts.push(['Indistinguishable band', `${pct(verdict.indistinguishableThresholdPct, 0)} of median operating cost`]);
   if (finite(verdict.bestAttainmentPct)) facts.push(['Best attainment in the region', pct(verdict.bestAttainmentPct)]);
   if (Array.isArray(verdict.capabilityTier) && verdict.capabilityTier.length) facts.push(['Capability tier', verdict.capabilityTier.map(nameOf).join(', ')]);
-  if (finite(verdict.capabilityTierPts)) facts.push(['Capability tier width', `strategies within ${points(verdict.capabilityTierPts)} of the region's best median attainment, because the Morris screening moves attainment 9.10 pp over the leaf-area range alone and finer differences are not resolved at this evidence tier`]);
+  if (finite(verdict.capabilityTierPts)) facts.push(['Capability tier width', `strategies within ${points(verdict.capabilityTierPts)} of the region's best median joint temperature-and-moisture target attainment; a retained methodological rule, not current-model calibration or an uncertainty interval`]);
   // `stable` is about the six-strategy cost order across weather years only. It says nothing about the
   // verdict surviving the assumptions: Phoenix is reproducible in 10 of 10 years and still unresolved.
-  facts.push(['Cost order across the study years', verdict.stable === true ? 'Reproducible across the observed years: one identical order in every year. This is reproducibility of the order, not robustness of the verdict to the assumptions.' : verdict.stable === false ? 'Not reproducible across the observed years: the order changes between years.' : 'Not stated']);
+  facts.push(['Cost order across the study years', verdict.stable === true ? 'Meets the regional rule: the most common operating-cost order holds in at least 90% of years. This is reproducibility, not robustness to assumptions.' : verdict.stable === false ? 'Does not meet the regional 90% reproducibility rule.' : 'Not stated']);
   const stability = text(verdict.stabilityBasis);
   if (stability) facts.push(['Stability basis', stability]);
   // The raw hour count is heating-dominated at any temperate site on a cool band, so it is never shown

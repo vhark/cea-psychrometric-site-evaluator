@@ -2,7 +2,7 @@
 
 Purpose: name every document in this folder, say who it is for, and give a reading order that does not waste your time.
 
-Status: current for model `0.2.0-screening`, 2026-09-14.
+Status: current for model `0.3.0-screening`, scenario schema 2, 2026-09-15.
 
 Read this if: you opened `docs/` and want to know which file answers your question.
 
@@ -29,7 +29,7 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | Document | Purpose | Reader |
 |---|---|---|
 | [WORKFLOW.md](WORKFLOW.md) | Step-by-step procedure, import schemas, exports and their limits | Anyone running the tool, or reading its output |
-| [examples/](examples/README.md) | Importable comparison sets, one per design question, with what each showed on Tulsa 2025 | Anyone starting a real comparison |
+| [examples/](examples/README.md) | Reviewed schema-2 comparison inputs, their design questions and current evidence limits | Anyone starting a real comparison |
 | [GLOSSARY.md](GLOSSARY.md) | Every domain term with unit, location in the interface, and how it is computed here | Anyone reading a result, report or brief |
 | [PRD.md](PRD.md) | Product requirements and approved scope, including the v0.2 site-evaluator contract in §10 | Product owner, implementer |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Deployment decision, module boundaries, canonical data contracts, controller design | Implementer, reviewer |
@@ -40,9 +40,9 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | [SENSITIVITY.md](SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives them | Engineer choosing what to measure, reviewer |
 | [CLIMATES.md](CLIMATES.md) | The bundled hourly weather: six sites, 60 complete calendar years, the provenance of every file, and what a bundled year must not be read as | Anyone choosing a site or a year, quoting a climate figure, or adding a site |
 | [REGIONS.md](REGIONS.md) | The ten-year, six-climate study: method, recommendation rule, per-region verdict and what each unresolved region needs measured | Anyone choosing equipment for a climate, reviewer |
-| [CLASSES.md](CLASSES.md) | The classes of environmental control, what exhausts each one, and what each achieved in six climates including a subarctic site | Anyone choosing a facility type, or asking whether a greenhouse is worth building at a latitude |
+| [CLASSES.md](CLASSES.md) | Control classes, physical limits and withdrawal of unsupported older facility rankings | Anyone comparing facility topologies |
 | [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) | Graded literature review of what measurement actually establishes for hot-humid CEA, the named gaps, and which of this tool's numbers the evidence can and cannot carry | Anyone acting on a humid-climate result, reviewer, anyone quoting a technology claim |
-| [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) | Sourced parameters for movable shade, thermal curtains, insect screens, the envelope ladder and air-source heat-pump heating, with every unsourced value named as unsourced | Anyone setting a screen, curtain, mesh or heat-pump input, reviewer |
+| [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) | Airflow/recovery/DOAS evidence, screens, envelope and heat-pump parameters with applicability boundaries | Anyone setting a component input |
 | [ENERGY-DATA.md](ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage counts, vintages, join limits, rebuild procedure | Data maintainer, anyone quoting a price or an emissions factor |
 | [RESEARCH.md](RESEARCH.md) | Landscape review, literature anchors and public source register behind the build decision | Reviewer, anyone asking why this exists |
 | [DIGITAL-TWIN.md](DIGITAL-TWIN.md) | Roadmap M1 to M6, with the claim each milestone earns and the gate it must pass | Product owner, reviewer |
@@ -70,3 +70,8 @@ These are data, not prose. They are the primary record behind the numbers in the
 - Every figure carries its basis. A number without a source, a date or a stated assumption is a defect, not a style choice.
 - Dates are ISO. Units are SI in inputs, with US equivalents displayed where the interface offers them.
 - Documents state what is **not** claimed as explicitly as what is.
+- One Season Farmers interactive tools use Instrument; reports and handoffs default to Field independent of OS theme.
+- Scenario and run-bundle schema is 2. Weather snapshots and the regional artifact envelope remain schema 1; regional scenarios are schema 2. Morris envelope is 2.
+- Every operating-cost number names its population, period, inclusions, numeric price basis and exclusions. Capital is separate; no result is a quote or guaranteed savings.
+- Differences in joint temperature-and-moisture target attainment use percentage points (pp) and both endpoints. Morris effects instead use pp per full screened range, not fictitious paired endpoints.
+- Historical audit, research and design records retain their dates and model versions; they do not supersede regenerated current artifacts.

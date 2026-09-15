@@ -16,5 +16,16 @@ Third-party software and datasets retain their own licenses and terms.
 - GeoNames US postal-code dataset: see docs/ENERGY-DATA.md for the attribution
   and license recorded with the download.
 
-Grownetics brand names, marks and the visual identity described in the
-documentation are not licensed as trademarks by the MIT license above.
+One Season Farmers brand names, marks and visual identity are not licensed as
+trademarks by the MIT license above. Tools use Instrument; documents use Field.
+
+Model 0.3.0-screening uses scenario schema 2. Weather snapshots retain schema 1.
+Engineering sources are cited for applicability, not as endorsements or product
+performance guarantees: UGA Bulletin 792; Shamshiri et al. (2018),
+doi:10.25165/j.ijabe.20181101.3210; Shao et al. (2021),
+doi:10.1016/j.buildenv.2021.107766; Chen et al. (2022),
+doi:10.25165/j.ijabe.20221501.6872; EnergyPlus 24.1 Engineering Reference,
+air-to-air sensible and latent heat exchangers; Maslak and Nimmermark,
+doi:10.23986/afsci.58936; Sapounas et al., doi:10.3390/agronomy10111739.
+These publications retain their own rights. See docs/COMPONENT-PARAMETERS.md
+for links, evidence status and limits. No manufacturer ratings are inferred.

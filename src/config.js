@@ -43,7 +43,7 @@ export const AIRFLOW_EVIDENCE = Object.freeze({
  closedRoom:Object.freeze({
   basis:'adjacentProxy',
   source:'Single closed-room measurement, adjacent proxy only',
-  sourceUrl:'https://doi.org/10.23986/afsci.58936',
+  sourceUrl:'https://doi.org/10.1016/j.buildenv.2021.107766',
   measuredACH:.18,
   applicability:'One measured room does not establish a universal opaque-facility infiltration or controlled-air value.'
  }),
@@ -105,7 +105,7 @@ const ENVELOPE_KEYS=['uValue','parTransmission','solarTransmission','infiltratio
 // rather than a generic format, so it would be a guess here.
 export const SYSTEMS = {bench:'Greenhouse benches',microgreens:'Microgreen racks',propagation:'Propagation racks',mushroom:'Mushroom racks'};
 const RETIRED_SYSTEMS = new Set(['wall']);
-export const TECHNOLOGIES = {pad:'Pads + ventilation + heat',dehu:'Pads + condensing dehumidifier',dx:'DX / mini-split + dehumidifier',integrated:'Integrated HVAC + reheat',desiccant:'Desiccant + evaporative cooling',hybridDesiccant:'Liquid-desiccant hybrid (generic)',doas:'Dry-neutral DOAS + DX sensible'};
+export const TECHNOLOGIES = {pad:'Pads + ventilation + heat',dehu:'Pads + condensing dehumidifier',dx:'DX / mini-split + dehumidifier',integrated:'Integrated HVAC + reheat',desiccant:'Desiccant + evaporative cooling',hybridDesiccant:'Liquid-desiccant hybrid (generic)',doas:'DOAS conditioning + DX sensible'};
 export const DEFAULT_SCENARIO = {
  schemaVersion:SCENARIO_SCHEMA_VERSION,id:'baseline',name:'Pad + vent baseline',facility:'greenhouse',system:'bench',crop:'lettuce',technology:'pad',
  areaM2:500,canopyM2:350,heightM:4,envelopeRatio:1.8,uValue:4,thermalMassKJm2K:100,
@@ -131,7 +131,7 @@ export const FIELDS = [
  {label:'Airflow & evaporative cooling',fields:[f('minVentACH','Minimum controlled outdoor air','ACH',0,60,.1),f('maxVentACH','Maximum controlled outdoor-air capacity','ACH',0,120,1),f('fanWPerM3s','Fan specific power','W/(m³/s)',0,2000,10),f('padEffectiveness','Pad effectiveness','fraction',0,.95,.05),f('padPumpW','Pad pump','W',0,20000,50),f('humidifierKgH','Humidifier capacity','kg/h',0,1000,1)]},
  {label:'Heating, cooling & dehumidification',fields:[f('heaterKW','Delivered heater capacity','kW',0,10000,10),f('heaterEfficiency','Heater efficiency','fraction',.1,1,.05),f('coolingKW','Total DX cooling capacity','kW',0,10000,10),f('coolingCOP','Assumed cooling COP','W/W',.5,10,.1),f('coolingSHR','Sensible heat ratio','fraction',.2,1,.05),f('coolingMinOutdoorC','DX minimum outdoor','°C',-50,30,1),f('coolingMaxOutdoorC','DX maximum outdoor','°C',20,65,1),f('dehuKgH','Condensing dehu capacity','kg/h',0,2000,5),f('dehuLPerKWh','Dehu efficiency','L/kWh',.2,10,.1),f('dehuHeatFraction','Dehu heat returned to the zone','fraction',0,1,.1),f('reheatFraction','Recoverable condenser heat','fraction',0,1,.1)]},
  {label:'Desiccant assumptions',fields:[f('desiccantKgH','Desiccant moisture capacity','kg/h',0,2000,5),f('regenerationKWhPerKg','Regeneration energy','kWh/kg water',.1,10,.1),f('regenerationElectricFraction','Electric share of regeneration','fraction',0,1,.1),f('desiccantHeatFraction','Sorption heat returned indoors','fraction',0,1,.1),f('hybridEvapEffectiveness','Hybrid indirect evap effectiveness','fraction',0,.95,.05)]},
- {label:'Dry-neutral DOAS (generic)',fields:[f('doasM3s','DOAS treatment capacity','m³/s',0,50,.1),f('doasSupplyDewPointC','DOAS supply dew point','°C',-10,25,.5),f('doasSupplyTempC','DOAS supply temperature','°C',5,35,.5),f('doasCoolingCOP','DOAS cooling COP','W/W',.5,10,.1),f('doasReheatRecoveryFraction','DOAS reheat recovery','fraction',0,1,.05)]},
+ {label:'DOAS conditioning (generic)',fields:[f('doasM3s','DOAS treatment capacity','m³/s',0,50,.1),f('doasSupplyDewPointC','DOAS supply dew point','°C',-10,25,.5),f('doasSupplyTempC','DOAS supply temperature','°C',5,35,.5),f('doasCoolingCOP','DOAS cooling COP','W/W',.5,10,.1),f('doasReheatRecoveryFraction','DOAS reheat recovery','fraction',0,1,.05)]},
  {label:'Investment assumptions',fields:[f('electricityPrice','Manual electricity price','$/kWh',0,2,.01),f('fuelPrice','Purchased heating fuel','$/kWh',0,1,.005),f('waterPrice','Water price','$/L',0,.1,.001),f('installedCost','Installed component cost','$',0,10000000,1000),f('maintenanceYear','Annual maintenance','$/year',0,1000000,100),f('lifeYears','Equipment service life','years',1,50,1),f('discountRate','Discount rate','fraction',0,.3,.01)]}
 ];
 export function makeScenario(facility='greenhouse',system='bench',crop='lettuce'){
@@ -209,7 +209,6 @@ export function migrateScenario(input){
  delete s.doasKWhPerKg;
  return s;
 }
-export function backfillScenario(s){return migrateScenario(s);}
 const valueText=value=>Number(value.toFixed(2)).toString();
 export function airflowEvidenceWarnings(input){
  let s;

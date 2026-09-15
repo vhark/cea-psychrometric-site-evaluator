@@ -1,37 +1,50 @@
 # CEA Psychrometric Site Evaluator: executed verification
 
-Purpose: record the checks that were actually executed, with the commands, the measured values and the date, so no claim in this repository rests on an unexecuted intention.
+Purpose: distinguish current executed evidence from historical development checks and unverified claims.
 
-Status: current for model `0.2.0-screening`, last updated 2026-09-15. Sections are dated and cumulative: the 0.1.0 sections are kept as the historical record, and the material precision limit they state was superseded by the staged controller in v0.2. This records executed checks, not completion of every future gate in [EVALUATION.md](EVALUATION.md).
-
-Read this if: you are deciding how far to trust a number, auditing the evidence behind a claim, or repeating a check.
+Status: model `0.3.0-screening`, scenario schema 2, updated 2026-09-15. The dated records below remain historical; they are not fresh verification of this release. No independent model benchmark, measured-site calibration or manufacturer validation is claimed.
 
 ## Current state, 2026-09-15
 
-| Check | Result |
+| Check | Executed evidence and scope |
 |---|---|
-| Regression suite (`npm test`) | **91 passed, 0 failed**: 30 model, 12 screens, 9 data, 9 analysis, 8 regional, 7 sensitivity, 6 conservation, 5 examples, 5 vintages |
-| Model version | `0.2.0-screening`, staged deadband controller default, one-minute dispatch step |
-| Controller cadence convergence, Tulsa 2025 full year, 1 min vs 0.5 min | 0.004 / 0.383 / 0.091 pp attainment, 0.31% electricity at most (staged); the retained ideal optimizer does not converge: 1.5 pp, 1.95% |
-| Conservation identities | Close between 1e-16 and 5e-13 relative across six independently derived closed-form checks |
-| Bundled weather | Six NASA POWER sites (Tulsa, Phoenix, Miami, Denver, Seattle, Fairbanks), 2016 to 2025 each, complete coverage (8,760 or 8,784 h per site-year, 87,672 per site) |
-| Regional study | 360 full-year simulations (6 sites x 10 years x 6 strategies), 281.7 s on 8 threads. Three of six regions return no recommendation by rule; see [REGIONS.md](REGIONS.md) |
-| Lighting delivery | A fixture with surplus capacity lands on the daily target exactly (14.000 of 14 mol) and is step-invariant at 5 and 1 minute; an undersized fixture still reports its shortfall. Regenerating the study after this fix left every verdict and strategy order unchanged, no strategy moving more than 0.05 pp or 50 dollars |
-| Pad and vent decoupling | Independently scored per hour and cross-checked: `padDeeperThanVentHours` reproduces the previous mutually exclusive pad-effective count (Tulsa 243 against 244, Phoenix 2,274, Miami 21, Denver 1,072, Seattle 84, Fairbanks 10 as study medians). Regenerating the study left all six verdicts and strategy orders unchanged. A regression pins independence in both directions, the strict subset relation, and that an uninstalled pad is never credited |
-| Insect screen ventilation penalty | Derate applied from measured Thai ratios. Reproduces the measured direction in the configuration the experiment ran (Miami pad-only, ideal control: 7.4% to 4.6% attainment from 40 to 78 mesh) and reverses where a mechanical moisture sink exists (Tulsa 38.9% to 44.2%, Fairbanks 40.4% to 49.8%). Survives the ideal controller, so not a staging artifact |
-| Hot-humid design questions | Miami 2025, ideal control: roof admits 604 MWh against 234 MWh of LED for the same crop target, at a 325 kW against 40 kW peak. Standalone dehumidifier at 60 kg/h rejects 184 MWh into the zone and still halves electricity (464 to 327 MWh) for +29.4 points. Coil-as-dehumidifier without reheat buys 498 MWh of heat in Miami at 67.6% attainment; full recovery reaches 98.4% |
-| Control-class ladder | Nine configurations x six climates, 2025, ideal controller, per-site sizing; see [CLASSES.md](CLASSES.md). Under the staged controller a Miami pad house fell from 9.6% to 0.0% attainment as cooling grew from 100 to 406 kW, while the ideal controller rose from 10.1% to 18.7% and saturated |
-| Closed facility on outside air, and a hybrid closing up | Fairbanks 2025, ideal control, 5 min steps, 500 m2, 150 W/m2, capacities fixed inside each facility. Sealed insulated box (DX 150 kW, dehumidifier 100 kg/h, heater 40 kW): shipped 2 ACH shell leakage 90.2% with 1,496,419 kg moisture unmet at 43,739; designed 6 ACH economizer 94.7% with 274 kg unmet at 42,758; plus dry-neutral DOAS 94.7% at 39,517, removing 10,550 kg. Hybrid house closed up (curtain plus shade, 15 to 6 ACH) holds 98.9% and saves 6,332. Re-homed to each site, dropping the shade's crop-light guard is worth 6.1 points in Denver (91.1 to 97.2) and 5.2 in Miami (92.8 to 98.0) for 1 to 2 MWh more lamp energy, DLI shortfall 0 days throughout. One site, one year, one configuration per row; see [CLASSES.md](CLASSES.md) and [examples/closed-and-hybrid-air.json](examples/closed-and-hybrid-air.json) |
-| Economizer capacity ranking, **not claimed** | The ideal dispatcher offers three airflow levels per substep (declared minimum, midpoint, maximum), so raising the declared maximum moves the midpoint and deletes the intermediate flow the controller was using: on the sealed Fairbanks box a 6 ACH maximum offers 0.30/3.15/6.00 and scores 94.7%, 12 ACH offers 0.30/6.15/12.00 and scores 89.9%, 20 ACH offers 0.30/10.15/20.00 and scores 76.4%, tracking the midpoint rather than the air. Replacing the ladder with fixed fractions of the maximum was measured (82.0% at 6 ACH, 67.2% at 12), judged a controller redesign rather than a fix, and reverted. The 20 ACH example row is reported as not interpretable; ranking economizer capacities needs continuous or finer airflow modulation and remains an open item |
-| Dehumidifier heat path | Miami and Fairbanks 2025, ideal control, 500 m2 indoor, 150 W/m2 lighting, DX 200 kW, dehumidifier 100 kg/h, heater 60 kW, 0.12 USD/kWh electricity and 0.045 USD/kWh fuel, scenarios re-homed to each site's coordinates, ZIP and IANA time zone. In-room or ducted-and-returned (`dehuHeatFraction` 1.0): Miami 98.5% at 63,555 USD, Fairbanks 97.0% at 44,015. Remote condenser (0): Miami 97.1% at 57,301, Fairbanks 93.3% at 53,886. Rejected plus recovered reheat at 1.0: Miami 99.1% at 57,063, Fairbanks 95.3% at 53,274. The Miami in-room unit sends 389 MWh into the zone and 430 MWh of cooling removes it again, so rejecting saves 6,254 USD/yr; in Fairbanks rejecting costs 9,871 USD/yr and 3.7 attainment points. One site, one year, one configuration per row, ideal controller; see [CLASSES.md](CLASSES.md#where-a-dehumidifiers-heat-goes-measured) |
-| Returned-fraction sweep, and the limit of a static fraction | Same configuration, `dehuHeatFraction` swept 0.00 to 1.00 in 0.25 steps. The cheapest fraction moves with climate: Miami 0.25 (98.1% at 56,452 USD), Tulsa 0.50 (97.1% at 50,387), Fairbanks 1.00 (97.0% at 44,015). Miami's cheapest fraction is not its best-attaining one (1.00 holds 98.5% at 63,555), so there it is a tolerance-against-cost choice. This is the measured case for modulating reheat, and the reason a static fraction is a limitation: the model applies the declared fraction in every hour rather than choosing it from each hour's heating demand, so these runs bracket a modulating machine, they do not simulate one. One site, one year, one configuration per row, ideal controller; see [CLASSES.md](CLASSES.md#where-a-dehumidifiers-heat-goes-measured) |
-| Multi-year example, six strategies over five years | Baseline median attainment 28.9%, worst year 2025 at 27.1%, spread 2.7 pts; cost ranking **not stable** (2 distinct orders over 5 years) |
-| Multi-site example | Tulsa vs Phoenix: 244 vs 2,334 pad-effective hours, 401 vs 2,636 free-cooling hours |
-| Tulsa pad, runtime vs weather-side viability | Pad ran 2,772 h on 296 days; the weather screen clears both pad limits in only 244 h on 65 days; moisture ceiling binds 3,851 h against 2,952 h for the temperature margin |
-| Outside air as the dehumidifier, Tulsa, against a 2.5 L/kWh unit | Outside air is cheaper per kg in 4,970 h and lower energy per kg in 1,752 h |
-| Morris screening | 1,872 simulations, 104 design points, 8 trajectories, 12 parameters, 3 years x 120 days, seed 1, 290 s, reproducible. mu\* leader on all three metrics is leaf area and transpiration (9.10 pp attainment), then envelope U (5.89), then shade fraction (3.43). Ranking unstable: 3 orders, most common 61.5%; the three cheapest positions identical in 104/104 points; instability confined to DX, hybrid-desiccant and integrated, whose median costs sit within 16% |
+| Release identity | Model `0.3.0-screening`, scenario/run schema 2; weather schema 1 |
+| Browser run | Actual Chromium loaded Tulsa 2025, imported canonical schema-2 scenarios, ran six strategies and downloaded JSON, hourly CSV, printable report and design-basis brief. [browser-run-metrics.json](browser-run-metrics.json) retains metrics, hashes and visual checks |
+| Browser numerical coverage | All six strategies: 8,760 valid hours, 8,759 eligible hours, one warm-up, zero missing or numerical-failure hours |
+| Focused model/data/export checks in browser artifact | 121 passed, zero failed, command and date retained in artifact; this is not the whole suite |
+| Screen-fixture cutover | `node --test test/screens.test.mjs`: 12 passed, zero failed after schema-2 review and one-stream moisture closure correction. Heat-pump fixtures explicitly review zero controlled air/fan power; conservation bounds are unchanged |
+| Focused post-cleanup contracts | `node --test test/data.test.mjs test/examples.test.mjs test/sensitivity.test.mjs test/regional.test.mjs`: 36 passed, zero failed, including real-weather example runs and current artifact schema/cost contracts |
+| Source syntax | `node --check` succeeded for config, app, Learn, report, tour, sensitivity and the reference-study generator |
+| Full integration suite | Before this documentation/test cutover the parent observed 157 total, 154 pass and three screen-fixture failures. Those three fixtures are repaired and the focused screen suite is green. Final project-wide integration validation is owned by the parent; no full-suite-green claim is made here |
+| Regional regeneration | `node scripts/regional-study.mjs`: 360 full-year simulations, zero numerical-failure hours; artifact envelope 1 with scenario schema 2, compatible with Learn; 220 s recorded |
+| Morris regeneration | `node scripts/morris-screening.mjs`: 1,872 simulations, 104 design points, zero numerical-failure hours; envelope 2, scenario schema 2; 418.7 s recorded |
+| Current Morris influence | Aggregate joint-attainment mu* LAI/transpiration 9.098627 pp per full screened range; maximum controlled-air capacity 2.164460 pp. Not a probability bound or threshold calibration |
+| Regional decision rules | Retained 5 pp joint-attainment tier and 16% operating-cost band; three unresolved regions, Phoenix/Denver/Seattle. Rules are methodological, not newly calibrated by Morris |
 
-Still not claimed, at this or any earlier date: no independent greenhouse-model benchmark, no site calibration, no equipment performance maps.
+### Actual browser metrics and populations
+
+Source: [browser-run-metrics.json](browser-run-metrics.json). Staged controller, one-minute dispatch, Stanghellini crop model, Tulsa calendar 2025. Attainment is joint temperature-and-moisture target attainment on the 8,759 eligible hours. Annual operating cost covers **all 8,760 valid hours**, including warm-up; matched cost covers **8,759 common eligible hours** and is not the full annual total.
+
+Operating costs include purchased electricity, purchased heating fuel and water represented by the scenario, using manual $0.12/kWh electricity, $0.045/kWh fuel and $0.002/L water. Excluded: installed capital, maintenance, labor, financing, taxes, demand charges, fixed charges, time-of-use effects and other unmodeled tariff components. Estimated or user-entered installed capital is separate. No modeled cost, difference or reduction is an equipment quote or guaranteed savings.
+
+| Strategy | Joint attainment % | Model-estimated annual operating cost USD, 8,760 h | Model-estimated matched-period operating cost USD, 8,759 h |
+|---|---:|---:|---:|
+| Pad + vent baseline | 27.135 | 22,064.29 | 22,060.97 |
+| Pads + condensing dehumidifier | 41.638 | 28,493.30 | 28,489.98 |
+| DX / mini-split + dehumidifier | 73.066 | 39,915.37 | 39,912.06 |
+| Integrated HVAC + reheat | 55.297 | 47,201.10 | 47,196.78 |
+| Desiccant + evaporative cooling | 51.875 | 33,827.30 | 33,823.78 |
+| Liquid-desiccant hybrid (generic) | 52.619 | 47,332.88 | 47,328.69 |
+
+Pad baseline to DX/dehumidifier increases joint attainment from 27.135% to 73.066%, **45.931 percentage points (pp)**. This is a difference of percentages, not a relative percent improvement. Other comparisons must likewise retain both endpoints and the same eligible population. A Morris mu* has no single pair of endpoints: it is an average normalized absolute elementary effect.
+
+### Claims withdrawn and historical limits
+
+The old **$39,517 DOAS result and all derived reductions are withdrawn**, because sensible conditioning energy was omitted. The old class ladder, DOAS library results, hybrid-close-up savings and related capacity recommendations are not current-model evidence. No new opaque/DOAS/class ranking is inferred from the canonical greenhouse artifacts. A 6 ACH case is modeled capacity, not a recommended rate; 15 ACH is constrained semi-closed operation, not conventional open-greenhouse capacity. The opaque 2 ACH maximum is controlled air, separate from infiltration. Mushroom airflow is project-specific and internal circulation is unmodeled.
+
+Historical cadence checks below are explicitly old-model development evidence. Their convergence figures are not a new model-0.3.0 tolerance claim. Discrete staged and ideal airflow ladders remain resolution-limited; no continuous economizer optimum is claimed. Current conservation and air-treatment tests defend the one-stream balance, finite source priority, complete performance/review gates and reported unmet conditioning, not real-world calibration.
+
+`node scripts/reference-study.mjs` regenerated the observed reference study during this release: 6,087 expected hours, 6,064 valid, 23 missing, 251 NOAA daily records and 16 sensitivity cases. All eight CSVs were hash-compared: seven are unchanged; the hourly psychrometric CSV changes only secondary flags in 2,928 rows to reflect the current independent pad/vent opportunity classifier. Numeric fields, primary modes and row counts are unchanged. The report remains weather-side opportunity analysis, not indoor simulation. Actual Chromium inspection under emulated dark OS confirmed Field ground `#F7FAF6` and no horizontal overflow. See [../reference-study/manifest.json](../reference-study/manifest.json) for source provenance. Interactive tools use Instrument.
 
 ## 0.1.0-screening record (2026-09-11)
 

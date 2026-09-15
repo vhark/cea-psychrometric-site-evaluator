@@ -18,7 +18,7 @@ const house=(over={})=>({...makeScenario('greenhouseDouble'),timezone:'UTC',name
 // Sealed unlit box: no fans, no lights, no pad, so purchased electricity is the heating branch alone.
 const box=(over={})=>({...makeScenario('indoor'),timezone:'UTC',name:'Heat source fixture',areaM2:100,canopyM2:100,heightM:4,
  dayTargetC:22,nightTargetC:22,tempToleranceC:2,vpdMin:.5,vpdMax:1.5,maxDewPointC:19,uValue:1,envelopeRatio:2,infiltrationACH:0,
- minVentACH:0,maxVentACH:0,lightWm2:0,dliTarget:0,transpirationModel:'schedule',transpirationLDayM2:0,cropSensibleWm2:0,
+ minVentACH:0,maxVentACH:0,outsideAirBasis:'projectInput',outsideAirReviewed:true,fanWPerM3s:0,lightWm2:0,dliTarget:0,transpirationModel:'schedule',transpirationLDayM2:0,cropSensibleWm2:0,
  coolingKW:0,dehuKgH:0,humidifierKgH:0,heaterKW:60,...over});
 const shadeScreen=(over={})=>({installed:true,shadeFraction:.5,parTransmission:null,solarTransmission:null,deployAboveWm2:250,deployAboveC:null,maxDeployDliDeficit:null,...over});
 const thermalScreen=(over={})=>({installed:true,uValueFactor:.5,parTransmission:null,solarTransmission:null,deployAboveC:null,nightDeploy:true,closedExchangeACH:null,...over});
@@ -184,7 +184,7 @@ test('screens and a heat pump keep the zone balances closed',()=>{
   const closureKWh=l.sensibleKWh-l.dxSensibleKWh+l.condensationKWh-l.storedKWh;
   assert.ok(Math.abs(closureKWh)<=1e-3*Math.max(1,Math.abs(l.sensibleKWh)),`hour ${h.time}: sensible closure ${closureKWh} kWh`);
   const lk=l.latentKg;
-  const moistureKg=lk.crop+lk.infiltration+lk.ventilation+lk.doas+lk.humidifier-lk.removed-lk.condensed-lk.stored;
+  const moistureKg=lk.crop+lk.infiltration+lk.controlledOutdoorAir+lk.humidifier-lk.removed-lk.condensed-lk.stored;
   assert.ok(Math.abs(moistureKg)<=1e-6*Math.max(1,lk.crop),`hour ${h.time}: moisture closure ${moistureKg} kg`);
  }
  assert.ok(result.summary.maxEnergyResidualW<=1);

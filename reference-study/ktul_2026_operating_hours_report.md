@@ -1,5 +1,7 @@
 # Tulsa 2026 observed weather-side operating windows
 
+One Season Farmers Field document. Generator model 0.3.0-screening; scenario schema 2, weather snapshot schema 1. No indoor simulation or operating-cost estimate is performed.
+
 6,064 valid of 6,087 expected hours. 23 missing. UTC bounds: 2026-01-01T06:00:00.000Z through 2026-09-11T21:00:00.000Z exclusive. Operational grouping uses America/Chicago, fixed 07:00–19:00 local daytime. No future months are invented.
 
 ## Interpretation
@@ -65,6 +67,6 @@ The appended HTML report includes the monthly mode chart, day/hour map, DB/DP an
 
 ## Reproduction and provenance
 
-Run `node scripts/reference-study.mjs` from the application folder. Optional arguments: snapshot JSON path and output directory. Change the explicit base/cases object for alternate targets. Refresh station data with weather.fetchObserved or scripts/fetch-weather.py, keeping the original payload. Inspect manifest.json, the input SHA-256 and source URLs. PsychroLib 2.5.0 uses SI; source units and target conversions are in the manifest.
+Run `node scripts/reference-study.mjs` from the application folder. Optional arguments: snapshot JSON path and output directory. Change the explicit base/cases object for alternate targets. Refresh station data with scripts/fetch-observed.mjs, keeping the original payload. Inspect manifest.json, the input SHA-256 and source URLs. PsychroLib 2.5.0 uses SI; source units and target conversions are in the manifest.
 
 Sources: [IEM](https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=TUL&data=tmpf%2Cdwpf%2Crelh%2Csknt%2Calti&sts=2026-01-01T05%3A30%3A00.000Z&ets=2026-09-11T21%3A16%3A26.141Z&tz=UTC&format=onlycomma&latlon=yes&elev=yes&missing=M&report_type=3), [NOAA daily summaries](https://www.ncei.noaa.gov/access/services/data/v1), [PsychroLib](https://github.com/psychrometrics/psychrolib).

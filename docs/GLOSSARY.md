@@ -2,7 +2,7 @@
 
 Purpose: define every domain term the interface, the exports and these documents use, with its unit, where it appears and exactly how this tool computes it.
 
-Status: current for model `0.2.0-screening`, 2026-09-14.
+Status: current for model `0.3.0-screening`, scenario schema 2, 2026-09-15.
 
 Read this if: you are reading a result, a report or a design-basis brief and want to know precisely what a number means here, rather than what the term means in general practice.
 
@@ -109,7 +109,7 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 ## SHR (sensible heat ratio)
 
-**What it is.** The share of the zone's total load that is sensible rather than latent. A low SHR is the physical argument for decoupled moisture control (DOAS, desiccant) over reheat.
+**What it is.** Positive sensible gains divided by those gains plus crop latent heat in this model. A low SHR motivates checking moisture-removal capacity and reheat, but does not prove that a DOAS can remove the zone load: DOAS conditions the controlled outdoor-air stream, not a separate zone-recirculation stream.
 
 **Unit.** Dimensionless, 0 to 1.
 
@@ -175,7 +175,7 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **Where it appears.** "Enrichment-compatible, equivalent hours", "Hours with any enrichment window", and the monthly enrichment row.
 
-**How it is computed here.** `src/simulate.js` accumulates `enrichmentFraction` as the share of control substeps in which ventilation sits at the scenario minimum, the pad and indirect stages are off and the DOAS duty is zero. Summing that fraction gives equivalent hours; counting hours with any nonzero fraction gives the second number. No CO2 mass balance, injection rate or crop response is modelled, and the Stanghellini transpiration does not respond to CO2 concentration. This counts opportunity, not benefit.
+**How it is computed here.** `src/simulate.js` accumulates `enrichmentFraction` when actual controlled outdoor air is at or below the declared minimum and the selected air path is outside air rather than pad or indirect evaporation. Recovery or DOAS treatment does not add another stream. Summed fractions give equivalent hours. There is no CO2 mass balance, injection rate or crop response, so this is a low-exchange opportunity indicator, not a concentration or biological benefit.
 
 ## Equivalent full-load hours
 
@@ -247,7 +247,7 @@ The measured basis is one instrumented rainy-season campaign at the Asian Instit
 
 **Where it appears.** The across-years verdict and the sensitivity verdict.
 
-**How it is computed here.** Both paths enumerate the full operating-cost order of the strategies at every year or design point, and both apply a rule fixed before the run. The across-years aggregation in `src/metrics.js` is the strict one: stable means one identical order in every year. `rankingStability` in `src/sensitivity.js` is the tolerant one: stable means the most common order holds in at least 90% of design points. Both current verdicts are **unstable**: 2 distinct orders over 5 weather years, and 3 orders over 104 screened points with the most common at 61.5%. The structure matters more than the label, and the tool reports both: the three cheapest positions are identical in 104 of 104 points, and all the instability is inside three strategies whose median costs sit within 16% of each other.
+**How it is computed here.** Across-years aggregation in `metrics.js` uses one identical operating-cost order in every year. Morris screening and the regional study use a pre-set 90% most-common-order rule. The regenerated Morris artifact has three orders and 61.5% for the most common; the ten-year Tulsa regional study has two orders and 80%, so both fail their 90% rule. Other regional verdicts differ. Ranking reproducibility is not robustness to unmeasured assumptions.
 
 ## Evidence tier
 
@@ -293,3 +293,33 @@ The measured basis is one instrumented rainy-season campaign at the Asian Instit
 | Common eligible set | The intersection of eligible hours across all compared scenarios. Comparison dollars and hours use it, so they differ slightly from single-scenario totals. |
 | Capital recovery | Annualized capital plus maintenance, shown separately from historical-period operating cost, and never added into the dominance test. |
 | Assumption label | Every default input carries a source string saying where the number came from and what it is not: a planning assumption with its arithmetic, an illustrative placeholder, or a user-defined value. |
+
+## Outdoor air and ACH
+
+**Infiltration** is uncontrolled envelope exchange (`infiltrationACH`). **Controlled outdoor air** is one commanded supply/exhaust stream, bounded by `minVentACH` and installed `maxVentACH`, with actual `controls.controlledOutdoorAirACH` and path limitations reported. The opaque template's 2 ACH maximum is controlled capacity, not leakage; the discussed insulated case separately has 0.4 ACH infiltration.
+
+**ACH** is volume changes per hour. For floor area A, mean height H and volume V = A × H: m³/s = ACH × V / 3600; m³/s per m² floor = ACH × H / 3600; cfm = m³/s × 2118.880003; cfm/ft² = (m³/s per m²) × 2118.880003 / 10.7639104. None of these conversions establishes a feasible natural-vent pressure flow.
+
+**Internal circulation** moves air within the enclosure. Its ACH, canopy air velocity and distribution uniformity are not modeled and are never added to outdoor-air exchange.
+
+**Airflow evidence status** is literature range, adjacent-evidence proxy, project-specific input or screening assumption. Literature context is not a universal validation limit; explicit review acknowledges controlled capacities and combined fan-power input, not scientific validation. Mushroom room minimum/maximum are project inputs, not generic species-independent defaults.
+
+## HRV, ERV and DOAS
+
+**HRV** transfers sensible heat between balanced supply and exhaust, with zero latent effectiveness. **ERV** also transfers moisture. Declared heating/cooling effectiveness at 75% and 100% nominal flow defines the model; core operation is supported only from 50% through 130%. Low flow bypasses; excess above 130% bypasses and mixes once. Economizer and pad paths bypass recovery. Recovery transfer is not purchased energy or an operating-cost reduction.
+
+**Frost control** is a qualified minimum operating temperature, exhaust-only bypass/defrost fraction, or finite preheat. Insufficient preheat bypasses the core and is reported; operation below a qualified no-frost minimum is invalid.
+
+**DOAS** conditions at most `doasM3s` of the existing controlled stream after recovery/bypass. Cooling and condensation are charged from moist-air enthalpy reduction / `doasCoolingCOP`; recovered condenser heat is limited by `doasReheatRecoveryFraction`. Remaining heat uses the finite source after preheat, before zone heat. Target temperature and dew point are not guaranteed achieved states; unmet conditioning is visible and no supply humidification is invented.
+
+Current one-stream moisture closure is crop + infiltration + controlledOutdoorAir + humidifier − removed − condensed − stored. Condensate made upstream is not subtracted twice as a zone sink. Detailed evidence and rating fields are in [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md#outdoor-air-recovery-and-doas-model-030).
+
+## Operating cost, capital and percentage points
+
+**Model-estimated operating cost** is purchased electricity, purchased heating fuel and represented water for the named simulated population/period. Its `costBasis` gives numeric manual or dated historical state-sector proxy prices and exclusions: installed capital, maintenance, labor, financing, taxes, demand/fixed charges, time-of-use effects and other unmodeled tariff components. Complete-year valid-hour totals may be called annual; sampled-day or matched eligible-hour totals are not silently annualized. A named difference or reduction is not a quote or guaranteed savings.
+
+**Installed capital** is separately estimated (`screeningAssumption`) or user-entered, never part of operating dominance. Annualized ownership also includes stated maintenance and financing assumptions and is a separate quantity.
+
+**Percentage points (pp)** subtract two joint temperature-and-moisture target-attainment percentages on the same eligible population. The actual Tulsa 2025 browser result rises from 27.135% pad baseline to 73.066% DX plus dehumidifier, a 45.931 pp increase, not a 45.931% relative increase. Morris mu* instead averages absolute elementary effects per full screened range, so it has no single pair of scenario endpoints and is not an uncertainty bound.
+
+**Schema 2** describes scenarios/run bundles; weather snapshots and the regional study envelope remain 1. Regional scenarios and the Morris envelope are 2. Legacy DOAS energy-per-kg inputs are migration-only recognition, not active parameters. See [WORKFLOW.md](WORKFLOW.md#scenario-schema-2-migration).

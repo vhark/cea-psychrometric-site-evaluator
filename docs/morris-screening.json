@@ -18,7 +18,7 @@
     "low": 0.5,
     "high": 2,
     "kind": "factor",
-    "rationale": "Greenhouse leakage is almost never blower-door measured. Published envelope leakage for film and polycarbonate houses spans about half to twice a nominal 0.3 ACH, and rises with wind."
+    "rationale": "Screening span of 0.5 to 2 times the scenario infiltration input, not a published universal range. UGA construction-specific guidance is contextual; measured site leakage should replace the generic assumption."
    },
    {
     "key": "lai",

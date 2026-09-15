@@ -1,6 +1,6 @@
 # Component parameters: evidence and limits
 
-Purpose: a sourced reference for movable shade, energy curtains, an envelope ladder, and air-source heat-pump heating in the CEA Psychrometric Site Evaluator. This document supplies evidence for a later implementation. It does not change the current `0.2.0-screening` model or validate it against a facility.
+Purpose: sourced parameters and applicability limits for airflow, recovery/DOAS, movable shade, energy curtains, envelopes and heat-pump heating. Current implementation contract: model `0.3.0-screening`, scenario schema 2, 2026-09-15. Literature support is not validation against a facility or a substitute for manufacturer ratings.
 
 ## Read this first: Aluminet is not automatically NIR-selective
 
@@ -398,3 +398,70 @@ These are reasoned priorities, not a new executed Morris ranking.
 - Fine timing adjustments in periods with neither heating nor shade demand. They become influential near dawn, sunset, humidity thresholds or a tight DLI limit, so do not label deployment timing universally negligible.
 
 Do not dismiss a parameter merely because it is uncertain. Run separate cold/heating-bound, hot/solar-bound and humid/moisture-bound cases. Keep linked parameters physically consistent, and report when the preferred equipment class changes across the evidence ranges.
+
+## Outdoor air, recovery and DOAS: model 0.3.0
+
+### Separate quantities and conversion
+
+Uncontrolled envelope infiltration (`infiltrationACH`) and controlled outdoor air (`minVentACH` to installed `maxVentACH`) are separate. The actual total outdoor-air exchange is their sum. The controlled stream passes through optional HRV/ERV recovery or bypass, then optional DOAS, then enters the zone once. `doasM3s` is maximum treatment capacity at the DOAS inlet, not additional outdoor flow. Inlet density changes after recovery/preheat can constrain the outdoor-reference command. Unconditioned excess is admitted only as explicit useful economizer bypass, not silently credited as conditioned air.
+
+Internal recirculation, crop air velocity, distribution uniformity, CO2 balance, wind/stack pressure and natural-vent opening geometry are not modeled. A natural-house maximum is a declared effective capacity, not a predicted wind-dependent flow.
+
+For floor area A, mean height H, volume V = A × H:
+
+| Quantity | Conversion |
+|---|---|
+| m³/s | ACH × V / 3600 |
+| m³/s per m² floor | ACH × H / 3600 |
+| cfm | m³/s × 2118.880003 |
+| cfm/ft² | (m³/s per m²) × 2118.880003 / 10.7639104 |
+
+Input and report conversions include mean height. A floor-normalized source is never compared directly against ACH without this geometry conversion.
+
+### Evidence status and applicability
+
+The four statuses are `literatureRange`, `adjacentProxy`, `projectInput`, `screeningAssumption`. `outsideAirReviewed` records review of minimum/maximum controlled capacities and `fanWPerM3s` together. It is acknowledgment, not calibration. A contextual warning does not prohibit a properly engineered out-of-range project.
+
+| Source | Supported context | What it does not establish |
+|---|---|---|
+| [UGA Extension Bulletin 792](https://fieldreport.caes.uga.edu/publications/B792/greenhouses-heating-ventilation-and-cooling/) | New glass/fiberglass natural infiltration 0.75 to 1.0 ACH; new double-layer polyethylene 0.5 to 1.0 ACH. About 60 ACH is warm-weather operating guidance | Universal CEA leakage, a polycarbonate-specific measurement, or a natural-vent capacity guarantee |
+| [Shamshiri et al., 2018](https://doi.org/10.25165/j.ijabe.20181101.3210) | Controlled greenhouse airflow 0.04 to 0.05 m³/s per m² glass, 0.03 to 0.04 polyethylene; 60 to 90 ACH fan-and-pad context | Universal minimum or maximum. At 4 m height the floor ranges are 36 to 45 and 27 to 36 ACH respectively; changing height changes ACH |
+| [Shao et al., 2021](https://doi.org/10.1016/j.buildenv.2021.107766) | Measured 0.18 ACH infiltration in one closed office used for a vertical-farm study, adjacent proxy only | A universal indoor-farm infiltration value or controlled-air maximum |
+| [Chen et al., 2022](https://doi.org/10.25165/j.ijabe.20221501.6872) | Mushroom-factory airflow depends on species, stage, CO2, substrate loading, equipment, fresh air and internal circulation; standardized design criteria are lacking | A universal mushroom controlled-air range. Both capacities are required project inputs; no 6 to 15 ACH default is justified |
+| [EnergyPlus 24.1 Engineering Reference](https://bigladdersoftware.com/epx/docs/24-1/engineering-reference/heat-exchangers.html#air-system-air-to-air-sensible-and-latent-effectiveness-heat-exchanger) | Sensible/latent effectiveness model, 75%/100% ratings, flow dependence, bypass and explicit frost control | Generic product-family ratings or guaranteed recovery performance |
+| [Maslak and Nimmermark](https://doi.org/10.23986/afsci.58936) | Their tomato-greenhouse cases modeled moisture removal as 23% to 29% of thermal energy and 15% to 17% thermal-energy savings with a measured non-hygroscopic rotary exchanger | A default effectiveness, a whole-facility operating-cost reduction, or a guaranteed savings range |
+| [Sapounas et al.](https://doi.org/10.3390/agronomy10111739) | Semi-closed topology replaces some window ventilation with air treatment for more independent temperature/humidity/CO2 control | A universal ACH value or recommendation that every hybrid should close |
+
+Generic, hybrid, opaque and unsupported polycarbonate controlled-air defaults remain screening assumptions requiring review. Direct glass/polyethylene source contexts can be literature ranges; transferred envelope assumptions stay labeled proxies. The opaque 2 ACH maximum is controlled capacity. In the discussed insulated case it is separate from 0.4 ACH infiltration. A 6 ACH case is a modeled capacity comparison, not a recommended rate. The 15 ACH hybrid case is constrained semi-closed operation, not conventional open-greenhouse evidence.
+
+### Recovery fields, flow domain and frost
+
+`heatRecovery.type` is `none` (inert default), `hrv` or `erv`. Active recovery requires positive `nominalM3s`, nonnegative `auxiliaryW`, and all four sensible ratings: `sensibleHeating75`, `sensibleHeating100`, `sensibleCooling75`, `sensibleCooling100`. ERV also requires `latentHeating75`, `latentHeating100`, `latentCooling75`, `latentCooling100`. All effectiveness values are fractions 0 to 1; HRV latent effectiveness is exactly zero. No generic ratings or auxiliary watts are supplied.
+
+The model assumes balanced supply/exhaust. It uses the two flow ratings to evaluate effectiveness from 50% through 130% nominal flow. Below 50%, bypass and warn rather than extend unsupported performance. Above 130%, cap core flow and mix excess bypass once. `economizerBypass` is fixed true: direct-air cooling/drying can bypass and pads always bypass. Saturation correction preserves moist-air enthalpy instead of clipping RH.
+
+`fanWPerM3s` is combined supply/exhaust electric input per actual controlled m³/s, including declared core/filter/conditioning pressure drops. `auxiliaryW` covers wheel drive/control power only while active, not fans again. Sensible/latent core transfer is reported separately from purchased energy and is not cash savings.
+
+| `frostControl` | Required information and behavior |
+|---|---|
+| `none` | Manufacturer-qualified `minimumOutdoorOperatingC`; colder source weather invalidates the run |
+| `exhaustOnly` | `frostThresholdC`, `initialDefrostFraction`, `defrostRatePerK`; bypass fraction = clamp(initial + rate × (threshold − outdoor), 0, 1) at/below threshold. Supply continues, effective core time decreases, defrost hours are reported |
+| `preheat` | `frostThresholdC`; finite source heats inlet before the core. If insufficient, the core bypasses and delivered/unmet preheat remains visible |
+
+### DOAS energy and finite source order
+
+An active DOAS requires `doasM3s > 0`, finite `doasSupplyDewPointC`, `doasSupplyTempC`, positive `doasCoolingCOP`, and `doasReheatRecoveryFraction` in 0 to 1. Treatment capacity cannot exceed maximum controlled volume flow derived from geometry. Selecting the technology alone leaves an incomplete reviewed configuration, rather than inventing performance.
+
+If incoming humidity exceeds the supply-dew-point target, cool to saturation at that dew point and collect condensate. Charge the complete moist-air enthalpy drop divided by cooling COP. If incoming air is warm but not wet, charge sensible cooling to target. Recoverable condenser heat meets reheat only up to the declared fraction; remaining sensible heating uses the shared finite source. DOAS adds no humidification. Actual supply state and `doasUnmetConditioningKWh` remain visible when a target cannot be reached.
+
+Heating priority is **recovery preheat, DOAS external heat, zone heating**. All share the declared heater capacity, fuel efficiency or temperature-dependent heat-pump COP/cutoff. Recovery or DOAS cannot assign a warmed supply state for free. A separate cooling-kW rating is not modeled for the DOAS: its declared flow, leaving-state targets and COP describe an idealized conditioner, not a manufacturer map.
+
+The staged controller checks useful supply cooling/drying and heating feasibility with dwell times. Its default 0.3 to 40 ACH levels are 0.30, 10.23, 20.15, 30.08 and 40.00 ACH; actual flow is limited by the path. The ideal dispatcher is a resolution-limited upper-bound experiment. Neither establishes a continuous economizer optimum or equipment size.
+
+### Migration, result invalidation and financial scope
+
+Schema-1 airflow values are preserved by `migrateScenario`, with evidence/review migration. Recovery starts inert, legacy DOAS supply performance resets to null, `doasKWhPerKg` is removed and replacement COP/reheat inputs require review. Mushroom room air remains project-specific. Saved result claims are discarded on import; only a new run supports a current result.
+
+The former $39,517 DOAS result and **every reduction derived from it are withdrawn**, because sensible supply conditioning was omitted. Earlier class/capacity and hybrid-close-up conclusions are not current evidence. See the regenerated browser, regional and Morris artifacts in [VERIFICATION.md](VERIFICATION.md).
+
+Operating cost means purchased electricity, purchased heating fuel and modeled water for the stated period and population at the stated numeric manual or historical state-sector proxy prices. It excludes installed capital, maintenance, labor, financing, taxes, demand/fixed charges, time-of-use effects and other unmodeled tariff components. Capital is separately estimated or user-entered. An operating-cost difference/reduction is a model result, not a quote or guarantee. A pp difference names both joint temperature-and-moisture attainment endpoints; Morris influence is pp per full screened range instead.
