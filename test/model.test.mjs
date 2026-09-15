@@ -119,6 +119,18 @@ test('configured HRV and ERV require their type-specific rating data',()=>{
  assert.ok(ervErrors.some(error=>error.includes('latentHeating75')));
  assert.match(validateScenario({...makeScenario('greenhouseDouble'),heatRecovery:'hrv'}).join(' '),/Heat recovery must be an object/);
 });
+test('direct simulation migrates a clone and reports every incomplete airflow treatment requirement',()=>{
+ const incomplete=makeScenario('greenhouseDouble','mushroom','mushroom');
+ incomplete.technology='doas';
+ const before=structuredClone(incomplete);
+ assert.throws(()=>simulateScenario(incomplete,weather(1)),error=>{
+  assert.match(error.message,/Scenario cannot be simulated:/);
+  for(const requirement of ['Mushroom minimum controlled outdoor air','Mushroom maximum controlled outdoor air','review','DOAS treatment capacity','DOAS supply dew point','DOAS supply temperature','DOAS cooling COP','DOAS reheat recovery'])
+   assert.match(error.message,new RegExp(requirement,'i'),`missing actionable requirement: ${requirement}`);
+  return true;
+ });
+ assert.deepEqual(incomplete,before,'direct migration and validation must not mutate caller input');
+});
 test('missing weather stays missing instead of producing compliant hours',()=>{
  const w=weather(6);w.hours[2].tempC=null;w.hours[3].rh=null;
  const result=simulateScenario(closed(),w);
@@ -139,7 +151,7 @@ test('electrical lighting cannot exceed installed power times photoperiod',()=>{
 });
 test('pad runtime is counted only when installed and only where pad leaving air helps',()=>{
  const hot=weather(24,{tempC:34,rh:.2,ghiWm2:600});
- const base={...makeScenario('greenhouse'),timezone:'UTC',dayTargetC:24,nightTargetC:24,tempToleranceC:2,coolingKW:0,dehuKgH:0,heaterKW:0};
+ const base={...makeScenario('greenhouse'),outsideAirReviewed:true,timezone:'UTC',dayTargetC:24,nightTargetC:24,tempToleranceC:2,coolingKW:0,dehuKgH:0,heaterKW:0};
  const withPad=simulateScenario({...base,padEnabled:true},hot).summary,without=simulateScenario({...base,padEnabled:false},hot).summary;
  assert.equal(without.runtime.pad.hours,0);assert.equal(without.padWaterL,0);
  assert.ok(withPad.runtime.pad.hours>0&&withPad.padWaterL>0,'pad must run under hot dry outdoor air');
@@ -148,7 +160,7 @@ test('pad runtime is counted only when installed and only where pad leaving air 
  assert.ok(withPad.compliantHours>=without.compliantHours,'pad must not reduce attainment under hot dry air');
 });
 test('outdoor air is a dehumidifier only when drier than the zone ceiling, with a heating penalty when cold',()=>{
- const s={...makeScenario('greenhouse'),timezone:'UTC',dehuLPerKWh:2.5};
+ const s={...makeScenario('greenhouse'),outsideAirReviewed:true,timezone:'UTC',dehuLPerKWh:2.5};
  const cold=simulateScenario(s,weather(6,{tempC:2,rh:.5})).weatherSummary.outdoorDrying;
  const humid=simulateScenario(s,weather(6,{tempC:24,rh:.95})).weatherSummary.outdoorDrying;
  assert.equal(cold.coldDry.hours,6);assert.equal(cold.coolDry.hours+cold.hotDry.hours,0);
@@ -164,7 +176,7 @@ test('unmet loads are steady capacity shortfalls, not re-counted every substep',
  assert.ok(Math.abs(a.unmetMoistureKg-b.unmetMoistureKg)<.05*a.unmetMoistureKg,`moisture ${a.unmetMoistureKg} vs ${b.unmetMoistureKg}`);
 });
 test('an unsaturable overheated candidate is excluded, not fatal to the scenario',()=>{
- const s=closed({lightWm2:2000,photoperiod:24,dayStart:0,dliTarget:0,uValue:0,thermalMassKJm2K:1});
+ const s=closed({lightWm2:500,photoperiod:24,dayStart:0,dliTarget:0,uValue:.05,thermalMassKJm2K:5});
  const w=weather(4,{pressurePa:30000,tempC:60,rh:.05});
  const result=simulateScenario(s,w);
  assert.equal(result.hours.length,4);
@@ -215,7 +227,7 @@ test('pad process respects wet bulb, moisture and enthalpy boundaries',()=>{
  assert.ok(Math.abs(enthalpy(35,w)-enthalpy(p.tempC,p.w))<1);
 });
 test('stacked greenhouse crop light cannot create photons beyond roof input',()=>{
- const s={...makeScenario(),timezone:'UTC',areaM2:100,canopyM2:400,parTransmission:1,shadeFraction:0,lightWm2:0,transpirationLDayM2:0};
+ const s={...makeScenario(),outsideAirReviewed:true,timezone:'UTC',areaM2:100,canopyM2:400,parTransmission:1,shadeFraction:0,lightWm2:0,transpirationLDayM2:0};
  const result=simulateScenario(s,weather(1,{ghiWm2:500}));
  const cropPhotons=result.hours[0].solarDLI*s.canopyM2;
  const incidentPhotons=500*2.02*3600/1e6*s.areaM2;
@@ -274,15 +286,16 @@ test('Stanghellini transpiration rises with VPD and absorbed radiation and vanis
  assert.ok(stanghelliniTranspiration(22,w(800),p,100,3)>stanghelliniTranspiration(22,w(800),p,100,1));
 });
 test('state-coupled crop moisture responds to zone humidity where a schedule cannot',()=>{
- const s={...makeScenario('greenhouse'),timezone:'UTC',dehuKgH:0};
+ const s={...makeScenario('greenhouse'),outsideAirReviewed:true,timezone:'UTC',dehuKgH:0};
  const dry=simulateScenario({...s,transpirationModel:'stanghellini'},weather(24,{tempC:22,rh:.4})).summary.cropWaterL;
  const humid=simulateScenario({...s,transpirationModel:'stanghellini'},weather(24,{tempC:22,rh:.9})).summary.cropWaterL;
  assert.ok(dry>humid,`ventilated dry air must raise transpiration: ${dry} vs ${humid}`);
  const scheduled=[.4,.9].map(rh=>simulateScenario({...s,transpirationModel:'schedule'},weather(24,{tempC:22,rh})).summary.cropWaterL);
  assert.ok(Math.abs(scheduled[0]-scheduled[1])<1e-6);
 });
-test('DOAS removes at most the outdoor-to-supply moisture difference carried by its airflow, and pays for it',()=>{
- const s={...applyTechnology(makeScenario('hybrid'),'doas'),timezone:'UTC'};
+test('conditioned DOAS acts on the selected controlled stream and pays for the water it removes',()=>{
+ const s={...applyTechnology(makeScenario('hybrid'),'doas'),timezone:'UTC',outsideAirReviewed:true,maxVentACH:6,
+  doasM3s:1,doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5};
  const hour={tempC:26,rh:.85,pressurePa:101325};
  const result=simulateScenario(s,weather(12,hour));
  const outside=weatherState({time:0,ghiWm2:0,...hour});
@@ -290,10 +303,12 @@ test('DOAS removes at most the outdoor-to-supply moisture difference carried by 
  const maxKgH=(outside.w-supplyW)*dryAirDensity(s.doasSupplyTempC,supplyW,hour.pressurePa)*s.doasM3s*3600;
  assert.ok(result.summary.doasRemovedKg>0,'humid outdoor air must produce DOAS removal');
  for(const h of result.hours.filter(h=>h.valid)){
-  assert.ok(h.doasRemovedKg<=maxKgH*h.controls.doasDuty+1e-9,`${h.doasRemovedKg} kg exceeds ${maxKgH*h.controls.doasDuty}`);
-  assert.ok(h.doasKWh>=h.doasRemovedKg*s.doasKWhPerKg-1e-9);
-  if(h.controls.doasDuty>0)assert.ok(h.controls.enrichmentFraction<1,'outdoor DOAS air is not CO2-enrichment compatible');
+  assert.ok(h.doasRemovedKg<=maxKgH*h.controls.doasConditionedFraction+1e-9,
+   `${h.doasRemovedKg} kg exceeds ${maxKgH*h.controls.doasConditionedFraction}`);
+  if(h.controls.doasConditionedFraction>0)assert.ok(h.controls.controlledACH>=s.minVentACH,
+   'DOAS conditions controlled outdoor air rather than creating a separate flow');
  }
+ assert.ok(result.summary.doasKWh>0,'conditioning humid outdoor air must consume energy');
  assert.ok(result.summary.electricKWh>=result.summary.doasKWh);
 });
 test('per-hour load decomposition closes the zone heat and moisture balances',()=>{
@@ -306,7 +321,7 @@ test('per-hour load decomposition closes the zone heat and moisture balances',()
   const closureKWh=l.sensibleKWh-l.dxSensibleKWh+l.condensationKWh-l.storedKWh;
   assert.ok(Math.abs(closureKWh)<=1e-3*Math.max(1,Math.abs(l.sensibleKWh)),`hour ${h.time}: sensible closure ${closureKWh} kWh`);
   const lk=l.latentKg;
-  const moistureKg=lk.crop+lk.infiltration+lk.ventilation+lk.doas+lk.humidifier-lk.removed-lk.condensed-lk.stored;
+  const moistureKg=lk.crop+lk.infiltration+lk.controlledOutdoorAir+lk.humidifier-lk.removed-lk.condensed-lk.stored;
   assert.ok(Math.abs(moistureKg)<=1e-6*Math.max(1,lk.crop),`hour ${h.time}: moisture closure ${moistureKg} kg`);
   assert.ok(Math.abs(l.cropLatentKWh+2.45e6*lk.crop/3.6e6)<1e-9,'crop latent heat is the crop water times latent heat');
   assert.ok(l.shr===null||(l.shr>=0&&l.shr<=1));
@@ -426,38 +441,105 @@ const coldDry=(hours=48)=>({schemaVersion:1,source:'Synthetic cold-dry fixture',
  hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:-22,rh:.7,pressurePa:99000,ghiWm2:0}))});
 const warmHumid=(hours=48)=>({schemaVersion:1,source:'Synthetic warm-humid fixture',sourceKind:'test',latitude:25.77,longitude:-80.19,timezone:'UTC',startDate:'2025-07-01',endDate:'2025-07-02',
  hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,6,1,i),tempC:29,rh:.85,pressurePa:101325,ghiWm2:0}))});
-const litBox=(over={})=>({...makeScenario('warehouseSip','bench','lettuce'),timezone:'UTC',areaM2:500,heightM:4,
+const litBox=(over={})=>({...makeScenario('warehouseSip','bench','lettuce'),outsideAirReviewed:true,timezone:'UTC',areaM2:500,heightM:4,
  lightWm2:150,dliTarget:14,photoperiod:16,dayStart:6,coolingKW:150,dehuKgH:30,heaterKW:60,humidifierKgH:0,
  padEnabled:false,controlMode:'ideal',minVentACH:.3,...over});
-const ventLatentKg=result=>result.hours.reduce((sum,h)=>sum+Math.max(0,-(h.loads?.latentKg?.ventilation||0)),0);
+const controlledLatentKg=result=>result.hours.reduce((sum,h)=>sum+Math.max(0,-(h.loads?.latentKg?.controlledOutdoorAir||0)),0);
 
-test('a closed facility can use outside air as a moisture sink, and the economizer has an optimum',()=>{
+test('a closed facility can use outside air as a moisture sink as controlled capacity rises',()=>{
   const leak=simulateScenario(litBox({maxVentACH:2}),coldDry());
   const econ=simulateScenario(litBox({maxVentACH:6}),coldDry());
   const flood=simulateScenario(litBox({maxVentACH:40}),coldDry());
-  // The path itself must carry more water out as it opens.
-  assert.ok(ventLatentKg(econ)>ventLatentKg(leak),
-    `6 ACH must export more water than 2 ACH: ${ventLatentKg(econ)} against ${ventLatentKg(leak)}`);
-  // And that displaces the coil, which is the whole point of an economizer on a lit box in dry weather.
+  assert.ok(controlledLatentKg(econ)>controlledLatentKg(leak),
+    `6 ACH must export more water than 2 ACH: ${controlledLatentKg(econ)} against ${controlledLatentKg(leak)}`);
   assert.ok(econ.summary.condensateKg<leak.summary.condensateKg,
     `an economizer must displace mechanical condensation: ${econ.summary.condensateKg} against ${leak.summary.condensateKg}`);
-  // Deliberately NOT asserted: that a larger maximum is worse. The dispatcher offers three airflow levels
-  // (minimum, midpoint, maximum), so raising the maximum moves the midpoint and deletes the intermediate flow
-  // the controller wanted. Economizer capacity therefore cannot be ranked in this model, and any test that
-  // pinned an optimum would be pinning that artifact. See docs/VERIFICATION.md.
-  assert.deepEqual([...new Set([2,(0.3+2)/2,0.3])].length,3,'the three-level ladder is the documented shape');
   for(const r of [leak,econ,flood]) assert.equal(r.summary.numericalFailureHours,0);
 });
+test('ideal dispatcher can select every controlled outdoor-air stage',()=>{
+ const cases=[
+  {expected:.3,hour:0,tempC:-10,rh:.1,cropSensibleWm2:0,transpirationLDayM2:0},
+  {expected:10.225,hour:0,tempC:18,rh:.9,cropSensibleWm2:50,transpirationLDayM2:10},
+  {expected:20.15,hour:1,tempC:24,rh:.7,cropSensibleWm2:50,transpirationLDayM2:5},
+  {expected:30.075,hour:0,tempC:20,rh:.9,cropSensibleWm2:0,transpirationLDayM2:5},
+  {expected:40,hour:1,tempC:20,rh:.9,cropSensibleWm2:0,transpirationLDayM2:5},
+ ];
+ for(const c of cases){
+  const s=closed({controlMode:'ideal',minVentACH:.3,maxVentACH:40,cropSensibleWm2:c.cropSensibleWm2,
+   transpirationLDayM2:c.transpirationLDayM2,heaterKW:200,thermalMassKJm2K:2000});
+  const result=simulateScenario(s,weather(2,{tempC:c.tempC,rh:c.rh}),{stepMinutes:5});
+  assert.equal(result.controlModeUsed,'ideal');
+  assert.ok(Math.abs(result.hours[c.hour].controls.controlledACH-c.expected)<1e-9,
+   `${c.expected} ACH stage was not selected: ${result.hours[c.hour].controls.controlledACH}`);
+ }
+});
+test('staged controller can sustain every controlled outdoor-air stage and rejects adverse air',()=>{
+ const stages=[
+  {expected:.3,hour:0,tempC:-10,rh:.1,cropSensibleWm2:0,transpirationLDayM2:0},
+  {expected:10.225,hour:2,tempC:-10,rh:.1,cropSensibleWm2:0,transpirationLDayM2:.5},
+  {expected:20.15,hour:11,tempC:0,rh:.1,cropSensibleWm2:0,transpirationLDayM2:.5},
+  {expected:30.075,hour:10,tempC:5,rh:.1,cropSensibleWm2:10,transpirationLDayM2:0},
+  {expected:40,hour:7,tempC:10,rh:.9,cropSensibleWm2:10,transpirationLDayM2:10},
+ ];
+ for(const c of stages){
+  const s=closed({controlMode:'staged',minVentACH:.3,maxVentACH:40,cropSensibleWm2:c.cropSensibleWm2,
+   transpirationLDayM2:c.transpirationLDayM2,coolingKW:20,dehuKgH:20,heaterKW:200,fanWPerM3s:0,
+   thermalMassKJm2K:50});
+  const result=simulateScenario(s,weather(24,{tempC:c.tempC,rh:c.rh}),{stepMinutes:5});
+  assert.equal(result.controlModeUsed,'staged');
+  assert.ok(Math.abs(result.hours[c.hour].controls.controlledACH-c.expected)<1e-9,
+   `${c.expected} ACH stage was not sustained: ${result.hours[c.hour].controls.controlledACH}`);
+ }
+ const adverseScenario=closed({controlMode:'staged',minVentACH:.3,maxVentACH:40,cropSensibleWm2:80,
+  transpirationLDayM2:1,coolingKW:20,dehuKgH:20,heaterKW:200,thermalMassKJm2K:50});
+ const adverse=simulateScenario(adverseScenario,weather(24,{tempC:35,rh:.9}));
+ for(const h of adverse.hours.filter(h=>h.valid))
+  assert.ok(Math.abs(h.controls.controlledACH-adverseScenario.minVentACH)<1e-9,
+   `adverse untreated air selected ${h.controls.controlledACH} ACH`);
+});
+test('DOAS capacity conditions one selected stream without increasing outdoor airflow',()=>{
+ const s=closed({controlMode:'staged',infiltrationACH:.7,minVentACH:.3,maxVentACH:40,technology:'doas',
+  doasM3s:2,doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,
+  cropSensibleWm2:80,transpirationLDayM2:1,heaterKW:200,thermalMassKJm2K:50});
+ const result=simulateScenario(s,weather(12,{tempC:15,rh:.2}));
+ const volume=s.areaM2*s.heightM;
+ for(const h of result.hours.filter(h=>h.valid)){
+  assert.ok(h.controls.controlledACH<=s.maxVentACH+1e-9);
+  assert.ok(Math.abs(h.controls.controlledM3s-h.controls.controlledACH*volume/3600)<1e-12);
+  assert.ok(Math.abs(h.controls.totalOutdoorACH-(s.infiltrationACH+h.controls.controlledACH))<1e-12);
+  assert.ok(Math.abs(h.controls.totalOutdoorM3s-(s.infiltrationACH*volume/3600+h.controls.controlledM3s))<1e-12);
+ }
+});
+test('DOAS eligibility follows curtain-capped actual controlled flow rather than the requested stage',()=>{
+ const s=closed({controlMode:'ideal',infiltrationACH:.7,minVentACH:40,maxVentACH:40,technology:'doas',
+  doasM3s:.2,doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,
+  cropSensibleWm2:0,transpirationLDayM2:1,heaterKW:200,thermalMassKJm2K:50});
+ s.thermalScreen={...s.thermalScreen,installed:true,uValueFactor:.8,nightDeploy:true,closedExchangeACH:2};
+ const result=simulateScenario(s,weather(12,{tempC:15,rh:.8}));
+ assert.ok(result.hours.some(h=>h.controls.doasConditionedFraction>0),'capped flow within DOAS capacity must be conditioned');
+ for(const h of result.hours.filter(h=>h.controls.thermalScreenFraction>0))
+  assert.ok(h.controls.controlledACH<=1.3+1e-9,`curtain-capped controlled flow reached ${h.controls.controlledACH} ACH`);
+});
+test('screen-open references validate declared airflow before applying the insect derate once',()=>{
+ const s=closed({controlMode:'ideal',minVentACH:.3,maxVentACH:40,technology:'doas',
+  doasM3s:3,doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5,
+  heaterKW:200});
+ s.insectScreen={...s.insectScreen,installed:true,ventilationFactor:.5};
+ s.thermalScreen={...s.thermalScreen,installed:true,uValueFactor:.8,nightDeploy:true};
+ const result=simulateScenario(s,weather(2,{tempC:15,rh:.8}),{stepMinutes:5});
+ assert.equal(result.scenario.maxVentACH,20,'the declared 40 ACH capacity must receive one 0.5 insect derate');
+ assert.ok(Number.isFinite(result.summary.screens.heatingSavedKWh),
+  'the automatic screen-open reference must complete from the declared scenario');
+});
 
-test('a dry-neutral DOAS on a closed facility only removes water the outdoor air actually carries',()=>{
-  const box=litBox({maxVentACH:6,technology:'doas',doasM3s:1.2,dehuKgH:30,coolingKW:150});
-  // Warm humid outdoor air is wetter than the declared supply dew point, so the DOAS has water to remove.
+
+test('a dry-neutral DOAS on a closed facility only removes water the controlled outdoor stream carries',()=>{
+  const box=litBox({maxVentACH:6,technology:'doas',doasM3s:1.2,dehuKgH:30,coolingKW:150,
+    doasSupplyDewPointC:8,doasSupplyTempC:21,doasCoolingCOP:3,doasReheatRecoveryFraction:.5});
   const humid=simulateScenario(box,warmHumid()).summary;
   assert.ok(humid.doasRemovedKg>0,'a DOAS must remove moisture from a humid outdoor stream');
   assert.ok(humid.doasKWh>0,'a running DOAS must cost energy');
   assert.ok((humid.runtime?.doas?.hours??0)>0,'DOAS runtime must be attributed to its own component');
-  // Cold dry outdoor air is already drier than the supply target, so there is nothing for it to remove. A model
-  // that credited removal here would be inventing dehumidification out of air that needs none.
   const dry=simulateScenario(box,coldDry()).summary;
   assert.equal(dry.doasRemovedKg,0,'a DOAS cannot dry air that is already drier than its supply dew point');
 });
@@ -470,7 +552,7 @@ test('a dry-neutral DOAS on a closed facility only removes water the outdoor air
 test('a dehumidifier releases its heat where the topology says, and the split conserves',()=>{
   const wet=(hours=48)=>({schemaVersion:1,source:'Synthetic warm-wet fixture',sourceKind:'test',latitude:25.77,longitude:-80.19,timezone:'UTC',startDate:'2025-07-01',endDate:'2025-07-02',
    hours:Array.from({length:hours},(_,i)=>({time:Date.UTC(2025,6,1,i),tempC:28,rh:.85,pressurePa:101325,ghiWm2:0}))});
-  const room=over=>({...makeScenario('indoor','bench','lettuce'),timezone:'UTC',areaM2:200,heightM:4,
+  const room=over=>({...makeScenario('indoor','bench','lettuce'),outsideAirReviewed:true,timezone:'UTC',areaM2:200,heightM:4,
    lightWm2:150,dliTarget:14,photoperiod:16,dayStart:6,coolingKW:80,dehuKgH:40,heaterKW:30,humidifierKgH:0,
    padEnabled:false,controlMode:'ideal',...over});
   const inRoom=simulateScenario(room({dehuHeatFraction:1}),wet()).summary;

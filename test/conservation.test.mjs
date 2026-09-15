@@ -13,7 +13,7 @@ const snapshot=(hours)=>({schemaVersion:1,source:'Synthetic conservation fixture
   timezone:'UTC',startDate:'2025-01-01',endDate:'2025-01-01',hours});
 const weather=(count=24,changes={},day=1)=>snapshot(Array.from({length:count},(_,i)=>
   ({time:Date.UTC(2025,0,day,i),tempC:22,rh:.6,pressurePa:101325,ghiWm2:0,...changes})));
-const closed=(overrides={})=>({...makeScenario('indoor'),timezone:'UTC',areaM2:100,canopyM2:100,heightM:4,dayTargetC:22,nightTargetC:22,
+const closed=(overrides={})=>({...makeScenario('indoor'),outsideAirReviewed:true,timezone:'UTC',areaM2:100,canopyM2:100,heightM:4,dayTargetC:22,nightTargetC:22,
   tempToleranceC:2,vpdMin:.5,vpdMax:1.5,maxDewPointC:19,uValue:.05,infiltrationACH:0,minVentACH:0,maxVentACH:0,lightWm2:0,dliTarget:0,
   transpirationModel:'schedule',transpirationLDayM2:0,cropSensibleWm2:0,coolingKW:0,dehuKgH:0,heaterKW:0,humidifierKgH:0,padEnabled:false,...overrides});
 // The segment initializes at the current temperature target and the midpoint of the moisture band, so the
@@ -66,7 +66,7 @@ test('indirect evaporative water matches the sensible heat its secondary stream 
  const last=result.hours.at(-1);
  assert.ok(Math.abs(last.humidityRatio-outsideW)<=1e-9,`zone humidity ratio ${last.humidityRatio} left outdoor ${outsideW}`);
  for(const h of result.hours)if(h.controls?.indirectFraction>0)
-  assert.ok(h.loads.latentKg.ventilation<=0,`hour ${h.time} gained ${h.loads.latentKg.ventilation} kg from the indirect supply`);
+  assert.ok(h.loads.latentKg.controlledOutdoorAir<=0,`hour ${h.time} gained ${h.loads.latentKg.controlledOutdoorAir} kg from the indirect supply`);
 });
 
 test('humidifier water enters the zone air and cools it by exactly its latent heat',()=>{
@@ -113,6 +113,41 @@ test('free-running zone temperature follows the analytic envelope and infiltrati
    `hour ${index+1}: ${row.humidityRatio} kg/kg vs analytic ${expectedW} kg/kg`);
  }
  assert.ok(startC-result.hours.at(-1).tempC>5,'fixture must actually drift, not sit on the initial state');
+});
+test('zero controlled-air capacity stays off while independent infiltration changes heat and moisture',()=>{
+ const base=closed({minVentACH:0,maxVentACH:0,uValue:.05,envelopeRatio:1.8,thermalMassKJm2K:100});
+ const outdoor={tempC:5,rh:.4,pressurePa:101325};
+ const sealed=simulateScenario(base,weather(4,outdoor));
+ const leaky=simulateScenario({...base,infiltrationACH:1},weather(4,outdoor));
+ for(const h of leaky.hours.filter(h=>h.valid)){
+  assert.equal(h.controls.controlledACH,0);
+  assert.equal(h.controls.controlledM3s,0);
+  assert.ok(Math.abs(h.controls.totalOutdoorACH-1)<1e-12);
+  assert.ok(Math.abs(h.controls.totalOutdoorM3s-base.areaM2*base.heightM/3600)<1e-12);
+ }
+ assert.ok(leaky.hours.at(-1).tempC<sealed.hours.at(-1).tempC-1,'infiltration must cool the zone without controlled air');
+ assert.ok(leaky.hours.at(-1).humidityRatio<sealed.hours.at(-1).humidityRatio-1e-4,
+  'infiltration must change zone moisture without controlled air');
+});
+test('free-running exchange uses infiltration plus exactly one controlled dry-air stream',()=>{
+ const s=closed({infiltrationACH:1,minVentACH:2,maxVentACH:2,fanWPerM3s:0,uValue:.05,envelopeRatio:1.8,thermalMassKJm2K:100});
+ const outdoor={tempC:5,rh:.4,pressurePa:101325};
+ const result=simulateScenario(s,weather(8,outdoor));
+ const {tempC:startC,w:startW,mass,capacity}=zoneInventory(s,outdoor.pressurePa);
+ const outsideW=humidityRatio(outdoor.tempC,outdoor.rh,outdoor.pressurePa);
+ const totalACH=s.infiltrationACH+s.minVentACH;
+ const totalKgS=dryAirDensity(outdoor.tempC,outsideW,outdoor.pressurePa)*s.areaM2*s.heightM*totalACH/3600;
+ const tau=capacity/(s.areaM2*s.envelopeRatio*s.uValue+CP*totalKgS),tauW=mass/totalKgS;
+ for(const [index,row] of result.hours.entries()){
+  const seconds=(index+1)*3600;
+  const expectedC=outdoor.tempC+(startC-outdoor.tempC)*Math.exp(-seconds/tau);
+  const expectedW=outsideW+(startW-outsideW)*Math.exp(-seconds/tauW);
+  assert.ok(Math.abs(row.tempC-expectedC)<=.05,`hour ${index+1}: ${row.tempC} C vs one-stream analytic ${expectedC} C`);
+  assert.ok(Math.abs(row.humidityRatio-expectedW)<=1e-6*Math.max(expectedW,outsideW),
+   `hour ${index+1}: ${row.humidityRatio} kg/kg vs one-stream analytic ${expectedW} kg/kg`);
+  assert.ok(Math.abs(row.controls.controlledACH-2)<1e-12);
+  assert.ok(Math.abs(row.controls.totalOutdoorACH-3)<1e-12);
+ }
 });
 
 test('integrated DX splits the coil total into sensible and latent and closes the condenser heat balance',()=>{

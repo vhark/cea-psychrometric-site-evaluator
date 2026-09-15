@@ -6,13 +6,13 @@ import {wetBulb,dewPoint,humidityRatio} from '../src/physics.js';
 import {weatherSummary} from '../src/metrics.js';
 import {makeScenario} from '../src/config.js';
 
-const scenario=(id,name,over={})=>({id,name,crop:'lettuce',facility:'greenhouse',timezone:'UTC',areaM2:1000,heightM:4,dayTargetC:22,nightTargetC:18,tempToleranceC:2,vpdMin:.6,vpdMax:1.2,maxDewPointC:18,dliTarget:14,photoperiod:16,dayStart:6,installedCost:50000,...over});
+const scenario=(id,name,over={})=>({id,name,crop:'lettuce',facility:'greenhouse',timezone:'UTC',areaM2:1000,heightM:4,dayTargetC:22,nightTargetC:18,tempToleranceC:2,vpdMin:.6,vpdMax:1.2,maxDewPointC:18,dliTarget:14,photoperiod:16,dayStart:6,minVentACH:.5,installedCost:50000,...over});
 const summary=over=>({compliancePct:90,compliantHours:7800,cost:1000,electricKWh:5000,fuelKWh:100,eligibleHours:8700,runtime:{pad:{hours:400,days:60}},...over});
 const result=(id,name,over={})=>({scenario:scenario(id,name),summary:summary(over),hours:[],warnings:[],weatherSummary:{modeCounts:{},padViability:{failureCauses:{moisture:0,temperature:0}},outdoorDrying:null},assumptions:{evidenceTier:'Assumption-based component screening',stepMinutes:1}});
 const run=(label,rows)=>({label,snapshot:{startDate:`${label}-01-01`,endDate:`${label}-12-31`,source:'test'},results:rows.map(([id,over])=>result(id,id,over))});
-// One hour row in the v0.2 contract shape.
+// One hour row in the current controlled-air contract shape.
 const hour=(i,over={})=>({time:Date.UTC(2025,0,1,i),valid:true,eligible:true,compliantFraction:1,tempDegreeHours:0,vpdKPaHours:0,condensateKg:0,padWaterL:0,weatherMode:'NEUTRAL_MIN_VENT',
-  controls:{ventACH:.5,enrichmentFraction:1,doasDuty:0},loads:{solarKWh:0,lightKWh:0,envelopeKWh:0,infiltrationSensibleKWh:0,ventilationSensibleKWh:0,fanKWh:0,cropSensibleKWh:0,cropLatentKWh:0,latentKg:{crop:0,infiltration:0,ventilation:0,doas:0,humidifier:0},sensibleKWh:0,shr:null},...over});
+  controls:{controlledACH:.5,controlledM3s:1000*4*.5/3600,totalOutdoorACH:.5,totalOutdoorM3s:1000*4*.5/3600,enrichmentFraction:1,doasConditionedFraction:0},loads:{solarKWh:0,lightKWh:0,envelopeKWh:0,infiltrationSensibleKWh:0,controlledOutdoorAirSensibleKWh:0,fanKWh:0,cropSensibleKWh:0,cropLatentKWh:0,latentKg:{crop:0,infiltration:0,controlledOutdoorAir:0,humidifier:0},sensibleKWh:0,shr:null},...over});
 
 test('multi-year aggregate selects median, worst and best years and fits a trend only with 5 or more numeric years',()=>{
   const pct=[80,95,70,85,90];
@@ -78,13 +78,13 @@ test('design conditions report coincident states of the selected hour, not indep
 
 test('design peaks use the result hours with their outdoor state and the ventilation requirement scales with volume',()=>{
   const weather=Array.from({length:200},(_,i)=>({time:Date.UTC(2025,0,1,i),tempC:30,rh:.4,pressurePa:101325,ghiWm2:0}));
-  const rows=Array.from({length:200},(_,i)=>hour(i,{controls:{ventACH:i===5?12:1,enrichmentFraction:0},condensateKg:i,padWaterL:2*i,tempDegreeHours:i===7?3:i===8?1:0,compliantFraction:i===7?.5:i===8?.9:1,
-    loads:{...hour(i).loads,solarKWh:i===10?50:5,cropSensibleKWh:-2,latentKg:{...hour(i).loads.latentKg,crop:i===14?9:1,ventilation:-3}}}));
+  const rows=Array.from({length:200},(_,i)=>hour(i,{controls:{controlledACH:i===5?12:1,enrichmentFraction:0},condensateKg:i,padWaterL:2*i,tempDegreeHours:i===7?3:i===8?1:0,compliantFraction:i===7?.5:i===8?.9:1,
+    loads:{...hour(i).loads,solarKWh:i===10?50:5,cropSensibleKWh:-2,latentKg:{...hour(i).loads.latentKg,crop:i===14?9:1,controlledOutdoorAir:-3}}}));
   const d=designHours(weather,rows,scenario('a','a',{areaM2:100,heightM:3}));
   assert.equal(d.peakSensibleHour.time,Date.UTC(2025,0,1,10));
   assert.equal(d.peakSensibleHour.sensibleKWh,50,'negative crop sensible does not offset the positive gains');
   assert.equal(d.peakLatentHour.time,Date.UTC(2025,0,1,14));
-  assert.equal(d.peakLatentHour.latentKg,9,'drying ventilation is not a latent load');
+  assert.equal(d.peakLatentHour.latentKg,9,'drying controlled outdoor air is not a latent load');
   assert.equal(d.peakLatentHour.outdoor.tempC,30);
   assert.equal(d.ventilationAirRequirement.maxACH,12);
   assert.ok(Math.abs(d.ventilationAirRequirement.m3s-12*300/3600)<1e-12);
@@ -99,8 +99,8 @@ test('design peaks use the result hours with their outdoor state and the ventila
 test('load decomposition keeps the sensible-heat ratio within [0,1] and null without gains',()=>{
   const rows=[
     hour(0,{loads:{...hour(0).loads,solarKWh:10,latentKg:{...hour(0).loads.latentKg,crop:2}}}),
-    hour(1,{loads:{...hour(1).loads,envelopeKWh:-5,ventilationSensibleKWh:-8,latentKg:{...hour(1).loads.latentKg,crop:2}}}),
-    hour(2,{loads:{...hour(2).loads,envelopeKWh:-5,latentKg:{...hour(2).loads.latentKg,ventilation:-1}}}),
+    hour(1,{loads:{...hour(1).loads,envelopeKWh:-5,controlledOutdoorAirSensibleKWh:-8,latentKg:{...hour(1).loads.latentKg,crop:2}}}),
+    hour(2,{loads:{...hour(2).loads,envelopeKWh:-5,latentKg:{...hour(2).loads.latentKg,controlledOutdoorAir:-1}}}),
     hour(3,{valid:false,loads:null})];
   const d=loadDecomposition({scenario:scenario('a','a'),hours:rows});
   assert.equal(d.hours,3);
@@ -118,7 +118,7 @@ test('load decomposition keeps the sensible-heat ratio within [0,1] and null wit
 });
 
 test('CO2 window equivalent hours never exceed valid hours and ignore invalid rows',()=>{
-  const rows=[hour(0,{controls:{ventACH:.5,enrichmentFraction:1}}),hour(1,{controls:{ventACH:2,enrichmentFraction:.25}}),hour(2,{controls:{ventACH:5,enrichmentFraction:0}}),hour(3,{valid:false,controls:{enrichmentFraction:1},weatherMode:'MISSING_DATA'}),hour(4,{controls:{enrichmentFraction:1.5}})];
+  const rows=[hour(0,{controls:{controlledACH:.5,enrichmentFraction:1}}),hour(1,{controls:{controlledACH:2,enrichmentFraction:.25}}),hour(2,{controls:{controlledACH:5,enrichmentFraction:0}}),hour(3,{valid:false,controls:{enrichmentFraction:1},weatherMode:'MISSING_DATA'}),hour(4,{controls:{controlledACH:.5,enrichmentFraction:1.5}})];
   const w=co2Window({scenario:scenario('a','a'),hours:rows});
   assert.equal(w.validHours,4);
   assert.ok(w.equivalentHours<=w.validHours);

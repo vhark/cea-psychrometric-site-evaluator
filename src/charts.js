@@ -282,8 +282,8 @@ export function renderDLI(container, daily, target) {
   svg.append(svgNode('text', {x: left, y: top + ph + 20}, daily[0].date));
   svg.append(svgNode('text', {x: left + pw, y: top + ph + 20, 'text-anchor': 'end'}, daily.at(-1).date));
 }
-const SENSIBLE_SERIES = [['solarKWh', 'Solar'], ['lightKWh', 'Lighting'], ['envelopeKWh', 'Envelope'], ['infiltrationSensibleKWh', 'Infiltration'], ['ventilationSensibleKWh', 'Ventilation'], ['fanKWh', 'Fans'], ['cropSensibleKWh', 'Crop sensible']];
-const LATENT_SERIES = [['crop', 'Crop transpiration'], ['infiltration', 'Infiltration moisture'], ['ventilation', 'Ventilation moisture']];
+const SENSIBLE_SERIES = [['solarKWh', 'Solar'], ['lightKWh', 'Lighting'], ['envelopeKWh', 'Envelope'], ['infiltrationSensibleKWh', 'Infiltration'], ['controlledOutdoorAirSensibleKWh', 'Controlled outdoor air'], ['fanKWh', 'Fans'], ['cropSensibleKWh', 'Crop sensible']];
+const LATENT_SERIES = [['crop', 'Crop transpiration'], ['infiltration', 'Infiltration moisture'], ['controlledOutdoorAir', 'Controlled outdoor-air moisture']];
 function legendEntry(legend, label, color, opacity = 1) {
   const span = document.createElement('span'), swatch = document.createElement('i'); swatch.className = 'swatch'; swatch.style.background = color; swatch.style.opacity = String(opacity);
   span.append(swatch, document.createTextNode(label)); legend.append(span);

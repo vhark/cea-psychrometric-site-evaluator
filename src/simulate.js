@@ -1,4 +1,4 @@
-import {MODEL_VERSION,backfillScenario,FACILITY_TEMPLATES} from './config.js';
+import {MODEL_VERSION,migrateScenario,validateScenario,FACILITY_TEMPLATES} from './config.js';
 import {CP_DRY_AIR as CP,LATENT_HEAT as L,clamp,humidityRatio,saturationHumidityRatio,saturationPressure,
   vaporPressure,relativeHumidity,dewPoint,airVPD,dryAirDensity,padState,weatherState,schedule,moistureBounds,classifyWeather,outdoorDryingHour,
   stanghelliniTranspiration,canopyAbsorbedWm2,localClock} from './physics.js';
@@ -11,9 +11,9 @@ const TOTALS=['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','solarD
   'dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','unmetSensibleKWh','unmetMoistureKg','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh',
   'desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg',
   'cropWaterL','padWaterL','humidifierWaterL','tempDegreeHours','vpdKPaHours','doasKWh','doasRemovedKg'];
-const SENSIBLE_LOADS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','ventilationSensibleKWh','fanKWh','cropSensibleKWh','cropLatentKWh','humidifierKWh','equipmentHeatKWh'];
-const LATENT_LOADS=['crop','infiltration','ventilation','doas','humidifier','removed','condensed','stored'];
-const SHR_GAINS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','ventilationSensibleKWh','fanKWh','cropSensibleKWh'];
+const SENSIBLE_LOADS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','controlledOutdoorAirSensibleKWh','fanKWh','cropSensibleKWh','cropLatentKWh','humidifierKWh','equipmentHeatKWh'];
+const LATENT_LOADS=['crop','infiltration','controlledOutdoorAir','humidifier','removed','condensed','stored'];
+const SHR_GAINS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','controlledOutdoorAirSensibleKWh','fanKWh','cropSensibleKWh'];
 
 // Frozen dry-air inventory and thermal capacitance per continuous segment. CP and
 // latent heat are constants, so the reduced energy inventory is C*T + L*M*W.
@@ -26,18 +26,17 @@ function coefficients(ctx,air) {
   const {state,outside,s,dt}=ctx;
   const volume=s.areaM2*s.heightM;
   const leak=dryAirDensity(outside.tempC,outside.w,outside.pressurePa)*volume*ctx.infiltrationACH/3600;
-  const flow=dryAirDensity(air.tempC,air.w,outside.pressurePa)*volume*air.ach/3600;
-  const doasFlow=air.doasDuty>0?dryAirDensity(air.doasTempC,air.doasW,outside.pressurePa)*s.doasM3s*air.doasDuty:0;
-  const massFlow=leak+flow+doasFlow;
+  const controlledFlow=dryAirDensity(air.supply.tempC,air.supply.w,outside.pressurePa)*air.controlledM3s;
+  const massFlow=leak+controlledFlow;
   const ua=ctx.ua;
   const conductance=ua+CP*massFlow;
   const massDecay=Math.exp(-massFlow*dt/state.mass);
   const massGain=massFlow>0?-Math.expm1(-massFlow*dt/state.mass)/massFlow:dt/state.mass;
   const heatDecay=Math.exp(-conductance*dt/state.capacity);
   const heatGain=conductance>0?-Math.expm1(-conductance*dt/state.capacity)/conductance:dt/state.capacity;
-  return {flow,leak,doasFlow,massFlow,ua,conductance,massDecay,massGain,heatDecay,heatGain,
-    wetSource:leak*outside.w+flow*air.w+doasFlow*air.doasW,
-    heatSource:(ua+CP*leak)*outside.tempC+CP*flow*air.tempC+CP*doasFlow*air.doasTempC};
+  return {leak,controlledFlow,massFlow,ua,conductance,massDecay,massGain,heatDecay,heatGain,
+    wetSource:leak*outside.w+controlledFlow*air.supply.w,
+    heatSource:(ua+CP*leak)*outside.tempC+CP*controlledFlow*air.supply.tempC};
 }
 
 // Equilibrate supersaturation by converting vapor into liquid and returning its
@@ -67,11 +66,13 @@ function duties(available,estimated) {
 function hourContext(outside,s,shade,thermal) {
   const pad=outside.tempC>2?padState(outside.tempC,outside.w,outside.pressurePa,s.padEffectiveness):null;
   const heat=heatSourceState(s,outside.tempC);
+  const doasConfigured=s.doasM3s>0&&Number.isFinite(s.doasSupplyTempC)&&Number.isFinite(s.doasSupplyDewPointC);
   return {outside,s,pad,shade,thermal,indirectTempC:pad?outside.tempC-s.hybridEvapEffectiveness*(outside.tempC-pad.wetBulbC):null,
     dryFloor:humidityRatio(0,.05,outside.pressurePa),coilFloorW:saturationHumidityRatio(7,outside.pressurePa),
     dxOutdoorOK:outside.tempC>=s.coolingMinOutdoorC&&outside.tempC<=s.coolingMaxOutdoorC,
     heatCapacityW:heat.capacityW,heatCOP:heat.cop,heatMode:heat.mode,uaOpen:s.areaM2*s.envelopeRatio*s.uValue,
-    doasTempC:s.doasSupplyTempC,doasW:Math.min(outside.w,saturationHumidityRatio(s.doasSupplyDewPointC,outside.pressurePa))};
+    doasTempC:doasConfigured?s.doasSupplyTempC:null,
+    doasW:doasConfigured?Math.min(outside.w,saturationHumidityRatio(s.doasSupplyDewPointC,outside.pressurePa)):null};
 }
 // Per-substep context: indoor-state-dependent device availability, plus the envelope and outside-air path
 // implied by the thermal curtain's position in this substep.
@@ -87,22 +88,32 @@ function substepContext(hour,state,forcing,target,dt,thermalClosed) {
     infiltrationACH,ventCapACH:cap===null?null:Math.max(0,cap-infiltrationACH),
     dehuAvailable:state.tempC>=10&&state.tempC<=40?s.dehuKgH/3600:0,desiccantAvailable:state.tempC>=2&&state.tempC<=50?s.desiccantKgH/3600:0};
 }
-function airOption(ctx,ach,kind,doasDuty) {
-  const {outside,pad}=ctx;
-  const tempC=kind==='pad'?pad.tempC:kind==='indirect'?ctx.indirectTempC:outside.tempC;
-  return {ach,tempC,w:kind==='pad'?pad.w:outside.w,pad:kind==='pad',indirect:kind==='indirect',doasDuty,doasTempC:ctx.doasTempC,doasW:ctx.doasW};
+function controlledAirOption(ctx,{controlledACH,kind='outside',doasMode='none'}){
+  const {outside,pad,s}=ctx;
+  const controlledM3s=s.areaM2*s.heightM*controlledACH/3600;
+  const requestedDoas=doasMode==='conditioned';
+  const canCondition=kind==='outside'&&controlledM3s>0&&controlledM3s<=s.doasM3s+1e-12&&ctx.doasTempC!==null&&ctx.doasW!==null;
+  const conditioned=requestedDoas&&canCondition;
+  const supply=conditioned?{tempC:ctx.doasTempC,w:ctx.doasW}:kind==='pad'?{tempC:pad.tempC,w:pad.w}:
+    kind==='indirect'?{tempC:ctx.indirectTempC,w:outside.w}:{tempC:outside.tempC,w:outside.w};
+  const treatmentFlow=conditioned?dryAirDensity(supply.tempC,supply.w,outside.pressurePa)*controlledM3s:0;
+  return {controlledACH,controlledM3s,kind,
+    recoveryMode:'none',
+    doasMode:conditioned?'conditioned':'none',supply,
+    treatment:{doasRequested:requestedDoas,doasRemovedKgS:treatmentFlow*Math.max(0,outside.w-supply.w),doasElectricW:0}};
 }
 // A shut curtain with a declared gap exchange cannot pass the airflow the ladder asked for.
-const cappedAir=(ctx,air)=>ctx.ventCapACH===null||air.ach<=ctx.ventCapACH?air:{...air,ach:ctx.ventCapACH};
+const cappedAir=(ctx,air)=>ctx.ventCapACH===null||air.controlledACH<=ctx.ventCapACH?air:
+  controlledAirOption(ctx,{controlledACH:ctx.ventCapACH,kind:air.kind,doasMode:air.treatment.doasRequested?'conditioned':'none'});
 function airOptions(ctx) {
   const {s,pad}=ctx;
-  const levels=[...new Set([s.minVentACH,(s.minVentACH+s.maxVentACH)/2,s.maxVentACH])];
-  const doasDuties=s.doasM3s>0?[0,.5,1]:[0];
+  const levels=[...new Set(Array.from({length:5},(_,i)=>s.minVentACH+(s.maxVentACH-s.minVentACH)*i/4))];
   const options=[];
-  for(const doasDuty of doasDuties)for(const ach of levels){
-    options.push(airOption(ctx,ach,'outside',doasDuty));
-    if(ach>0&&s.padEnabled&&pad)options.push(airOption(ctx,ach,'pad',doasDuty));
-    if(ach>0&&s.technology==='hybridDesiccant'&&pad&&s.desiccantKgH>0)options.push(airOption(ctx,ach,'indirect',doasDuty));
+  for(const controlledACH of levels){
+    options.push(controlledAirOption(ctx,{controlledACH}));
+    if(controlledACH>0&&s.doasM3s>0)options.push(controlledAirOption(ctx,{controlledACH,doasMode:'conditioned'}));
+    if(controlledACH>0&&s.padEnabled&&pad)options.push(controlledAirOption(ctx,{controlledACH,kind:'pad'}));
+    if(controlledACH>0&&s.technology==='hybridDesiccant'&&pad&&s.desiccantKgH>0)options.push(controlledAirOption(ctx,{controlledACH,kind:'indirect'}));
   }
   return options;
 }
@@ -114,8 +125,8 @@ function evaluate(ctx,rawAir,dxDuty,dehuDuty,desiccantDuty,plan) {
   const {state,outside,s,forcing,target,dt}=ctx;
   const air=cappedAir(ctx,rawAir);
   const k=coefficients(ctx,air);
-  const fanW=s.fanWPerM3s*(s.areaM2*s.heightM*air.ach/3600+s.doasM3s*air.doasDuty);
-  const pumpW=(air.pad||air.indirect)?s.padPumpW:0;
+  const fanW=s.fanWPerM3s*air.controlledM3s;
+  const pumpW=(air.kind==='pad'||air.kind==='indirect')?s.padPumpW:0;
   const qBase=forcing.solarW+forcing.lightW+s.cropSensibleWm2*s.canopyM2-L*forcing.cropKgS+fanW;
   const baselineW=k.massDecay*state.w+k.massGain*(k.wetSource+forcing.cropKgS);
   // Refrigerant coils assume a 7 C moisture floor and actual vapor
@@ -165,14 +176,14 @@ function evaluate(ctx,rawAir,dxDuty,dehuDuty,desiccantDuty,plan) {
   const pv=vaporPressure(final.w,outside.pressurePa),ps=saturationPressure(final.tempC);
   const moistureMiss=Math.max(0,(ps-s.vpdMax*1000)-pv,pv-Math.min(ps-s.vpdMin*1000,saturationPressure(s.maxDewPointC)))/1000;
   const violation=temperatureMiss/Math.max(.1,s.tempToleranceC)+moistureMiss/Math.max(.05,s.vpdMax-s.vpdMin);
-  const padKgS=air.pad?k.flow*Math.max(0,air.w-outside.w):0;
+  const padKgS=air.kind==='pad'?k.controlledFlow*Math.max(0,air.supply.w-outside.w):0;
   // Indirect evap rejects sensible heat through a separate wet secondary
   // stream. Its water is an ideal latent-equivalent estimate, not product data.
-  const indirectKgS=air.indirect?k.flow*CP*(outside.tempC-air.tempC)/L:0;
-  // Generic dry-neutral DOAS: outdoor air delivered at the declared supply state; purchased energy is the
-  // declared kWh per kg removed from that outdoor air. Supply tempering is assumed inside that figure.
-  const doasKgS=k.doasFlow*Math.max(0,outside.w-air.doasW);
-  const doasW=doasKgS*s.doasKWhPerKg*KWH;
+  const indirectKgS=air.kind==='indirect'?k.controlledFlow*CP*(outside.tempC-air.supply.tempC)/L:0;
+  // DOAS treatment changes the supply state of this controlled stream. Task 5 supplies its detailed
+  // thermodynamics and energy; this topology step intentionally carries only the removed-water quantity.
+  const doasKgS=air.treatment.doasRemovedKgS;
+  const doasW=air.treatment.doasElectricW;
   // A heat pump buys delivered heat as electricity at the interpolated COP; a fuel heater books it to fuel
   // at its combustion efficiency. Exactly one branch is charged for the same delivered heaterW.
   const heaterElectricW=ctx.heatCOP!==null?heaterW/ctx.heatCOP:0;
@@ -205,7 +216,7 @@ function chooseIdeal(ctx,options) {
     const air=cappedAir(ctx,option);
     const k=coefficients(ctx,air);
     const baselineW=k.massDecay*state.w+k.massGain*(k.wetSource+ctx.forcing.cropKgS);
-    const qBase=ctx.forcing.solarW+ctx.forcing.lightW+s.cropSensibleWm2*s.canopyM2-L*ctx.forcing.cropKgS+s.fanWPerM3s*(s.areaM2*s.heightM*air.ach/3600+s.doasM3s*air.doasDuty);
+    const qBase=ctx.forcing.solarW+ctx.forcing.lightW+s.cropSensibleWm2*s.canopyM2-L*ctx.forcing.cropKgS+s.fanWPerM3s*air.controlledM3s;
     const baselineT=k.heatDecay*state.tempC+k.heatGain*(k.heatSource+qBase);
     // Moisture targets must correspond to the temperature the thermostat will
     // actually hold, not the center setpoint when it operates at a deadband edge.
@@ -300,7 +311,7 @@ function chooseStaged(ctx,c) {
       const flow=dryAirDensity(outside.tempC,outside.w,outside.pressurePa)*s.areaM2*s.heightM*(ventLevel(r.stage)+ctx.infiltrationACH)/3600;
       return (ua+CP*flow)*Math.max(0,heatSetC-outside.tempC)<=heatCapW;
     }
-    return r.device==='doas'?drier(ctx.doasW,r):r.device==='dehu'?ctx.dehuAvailable>0:r.device==='desiccant'?ctx.desiccantAvailable>0:ctx.dxAvailable>0&&ctx.dxMoisture>0;
+    return r.device==='doas'?ctx.doasW!==null&&drier(ctx.doasW,r):r.device==='dehu'?ctx.dehuAvailable>0:r.device==='desiccant'?ctx.desiccantAvailable>0:ctx.dxAvailable>0&&ctx.dxMoisture>0;
   };
   stepLadder(c.moist,em,helpsMoist,ctx.dt);
   let moistVent=0,doas=0,dehu=0,desiccant=0,dxMoist=0;
@@ -311,7 +322,8 @@ function chooseStaged(ctx,c) {
   }
   c.humidifierSince+=ctx.dt;
   const evap=indirect||padOn;
-  const air=airOption(ctx,evap?s.maxVentACH:ventLevel(Math.max(coolVent,moistVent)),indirect?'indirect':padOn?'pad':'outside',doas/2);
+  const air=controlledAirOption(ctx,{controlledACH:evap?s.maxVentACH:ventLevel(Math.max(coolVent,moistVent)),
+    kind:indirect?'indirect':padOn?'pad':'outside',doasMode:doas>0?'conditioned':'none'});
   const plan={
     humidifier:(unheatedT,unhumidifiedW,k)=>c.humidifierOn?Math.min(s.humidifierKgH/3600,Math.max(0,(wMid+.5*half-state.w)/k.massGain)):0,
     heat:(unheatedT,k,recoverable)=>clamp((heatSetC-state.tempC)/heatBand,0,1)*(ctx.heatCapacityW+recoverable)};
@@ -344,14 +356,14 @@ function accumulateLoads(loads,picked,forcing,s,outside,averageT,averageW,dt) {
   loads.solarKWh+=forcing.solarW*scale;loads.lightKWh+=forcing.lightW*scale;
   loads.envelopeKWh+=k.ua*(outside.tempC-averageT)*scale;
   loads.infiltrationSensibleKWh+=CP*k.leak*(outside.tempC-averageT)*scale;
-  loads.ventilationSensibleKWh+=CP*(k.flow*(air.tempC-averageT)+k.doasFlow*(air.doasTempC-averageT))*scale;
+  loads.controlledOutdoorAirSensibleKWh+=CP*k.controlledFlow*(air.supply.tempC-averageT)*scale;
   loads.fanKWh+=picked.fanW*scale;loads.cropSensibleKWh+=s.cropSensibleWm2*s.canopyM2*scale;
   loads.cropLatentKWh-=L*forcing.cropKgS*scale;loads.humidifierKWh-=L*picked.humidifier*scale;
   loads.equipmentHeatKWh+=(picked.dehuHeatW+picked.sorptionW+picked.heaterW+picked.reheatW)*scale;
   loads.dxSensibleKWh+=picked.dxSensibleW*scale;loads.condensationKWh+=L*picked.condensate/KWH;
   const lk=loads.latentKg;
-  lk.crop+=forcing.cropKgS*dt;lk.infiltration+=k.leak*(outside.w-averageW)*dt;lk.ventilation+=k.flow*(air.w-averageW)*dt;
-  lk.doas+=k.doasFlow*(air.doasW-averageW)*dt;lk.humidifier+=picked.humidifier*dt;
+  lk.crop+=forcing.cropKgS*dt;lk.infiltration+=k.leak*(outside.w-averageW)*dt;
+  lk.controlledOutdoorAir+=k.controlledFlow*(air.supply.w-averageW)*dt;lk.humidifier+=picked.humidifier*dt;
   lk.removed+=(picked.dxKgS+picked.dehuKgS+picked.desiccantKgS)*dt;lk.condensed+=picked.condensate;
 }
 function finishLoads(loads) {
@@ -366,9 +378,12 @@ function finishLoads(loads) {
 export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,screenBaseline=true}={}) {
   if(!Number.isFinite(stepMinutes)||stepMinutes<=0||stepMinutes>5||Math.abs(60/stepMinutes-Math.round(60/stepMinutes))>1e-9)
     throw Error('Integration step must divide one hour and be at most five minutes.');
-  // Back-fill v0.2 and 0.3 keys here too: simulateScenario is the physics entry point and must not
-  // depend on the caller having validated first. Copy, then fill; never mutate the input.
-  const s=backfillScenario({...scenario});
+  // Direct callers receive the same schema migration and completeness checks as worker and browser paths.
+  // Clone first so migration and later capacity derates never mutate the caller's scenario.
+  const declared=migrateScenario({...scenario});
+  const scenarioErrors=validateScenario(declared);
+  if(scenarioErrors.length)throw Error(`Scenario cannot be simulated: ${scenarioErrors.join(' ')}`);
+  const s={...declared};
   const shade=resolveShadeScreen(s.shadeScreen),thermal=resolveThermalScreen(s.thermalScreen);
   // An insect screen restricts the outside-air path, so it lowers the achievable maximum exchange before any
   // control decision is taken. The declared minimum is a requirement rather than a capability and is left
@@ -406,7 +421,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
   ];
   if(s.desiccantKgH>0)warnings.push('Generic desiccant assumptions only: 2 to 50 C indoor operating bounds, fixed moisture capacity, latent-equivalent sorption heat, explicit indoor sorption fraction, and purchased regeneration split fuel/electric. Regeneration and exported sorption heat reject outdoors. Hybrid indirect evaporation uses a separate wet secondary stream and ideal latent-equivalent water, not certified liquid-desiccant product performance.');
   if(insect.installed)warnings.push(`Insect screen derates the maximum outside-air exchange by a factor of ${insect.ventilationFactor} to ${s.maxVentACH.toFixed(2)} ACH${insect.clampedToMinimum?', clamped up to the declared minimum, so the screened capacity is below the ventilation the scenario requires':''}. The factor is ${insect.basis}, measured relative to a 40-mesh screened house and NOT to an unscreened one, so it cannot price the first screen. No optical or thermal effect of the mesh is modeled.`);
-  if(s.doasM3s>0)warnings.push('Generic dry-neutral DOAS: outdoor air delivered at the declared supply temperature and the lower of outdoor or supply dew-point moisture; purchased electricity is the declared kWh per kg removed from outdoor air plus fan power, with supply tempering assumed inside that figure. DOAS air is outdoor air and counts against CO2 enrichment. Brand-agnostic assumption, not product data.');
+  if(s.doasM3s>0)warnings.push('Generic dry-neutral DOAS treatment applies only to the selected controlled outdoor-air stream and never adds outdoor airflow. This topology stage reports the declared supply state and water removed; detailed coil, reheat, and purchased-energy thermodynamics are not included. Brand-agnostic assumption, not product data.');
   warnings.push(...componentWarnings(s,shade,thermal,s.heatSource==='heatpump'&&!heatPumpConfigured(s)?'incomplete':'ok'));
   // Envelope provenance follows the template the scenario still matches. Two of the ladder entries have no
   // sourced PAR or total-shortwave transmission at all, so a run that keeps their placeholder optics says so.
@@ -437,7 +452,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       controller=controlMode==='staged'?stagedController(s):null;
     }
     let compliant=0,maxEnergyResidual=0,maxMoistureResidual=0,failed=false;
-    const modeCounts={},controls={ventACH:0,padFraction:0,indirectFraction:0,dxDuty:0,dehuDuty:0,desiccantDuty:0,doasDuty:0,heaterDuty:0,humidifierFraction:0,lightFraction:0,enrichmentFraction:0,shadeFraction:0,thermalScreenFraction:0};
+    const modeCounts={},controls={controlledACH:0,controlledM3s:0,totalOutdoorACH:0,totalOutdoorM3s:0,padFraction:0,indirectFraction:0,dxDuty:0,dehuDuty:0,desiccantDuty:0,doasConditionedFraction:0,heaterDuty:0,humidifierFraction:0,lightFraction:0,enrichmentFraction:0,shadeFraction:0,thermalScreenFraction:0};
     const loads=emptyLoads(),startTempC=state.tempC,startW=state.w;
     const dayContributions=new Map();
     const hour=hourContext(outside,s,shade,thermal);
@@ -503,13 +518,17 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       row.tempDegreeHours+=picked.temperatureMiss*dt/3600;row.vpdKPaHours+=picked.moistureMiss*dt/3600;
       row.peakCoolingKW=Math.max(row.peakCoolingKW||0,picked.dxTotalW/1000);row.peakElectricKW=Math.max(row.peakElectricKW||0,picked.electricW/1000);
       accumulateLoads(loads,picked,forcing,s,outside,averageT,averageW,dt);
-      controls.ventACH+=picked.air.ach/nSteps;controls.padFraction+=(picked.air.pad?1:0)/nSteps;controls.indirectFraction+=(picked.air.indirect?1:0)/nSteps;
-      controls.dxDuty+=picked.dxDuty/nSteps;controls.dehuDuty+=picked.dehuDuty/nSteps;controls.desiccantDuty+=picked.desiccantDuty/nSteps;controls.doasDuty+=picked.air.doasDuty/nSteps;
+      controls.controlledACH+=picked.air.controlledACH/nSteps;controls.controlledM3s+=picked.air.controlledM3s/nSteps;
+      controls.totalOutdoorACH+=(ctx.infiltrationACH+picked.air.controlledACH)/nSteps;
+      controls.totalOutdoorM3s+=(s.areaM2*s.heightM*ctx.infiltrationACH/3600+picked.air.controlledM3s)/nSteps;
+      controls.padFraction+=(picked.air.kind==='pad'?1:0)/nSteps;controls.indirectFraction+=(picked.air.kind==='indirect'?1:0)/nSteps;
+      controls.dxDuty+=picked.dxDuty/nSteps;controls.dehuDuty+=picked.dehuDuty/nSteps;controls.desiccantDuty+=picked.desiccantDuty/nSteps;
+      controls.doasConditionedFraction+=(picked.air.doasMode==='conditioned'?1:0)/nSteps;
       controls.heaterDuty+=(s.heaterKW>0?picked.heaterW/(s.heaterKW*1000):0)/nSteps;controls.humidifierFraction+=(picked.humidifier>0?1:0)/nSteps;controls.lightFraction+=(forcing.lightW>0?1:0)/nSteps;
-      controls.enrichmentFraction+=(picked.air.ach<=s.minVentACH+1e-9&&!picked.air.pad&&!picked.air.indirect&&picked.air.doasDuty===0?1:0)/nSteps;
+      controls.enrichmentFraction+=(picked.air.controlledACH<=s.minVentACH+1e-9&&picked.air.kind==='outside'?1:0)/nSteps;
       controls.shadeFraction+=(shadeOn?1:0)/nSteps;controls.thermalScreenFraction+=(thermalOn?1:0)/nSteps;
       const mode=picked.dxTotalW>0?'DX_COOL_DEHUMIDIFY':picked.desiccantKgS>0?'DESICCANT_REGENERATION':picked.dehuKgS>0?'CONDENSING_DEHUMIDIFY':picked.doasKgS>0?'DOAS_DEHUMIDIFY':
-        picked.heaterW>0?'HEATING':picked.air.indirect?'INDIRECT_EVAP_COOL':picked.air.pad?'PAD_COOLING':picked.humidifier>0?'HUMIDIFY':picked.air.ach>s.minVentACH?'VENTILATION':'MINIMUM_AIR';
+        picked.heaterW>0?'HEATING':picked.air.kind==='indirect'?'INDIRECT_EVAP_COOL':picked.air.kind==='pad'?'PAD_COOLING':picked.humidifier>0?'HUMIDIFY':picked.air.controlledACH>s.minVentACH?'VENTILATION':'MINIMUM_AIR';
       modeCounts[mode]=(modeCounts[mode]||0)+1;
       if(picked.violation<=1e-7)compliant++;
       if(!dayContributions.has(target.date))dayContributions.set(target.date,{date:target.date,start:weather.time+sub*dt*1000,end:0,hours:0,solarDLI:0,lightDLI:0,compliantHours:0});
@@ -560,11 +579,11 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     dliCostMol:shade.installed?null:0,heatingSavedKWh:thermal.installed?null:0,
     basis:'Differenced against an otherwise identical run with that screen forced open.'};
   if(screenBaseline&&shade.installed){
-    const open=simulateScenario({...s,shadeScreen:{...s.shadeScreen,installed:false}},snapshot,{stepMinutes,screenBaseline:false});
+    const open=simulateScenario({...declared,shadeScreen:{...declared.shadeScreen,installed:false}},snapshot,{stepMinutes,screenBaseline:false});
     screens.dliCostMol=open.hours.reduce((sum,h)=>sum+(h.valid?h.solarDLI:0),0)-total('solarDLI');
   }
   if(screenBaseline&&thermal.installed){
-    const open=simulateScenario({...s,thermalScreen:{...s.thermalScreen,installed:false}},snapshot,{stepMinutes,screenBaseline:false});
+    const open=simulateScenario({...declared,thermalScreen:{...declared.thermalScreen,installed:false}},snapshot,{stepMinutes,screenBaseline:false});
     screens.heatingSavedKWh=open.summary.heatingKWh-summary.heatingKWh;
   }
   if(!screenBaseline&&(shade.installed||thermal.installed))screens.basis='Screen-open reference runs were not executed for this run, so the attributed light cost and heating saving are null.';

@@ -32,7 +32,7 @@ function outdoorDrying(hours, scenario) {
 const ENERGY_FIELDS = ['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh','desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg','cropWaterL','padWaterL','humidifierWaterL','unmetSensibleKWh','unmetMoistureKg','doasKWh','doasRemovedKg'];
 const eligible = h => h.valid && h.eligible !== false && !h.warmup;
 // Runtime: hours with any use, duty-weighted equivalent full-load hours, and distinct local days with any use.
-const RUNTIME_COMPONENTS=[['pad','padFraction'],['indirect','indirectFraction'],['dx','dxDuty'],['dehu','dehuDuty'],['desiccant','desiccantDuty'],['heating','heaterDuty'],['humidifier','humidifierFraction'],['light','lightFraction'],['doas','doasDuty']];
+const RUNTIME_COMPONENTS=[['pad','padFraction'],['indirect','indirectFraction'],['dx','dxDuty'],['dehu','dehuDuty'],['desiccant','desiccantDuty'],['heating','heaterDuty'],['humidifier','humidifierFraction'],['light','lightFraction'],['doas','doasConditionedFraction']];
 export function hourCost(hour,scenario) {
   if (Object.hasOwn(hour,'cost')) return Number.isFinite(hour.cost)?hour.cost:null;
   return (hour.electricKWh||0)*scenario.electricityPrice+(hour.fuelKWh||0)*scenario.fuelPrice+(hour.waterL||0)*scenario.waterPrice;
@@ -219,13 +219,13 @@ const YEAR_METRICS=['compliancePct','compliantHours','cost','electricKWh','fuelK
 export const FREE_COOLING_MODES=['PASSIVE_VENT_COOL_DRY','PAD_EFFECTIVE'];
 export const CO2_WEATHER_MODES=['NEUTRAL_MIN_VENT','HEAT_MIN_VENT','ACTIVE_HUMIDIFICATION_LIKELY','PASSIVE_HUMIDIFY_OPPORTUNITY'];
 export const SENSIBLE_GAIN_KEYS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','fanKWh','cropSensibleKWh'];
-export const LOAD_KEYS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','ventilationSensibleKWh','fanKWh','cropSensibleKWh','cropLatentKWh','humidifierKWh','equipmentHeatKWh','dxSensibleKWh','condensationKWh','storedKWh'];
-export const LATENT_KEYS=['crop','infiltration','ventilation','doas','humidifier','removed','condensed','stored'];
+export const LOAD_KEYS=['solarKWh','lightKWh','envelopeKWh','infiltrationSensibleKWh','controlledOutdoorAirSensibleKWh','fanKWh','cropSensibleKWh','cropLatentKWh','humidifierKWh','equipmentHeatKWh','dxSensibleKWh','condensationKWh','storedKWh'];
+export const LATENT_KEYS=['crop','infiltration','controlledOutdoorAir','humidifier','removed','condensed','stored'];
 export const LATENT_KWH_PER_KG=LATENT_HEAT/3600000;
-// Space loads the equipment must handle: positive gains only. Ventilation sensible is the control response, not a load;
-// humidifier and DOAS moisture are equipment actions. Ventilation/infiltration moisture import counts when positive.
+// Space loads the equipment must handle: positive gains only. Controlled outdoor-air sensible exchange is
+// a control response, not a load; its moisture and infiltration moisture count only when they are positive.
 const sensibleGainKWh=l=>SENSIBLE_GAIN_KEYS.reduce((a,k)=>a+pos(l[k]),0);
-const latentGainKg=l=>pos(l.latentKg?.crop)+pos(l.latentKg?.infiltration)+pos(l.latentKg?.ventilation);
+const latentGainKg=l=>pos(l.latentKg?.crop)+pos(l.latentKg?.infiltration)+pos(l.latentKg?.controlledOutdoorAir);
 const spaceSHR=(sensibleKWh,cropLatentKg)=>{const den=sensibleKWh+LATENT_KWH_PER_KG*cropLatentKg;return den>0?sensibleKWh/den:null;};
 
 function yearRow(label,result){
@@ -352,7 +352,7 @@ export function designHours(weatherHours,resultHours,scenario){
       if(latent===null||kg>latent.latentKg)latent={time:h.time,latentKg:kg,latentKgBySource:{...(l.latentKg||{})},sensibleKWh:kwh,row:h};
       if(sensible===null||kwh>sensible.sensibleKWh)sensible={time:h.time,sensibleKWh:kwh,latentKg:kg,shr:spaceSHR(kwh,pos(l.latentKg?.crop)),row:h};
     }
-    const ach=h.controls?.ventACH;
+    const ach=h.controls?.controlledACH;
     if(finite(ach)&&(vent===null||ach>vent.maxACH))vent={maxACH:ach,atHour:h.time,row:h};
     if(finite(h.condensateKg))cond=cond===null?h.condensateKg:Math.max(cond,h.condensateKg);
     if(finite(h.padWaterL))pad=pad===null?h.padWaterL:Math.max(pad,h.padWaterL);
@@ -388,10 +388,10 @@ export function loadDecomposition(result){
   }
   const finish=row=>{row.shr=spaceSHR(row.sensibleGainKWh,row.cropLatentKg);return row;};
   return {monthly:[...months.values()].sort((a,b)=>a.month.localeCompare(b.month)).map(finish),total:finish(total),shrHistogram,hours,noGainHours,latentKWhPerKg:LATENT_KWH_PER_KG,
-    basis:'Signed balance terms per local month, positive = gain into zone air. Sensible-heat ratio = positive sensible gains / (positive sensible gains + latent heat of crop transpiration); null in hours without gains. Latent kg listed by source; ventilation and infiltration are negative when outside air is drier than the zone.'};
+    basis:'Signed balance terms per local month, positive = gain into zone air. Sensible-heat ratio = positive sensible gains / (positive sensible gains + latent heat of crop transpiration); null in hours without gains. Latent kg listed by source; controlled outdoor air and infiltration are negative when outside air is drier than the zone.'};
 }
 
-// CO2 enrichment window: hours where the strategy holds minimum ventilation with evaporative stages off, plus the weather-side counterpart.
+// CO2 enrichment window: hours where the strategy holds minimum controlled air with evaporative stages off, plus the weather-side counterpart.
 export function co2Window(result){
   const tz=result.scenario?.timezone,months=new Map(),days=new Set();
   let equivalentHours=0,hoursAny=0,validHours=0,weatherSideHours=0;
@@ -405,5 +405,5 @@ export function co2Window(result){
     equivalentHours+=fr;hoursAny++;days.add(c.date);months.set(c.month,(months.get(c.month)||0)+fr);
   }
   return {equivalentHours,hoursAny,days:days.size,validHours,weatherSideHours,byMonth:[...months].sort((a,b)=>a[0].localeCompare(b[0])).map(([month,equivalentHours])=>({month,equivalentHours})),
-    note:'Strategy window: substeps at minimum ventilation with pad and indirect evaporative stages off, so injected CO2 is not flushed; duty-weighted equivalent hours. Weather-side hours: outdoor states with no primary ventilation demand at the target band. Neither models CO2 mass balance, injection rate or crop uptake.'};
+    note:'Strategy window: substeps at the actual minimum controlled outdoor-air stage with pad and indirect evaporative stages off, so injected CO2 is not flushed; duty-weighted equivalent hours. Weather-side hours: outdoor states with no primary controlled-air demand at the target band. Neither models CO2 mass balance, injection rate or crop uptake.'};
 }
