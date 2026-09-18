@@ -533,3 +533,12 @@ test('a weather year cached on another clock is not offered for this site',()=>{
  const loadedWrong=yearSources([],{...boulder,timezone:'America/Chicago',year:'2023'},boulder.latitude,boulder.longitude,'America/Denver');
  assert.equal(loadedWrong.size,0,'a loaded snapshot on another clock must not count either');
 });
+
+// range() computes local-day bounds, so a guessed zone corrupts the request rather than just
+// mislabelling it. This was the last place a zone was silently assumed.
+test('fetching weather without a time zone fails instead of assuming one',async()=>{
+ const {fetchWeather}=await import('../src/weather.js');
+ for(const tz of [undefined,'','   ','Not/AZone'])
+  await assert.rejects(()=>fetchWeather({provider:'openmeteo',latitude:40,longitude:-105,
+   timezone:tz,startDate:'2025-07-01',endDate:'2025-07-01'}),/valid IANA time zone is required/,`timezone ${JSON.stringify(tz)}`);
+});

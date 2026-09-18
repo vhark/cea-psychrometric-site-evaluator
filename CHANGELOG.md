@@ -8,6 +8,7 @@ Versions are model versions: the string the engine stamps into every result and 
 
 ### Fixed
 
+- `range()` no longer defaults to `America/Chicago` when a caller omits the time zone. It converts local calendar dates into UTC instants, so an assumed zone corrupts the request itself rather than just mislabelling the result. This was the last place in the codebase that guessed a zone, and it is the same defect that first surfaced as a Boulder run reporting Tulsa time. A fetch without a valid IANA zone now fails and says why.
 - A weather year cached under one time zone is no longer offered to a site on another. A calendar year is bounded by local days, so the same year on two clocks covers different UTC hours. `yearSources` matched cached years on coordinates alone, which left a returning user stuck: the run refused the mismatched year, and `retrieveYears` skips any year that function reports as available, so the one action that would have fixed it was blocked too. It now matches the time zone as well, so a mismatched year reads as missing and can simply be retrieved again. Changing the time zone also refreshes the year list, which it previously did not, and the guard that catches this at run time now names the control to use.
 
 

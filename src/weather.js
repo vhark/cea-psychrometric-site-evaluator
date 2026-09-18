@@ -41,7 +41,11 @@ function localMidnight(date, timezone) {
   return Math.min(...candidates); // Earliest midnight if a zone repeats it.
 }
 function range(options) {
-  const { startDate, endDate, timezone = 'America/Chicago' } = options;
+  const { startDate, endDate, timezone } = options;
+  // No default. A silently assumed zone is what put a Boulder run on a Tulsa clock: local-day
+  // bounds are computed from this, so guessing it here would corrupt the request itself.
+  try { if (typeof timezone !== 'string' || !timezone.trim()) throw new Error(); new Intl.DateTimeFormat('en', { timeZone: timezone }); }
+  catch { throw new Error('A valid IANA time zone is required to fetch weather, because calendar dates are local days. Locate the ZIP or enter the zone directly.'); }
   const start = localMidnight(startDate, timezone);
   const end = localMidnight(dateString(dateValue(endDate) + DAY), timezone);
   if (end <= start) throw new Error('End date must be on or after start date.');
