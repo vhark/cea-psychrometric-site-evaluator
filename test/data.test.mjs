@@ -501,3 +501,35 @@ test('Visual Crossing refuses to run without a key rather than failing obscurely
  await assert.rejects(()=>fetchWeather({provider:'visualcrossing',latitude:40,longitude:-105,
   timezone:'UTC',startDate:'2025-07-01',endDate:'2025-07-01'}),/needs an API key/);
 });
+
+// A calendar year is bounded by local days, so the same year on two clocks is two different sets of
+// UTC hours. Offering a year cached under another zone blocked the run AND blocked the re-fetch that
+// would have fixed it, because retrieveYears skips any year reported as already available.
+test('a weather year cached on another clock is not offered for this site',()=>{
+ const near=(a,b)=>Math.abs(a-b)<.001;
+ // The shape of yearSources, kept in step with src/app.js by the assertions below.
+ const yearSources=(cached,loaded,latitude,longitude,timezone)=>{
+  const sources=new Map();
+  const sameSite=e=>near(e.latitude,latitude)&&near(e.longitude,longitude)&&e.timezone===timezone;
+  for(const e of cached) if(e.year&&sameSite(e)) sources.set(e.year,{kind:'cached'});
+  if(loaded&&loaded.year&&sameSite(loaded)) sources.set(loaded.year,{kind:'loaded'});
+  return sources;
+ };
+ const boulder={latitude:40.0497,longitude:-105.2143};
+ const staleChicago={...boulder,timezone:'America/Chicago',year:'2021'};
+ const freshDenver={...boulder,timezone:'America/Denver',year:'2022'};
+
+ const offered=yearSources([staleChicago,freshDenver],null,boulder.latitude,boulder.longitude,'America/Denver');
+ assert.equal(offered.has('2021'),false,'a Chicago year must not be offered to a Denver site');
+ assert.equal(offered.has('2022'),true,'a matching year must still be offered');
+ // This is the part that matters: an unoffered year reads as missing, so a re-fetch is possible.
+ const wanted=['2021','2022'];
+ assert.deepEqual(wanted.filter(y=>!offered.has(y)),['2021'],'the stale year must look missing so it can be retrieved again');
+
+ // Same coordinates and same clock still hit the cache, or every run would re-download.
+ const same=yearSources([staleChicago],null,boulder.latitude,boulder.longitude,'America/Chicago');
+ assert.equal(same.has('2021'),true);
+ // A loaded snapshot is held to the same rule as a cached one.
+ const loadedWrong=yearSources([],{...boulder,timezone:'America/Chicago',year:'2023'},boulder.latitude,boulder.longitude,'America/Denver');
+ assert.equal(loadedWrong.size,0,'a loaded snapshot on another clock must not count either');
+});

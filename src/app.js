@@ -392,18 +392,23 @@ function weatherBusy(busy, text = '') {
   state.weatherBusy = busy; renderComponentStatus();
 }
 /* Weather years: every calendar-year snapshot available for a coordinate pair, by source. Loaded > cached. */
-function yearSources(latitude, longitude) {
+/* A calendar year is bounded by local days, so a year stored on one clock covers a different set of
+   UTC hours than the same year on another. Offering a year cached under a different time zone would
+   both fail the run and, because retrieveYears skips any year listed here, stop the user re-fetching
+   the one that would work. Matching the zone as well as the coordinates is what keeps that door open. */
+function yearSources(latitude, longitude, timezone) {
   const sources = new Map();
-  for (const entry of state.cached) {const year = calendarYear(entry); if (year && near(entry.latitude, latitude) && near(entry.longitude, longitude)) sources.set(year, {kind: 'cached', key: entry.key, source: entry.source});}
+  const sameSite = entry => near(entry.latitude, latitude) && near(entry.longitude, longitude) && entry.timezone === timezone;
+  for (const entry of state.cached) {const year = calendarYear(entry); if (year && sameSite(entry)) sources.set(year, {kind: 'cached', key: entry.key, source: entry.source});}
   const loaded = calendarYear(state.snapshot);
-  if (loaded && near(state.snapshot.latitude, latitude) && near(state.snapshot.longitude, longitude)) sources.set(loaded, {kind: 'loaded', source: state.snapshot.source});
+  if (loaded && state.snapshot && sameSite(state.snapshot)) sources.set(loaded, {kind: 'loaded', source: state.snapshot.source});
   return new Map([...sources].sort());
 }
 async function refreshYears() {
   try {state.cached = await listWeather();} catch {state.cached = [];}
   // Blank coordinates are not 0,0: an unlocated site has no weather years, it does not sit off Africa.
   const located = $('latitude').value !== '' && $('longitude').value !== '';
-  state.yearSources = located ? yearSources(Number($('latitude').value), Number($('longitude').value)) : new Map();
+  state.yearSources = located ? yearSources(Number($('latitude').value), Number($('longitude').value), $('timezone').value.trim()) : new Map();
   for (const year of state.years) if (!state.yearSources.has(year)) state.years.delete(year);
   renderYearChips(); renderSiteChips();
 }
@@ -424,7 +429,7 @@ function renderSiteChips() {
   if (!state.sites.length) box.append(node('p', 'No additional sites. The primary site above is always included.', 'help'));
   for (const site of state.sites) {
     const chip = node('span', undefined, 'chip'); chip.setAttribute('role', 'listitem');
-    const sources = yearSources(site.latitude, site.longitude), local = [...state.years].filter(year => sources.has(year)).length;
+    const sources = yearSources(site.latitude, site.longitude, site.timezone), local = [...state.years].filter(year => sources.has(year)).length;
     chip.append(document.createTextNode(`${site.city || 'Site'}${site.state ? `, ${site.state}` : ''} · ${site.zip}`), node('small', state.years.size ? `${local}/${state.years.size} years local` : 'same period as loaded snapshot'));
     const remove = node('button', '×'); remove.type = 'button'; remove.setAttribute('aria-label', `Remove site ${site.zip}`);
     remove.addEventListener('click', () => {state.sites = state.sites.filter(s => s !== site); markChanged(); renderSiteChips();});
@@ -619,7 +624,7 @@ async function run() {
   if (!state.snapshot) throw new Error('Load or import actual weather before running.');
   const location = locationValues(), years = [...state.years].sort();
   try {state.cached = await listWeather();} catch {state.cached = [];}
-  if (years.length) {state.yearSources = yearSources(location.latitude, location.longitude); for (const year of years) if (!state.yearSources.has(year)) throw new Error(`Weather year ${year} is not available for the current coordinates. Locate the site again or refresh the year list.`);}
+  if (years.length) {state.yearSources = yearSources(location.latitude, location.longitude, location.timezone); for (const year of years) if (!state.yearSources.has(year)) throw new Error(`Weather year ${year} is not available for the current coordinates. Locate the site again or refresh the year list.`);}
   else if (Math.abs(location.latitude - state.snapshot.latitude) > .001 || Math.abs(location.longitude - state.snapshot.longitude) > .001 || location.timezone !== state.snapshot.timezone || $('start-date').value !== state.snapshot.startDate || $('end-date').value !== state.snapshot.endDate) throw new Error('Location or dates do not match the loaded snapshot. Retrieve weather again, or restore the snapshot location and dates. No old weather is silently reused for a new site.');
   copyLocationToScenarios({...location, sector: $('sector').value});
   const errors = state.scenarios.flatMap(s => scenarioErrors(s).map(error => `${s.name}: ${error}`));
@@ -636,7 +641,7 @@ async function run() {
   const jobs = [];
   try {
     for (const [siteIndex, entry] of sites.entries()) {
-      const sources = yearSources(entry.site.latitude, entry.site.longitude);
+      const sources = yearSources(entry.site.latitude, entry.site.longitude, entry.site.timezone);
       const periods = years.length ? years.map(year => ({year, startDate: `${year}-01-01`, endDate: `${year}-12-31`})) : [{year: null, startDate: state.snapshot.startDate, endDate: state.snapshot.endDate}];
       for (const period of periods) {
         const progressLabel = `${entry.site.city || entry.site.zip || 'Site'} ${period.year || `${period.startDate} to ${period.endDate}`}`;
@@ -644,7 +649,7 @@ async function run() {
         const cachedKey = weatherKey({...entry.site, ...period}), cachedEntry = state.cached.find(c => c.key === cachedKey);
         const source = period.year ? sources.get(period.year) : !siteIndex ? {kind: 'loaded'} : cachedEntry ? {kind: 'cached', key: cachedEntry.key} : null;
         const snapshot = await resolveSnapshot(entry.site, period, source, controller.signal, (value, text) => {if (state.runId === runId) $('progress-label').textContent = `Retrieving ${progressLabel} · ${finite(value) ? `${format(value * 100)}% · ` : ''}${text || ''}`;});
-        if (!siteIndex && snapshot.timezone !== location.timezone) throw new Error(`Weather year ${period.year} was stored for time zone ${snapshot.timezone}, but the site is set to ${location.timezone}. Align the time zone or retrieve the year again.`);
+        if (!siteIndex && snapshot.timezone !== location.timezone) throw new Error(`Weather year ${period.year} was stored for time zone ${snapshot.timezone}, but this site is on ${location.timezone}. A calendar year is bounded by local days, so the stored year covers different hours than this site needs. Select Retrieve years to download it for ${location.timezone}, which replaces the stored copy.`);
         if (state.runId !== runId) return;
         const energyContext = entry.priced && state.energyContext ? getEnergyContext(state.zipInfo, {sector, startDate: snapshot.startDate, endDate: snapshot.endDate}, state.catalog) : null;
         jobs.push({id: `${runId}:${jobs.length}`, siteIndex, label: period.year || `${snapshot.startDate} to ${snapshot.endDate}`, snapshot, scenarios: entry.scenarios, energyContext});
@@ -924,7 +929,7 @@ async function importFile(event) {
 function bindEvents() {
   on('lookup-zip', 'click', locate); on('weather-form', 'submit', retrieveWeather);
   buildProviders(); on('weather-provider', 'change', renderProvider); on('provider-key', 'change', saveProviderKey); on('provider-key', 'blur', saveProviderKey);
-  for (const id of ['zip', 'latitude', 'longitude', 'timezone', 'start-date', 'end-date', 'weather-provider', 'station']) on(id, 'change', () => {markChanged(); if (['latitude', 'longitude'].includes(id)) return refreshYears(); if (['zip', 'start-date', 'end-date'].includes(id)) return refreshEnergy();});
+  for (const id of ['zip', 'latitude', 'longitude', 'timezone', 'start-date', 'end-date', 'weather-provider', 'station']) on(id, 'change', () => {markChanged(); if (['latitude', 'longitude', 'timezone'].includes(id)) return refreshYears(); if (['zip', 'start-date', 'end-date'].includes(id)) return refreshEnergy();});
   on('retrieve-years', 'click', retrieveYears); on('add-site', 'click', addSite); on('site-zip', 'keydown', event => {if (event.key === 'Enter') {event.preventDefault(); return addSite();}});
   on('site-zip', 'input', proposeSiteTimezone); on('site-timezone', 'input', () => {$('site-timezone').dataset.edited = '1';});
   on('scenario-form', 'input', updateScenario); on('scenario-form', 'submit', event => event.preventDefault());

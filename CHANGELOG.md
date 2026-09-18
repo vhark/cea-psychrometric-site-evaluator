@@ -6,6 +6,11 @@ Versions are model versions: the string the engine stamps into every result and 
 
 ## [Unreleased]
 
+### Fixed
+
+- A weather year cached under one time zone is no longer offered to a site on another. A calendar year is bounded by local days, so the same year on two clocks covers different UTC hours. `yearSources` matched cached years on coordinates alone, which left a returning user stuck: the run refused the mismatched year, and `retrieveYears` skips any year that function reports as available, so the one action that would have fixed it was blocked too. It now matches the time zone as well, so a mismatched year reads as missing and can simply be retrieved again. Changing the time zone also refreshes the year list, which it previously did not, and the guard that catches this at run time now names the control to use.
+
+
 ### Added
 
 - Visual Crossing as a fifth weather source, and the first needing a key, which finally exercises the key field end to end. It is the only source here returning all six values in one request over about fifty years. Two things make it usable honestly. Its `pressure` is sea-level pressure, which their own documentation defines as removing the altitude reduction, and at 1,655 m that runs about 22 percent above real station pressure; since humidity ratio follows pressure, passing it through would corrupt every moisture figure, so the adapter reduces it using site elevation from Open-Meteo's keyless elevation service and flags each hour as derived. And the service blends observations with model output with no per-hour flag saying which, so the adapter records the contributing stations it does publish and marks an hour naming none as modelled. Both facts are in the source's "Costs you" list rather than buried.
