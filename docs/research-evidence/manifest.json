@@ -1,0 +1,21 @@
+{
+  "retrievedAt": "2026-09-11T20:48:25.706266+00:00",
+  "sourceUrl": "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=TUL&network=OK_ASOS&data=tmpf&data=dwpf&data=relh&data=sknt&sts=2026-09-01T00:00:00Z&ets=2026-09-02T00:00:00Z&tz=UTC&format=onlycomma&latlon=yes&elev=yes&missing=M&report_type=3",
+  "station": "TUL / KTUL",
+  "requestedIntervalUTC": [
+    "2026-09-01T00:00:00Z",
+    "2026-09-02T00:00:00Z"
+  ],
+  "file": "ktul-2026-09-01-raw.csv",
+  "sha256": "dfaf0802b73be8e6bdab3a27f153335e10b0ebbe72649ea9e1dad939af464dc0",
+  "purpose": "Research access probe only, not full 2026 analysis",
+  "units": {
+    "tmpf": "degF",
+    "dwpf": "degF",
+    "relh": "percent",
+    "sknt": "knots",
+    "elevation": "m"
+  },
+  "timezone": "UTC",
+  "reportType": "3 routine"
+}

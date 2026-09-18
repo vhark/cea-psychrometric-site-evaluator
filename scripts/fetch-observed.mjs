@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+import {writeFile,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {fileURLToPath} from 'node:url';
+import {fetchObserved,normalizeWeather} from '../src/weather.js';
+const root=new URL('../',import.meta.url);
+const timezone='America/Chicago';
+const parts=new Intl.DateTimeFormat('en-CA',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+const part=key=>parts.find(p=>p.type===key).value;
+const startDate=process.argv[2]||'2026-01-01',endDate=process.argv[3]||`${part('year')}-${part('month')}-${part('day')}`;
+const deadline=ms=>AbortSignal.timeout(ms);
+const source=await fetchObserved({station:'TUL',latitude:36.15,longitude:-95.99,timezone,startDate,endDate,signal:deadline(600000),onProgress:(n,message)=>console.log(Math.round(n*100)+'% '+message)});
+const latestComplete=Math.floor(Date.now()/3600000)*3600000;
+const valid=source.hours.filter(h=>h.time<latestComplete&&Number.isFinite(h.tempC)&&(Number.isFinite(h.rh)||Number.isFinite(h.dewPointC)));
+if(!valid.length)throw new Error('No completed station weather hours returned.');
+const endExclusive=Math.min(latestComplete,valid.at(-1).time+3600000);
+const snapshot=normalizeWeather({...source,startUTC:new Date(source.hours[0].time).toISOString(),endExclusiveUTC:new Date(endExclusive).toISOString(),hours:source.hours.filter(h=>h.time<endExclusive)});
+const data=JSON.stringify(snapshot),target=new URL('data/weather/ktul-2026.json',root);
+await mkdir(new URL('data/weather/',root),{recursive:true});await writeFile(target,data);await writeFile(new URL('data/weather/ktul-2026.sha256',root),createHash('sha256').update(data).digest('hex')+'  ktul-2026.json\n');
+const url=new URL('https://www.ncei.noaa.gov/access/services/data/v1');
+for(const[k,v]of Object.entries({dataset:'daily-summaries',stations:'USW00013968',startDate,endDate,dataTypes:'TMAX,TMIN,PRCP',units:'metric',format:'json'}))url.searchParams.set(k,v);
+const response=await fetch(url,{signal:deadline(180000)});if(!response.ok)throw new Error(`NOAA daily cross-check HTTP ${response.status}. IEM snapshot was saved.`);
+const raw=await response.text(),daily=JSON.parse(raw);if(!Array.isArray(daily))throw new Error('NOAA daily response was not a data array.');
+await mkdir(new URL('data/reference/',root),{recursive:true});
+await writeFile(new URL('data/reference/noaa-tulsa-daily-2026.json',root),raw);
+await writeFile(new URL('data/reference/noaa-provenance.json',root),JSON.stringify({sourceUrl:String(url),retrievedAt:new Date().toISOString(),sha256:createHash('sha256').update(raw).digest('hex'),station:'USW00013968',units:'TMAX/TMIN degrees C, PRCP mm',rows:daily.length,lastDate:daily.at(-1)?.DATE,note:'Official daily extrema differ from local-civil hourly sampling; no calibration correction applied.'},null,2));
+console.log(JSON.stringify({path:fileURLToPath(target),coverage:snapshot.coverage,noaaDays:daily.length},null,2));

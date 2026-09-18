@@ -1,0 +1,97 @@
+{
+  "source": "NASA Tulsa2025 warmest48h actual-source smoke; step sensitivity, not empirical validation",
+  "startUTC": "2025-08-17T20:00:00.000Z",
+  "endExclusiveUTC": "2025-08-19T20:00:00.000Z",
+  "results": [
+    {
+      "technology": "pad",
+      "stepMinutes": 5,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 428.2676133994588,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 1.382431946694851e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "pad",
+      "stepMinutes": 2.5,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 423.60342235300317,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 2.7567148208618164e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "pad",
+      "stepMinutes": 1,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 420.7020300661257,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 6.2262794623772304e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "dx",
+      "stepMinutes": 5,
+      "valid": 48,
+      "compliancePct": 39.00709219858156,
+      "electricKWh": 1580.5152846248957,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 9.505796091010174e-10,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "dx",
+      "stepMinutes": 2.5,
+      "valid": 48,
+      "compliancePct": 39.27304964539007,
+      "electricKWh": 1576.876754577435,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 2.1893841524918876e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "dx",
+      "stepMinutes": 1,
+      "valid": 48,
+      "compliancePct": 47.5531914893617,
+      "electricKWh": 1596.0123102002042,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 6.555364961968735e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "hybridDesiccant",
+      "stepMinutes": 5,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 1273.4859467327915,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 1.3372239967187245e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "hybridDesiccant",
+      "stepMinutes": 2.5,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 1214.7605056863363,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 2.2165477275848388e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "hybridDesiccant",
+      "stepMinutes": 1,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 1195.0552800661253,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 6.3456051672498385e-9,
+      "numericalFailures": 0
+    }
+  ]
+}

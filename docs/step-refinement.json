@@ -1,0 +1,67 @@
+{
+  "source": "NASA Tulsa2025 warmest48h actual-source smoke; step sensitivity, not empirical validation",
+  "startUTC": "2025-08-17T20:00:00.000Z",
+  "endExclusiveUTC": "2025-08-19T20:00:00.000Z",
+  "results": [
+    {
+      "technology": "dx",
+      "stepMinutes": 1,
+      "valid": 48,
+      "compliancePct": 47.5531914893617,
+      "electricKWh": 1596.0123102002042,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 6.555364961968735e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "dx",
+      "stepMinutes": 0.5,
+      "valid": 48,
+      "compliancePct": 47.641843971631204,
+      "electricKWh": 1591.9834758277725,
+      "fuelKWh": 0.32299412182446186,
+      "maxEnergyResidualW": 1.3831110360721748e-8,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "dx",
+      "stepMinutes": 0.25,
+      "valid": 48,
+      "compliancePct": 47.5354609929078,
+      "electricKWh": 1588.389923166998,
+      "fuelKWh": 0.5569833949894946,
+      "maxEnergyResidualW": 2.786594753464063e-8,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "hybridDesiccant",
+      "stepMinutes": 1,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 1195.0552800661253,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 6.3456051672498385e-9,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "hybridDesiccant",
+      "stepMinutes": 0.5,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 1194.5243745734654,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 1.2479722499847412e-8,
+      "numericalFailures": 0
+    },
+    {
+      "technology": "hybridDesiccant",
+      "stepMinutes": 0.25,
+      "valid": 48,
+      "compliancePct": 0,
+      "electricKWh": 1192.059689866997,
+      "fuelKWh": 0,
+      "maxEnergyResidualW": 2.26670332873861e-8,
+      "numericalFailures": 0
+    }
+  ]
+}

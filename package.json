@@ -1,0 +1,21 @@
+{
+  "name": "cea-psychrometric-site-evaluator",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Grownetics CEA Psychrometric Site Evaluator: open-source component and historical-climate screening",
+  "author": "Grownetics",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vhark/cea-psychrometric-site-evaluator.git"
+  },
+  "homepage": "https://vhark.github.io/cea-psychrometric-site-evaluator/",
+  "bugs": {
+    "url": "https://github.com/vhark/cea-psychrometric-site-evaluator/issues"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "serve": "python3 -m http.server 8150 --bind 127.0.0.1"
+  }
+}

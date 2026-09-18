@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "sites": [
+    {
+      "key": "tulsa",
+      "label": "Tulsa, OK",
+      "zip": "74103",
+      "latitude": 36.15,
+      "longitude": -95.99,
+      "timezone": "America/Chicago",
+      "climate": "humid subtropical",
+      "sourceElevationM": 249.54,
+      "source": "NASA POWER",
+      "studyYears": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "key": "phoenix",
+      "label": "Phoenix, AZ",
+      "zip": "85004",
+      "latitude": 33.4484,
+      "longitude": -112.074,
+      "timezone": "America/Phoenix",
+      "climate": "hot-dry",
+      "sourceElevationM": 494.49,
+      "source": "NASA POWER",
+      "studyYears": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "key": "miami",
+      "label": "Miami, FL",
+      "zip": "33101",
+      "latitude": 25.7743,
+      "longitude": -80.1937,
+      "timezone": "America/New_York",
+      "climate": "hot-humid",
+      "sourceElevationM": 2.81,
+      "source": "NASA POWER",
+      "studyYears": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "key": "denver",
+      "label": "Denver, CO",
+      "zip": "80202",
+      "latitude": 39.7392,
+      "longitude": -104.9903,
+      "timezone": "America/Denver",
+      "climate": "cold-dry at altitude",
+      "sourceElevationM": 2094.96,
+      "source": "NASA POWER",
+      "studyYears": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "key": "seattle",
+      "label": "Seattle, WA",
+      "zip": "98104",
+      "latitude": 47.6062,
+      "longitude": -122.3321,
+      "timezone": "America/Los_Angeles",
+      "climate": "cool-marine",
+      "sourceElevationM": 110.01,
+      "source": "NASA POWER",
+      "studyYears": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "key": "fairbanks",
+      "label": "Fairbanks, AK",
+      "zip": "99701",
+      "latitude": 64.8378,
+      "longitude": -147.7164,
+      "timezone": "America/Anchorage",
+      "climate": "subarctic, light-limited",
+      "sourceElevationM": 366.64,
+      "source": "NASA POWER",
+      "studyYears": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    }
+  ],
+  "note": "Climate reference registry for the six sites the committed studies were computed at. The hourly NASA POWER archive these studies ran on is not shipped: see docs/CLIMATES.md for the computed profiles and scripts/fetch-weather.py to retrieve any site's years again."
+}

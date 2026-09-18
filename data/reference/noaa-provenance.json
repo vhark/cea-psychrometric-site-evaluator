@@ -1,0 +1,10 @@
+{
+  "sourceUrl": "https://www.ncei.noaa.gov/access/services/data/v1?dataset=daily-summaries&stations=USW00013968&startDate=2026-01-01&endDate=2026-09-10&dataTypes=TMAX,TMIN,PRCP&units=metric&format=json",
+  "retrievedAt": "2026-09-11T21:16:55.592426+00:00",
+  "sha256": "d949ea431578c449eab8c836fdc492fed10e897c5b2477712f953762de8f3c3c",
+  "station": "USW00013968",
+  "units": "TMAX/TMIN degrees C, PRCP mm",
+  "rows": 251,
+  "lastDate": "2026-09-08",
+  "note": "Daily extrema cross-check; observation-day and subhourly maxima differ from hourly local-civil samples."
+}
