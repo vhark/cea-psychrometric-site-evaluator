@@ -14,16 +14,23 @@
    from the study and cannot be more specific than the study is. Nothing here is computed by this
    module, and nothing is invented: an absent study renders as an absent study.
 
+   The one exception is the worked hours. data/weather/sample-hours.json holds two real NASA POWER hours with
+   their source requests, and src/steps.js recomputes every step from them with the functions the screen itself
+   runs, so the worked arithmetic cannot drift from the engine either. An absent file renders as an absent file.
+
    The spotlight is the guided tour's, imported rather than duplicated. */
 
 import {costBasisText, capitalBasisText} from './report.js';
 import {spotlight} from './tour.js';
+import {weatherSteps} from './steps.js';
+import {DEFAULT_SCENARIO} from './config.js';
 
 export const LEARN_VERSION = 1;
 export const VIEW_KEY = 'cea-psychrometric-site-evaluator.view.v1';
 export const STUDY_URL = 'docs/regional-study.json';
 export const STUDY_COMMAND = 'node scripts/regional-study.mjs';
 export const STUDY_SCHEMA = 1;
+export const WORKED_HOURS_URL = 'data/weather/sample-hours.json';
 
 const $ = id => document.getElementById(id);
 const still = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -49,6 +56,18 @@ function node(tag, content, className) {
 
 /** The ladder of equipment classes, summarised from docs/CLASSES.md. One line on what a class can do,
     one line on what defeats it, and the class code so a reader can find the full row in that document. */
+/** Ordered arithmetic steps from src/steps.js as a list: title, formula, the hour's own numbers, the result, the function. */
+export function stepsNode(steps) {
+  const list = node('ol', undefined, 'steps');
+  for (const step of steps) {
+    const item = document.createElement('li');
+    item.append(node('p', `${step.n}. ${step.title}`, 'step-title'), node('p', step.formula, 'step-formula'),
+      node('p', step.working, 'step-working'), node('p', step.result, 'step-result'), node('p', `computed by ${step.fn}`, 'step-fn'));
+    list.append(item);
+  }
+  return list;
+}
+
 const LADDER = [
   {
     code: 'C0, without the pad',
@@ -588,6 +607,7 @@ const DEEPER_ID = 'learn-deeper';
 const DEEPER_TITLE = 'Go deeper: how each number is computed';
 const DEEPER_META = 'Ten technical sections. The concept, the arithmetic, a figure measured in this repository, and the caveat that travels with it.';
 let deeper = null;
+const workedHosts = [];
 
 /** Opens the technical area, and optionally scrolls to it. A module route opens this first, because a
     <details> inside a closed <details> has no box on screen to scroll to. */
@@ -626,6 +646,7 @@ function patchIntro() {
 export const MODULES = [
   {
     key: 'outdoor-state',
+    steps: [1, 4],
     title: 'Reading the outdoor state',
     meta: 'Dry bulb, dew point, wet bulb, humidity ratio, VPD',
     lede: [
@@ -640,10 +661,11 @@ export const MODULES = [
       {label: 'Station pressure at Denver, 2,094.96 m source elevation', value: '76.4 to 80.4 kPa, 75 to 79% of the 101.325 kPa sea-level standard', source: 'docs/CLIMATES.md'}
     ],
     caveat: 'Miami\u2019s average summer wet bulb sits above Phoenix\u2019s hottest-hour wet bulb, so the evaporative-cooling question is settled by the outdoor state before any equipment is chosen. Denver shows why pressure is not a constant: assume sea level there and humidity ratio, enthalpy, wet bulb and fan mass flow are all wrong at once.',
-    show: {target: 'inspector-panel', label: 'Show me the hourly inspector', needsRun: true, first: 'In the Analyze view: select a bundled year chip under Weather years, then Run all scenarios. The inspector walks the record hour by hour and reports the outdoor state behind every number.'}
+    show: {target: 'inspector-panel', label: 'Show me the hourly inspector', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then Run all scenarios. The inspector walks the record hour by hour and reports the outdoor state behind every number.'}
   },
   {
     key: 'target-band',
+    steps: [5, 6],
     title: 'The joint band, and what attainment is a percentage of',
     meta: 'Eligible hours, warm-up, partial hours',
     lede: [
@@ -656,10 +678,11 @@ export const MODULES = [
       {label: 'Pad-and-vent baseline across ten Tulsa years', value: 'joint temperature-and-moisture target attainment: median 28.038% of eligible hours; observed worst 22.589% and best 30.315%, a 7.726 percentage-point (pp) difference', source: 'docs/regional-study.json'},
     ],
     caveat: 'A wider band raises attainment without changing the building. That makes attainment comparable between strategies on one band and not comparable between two different bands. Warm-up hours keep their energy and water in the individual totals, because that energy really was spent, but they carry no compliance at all.',
-    show: {target: 'headline-metrics', label: 'Show me the four headline numbers', needsRun: true, first: 'In the Analyze view: select a bundled year chip under Weather years, then Run all scenarios. Attainment is shown as equivalent compliant hours over eligible hours, with valid hours beside it.'}
+    show: {target: 'headline-metrics', label: 'Show me the four headline numbers', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then Run all scenarios. Attainment is shown as equivalent compliant hours over eligible hours, with valid hours beside it.'}
   },
   {
     key: 'free-cooling',
+    steps: [7, 9],
     title: 'What the climate gives free',
     meta: 'Free cooling, wet-bulb depression, pad viability',
     lede: [
@@ -693,6 +716,7 @@ export const MODULES = [
   },
   {
     key: 'outside-air',
+    steps: [10, 10],
     title: 'Outside air as a dehumidifier',
     meta: 'Removal potential, cost per kilogram, the hidden heat',
     lede: [
@@ -705,7 +729,7 @@ export const MODULES = [
       {label: 'Outside-air drying is conditional', value: 'The earlier Tulsa per-kilogram advantage count is historical. Read actual fan, conditioning and finite heating inputs before comparing a current run; low outdoor humidity alone does not establish an operating-cost reduction.', source: 'docs/COMPONENT-PARAMETERS.md'}
     ],
     caveat: 'The hot-and-dry hours import sensible heat that this table does not cost, so they are cheap only in the moisture account: read them against a separate cooling plan, or ventilation becomes the reason the temperature bound fails. A removal potential is also what the installed fans could move, not what the controller chose to do, so it is an upper bound on the opportunity and not a saving already banked.',
-    show: {target: 'drying-table', label: 'Show me the outside-air screen', needsRun: true, first: 'In the Analyze view: select a bundled year chip under Weather years, then Run all scenarios. The outside-air table gives hours, days, mean removal potential and energy and cost per kilogram.'}
+    show: {target: 'drying-table', label: 'Show me the outside-air screen', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then Run all scenarios. The outside-air table gives hours, days, mean removal potential and energy and cost per kilogram.'}
   },
   {
     key: 'equipment-frontier',
@@ -838,6 +862,12 @@ function moduleNode(mod, index) {
   relation.append(node('p', 'The relationship', 'eyebrow'), node('p', mod.formula, 'learn-formula mono'), node('p', mod.formulaNote, 'help'));
   body.append(relation);
   body.append(node('p', 'Measured in this repository', 'eyebrow'), workedTable(mod.worked));
+  if (mod.steps) {
+    const host = node('div', undefined, 'learn-worked-hours');
+    host.append(node('p', 'Worked on two real hours', 'eyebrow'), node('p', `Loading ${WORKED_HOURS_URL}…`, 'help'));
+    workedHosts.push({host, steps: mod.steps});
+    body.append(host);
+  }
   const caveat = node('div', undefined, 'learn-caveat');
   caveat.append(node('p', 'The caveat that travels with it', 'eyebrow'), node('p', mod.caveat));
   body.append(caveat);
@@ -1103,6 +1133,33 @@ function renderStudy(study) {
   fillPrimerStudy(study, regions);
 }
 
+/* The same two real hours are followed through every module that has a per-hour step, so the January hour a
+   reader meets in § 01 is still recognisable in § 05. Nothing is cached here: the file is the record. */
+async function loadWorkedHours() {
+  if (!workedHosts.length) return;
+  const fail = reason => {for (const {host} of workedHosts) host.replaceChildren(node('p', 'Worked on two real hours', 'eyebrow'), node('p', `${WORKED_HOURS_URL} ${reason} Nothing is substituted for it.`, 'help'));};
+  let file;
+  try {
+    const response = await fetch(WORKED_HOURS_URL, {cache: 'no-store'});
+    if (!response.ok) return fail(`returned ${response.status} ${response.statusText}, so no worked hour is shown.`);
+    file = await response.json();
+  } catch (error) {return fail(`could not be read: ${error.message}.`);}
+  if (file?.schemaVersion !== 1 || !Array.isArray(file.hours) || !file.site?.timezone) return fail('is not a schema 1 sample-hours file.');
+  const scenario = {...DEFAULT_SCENARIO, timezone: file.site.timezone, latitude: file.site.latitude, longitude: file.site.longitude};
+  for (const {host, steps: [from, to]} of workedHosts) {
+    host.replaceChildren(node('p', 'Worked on two real hours', 'eyebrow'));
+    host.append(node('p', `${file.site.label}, ${file.source}, with the default scenario: ${scenario.dayTargetC} °C by day and ${scenario.nightTargetC} °C at night, air VPD ${scenario.vpdMin} to ${scenario.vpdMax} kPa, dew point at most ${scenario.maxDewPointC} °C, pad effectiveness ${scenario.padEffectiveness}. Steps ${from} to ${to} of the same ten for each hour. The hourly inspector shows all ten for any hour of your own run.`, 'help'));
+    for (const sample of file.hours) {
+      const raw = Object.entries(sample.raw || {}).map(([k, v]) => `${k} ${v} ${file.units?.[k] || ''}`.trim()).join(', ');
+      const head = node('p', undefined, 'source-line');
+      head.append(document.createTextNode(`${sample.label}: ${sample.timeUTC}. As received: ${raw}. `));
+      const link = node('a', 'Source request'); link.href = sample.sourceUrl; link.rel = 'noopener'; link.target = '_blank';
+      head.append(link, document.createTextNode(`, retrieved ${sample.retrievedAt}.`));
+      host.append(head, stepsNode(weatherSteps(sample.hour, scenario, file.site).slice(from - 1, to)));
+    }
+  }
+}
+
 async function loadStudy() {
   if (!regionsBody) return studyState;
   regionsBody.replaceChildren(node('p', `Loading ${STUDY_URL}…`, 'help'));
@@ -1329,6 +1386,7 @@ export function initLearn() {
     if (!intoAnalysis && readView() === 'learn') showView('learn', {hash: false, restore: false});
   }
   const loading = loadStudy();
+  loadWorkedHours();
   loading.then(settleRoutedScroll, () => {routedModule = null;});
   return {primer: PRIMER.length, patched, modules: MODULES.length, sections: MODULES.length + 1, view, persists, study: loading};
 }

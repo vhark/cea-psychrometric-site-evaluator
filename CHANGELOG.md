@@ -6,7 +6,28 @@ Versions are model versions: the string the engine stamps into every result and 
 
 ## [Unreleased]
 
+### Added
+
+- The arithmetic behind every hour, shown with that hour's own numbers. `src/steps.js` recomputes ten steps from the raw weather row to the weather-side mode (validation, vapour pressures, humidity ratio, dew point and wet bulb and enthalpy and VPD, the local schedule, the moisture band, the pad state, the tests, the mode, outside air as a dehumidifier) plus how the coupled run scored the hour. The hourly inspector shows it under "Show the arithmetic for this hour"; the four per-hour Learn sections follow two real NASA POWER Tulsa hours (`data/weather/sample-hours.json`, with their source requests) through the same steps; `node scripts/worked-example.mjs` prints them. Nothing is stored: every number is recomputed by the functions the screen runs, and `test/steps.test.mjs` asserts the steps agree with the classifier.
+- Purchased fuel combustion now counts in CO2 at a scenario factor, `fuelCo2KgPerKWh`, default 0.181 kg CO2 per kWh of fuel (natural gas at 53.06 kg CO2 per MMBtu, EPA GHG Emission Factors Hub). Older scenarios receive the default on migration.
+- The weather status line and step 1 of the arithmetic show the source's elevation, because a gridded source reports pressure at its cell rather than the site. Denver's NASA POWER cell sits at 2,095 m against a 1,609 m city, which puts humidity ratio about 5% high there.
+- Declared airflow assumptions now state that recovery effectiveness is extrapolated linearly outside the 75% and 100% rating points, and that pad and indirect streams use supply-side air density while plain ventilation uses outdoor density.
+
 ### Fixed
+
+- Open-Meteo reports shortwave radiation as the mean of the preceding hour, while NASA POWER stamps the hour it covers. The Open-Meteo adapter filed both at the stamp, so its solar arrived one hour late against the same hour's temperature. Radiation is now filed one hour earlier; instant fields are unchanged.
+- A weather CSV was labelled UTC and that label became the site's zone on import. The import now takes the zone from the site controls and refuses to proceed without one.
+- The NCEI request ended at UTC midnight of the last local day, so every year on a western-hemisphere clock lost its last four to ten hours as false station gaps. The request now runs one UTC day past the end date; the local grid still stops where it did.
+- A weather snapshot without a declared time zone was read as UTC, and that label was then adopted as the site's zone on import. `normalizeWeather` now refuses it and says why; the CSV path still labels its UTC-stamped hours as UTC explicitly.
+- The IEM adapter filled a missing altimeter reading with a standard-atmosphere pressure at station elevation. Missing stays missing: the hour is now flagged `station-pressure-unavailable-no-valid-altimeter` and left without a pressure.
+- Coverage counted only hours with relative humidity, although an hour carried by dew point alone is valid weather. Both now count.
+- The browser weather cache key includes the site time zone, so the same calendar year on two clocks no longer overwrites one slot.
+- `heatPumpElectricKWh` reported only the zone heater's share of heat-pump electricity; recovery preheat and DOAS external heat drawn through the same heat pump were priced correctly but left out of this figure. All three are now in it.
+- DOAS condenser heat not recovered as reheat is now booked to rejected heat, where DX and dehumidifier condenser heat already were.
+- The one-at-a-time pad-effectiveness cases were fixed at 0.7 and 0.9 regardless of the scenario; they are now the scenario's value minus and plus 0.1, clamped to 0 to 1.
+- A run in state price mode carried a cost basis naming the state proxy before the energy context had been applied; the basis now names the provisional scenario price until `applyEnergyContext` replaces it.
+- The six fixture weeks carried coverage blocks copied from full years (8,760 h); they now state their own 168 h.
+- README, WORKFLOW, the docs index and the Learn prompts described bundled year chips that load without a network call; no hourly weather ships, and the copy now says what the chips actually list.
 
 - `range()` no longer defaults to `America/Chicago` when a caller omits the time zone. It converts local calendar dates into UTC instants, so an assumed zone corrupts the request itself rather than just mislabelling the result. This was the last place in the codebase that guessed a zone, and it is the same defect that first surfaced as a Boulder run reporting Tulsa time. A fetch without a valid IANA zone now fails and says why.
 - A weather year cached under one time zone is no longer offered to a site on another. A calendar year is bounded by local days, so the same year on two clocks covers different UTC hours. `yearSources` matched cached years on coordinates alone, which left a returning user stuck: the run refused the mismatched year, and `retrieveYears` skips any year that function reports as available, so the one action that would have fixed it was blocked too. It now matches the time zone as well, so a mismatched year reads as missing and can simply be retrieved again. Changing the time zone also refreshes the year list, which it previously did not, and the guard that catches this at run time now names the control to use.

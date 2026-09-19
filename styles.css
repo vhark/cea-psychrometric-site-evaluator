@@ -522,3 +522,18 @@ button.info:active:not(:disabled) { transform: none; }
 .provider-key { margin-top: 16px; padding: 14px 16px; border: 1px solid var(--hairline-strong); border-radius: var(--r-sm); background: var(--panel-2); }
 .provider-key .help { margin-top: 8px; }
 @media (max-width: 640px) { .provider-facts > div { grid-template-columns: 1fr; gap: 2px; } }
+
+/* Hourly inspector and Learn tab: the arithmetic behind one hour, one step per card. */
+.hour-steps { margin-top: 18px; }
+.hour-steps > summary { font: 500 10px/1.4 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--text-2); padding: 10px 0; cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; }
+.hour-steps > summary::before { content: "+"; color: var(--green); font-weight: 400; width: 10px; }
+.hour-steps[open] > summary::before { content: "−"; }
+.steps { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 10px; }
+.steps li { padding: 12px 14px; background: var(--canvas-2); border: 1px solid var(--hairline); border-radius: var(--r-sm); display: grid; gap: 4px; max-width: 96ch; }
+.step-title { font-weight: 500; color: var(--text); font-size: 13px; }
+.step-formula, .step-working { font: 400 11px/1.7 var(--font-mono); color: var(--text-2); overflow-wrap: anywhere; }
+.step-working::before { content: "with this hour: "; color: var(--text-3); }
+.step-result { font-size: 13px; color: var(--text); }
+.step-result::before { content: "= "; color: var(--green); font-family: var(--font-mono); }
+.step-fn { font: 400 10px/1.6 var(--font-mono); color: var(--text-3); }
+.learn-worked-hours { display: grid; gap: 10px; }

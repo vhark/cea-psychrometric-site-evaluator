@@ -8,7 +8,8 @@ import {compareScenarios, aggregateYears, compareSites, loadDecomposition, co2Wi
 import {modeLabel, modeEntries, attainmentClass, attainmentText, renderMonthly, renderTimeline, renderTimelineTable, renderScatter, renderDLI, renderLoads, renderYears} from './charts.js';
 import {costBasisText, capitalBasisText, conditioningRows, airflowRows, attainmentComparisonText, comparisonPopulationText} from './report.js';
 import {initTour} from './tour.js';
-import {initLearn} from './learn.js';
+import {initLearn, stepsNode} from './learn.js';
+import {weatherSteps, attainmentSteps} from './steps.js';
 import {TERMS, infoBubble, decorateTerms} from './terms.js';
 import {PROVIDERS, PROVIDER_ORDER, needsApiKey} from './providers.js';
 
@@ -503,7 +504,7 @@ async function acceptWeather(snapshot, {persistSnapshot = true, adoptLocation = 
   $('weather-badge').textContent = `${format(hours.length)} hourly intervals`; $('weather-badge').className = 'badge loaded';
   const detail = $('weather-detail'); detail.replaceChildren();
   safeSource(detail, `${describe(snapshot.source)} · ${describe(snapshot.sourceKind)}`, snapshot.sourceUrl);
-  detail.append(document.createTextNode(` · ${snapshot.startDate} to ${snapshot.endDate} · ${snapshot.timezone}. Meteorology ${format(met)}/${format(hours.length)} h; solar ${format(solar)}/${format(hours.length)} h. Retrieved ${snapshot.retrievedAt || 'date unavailable'}.`));
+  detail.append(document.createTextNode(` · ${snapshot.startDate} to ${snapshot.endDate} · ${snapshot.timezone}. Meteorology ${format(met)}/${format(hours.length)} h; solar ${format(solar)}/${format(hours.length)} h.${finite(snapshot.sourceElevationM) ? ` Source elevation ${format(snapshot.sourceElevationM, 0)} m: pressure, and so humidity ratio, are at the source's elevation, not necessarily the site's.` : ''} Retrieved ${snapshot.retrievedAt || 'date unavailable'}.`));
   if (snapshot.warnings?.length) detail.append(document.createTextNode(` ${snapshot.warnings.map(describe).join(' ')}`));
   markChanged(); persist(); renderComponentStatus();
   if (persistSnapshot) {try {await saveWeather(state.snapshot);} catch (error) {message(`Weather is loaded but could not be cached: ${error.message}`, 'warning');}}
@@ -612,7 +613,7 @@ function startPool(jobs, {onProgress, onDone, onError}) {
     pool.workers.push(worker); next(worker);
   }
 }
-/** Snapshot for one site and period: the loaded snapshot, a bundled year, the browser cache, or (additional sites only) a NASA POWER retrieval that is then cached. */
+/** Snapshot for one site and period: the loaded snapshot, the browser cache, or (additional sites only) a NASA POWER retrieval that is then cached. */
 async function resolveSnapshot(site, period, source, signal, onProgress) {
   if (source?.kind === 'loaded') return state.snapshot;
   if (source?.kind === 'cached') {const cached = await loadCachedWeather(source.key); if (cached) return normalizeWeather(cached);}
@@ -806,7 +807,7 @@ function renderCalendar() {
 }
 /* One polite announcement per settled hour. Dragging the slider or holding an arrow key would otherwise
    queue one message per intermediate hour, so only the hour still selected after 400 ms is announced. */
-let announceTimer = null, announced = null;
+let announceTimer = null, announced = null, stepsOpen = false;
 function announceHour(text) {
   if (text === announced) return;
   clearTimeout(announceTimer);
@@ -836,6 +837,15 @@ function renderInspector() {
     ['Sensible gains', units(h.loads?.sensibleKWh, 'kWh', 2)], ['Crop latent', units(h.loads?.latentKg?.crop, 'kg', 2)], ['Sensible-heat ratio', finite(h.loads?.shr) ? format(h.loads.shr, 2) : 'No gains'], ['Controlled outdoor air', units(h.controls?.controlledACH, 'ACH', 2)], ['Enrichment-compatible fraction', units(finite(h.controls?.enrichmentFraction) ? h.controls.enrichmentFraction * 100 : null, '%', 0)]);
   if (!state.weatherOnly) rows.push(['Installed controlled maximum', units(r.scenario.maxVentACH, 'ACH', 2)], ['Total outdoor air including infiltration', units(h.controls?.totalOutdoorACH, 'ACH', 2)], ['Controlled / total outdoor flow', `${units(h.controls?.controlledM3s, 'm³/s', 3)} / ${units(h.controls?.totalOutdoorM3s, 'm³/s', 3)}`], ['Actual controlled stages', h.controls?.controlledACHStages?.map(stage => `${format(stage.ach,2)} ACH: ${format(stage.hours,3)} h`).join('; ') || 'Not available'], ...conditioningRows(h));
   rows.forEach(([label, value]) => {const item = node('div'); item.append(node('dt', label), node('dd', value)); grid.append(item);}); box.append(grid);
+  /* The arithmetic behind the numbers above, recomputed from the raw hour and the scenario by src/steps.js. It stays open
+     or closed across hours so a reader can step through the record with the working visible. */
+  const arithmetic = document.createElement('details'); arithmetic.className = 'hour-steps'; arithmetic.open = stepsOpen;
+  arithmetic.addEventListener('toggle', () => {stepsOpen = arithmetic.open;});
+  arithmetic.append(node('summary', 'Show the arithmetic for this hour'));
+  arithmetic.append(node('p', 'Every line below is recomputed from this hour\u2019s weather record and your scenario by the same functions the run used, so any number can be checked by hand. The weather-side steps never see the zone state; the last step is what the coupled run scored.', 'help'));
+  arithmetic.append(stepsNode(weatherSteps(w, r.scenario, state.resultSnapshot)));
+  if (!state.weatherOnly) arithmetic.append(stepsNode(attainmentSteps(h)));
+  box.append(arithmetic);
   const s = r.scenario;
   const moisture = (r.summary.transpirationModelUsed || s.transpirationModel) === 'schedule' ? `Assumed crop evaporation ${format(s.transpirationLDayM2, 2)} L/m²/day (fixed schedule).` : `Stanghellini transpiration at LAI ${format(s.lai, 1)}, canopy temperature taken as air temperature.`;
   box.append(node('p', `Targets you set: ${s.dayTargetC} °C by day and ${s.nightTargetC} °C at night, either within ${s.tempToleranceC} °C. Air VPD between ${s.vpdMin} and ${s.vpdMax} kPa. Dew point no higher than ${s.maxDewPointC} °C. ${moisture}`, 'source-line'));
@@ -901,7 +911,7 @@ function parseInWorker(file, onProgress) {
     };
     worker.onerror = event => {event.preventDefault(); settle(reject, new Error(`The import worker stopped: ${event.message || 'the file needed more memory than this browser tab could allocate'}. Nothing was replaced. Split the comparison or the weather period and import again.`));};
     worker.onmessageerror = () => settle(reject, new Error('The parsed import could not be transferred out of the worker. Nothing was replaced.'));
-    try {worker.postMessage({id, type: 'parse', file});} catch (error) {settle(reject, error);}
+    try {worker.postMessage({id, type: 'parse', file, timezone: $('timezone').value.trim()});} catch (error) {settle(reject, error);}
   });
 }
 async function importFile(event) {

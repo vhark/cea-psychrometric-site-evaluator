@@ -4,6 +4,8 @@ Purpose: state exactly which hourly weather ships with this repository, where ea
 
 Status: six sites bundled, 60 complete calendar years (ten each). Tulsa 2025 was retrieved 2026-09-11 and its other nine years 2026-09-13; the four climate archetypes (Phoenix, Miami, Denver, Seattle) and Fairbanks were retrieved 2026-09-14, all with NASA POWER Hourly API `v2.10.0` (read from each snapshot's `sourceVersions`, identical across all 60). Every profile figure below was computed from the committed files, not quoted from a climate summary. Staleness is tracked by `node scripts/check-vintages.mjs` against `data/weather/index.json`.
 
+**Status update, 2026-09-19:** the hourly archive described below is no longer shipped; `data/weather/` holds only the site registry. Every profile and study figure below was computed from it and stands as the record. Retrieve the years again with `scripts/fetch-weather.py` to reproduce them.
+
 Read this if: you are choosing which bundled site or year to run, quoting a climate figure out of this tool, or adding a site of your own.
 
 ## What is bundled

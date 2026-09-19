@@ -125,7 +125,7 @@ test('version 1 DOAS airflow becomes unreviewed candidate treatment capacity',()
 });
 test('inferred CSV bounds cannot expand into an unbounded missing-hour grid',()=>{
  const csv='time,tempC,rh,pressurePa,ghiWm2\n1970-01-01T00:00:00Z,20,.6,101325,0\n9999-01-01T00:00:00Z,20,.6,101325,0';
- assert.throws(()=>normalizeWeather(csv),/30 years/);
+ assert.throws(()=>normalizeWeather(csv,{timezone:'UTC'}),/30 years/);
 });
 test('civil spring and fall date ranges preserve 23 and 25 UTC hours',()=>{
  for(const[date,first,count]of [['2025-03-09',Date.UTC(2025,2,9,6),23],['2025-11-02',Date.UTC(2025,10,2,5),25]]){
@@ -138,7 +138,7 @@ test('gap and blank import cells remain missing, duplicate timestamps reject',()
  assert.equal(s.hours.length,3);assert.equal(s.hours[1].tempC,null);
  assert.throws(()=>normalizeWeather(snapshot([sample(t),sample(t)])));
  const csv='time,tempC,rh,pressurePa,ghiWm2\n2025-01-01T00:00:00Z,,.6,101325,0';
- assert.equal(normalizeWeather(csv).hours[0].tempC,null);
+ assert.equal(normalizeWeather(csv,{timezone:'UTC'}).hours[0].tempC,null);
 });
 test('authoritative source RH survives an auxiliary frost-point disagreement',()=>{
  const h={...sample(0),tempC:-30,dewPointC:-30,rh:.75};
@@ -373,6 +373,8 @@ test('the Open-Meteo adapter records which model supplied each value',async()=>{
   payload.hourly[`${name}_era5_land`]=land?series(null):series(20);
   payload.hourly[`${name}_era5`]=series(name==='surface_pressure'?850:name==='wind_speed_10m'?3.6:20);
  }
+ // Radiation stamped T is the mean over the hour before T, so the value at index i belongs to hour i - 1.
+ payload.hourly.shortwave_radiation_era5=hours.map((_,i)=>i);
  const prior=globalThis.fetch;
  globalThis.fetch=async()=>({ok:true,status:200,text:async()=>JSON.stringify(payload)});
  try{
@@ -384,6 +386,8 @@ test('the Open-Meteo adapter records which model supplied each value',async()=>{
   assert.equal(h.pressurePa,85000,'hPa must convert to Pa');
   assert.equal(h.windMs,1,'km/h must convert to m/s');
   assert.equal(h.rh,.2,'percent must convert to a fraction');
+  assert.equal(h.ghiWm2,6,'the preceding-hour mean stamped 06:00 covers hour 05:00');
+  assert.equal(snap.hours[23].ghiWm2,null,'the last hour has no following stamp in this payload, so it stays missing');
   assert.ok(h.quality.includes('tempC-from-era5-land-0.1deg'),'the 9 km model must be named when it supplied the value');
   assert.ok(h.quality.includes('pressurePa-from-era5-0.25deg'),'the fallback to the coarser model must be recorded');
   assert.match(snap.attribution,/CC BY 4.0/,'the licence requires attribution, so the snapshot must carry it');
@@ -541,4 +545,10 @@ test('fetching weather without a time zone fails instead of assuming one',async(
  for(const tz of [undefined,'','   ','Not/AZone'])
   await assert.rejects(()=>fetchWeather({provider:'openmeteo',latitude:40,longitude:-105,
    timezone:tz,startDate:'2025-07-01',endDate:'2025-07-01'}),/valid IANA time zone is required/,`timezone ${JSON.stringify(tz)}`);
+});
+
+test('a snapshot without a declared time zone is refused rather than read as UTC', () => {
+ const t=Date.UTC(2025,0,1);
+ assert.throws(()=>normalizeWeather(snapshot([sample(t)],{timezone:undefined})),/time zone/);
+ assert.throws(()=>normalizeWeather(snapshot([sample(t)],{timezone:''})),/time zone/);
 });

@@ -315,7 +315,7 @@ function evaluate(ctx,air,dxDuty,dehuDuty,desiccantDuty,plan) {
     regenW,regenElectricW,regenFuelW,reheatW,heaterW,heaterElectricW,preheatElectricW,preheatFuelW,electricW,fuelW,waterKgS,
     padKgS:padKgS+indirectKgS,humidifier,doasCondensateKgS,doasCoolingDeliveredW,doasCoolingElectricW,
     doasRecoveredReheatW,doasExternalHeatW,doasUnmetConditioningW,doasExternalElectricW,doasExternalFuelW,
-    rejectedW:dxTotalW+dxW-reheatW+dehuRejectedW,dehuRejectedW,desiccantExportedW:L*desiccantKgS*(1-s.desiccantHeatFraction)+regenW,
+    rejectedW:dxTotalW+dxW-reheatW+dehuRejectedW+Math.max(0,doasCoolingDeliveredW+doasCoolingElectricW-doasRecoveredReheatW),dehuRejectedW,desiccantExportedW:L*desiccantKgS*(1-s.desiccantHeatFraction)+regenW,
     unmetSensibleW,unmetMoistureKgS};
 }
 
@@ -614,7 +614,10 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       const lightW=s.canopyM2>0?deliveredPPFD*s.canopyM2/(s.efficacy*s.lightDelivery):0;
       const lightDLI=s.canopyM2>0?deliveredPPFD*dt/1e6:0;
       // Crop moisture: state-coupled Stanghellini from the current zone state and shortwave absorbed by the
-      // canopy (solar through the envelope plus delivered fixture power, Beer-Lambert), or the declared schedule.
+      // canopy (Beer-Lambert on solar through the envelope plus fixture electrical power per m2 canopy times the delivery
+      // fraction). The fixture term is electric input, not radiant PAR, which is roughly 55% of it for an LED; the
+      // radiation factor rfR saturates above a few tens of W/m2, so the overstatement moves transpiration by about 1%.
+      // Or the declared schedule.
       const cropKgS=transpirationModel==='stanghellini'?
         s.canopyM2*stanghelliniTranspiration(state.tempC,state.w,outside.pressurePa,
           canopyAbsorbedWm2(transmittedWm2*canopySunShare+(s.canopyM2>0?lightW/s.canopyM2:0)*s.lightDelivery,s.lai),s.lai):
@@ -638,7 +641,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       const scale=dt/KWH;
       row.electricKWh+=picked.electricW*scale;row.fuelKWh+=picked.fuelW*scale;row.waterL+=picked.waterKgS*dt;
       row.lightKWh+=lightW*scale;row.solarDLI+=solarDLI;row.lightDLI+=lightDLI;
-      row.heatingKWh+=picked.heaterW*scale;row.heatPumpElectricKWh+=picked.heaterElectricW*scale;row.coolingKWh+=picked.dxTotalW*scale;
+      row.heatingKWh+=picked.heaterW*scale;row.heatPumpElectricKWh+=(picked.heaterElectricW+picked.preheatElectricW+picked.doasExternalElectricW)*scale;row.coolingKWh+=picked.dxTotalW*scale;
       row.dehuKWh+=picked.dehuW*scale;row.dehuHeatKWh+=picked.dehuHeatW*scale;row.dehuRejectedHeatKWh+=(picked.dehuRejectedW||0)*scale;
       row.regenerationKWh+=picked.regenW*scale;row.regenerationElectricKWh+=picked.regenElectricW*scale;row.regenerationFuelKWh+=picked.regenFuelW*scale;
       row.desiccantRemovedKg+=picked.desiccantKgS*dt;row.desiccantHeatKWh+=picked.sorptionW*scale;
@@ -756,6 +759,8 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     supportedRecoveryFlowFraction:{minimum:.5,maximum:1.3},
     ratingInputs:'Sensible and latent effectiveness and auxiliary power are project or manufacturer inputs; no product-family performance is inferred.',
     excessFlow:'Above 130% nominal flow, core flow is capped and the excess is mixed once as untreated bypass air.',
+    effectivenessBetweenRatings:'Linear in flow ratio between the 75% and 100% ratings, extrapolated on the same line from 50% to 130% of nominal flow and clamped to 0 to 1.',
+    massFlowBasis:'Pad and indirect evaporative streams are converted to mass flow at supply-side air density; plain ventilation at outdoor density, for the same declared m3/s.',
     doas:s.doasM3s>0?{
       supplyTempC:s.doasSupplyTempC,supplyDewPointC:s.doasSupplyDewPointC,coolingCOP:s.doasCoolingCOP,
       reheatRecoveryFraction:s.doasReheatRecoveryFraction,treatmentCapacityM3s:s.doasM3s,
@@ -781,8 +786,8 @@ export function sensitivity(scenario,snapshot,cases=[
     {name:'Higher crop moisture',changes:{transpirationLDayM2:scenario.transpirationLDayM2*1.25}}]:[
     {name:'Lower crop moisture',changes:{lai:scenario.lai*.75}},
     {name:'Higher crop moisture',changes:{lai:scenario.lai*1.25}}]),
-  {name:'Lower pad effectiveness',changes:{padEffectiveness:.7}},
-  {name:'Higher pad effectiveness',changes:{padEffectiveness:.9}}
+  {name:'Lower pad effectiveness',changes:{padEffectiveness:Math.round(Math.max(0,scenario.padEffectiveness-.1)*100)/100}},
+  {name:'Higher pad effectiveness',changes:{padEffectiveness:Math.round(Math.min(1,scenario.padEffectiveness+.1)*100)/100}}
 ]) {
   return cases.map(({name,changes})=>{const result=simulateScenario({...scenario,...changes,name},snapshot);return {name,changes,summary:result.summary,weatherSummary:result.weatherSummary};});
 }

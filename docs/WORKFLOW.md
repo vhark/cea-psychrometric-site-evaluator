@@ -37,7 +37,7 @@ Four paths, none of which invents data:
 | NASA POWER retrieval | Gridded hourly meteorology and solar for the chosen dates, with the original payload and provenance retained |
 | Station observations (IEM) | Routine observations matched to the nearest UTC hour within 30 minutes, plus independently sourced solar that may be unavailable |
 | Import | A saved snapshot, an exported run bundle, or a CSV (schema below) |
-| Bundled climate archetypes | Ten complete NASA POWER years (2016 to 2025) at each of six sites, Tulsa, Phoenix, Miami, Denver, Seattle and Fairbanks: 60 site-years, 87,672 h per site, listed in `data/weather/index.json`. No site is the default one; year chips appear when your coordinates match a bundled site |
+| Reference climates | Six sites with ten NASA POWER years each (2016 to 2025), Tulsa, Phoenix, Miami, Denver, Seattle and Fairbanks, are registered in `data/weather/index.json` because the committed studies ran on them. Their hourly archive is not shipped: retrieve any site's years with `scripts/fetch-weather.py` or the Retrieve control, after which year chips appear whenever your coordinates and time zone match. No site is the default one |
 
 Retrieval failures never generate substitute weather. A partially observed period stays partial, and no partial-period weather-dependent cost is annualized.
 

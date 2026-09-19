@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Two real NASA POWER hours at the Tulsa reference site, kept so the Learn tab and the hourly inspector can show the arithmetic on actual weather. The raw row is the API response as received; the hour is that row after the unit conversions in src/weather.js (RH percent to fraction, kPa to Pa). Every derived number is recomputed at read time by src/steps.js, never stored here.",
+  "site": {
+    "key": "tulsa",
+    "label": "Tulsa, OK",
+    "zip": "74103",
+    "latitude": 36.15,
+    "longitude": -95.99,
+    "timezone": "America/Chicago",
+    "sourceElevationM": 249.54
+  },
+  "source": "NASA POWER",
+  "sourceKind": "gridded reanalysis + satellite solar",
+  "units": {
+    "T2M": "C",
+    "RH2M": "%",
+    "PS": "kPa",
+    "ALLSKY_SFC_SW_DWN": "Wh/m2 over the stamped hour",
+    "T2MDEW": "C",
+    "WS2M": "m/s"
+  },
+  "licence": "NASA POWER data are public domain; cite the source URL.",
+  "hours": [
+    {
+      "label": "A cold, dry January afternoon",
+      "key": "2025010120",
+      "timeUTC": "2025-01-01T20:00:00.000Z",
+      "raw": {
+        "T2M": 7.21,
+        "RH2M": 44.69,
+        "PS": 99.69,
+        "ALLSKY_SFC_SW_DWN": 410.42,
+        "T2MDEW": -3.91,
+        "WS2M": 1.33
+      },
+      "hour": {
+        "time": 1735761600000,
+        "tempC": 7.21,
+        "rh": 0.44689999999999996,
+        "pressurePa": 99690,
+        "ghiWm2": 410.42,
+        "dewPointC": -3.91,
+        "windMs": 1.33,
+        "quality": []
+      },
+      "sourceUrl": "https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&community=RE&longitude=-95.99&latitude=36.15&start=20250101&end=20251231&format=JSON&time-standard=UTC",
+      "retrievedAt": "2026-09-11T21:12:17.231016+00:00",
+      "apiVersion": null,
+      "fillValue": -999
+    },
+    {
+      "label": "A hot, humid July afternoon",
+      "key": "2025071520",
+      "timeUTC": "2025-07-15T20:00:00.000Z",
+      "raw": {
+        "T2M": 30.69,
+        "RH2M": 68.93,
+        "PS": 98.38,
+        "ALLSKY_SFC_SW_DWN": 772.12,
+        "T2MDEW": 24.34,
+        "WS2M": 2.89
+      },
+      "hour": {
+        "time": 1752609600000,
+        "tempC": 30.69,
+        "rh": 0.6893,
+        "pressurePa": 98380,
+        "ghiWm2": 772.12,
+        "dewPointC": 24.34,
+        "windMs": 2.89,
+        "quality": []
+      },
+      "sourceUrl": "https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=T2M%2CRH2M%2CPS%2CALLSKY_SFC_SW_DWN%2CT2MDEW%2CWS2M&community=RE&longitude=-95.99&latitude=36.15&start=20250715&end=20250715&format=JSON&time-standard=UTC",
+      "retrievedAt": "2026-09-19T18:47:00Z",
+      "apiVersion": "v2.10.2",
+      "fillValue": -999
+    }
+  ]
+}

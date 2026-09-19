@@ -42,9 +42,10 @@ python3 -m http.server 8150 --bind 127.0.0.1
 
 Then open **http://127.0.0.1:8150/** and:
 
-1. Enter the site **ZIP** and select **Locate**, then retrieve weather for the period you want to screen. Nothing loads until you ask for it, and no site is assumed. If your coordinates match a bundled climate archetype, its year chips appear under **Weather years** and load without a network call.
+1. Enter the site **ZIP** and select **Locate**, then retrieve weather for the period you want to screen. Nothing loads until you ask for it, and no site is assumed. Year chips appear under **Weather years** for every calendar year already retrieved for these coordinates and time zone, in this session or from the browser cache. No hourly weather ships in the repository; each year is fetched once and cached locally.
 2. Import [docs/example-scenarios.json](docs/example-scenarios.json) for the six-strategy comparison.
 3. Press **Run all scenarios**, then read attainment, misses, loads, runtime and cost.
+4. Open **Show the arithmetic for this hour** in the hourly inspector to see every step from the raw weather row to the mode, with that hour's own numbers substituted. `node scripts/worked-example.mjs` prints the same steps for two real Tulsa hours, or for any hour of a saved snapshot.
 
 Do not open `index.html` through `file://`: module fetches and workers require HTTP.
 
@@ -108,7 +109,9 @@ is a percentage of, what the climate gives free, the sensible/latent split, outs
 capacity frontier, screens as a schedule, why one year is an anecdote, what actually moves the answer, and a
 closing section that reports what ten weather years recommend in each bundled region. Each part carries the
 relationship it teaches and a button that switches to Analyze and highlights the panel where you would read it,
-so the concept and its evidence are never separated. Modules are linkable: `#learn/uncertainty`,
+so the concept and its evidence are never separated. The four per-hour sections also follow two real NASA POWER hours,
+a January afternoon and a July afternoon at Tulsa, through the arithmetic step by step, recomputed at load time from
+[data/weather/sample-hours.json](data/weather/sample-hours.json) by `src/steps.js`. Modules are linkable: `#learn/uncertainty`,
 `#learn/regional-findings`.
 
 The closing section is generated, not written. [docs/regional-study.json](docs/regional-study.json) is produced by

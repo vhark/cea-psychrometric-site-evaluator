@@ -129,7 +129,7 @@ export const DEFAULT_SCENARIO = {
  vpdMin:.6,vpdMax:1,maxDewPointC:19,dliTarget:14,transpirationLDayM2:1.3*9/7,darkTranspirationFraction:.15,cropSensibleWm2:0,
  controlMode:'staged',transpirationModel:'stanghellini',lai:3,heatRecovery:HEAT_RECOVERY_DEFAULT,
  doasM3s:0,doasSupplyDewPointC:null,doasSupplyTempC:null,doasCoolingCOP:null,doasReheatRecoveryFraction:null,
- electricityPrice:.12,fuelPrice:.045,waterPrice:.002,installedCost:15000,installedCostBasis:'screeningAssumption',maintenanceYear:500,lifeYears:15,discountRate:.06,
+ electricityPrice:.12,fuelPrice:.045,fuelCo2KgPerKWh:.181,waterPrice:.002,installedCost:15000,installedCostBasis:'screeningAssumption',maintenanceYear:500,lifeYears:15,discountRate:.06,
  // Inert component defaults are frozen. Scenario creation and migration clone every nested component so
  // editing one scenario cannot mutate the defaults or another scenario.
  ...HEAT_PUMP_DEFAULTS,shadeScreen:SHADE_SCREEN_DEFAULT,thermalScreen:THERMAL_SCREEN_DEFAULT,insectScreen:INSECT_SCREEN_DEFAULT,
@@ -145,7 +145,7 @@ export const FIELDS = [
  {label:'Heating, cooling & dehumidification',fields:[f('heaterKW','Delivered heater capacity','kW',0,10000,10),f('heaterEfficiency','Heater efficiency','fraction',.1,1,.05),f('coolingKW','Total DX cooling capacity','kW',0,10000,10),f('coolingCOP','Assumed cooling COP','W/W',.5,10,.1),f('coolingSHR','Sensible heat ratio','fraction',.2,1,.05),f('coolingMinOutdoorC','DX minimum outdoor','°C',-50,30,1),f('coolingMaxOutdoorC','DX maximum outdoor','°C',20,65,1),f('dehuKgH','Condensing dehu capacity','kg/h',0,2000,5),f('dehuLPerKWh','Dehu efficiency','L/kWh',.2,10,.1),f('dehuHeatFraction','Dehu heat returned to the zone','fraction',0,1,.1),f('reheatFraction','Recoverable condenser heat','fraction',0,1,.1)]},
  {label:'Desiccant assumptions',fields:[f('desiccantKgH','Desiccant moisture capacity','kg/h',0,2000,5),f('regenerationKWhPerKg','Regeneration energy','kWh/kg water',.1,10,.1),f('regenerationElectricFraction','Electric share of regeneration','fraction',0,1,.1),f('desiccantHeatFraction','Sorption heat returned indoors','fraction',0,1,.1),f('hybridEvapEffectiveness','Hybrid indirect evap effectiveness','fraction',0,.95,.05)]},
  {label:'DOAS conditioning (generic)',fields:[f('doasM3s','DOAS treatment capacity','m³/s',0,50,.1),f('doasSupplyDewPointC','DOAS supply dew point','°C',-10,25,.5),f('doasSupplyTempC','DOAS supply temperature','°C',5,35,.5),f('doasCoolingCOP','DOAS cooling COP','W/W',.5,10,.1),f('doasReheatRecoveryFraction','DOAS reheat recovery','fraction',0,1,.05)]},
- {label:'Investment assumptions',fields:[f('electricityPrice','Manual electricity price','$/kWh',0,2,.01),f('fuelPrice','Purchased heating fuel','$/kWh',0,1,.005),f('waterPrice','Water price','$/L',0,.1,.001),f('installedCost','Installed component cost','$',0,10000000,1000),f('maintenanceYear','Annual maintenance','$/year',0,1000000,100),f('lifeYears','Equipment service life','years',1,50,1),f('discountRate','Discount rate','fraction',0,.3,.01)]}
+ {label:'Investment assumptions',fields:[f('electricityPrice','Manual electricity price','$/kWh',0,2,.01),f('fuelPrice','Purchased heating fuel','$/kWh',0,1,.005),f('fuelCo2KgPerKWh','Fuel combustion CO2 factor','kg CO2/kWh fuel',0,1,.001),f('waterPrice','Water price','$/L',0,.1,.001),f('installedCost','Installed component cost','$',0,10000000,1000),f('maintenanceYear','Annual maintenance','$/year',0,1000000,100),f('lifeYears','Equipment service life','years',1,50,1),f('discountRate','Discount rate','fraction',0,.3,.01)]}
 ];
 export function makeScenario(facility='greenhouse',system='bench',crop='lettuce'){
  const s={...DEFAULT_SCENARIO,...(CROPS[crop]||CROPS.lettuce),id:globalThis.crypto?.randomUUID?.()||`scenario-${Date.now()}`,facility,system,crop};
@@ -182,7 +182,7 @@ export function applyTechnology(s,technology){
 }
 // Published schema migration is explicit. Required treatment performance remains null until declared.
 const LEGACY_INERT_KEYS=['controlMode','transpirationModel','lai'];
-const COMPONENT_INERT_KEYS=['heatSource',...HEAT_PUMP_RATING_FIELDS,'heatPumpCutoffC','heatPumpCapacityDerate','dehuHeatFraction'];
+const COMPONENT_INERT_KEYS=['heatSource',...HEAT_PUMP_RATING_FIELDS,'heatPumpCutoffC','heatPumpCapacityDerate','dehuHeatFraction','fuelCo2KgPerKWh'];
 const DOAS_FIELDS=new Set(['doasSupplyDewPointC','doasSupplyTempC','doasCoolingCOP','doasReheatRecoveryFraction']);
 export function migrateScenario(input){
  if(!input||typeof input!=='object'||Array.isArray(input)||![1,SCENARIO_SCHEMA_VERSION].includes(input.schemaVersion))

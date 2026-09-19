@@ -88,7 +88,7 @@ function costBasisFromCoverage(scenario,coverage){
     priceBasis:{
       electricity:scenario.priceMode==='manual'?
         {source:'manual scenario input',usdPerKWh:Number.isFinite(scenario.electricityPrice)?scenario.electricityPrice:null}:
-        {source:'calendar-matched state-sector average proxy',sector:scenario.sector??null},
+        {source:'scenario electricity price, provisional until the calendar-matched state-sector average proxy is applied by applyEnergyContext',usdPerKWh:Number.isFinite(scenario.electricityPrice)?scenario.electricityPrice:null,sector:scenario.sector??null},
       fuel:{source:'scenario input',usdPerKWh:Number.isFinite(scenario.fuelPrice)?scenario.fuelPrice:null},
       water:{source:'scenario input',usdPerL:Number.isFinite(scenario.waterPrice)?scenario.waterPrice:null},
     },

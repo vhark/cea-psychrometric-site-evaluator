@@ -177,7 +177,9 @@ export function applyEnergyContext(result, context) {
     const hour = {...original, billingPeriod:clock.month, pricePeriod:price?.period ?? null, priceSource:price?.source ?? null,
       electricityPriceUsdPerKWh:rate, priceMissing:!price, electricityCost, fuelCost, waterCost,
       cost:validEnergy && price ? knownCost : null, knownCost,
-      co2Kg:validEnergy && factor !== null ? original.electricKWh * factor : null,
+      // Purchased fuel is converted at the scenario's combustion factor; the grid factor still gates the total, because
+      // a total that silently dropped the electricity share would read as smaller than it is.
+      co2Kg:validEnergy && factor !== null ? original.electricKWh * factor + original.fuelKWh * (finite(scenario.fuelCo2KgPerKWh) ? scenario.fuelCo2KgPerKWh : 0) : null,
       gridYear:factor !== null ? context.grid.year : null};
     // Valid simulation hours must have physical energy quantities. Treat a
     // malformed result as unknown, rather than quietly pricing NaN as zero.
@@ -209,7 +211,7 @@ export function applyEnergyContext(result, context) {
     monthly:(result.summary.monthly || []).map(month => ({...month, ...costFields(months.get(month.month) || fresh())})),
     daily:(result.summary.daily || []).map(day => ({...day, ...costFields(days.get(day.date) || fresh())})),
     costBasis:{...baseCostBasis,priceBasis:{...baseCostBasis.priceBasis,electricity:electricityPriceBasis}},
-    emissionsBasis:'Year-matched annual eGRID total-output CO2, kg CO2; regional generation proxy, not marginal or supplier procurement. No grid-loss adjustment.',
+    emissionsBasis:'Year-matched annual eGRID total-output CO2, kg CO2; regional generation proxy, not marginal or supplier procurement. No grid-loss adjustment. Purchased fuel is added at the scenario\'s combustion factor (default 0.181 kg CO2 per kWh of fuel, natural gas at 53.06 kg CO2 per MMBtu, EPA GHG Emission Factors Hub); change it for propane or oil. Hours without a grid factor carry no total.',
   };
   const warnings = [...new Set([...(result.warnings || []), ...(context?.warnings || [])])];
   if (total.priceMissingHours) warnings.push(`${total.priceMissingHours} valid hours have no matching electricity price. Total cost is unknown; knownCost is only the priced electricity plus fuel and water subtotal.`);

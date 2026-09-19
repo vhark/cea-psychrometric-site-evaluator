@@ -7,7 +7,7 @@ const megabytes=size=>Number.isFinite(size)?`${(size/1048576).toLocaleString('en
 /* Import parsing off the UI thread. Portable schema versions 1 and 2 migrate to current scenarios,
  * 1-20 validated scenarios are accepted, and imported result claims are dropped rather than displayed.
  * The main thread still re-checks its weather epoch before it adopts anything this returns. */
-async function parseFile({id,file}){
+async function parseFile({id,file,timezone}){
  const post=(value,message)=>self.postMessage({id,type:'progress',value,message});
  try{
   if(!file||typeof file.text!=='function')throw new Error('No import file reached the parser. Choose the file again.');
@@ -15,7 +15,7 @@ async function parseFile({id,file}){
   const text=await file.text();
   post(.4,`Parsing ${megabytes(file.size)}…`);
   if(String(file.name||'').toLowerCase().endsWith('.csv')){
-   const snapshot=normalizeWeather(text);
+   const snapshot=normalizeWeather(text,{timezone});
    self.postMessage({id,type:'parsed',kind:'weather-csv',scenarios:null,snapshot});
    return;
   }

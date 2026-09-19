@@ -81,7 +81,7 @@ function completeGrid(records, start, end) {
   return hours;
 }
 function coverage(hours, bounds) {
-  const weather = hours.filter(h => ['tempC', 'rh', 'pressurePa'].every(key => h[key] != null));
+  const weather = hours.filter(h => h.tempC != null && h.pressurePa != null && (h.rh != null || h.dewPointC != null));
   const solar = hours.filter(h => h.ghiWm2 != null);
   return { expectedHours: hours.length, weatherHours: weather.length, solarHours: solar.length,
     startUTC: new Date(bounds.start).toISOString(), endExclusiveUTC: new Date(bounds.end).toISOString(),
@@ -212,18 +212,23 @@ export async function fetchOpenMeteo(options) {
   const records = new Map();
   for (const [index, stamp] of hourly.time.entries()) {
     const time = Date.parse(stamp.length === 16 ? stamp + ':00Z' : stamp + 'Z');
-    if (!Number.isFinite(time) || time < bounds.start || time >= bounds.end) continue;
-    const hour = emptyHour(time);
+    if (!Number.isFinite(time) || time < bounds.start || time > bounds.end) continue;
     for (const [name, [field, factor]] of Object.entries(OPEN_METEO_FIELDS)) {
       const land = hourly[`${name}_era5_land`]?.[index];
       const wide = hourly[`${name}_era5`]?.[index];
       const value = land ?? wide;
       if (value == null) continue;
       if (!Number.isFinite(value)) throw new Error('Open-Meteo returned a non-numeric ' + name);
+      // Open-Meteo documents shortwave radiation as the mean of the preceding hour, so the value stamped T
+      // describes [T - 1 h, T). It is filed at T - 1 h to match NASA POWER's hour-start convention and to sit
+      // beside the instant temperature of the same hour. Instant fields stay at their stamp.
+      const at = field === 'ghiWm2' ? time - HOUR : time;
+      if (at < bounds.start || at >= bounds.end) continue;
+      if (!records.has(at)) records.set(at, emptyHour(at));
+      const hour = records.get(at);
       hour[field] = value * factor;
       hour.quality.push(`${field}-from-${land == null ? 'era5-0.25deg' : 'era5-land-0.1deg'}`);
     }
-    records.set(time, hour);
   }
   const hours = completeGrid(records, bounds.start, bounds.end);
   for (const hour of hours) markMissing(hour);
@@ -231,7 +236,7 @@ export async function fetchOpenMeteo(options) {
   return { schemaVersion: 1, source: 'Open-Meteo ERA5 archive', sourceKind: 'gridded reanalysis', ...coords,
     timezone: bounds.timezone, startDate: bounds.startDate, endDate: bounds.endDate,
     retrievedAt: new Date().toISOString(), sourceUrl: item.url, sourceUrls: [item.url], units: { ...UNITS },
-    interval: 'UTC hour start. ERA5 and ERA5-Land hourly reanalysis. Wind measured at 10 m, not 2 m.',
+    interval: 'UTC hour start. Instant fields at their stamp; shortwave radiation, which Open-Meteo reports as the preceding-hour mean, is filed one hour earlier so it covers the hour it describes. ERA5 and ERA5-Land hourly reanalysis. Wind measured at 10 m, not 2 m.',
     sourceVersions: [{ model: 'era5_land + era5', generationTimeMs: data.generationtime_ms, utcOffsetSeconds: data.utc_offset_seconds }],
     coordinateNotes: OPEN_METEO_NOTE, sourceElevationM: Number.isFinite(data.elevation) ? data.elevation : null,
     licence: 'CC BY 4.0, Open-Meteo. Free tier is non-commercial use only.',
@@ -288,7 +293,8 @@ export async function fetchNcei(options) {
   options.onProgress?.(0, 'Finding the nearest NCEI station');
   const station = await nceiStation(options, bounds);
   const params = new URLSearchParams({ dataset: 'global-hourly', stations: station.id,
-    startDate: bounds.startDate, endDate: bounds.endDate,
+    // NCEI reads these as UTC dates, and the local period ends after UTC midnight of endDate in every western zone.
+    startDate: bounds.startDate, endDate: new Date(dateValue(bounds.endDate) + DAY).toISOString().slice(0, 10),
     dataTypes: 'TMP,DEW,WND,MA1,SLP', includeStationName: 'true', includeStationLocation: '1', format: 'json' });
   options.onProgress?.(.1, `Fetching NCEI observations for station ${station.id}`);
   const item = await request(NCEI_DATA + '?' + params, options.signal);
@@ -540,7 +546,7 @@ function normalizeHour(input) {
   return markMissing(hour);
 }
 
-export function normalizeWeather(input) {
+export function normalizeWeather(input, {timezone: csvTimezone} = {}) {
   if (typeof input === 'string') {
     const text = input.trim();
     if (text.startsWith('{')) { try { input = JSON.parse(text); } catch { throw new Error('Invalid weather JSON.'); } }
@@ -549,7 +555,10 @@ export function normalizeWeather(input) {
       for (const required of ['time', 'tempC', 'pressurePa', 'ghiWm2']) if (!csv.headers.includes(required)) throw new Error('CSV requires column ' + required + '. Units: C, Pa, W/m2; time UTC ending Z.');
       if (!csv.headers.includes('rh') && !csv.headers.includes('dewPointC')) throw new Error('CSV requires rh (fraction) or dewPointC (C).');
       for (const header of csv.headers) if (!Object.hasOwn(UNITS, header)) throw new Error('Unknown CSV column: ' + header + '. Use the documented canonical unit names.');
-      input = { schemaVersion: 1, source: 'Imported CSV', sourceKind: 'user-supplied, unverified', timezone: 'UTC', units: { ...UNITS }, raw: { format: 'csv', text }, hours: csv.rows };
+      // A CSV has no time zone column, so the caller states the site's zone. It is adopted as the site's zone on
+      // import and it decides which local day each UTC-stamped hour belongs to, so it is not defaulted.
+      if (typeof csvTimezone !== 'string' || !csvTimezone.trim()) throw new Error('A weather CSV needs the site time zone. Locate the site or enter its IANA time zone first, then import again.');
+      input = { schemaVersion: 1, source: 'Imported CSV', sourceKind: 'user-supplied, unverified', timezone: csvTimezone.trim(), units: { ...UNITS }, raw: { format: 'csv', text }, hours: csv.rows };
     }
   }
   if (!input || input.schemaVersion !== 1 || !Array.isArray(input.hours) || !input.hours.length) throw new Error('Expected schemaVersion 1 weather snapshot with nonempty hours.');
@@ -564,7 +573,10 @@ export function normalizeWeather(input) {
     records.set(hour.time, hour);
   }
   const times = [...records.keys()].sort((a, b) => a - b);
-  const timezone = input.timezone || 'UTC';
+  // The zone is part of the record, not a label: it decides which UTC hours a calendar day covers, and the app adopts
+  // it as the site's zone on import. A snapshot that does not declare one is refused rather than read as UTC.
+  const timezone = input.timezone;
+  if (typeof timezone !== 'string' || !timezone.trim()) throw new Error('Weather snapshot must declare the IANA time zone its calendar dates are on (timezone). Nothing is assumed.');
   new Intl.DateTimeFormat('en', { timeZone: timezone });
   let bounds = { start: times[0], end: times.at(-1) + HOUR };
   if (input.startDate || input.endDate) {
@@ -660,10 +672,7 @@ export async function fetchObserved(options) {
         const pressureHpa = Math.pow(Math.pow(altimeter * 33.8638866667, .190284) - .00008418496 * elevationM, 1 / .190284);
         hour.pressurePa = pressureHpa * 100;
         hour.quality.push('station-pressure-estimated-from-altimeter-and-elevation');
-      } else {
-        hour.pressurePa = 101325 * Math.pow(1 - 2.25577e-5 * elevationM, 5.25588);
-        hour.quality.push('station-pressure-standard-atmosphere-elevation-fallback');
-      }
+      } else hour.quality.push('station-pressure-unavailable-no-valid-altimeter'); // Missing stays missing: no standard-atmosphere fill.
     } else hour.quality.push('station-pressure-unavailable-no-valid-elevation');
     stationMetadata.set(station, { station, latitude: finiteCell(row.lat, 'IEM latitude'), longitude: finiteCell(row.lon, 'IEM longitude'), elevationM });
     // Preserve the raw report; invalid reported values become explicit missing values, not reanalysis.

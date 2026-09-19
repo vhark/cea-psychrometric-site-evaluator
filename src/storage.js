@@ -18,10 +18,11 @@ function database(){return new Promise((resolve,reject)=>{
  request.onblocked=()=>reject(new Error('Weather storage is open in another tab with an older version. Close other tabs and reload.'));
  });}
 const finite=value=>typeof value==='number'&&Number.isFinite(value);
-/** Cache key: coordinates to 0.001° plus the inclusive local date range. Null when the snapshot has no coordinates. */
-export function weatherKey({latitude,longitude,startDate,endDate}){
+/** Cache key: coordinates to 0.001°, the site time zone and the inclusive local date range. The zone is part of the key
+    because the same local dates on another clock cover different UTC hours. Null when the snapshot has no coordinates. */
+export function weatherKey({latitude,longitude,timezone,startDate,endDate}){
  if(!finite(latitude)||!finite(longitude)||!startDate||!endDate)return null;
- return `${latitude.toFixed(3)},${longitude.toFixed(3)}|${startDate}|${endDate}`;
+ return `${latitude.toFixed(3)},${longitude.toFixed(3)}|${timezone||''}|${startDate}|${endDate}`;
 }
 function transact(db,store,mode,work){
  return new Promise((resolve,reject)=>{const tx=db.transaction(store,mode);let value;work(tx.objectStore(store),result=>{value=result;});tx.oncomplete=()=>resolve(value);tx.onerror=()=>reject(new Error(mode==='readwrite'?'Could not save weather. Storage may be full; use the JSON export.':'Could not read saved weather.'));tx.onabort=()=>reject(new Error('Weather storage was interrupted.'));});
