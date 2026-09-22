@@ -151,7 +151,7 @@ function buildFields() {
     $(`recovery-${field.group || 'frost'}-fields`).append(control);
   }
   options($('outside-air-basis'), Object.entries(AIRFLOW_BASIS));
-  $('run-all').setAttribute('aria-describedby', 'configuration-status');
+  $('run-all').setAttribute('aria-describedby', 'run-review-summary configuration-status');
   for (const [id, source] of [['facility', FACILITIES], ['system', SYSTEMS], ['technology', TECHNOLOGIES], ['upgrade-select', TECHNOLOGIES]]) options($(id), Object.entries(source));
   options($('crop'), Object.entries(CROPS).map(([key, crop]) => [key, crop.label])); $('upgrade-select').value = 'integrated';
 }
@@ -164,8 +164,40 @@ function showErrors(id, errors) {
   const box = $(id); box.replaceChildren(); box.hidden = !errors.length;
   if (errors.length) {const list = node('ul'); for (const error of errors) list.append(node('li', error)); box.append(list);}
 }
+function renderRunReview() {
+  const pending = state.scenarios.filter(s => !s.outsideAirReviewed);
+  $('run-review-summary').textContent = pending.length
+    ? `Review required for: ${pending.map(s => s.name || 'Unnamed scenario').join(', ')}.`
+    : 'Outdoor-air assumptions reviewed for all scenarios.';
+  const list = $('run-review-list');
+  const rows = new Map([...list.children].map(row => [row.dataset.scenarioId, row]));
+  for (const s of state.scenarios) {
+    let row = rows.get(s.id);
+    if (!row) {
+      row = node('div', undefined, 'scenario-review'); row.dataset.scenarioId = s.id;
+      const label = node('label', undefined, 'review-control'), input = node('input');
+      input.type = 'checkbox'; input.dataset.reviewScenario = s.id;
+      const name = node('strong'), text = node('span');
+      text.append(name, node('span', 'I’ve reviewed the outdoor-air and fan-power assumptions.'));
+      label.append(input, text);
+      const values = node('p', undefined, 'review-values'), basis = node('p', undefined, 'help');
+      values.id = `review-values-${s.id}`; basis.id = `review-basis-${s.id}`;
+      input.setAttribute('aria-describedby', `${values.id} ${basis.id}`);
+      const edit = node('button', 'Edit outdoor air', 'quiet'); edit.type = 'button'; edit.dataset.editScenario = s.id;
+      row.append(label, values, basis, edit); list.append(row);
+    }
+    rows.delete(s.id);
+    row.querySelector('input').checked = s.outsideAirReviewed === true;
+    row.querySelector('strong').textContent = s.name || 'Unnamed scenario';
+    row.querySelector('.review-values').textContent = `Minimum ${units(s.minVentACH, 'ACH', 4)} · Maximum ${units(s.maxVentACH, 'ACH', 4)} · Fan power ${units(s.fanWPerM3s, 'W/(m³/s)', 4)}`;
+    row.querySelector('.help').textContent = `${AIRFLOW_BASIS[s.outsideAirBasis] || 'Unknown evidence basis'}. ${s.outsideAirReviewed ? 'Reviewed.' : 'Review required.'}${s.system === 'mushroom' ? ' Mushroom airflow must reflect species, growth stage, substrate loading, CO2 target and equipment.' : ''}`;
+    row.querySelector('button').setAttribute('aria-label', `Edit outdoor air for ${s.name || 'Unnamed scenario'}`);
+  }
+  for (const row of rows.values()) row.remove();
+}
 function renderComponentStatus() {
   const s = current(); if (!s) return;
+  renderRunReview();
   const errors = scenarioErrors(s);
   showErrors('airflow-errors', errors.filter(error => /outdoor.air|infiltration|fan specific power/i.test(error) && !error.startsWith('DOAS treatment')));
   showErrors('recovery-errors', heatRecoveryErrors(s.heatRecovery).map(error => {
@@ -192,8 +224,7 @@ function renderComponentStatus() {
 function renderAirflow() {
   const s = current();
   $('outside-air-basis').value = s.outsideAirBasis;
-  $('outside-air-reviewed').checked = s.outsideAirReviewed === true;
-  $('airflow-basis-readout').textContent = `${AIRFLOW_BASIS[s.outsideAirBasis] || 'Unknown basis'}. ${s.outsideAirReviewed ? 'Reviewed inputs.' : 'Review required.'} Changing minimum, maximum or fan power clears review.`;
+  $('airflow-basis-readout').textContent = `${AIRFLOW_BASIS[s.outsideAirBasis] || 'Unknown basis'}. ${s.outsideAirReviewed ? 'Reviewed inputs.' : 'Confirm review below Run all scenarios.'} Changing minimum, maximum, fan power or evidence basis clears review.`;
   $('mushroom-airflow-note').hidden = s.system !== 'mushroom';
   const readouts = $('airflow-conversions'); readouts.replaceChildren();
   readouts.append(node('p', `Flow conversion at ${units(s.heightM, 'm', 2)} mean height and ${units(s.areaM2, 'm²', 1)} floor area.`, 'help'));
@@ -977,6 +1008,19 @@ function bindEvents() {
   });
   on('retrieve-years', 'click', retrieveYears); on('add-site', 'click', addSite); on('site-zip', 'keydown', event => {if (event.key === 'Enter') {event.preventDefault(); return addSite();}});
   on('site-zip', 'input', proposeSiteTimezone); on('site-timezone', 'input', () => {$('site-timezone').dataset.edited = '1';});
+  on('run-review-list', 'change', event => {
+    const id = event.target.dataset.reviewScenario;
+    const s = state.scenarios.find(s => s.id === id); if (!s) return;
+    s.outsideAirReviewed = event.target.checked;
+    renderAirflow(); markChanged();
+  });
+  on('run-review-list', 'click', event => {
+    const id = event.target.closest('button[data-edit-scenario]')?.dataset.editScenario;
+    if (!state.scenarios.some(s => s.id === id)) return;
+    state.selected = id; renderScenario();
+    $('airflow-panel').scrollIntoView({block: 'center'}); $('airflow-panel').focus({preventScroll: true});
+    return refreshEnergy();
+  });
   on('scenario-form', 'input', updateScenario); on('scenario-form', 'submit', event => event.preventDefault());
   on('scenario-select', 'change', () => {state.selected = $('scenario-select').value; renderScenario(); return refreshEnergy();});
   on('facility', 'change', () => templateChanged('Facility')); on('system', 'change', () => templateChanged('Cultivation'));

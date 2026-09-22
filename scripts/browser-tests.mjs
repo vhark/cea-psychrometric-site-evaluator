@@ -1,3 +1,4 @@
+import {reviewBrowserChecks} from './review-browser-checks.mjs';
 import {appBrowserChecks} from './app-browser-checks.mjs';
 import {chromium} from 'playwright';
 import {createServer} from 'node:http';
@@ -49,6 +50,7 @@ try{
    console.log(`PASS ${prefix||'root'} app import`);
   }catch(error){failures++;console.error(`FAIL app ${prefix}: ${error.stack}`);}
   await context.close();
+  try{await reviewBrowserChecks(browser,base,prefix);}catch(error){failures++;console.error(`FAIL scenario review ${prefix}: ${error.stack}`);}
   try{await appBrowserChecks(browser,base,prefix);}catch(error){failures++;console.error(`FAIL integrated app ${prefix}: ${error.stack}`);}
  }
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

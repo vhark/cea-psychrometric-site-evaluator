@@ -419,7 +419,7 @@ Input and report conversions include mean height. A floor-normalized source is n
 
 ### Evidence status and applicability
 
-The four statuses are `literatureRange`, `adjacentProxy`, `projectInput`, `screeningAssumption`. `outsideAirReviewed` records review of minimum/maximum controlled capacities and `fanWPerM3s` together. It is acknowledgment, not calibration. A contextual warning does not prohibit a properly engineered out-of-range project.
+The four statuses are `literatureRange`, `adjacentProxy`, `projectInput`, `screeningAssumption`. `outsideAirReviewed` records review of minimum/maximum controlled capacities and `fanWPerM3s` together. It is acknowledgment, not calibration. Confirm it with the scenario’s checkbox directly below **Run all scenarios**, where both capacities, fan power and evidence basis are displayed. **Edit outdoor air** opens the named scenario’s inputs; changing minimum, maximum, fan power or evidence basis clears its review. A contextual warning does not prohibit a properly engineered out-of-range project.
 
 | Source | Supported context | What it does not establish |
 |---|---|---|

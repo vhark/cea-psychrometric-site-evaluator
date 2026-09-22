@@ -661,7 +661,7 @@ export const MODULES = [
       {label: 'Station pressure at Denver, 2,094.96 m source elevation', value: '76.4 to 80.4 kPa, 75 to 79% of the 101.325 kPa sea-level standard', source: 'docs/CLIMATES.md'}
     ],
     caveat: 'Miami\u2019s average summer wet bulb sits above Phoenix\u2019s hottest-hour wet bulb, so the evaporative-cooling question is settled by the outdoor state before any equipment is chosen. Denver shows why pressure is not a constant: assume sea level there and humidity ratio, enthalpy, wet bulb and fan mass flow are all wrong at once.',
-    show: {target: 'inspector-panel', label: 'Show me the hourly inspector', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then Run all scenarios. The inspector walks the record hour by hour and reports the outdoor state behind every number.'}
+    show: {target: 'inspector-panel', label: 'Show me the hourly inspector', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then confirm each scenario’s outdoor-air review below Run all scenarios and run the comparison. The inspector walks the record hour by hour and reports the outdoor state behind every number.'}
   },
   {
     key: 'target-band',
@@ -678,7 +678,7 @@ export const MODULES = [
       {label: 'Pad-and-vent baseline across ten Tulsa years', value: 'joint temperature-and-moisture target attainment: median 28.038% of eligible hours; observed worst 22.589% and best 30.315%, a 7.726 percentage-point (pp) difference', source: 'docs/regional-study.json'},
     ],
     caveat: 'A wider band raises attainment without changing the building. That makes attainment comparable between strategies on one band and not comparable between two different bands. Warm-up hours keep their energy and water in the individual totals, because that energy really was spent, but they carry no compliance at all.',
-    show: {target: 'headline-metrics', label: 'Show me the four headline numbers', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then Run all scenarios. Attainment is shown as equivalent compliant hours over eligible hours, with valid hours beside it.'}
+    show: {target: 'headline-metrics', label: 'Show me the four headline numbers', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then confirm each scenario’s outdoor-air review below Run all scenarios and run the comparison. Attainment is shown as equivalent compliant hours over eligible hours, with valid hours beside it.'}
   },
   {
     key: 'free-cooling',
@@ -696,7 +696,7 @@ export const MODULES = [
       {label: 'Median pad-effective hours over those same ten weather years', value: 'Tulsa 205 h against Phoenix 2,274 h; actual runtime is a separate coupled-model output', source: 'docs/regional-study.json'}
     ],
     caveat: 'Free cooling is an outside-air capability count, not a claim that fans or tempering are free. A small pad opportunity count can mean humid supply, little cooling demand or prolonged cold weather; inspect the active constraint rather than assigning one cause to every climate.',
-    show: {target: 'runtime-table', label: 'Show me the pad-viability screen', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: run scenarios, then switch the evidence tier to Weather only. The runtime table becomes the pad-viability screen, splitting cooling-demand hours into effective, marginal and ineffective with the limit that bound.'}
+    show: {target: 'runtime-table', label: 'Show me the pad-viability screen', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: confirm each scenario’s outdoor-air review below Run all scenarios, run the comparison, then switch the evidence tier to Weather only. The runtime table becomes the pad-viability screen, splitting cooling-demand hours into effective, marginal and ineffective with the limit that bound.'}
   },
   {
     key: 'sensible-latent',
@@ -712,7 +712,7 @@ export const MODULES = [
       {label: 'DOAS comparison withdrawn', value: 'Earlier decoupling results omitted sensible supply-conditioning energy. Configure reviewed treatment flow, dew point, temperature, COP and reheat recovery, then compare a new run; no earlier DOAS savings claim remains valid.', source: 'docs/examples/README.md'},
     ],
     caveat: 'The decoupling verdict is a price ratio, not a property of the equipment. Moving purchased energy between electricity and fuel can improve modeled operating cost at one price ratio and worsen it at another; any attainment difference needs both eligible-hour endpoints, and the electricity-to-fuel ratio is an editable input here, not a measured quantity.',
-    show: {target: 'loads-panel', label: 'Show me the sensible and latent decomposition', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: run scenarios and stay on the Equipment estimate tier. The load decomposition is a model balance, so it is hidden in the Weather only view.'}
+    show: {target: 'loads-panel', label: 'Show me the sensible and latent decomposition', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: confirm each scenario’s outdoor-air review below Run all scenarios, run the comparison and stay on the Equipment estimate tier. The load decomposition is a model balance, so it is hidden in the Weather only view.'}
   },
   {
     key: 'outside-air',
@@ -729,7 +729,7 @@ export const MODULES = [
       {label: 'Outside-air drying is conditional', value: 'The earlier Tulsa per-kilogram advantage count is historical. Read actual fan, conditioning and finite heating inputs before comparing a current run; low outdoor humidity alone does not establish an operating-cost reduction.', source: 'docs/COMPONENT-PARAMETERS.md'}
     ],
     caveat: 'The hot-and-dry hours import sensible heat that this table does not cost, so they are cheap only in the moisture account: read them against a separate cooling plan, or ventilation becomes the reason the temperature bound fails. A removal potential is also what the installed fans could move, not what the controller chose to do, so it is an upper bound on the opportunity and not a saving already banked.',
-    show: {target: 'drying-table', label: 'Show me the outside-air screen', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then Run all scenarios. The outside-air table gives hours, days, mean removal potential and energy and cost per kilogram.'}
+    show: {target: 'drying-table', label: 'Show me the outside-air screen', needsRun: true, first: 'In the Analyze view: retrieve a weather year, or select one already cached under Weather years, then confirm each scenario’s outdoor-air review below Run all scenarios and run the comparison. The outside-air table gives hours, days, mean removal potential and energy and cost per kilogram.'}
   },
   {
     key: 'equipment-frontier',
@@ -780,8 +780,8 @@ export const MODULES = [
       {label: 'Operating-cost order across those years', value: 'not stable under the regional 90% rule: two orders, most common in eight of ten years', source: 'docs/regional-study.json'},
       {label: 'Tulsa hours above 30 °C in 2023, 2024, 2025', value: '982, then 1,117, then 634: a 483-hour swing between two neighbouring years at one site', source: 'docs/CLIMATES.md'}
     ],
-    caveat: 'Ten bundled years are ten particular weather years, not a stationary probability distribution. Their observed spread is not a forecast, confidence interval or design year. A climatological normal is 30 years, not this ten-year screening record.',
-    show: {target: 'years-panel', label: 'Show me the across-years panel', needsRun: true, first: 'In the Analyze view: select two or more weather years under Weather years, then run. Ten complete years, 2016 through 2025, ship for each of the six bundled climate sites; any other ZIP retrieves its own years from the public sources.'}
+    caveat: 'The study’s ten years are ten particular weather years, not a stationary probability distribution. Their observed spread is not a forecast, confidence interval or design year. A climatological normal is 30 years, not this ten-year screening record.',
+    show: {target: 'years-panel', label: 'Show me the across-years panel', needsRun: true, first: 'In the Analyze view: retrieve two or more years, select them under Weather years, then confirm each scenario’s outdoor-air review below Run all scenarios and run the comparison. Years come from your retrievals or browser cache; no hourly weather archive ships with the tool.'}
   },
   {
     key: 'uncertainty',

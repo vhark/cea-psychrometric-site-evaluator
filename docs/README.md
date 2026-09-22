@@ -2,7 +2,7 @@
 
 Purpose: name every document in this folder, say who it is for, and give a reading order that does not waste your time.
 
-Status: current for model `0.3.0-screening`, scenario schema 2, 2026-09-15.
+Status: current for model `0.4.0-screening`, scenario schema 2, 2026-09-22.
 
 Read this if: you opened `docs/` and want to know which file answers your question.
 
@@ -20,8 +20,8 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | Know what published research actually proves for a humid site | [EVIDENCE-HOT-HUMID.md](EVIDENCE-HOT-HUMID.md) |
 | Know whether a screen, curtain, insect mesh or heat-pump number is measured or assumed | [COMPONENT-PARAMETERS.md](COMPONENT-PARAMETERS.md) |
 | Change the code | [ARCHITECTURE.md](ARCHITECTURE.md), then [IMPLEMENTATION.md](IMPLEMENTATION.md), then [../CONTRIBUTING.md](../CONTRIBUTING.md) |
-| Know which weather years ship, or add a site of your own | [CLIMATES.md](CLIMATES.md) |
-| [WEATHER-SOURCES.md](WEATHER-SOURCES.md) | Why the tool offers the four weather sources it offers, and why it rejects the others |
+| Understand the reference weather studies, or retrieve years for your own site | [CLIMATES.md](CLIMATES.md) |
+| Choose among the five weather sources and understand their limits | [WEATHER-SOURCES.md](WEATHER-SOURCES.md) |
 | Know where the data came from | [ENERGY-DATA.md](ENERGY-DATA.md) and [RESEARCH.md](RESEARCH.md) |
 | Know what happens next | [DIGITAL-TWIN.md](DIGITAL-TWIN.md) |
 
@@ -47,6 +47,8 @@ Read this if: you opened `docs/` and want to know which file answers your questi
 | [ENERGY-DATA.md](ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage counts, vintages, join limits, rebuild procedure | Data maintainer, anyone quoting a price or an emissions factor |
 | [RESEARCH.md](RESEARCH.md) | Landscape review, literature anchors and public source register behind the build decision | Reviewer, anyone asking why this exists |
 | [DIGITAL-TWIN.md](DIGITAL-TWIN.md) | Roadmap M1 to M6, with the claim each milestone earns and the gate it must pass | Product owner, reviewer |
+| [Run review design](superpowers/specs/2026-09-22-run-review-design.md) | Review controls beside the run action, per-scenario state and validation | Maintainer |
+| [Run review implementation plan](superpowers/plans/2026-09-22-run-review.md) | UI, documentation and browser verification checklist | Maintainer |
 | [Airflow implementation plan](superpowers/plans/2026-09-15-ach-airflow-recovery-cost-labels.md) | Historical approved task sequence, not the current completion checklist or API | Maintainer reviewing design history |
 | [Airflow design specification](superpowers/specs/2026-09-15-ach-airflow-recovery-cost-labels-design.md) | Historical design intent, with current implementation and evidence pointers | Maintainer reviewing the cutover |
 
@@ -74,7 +76,7 @@ These are data, not prose. They are the primary record behind the numbers in the
 - Dates are ISO. Units are SI in inputs, with US equivalents displayed where the interface offers them.
 - Documents state what is **not** claimed as explicitly as what is.
 - Grownetics interactive tools use Instrument mode; reports and handoffs default to Archive mode independent of OS theme.
-- Scenario and run-bundle schema is 2. Weather snapshots and the regional artifact envelope remain schema 1; regional scenarios are schema 2. Morris envelope is 2.
+- Scenario and run-bundle schema is 2. Weather snapshots use schema 2 with legacy schema-1 migration. The retained regional artifact envelope remains schema 1; regional scenarios are schema 2. Morris envelope is 2.
 - Every operating-cost number names its population, period, inclusions, numeric price basis and exclusions. Capital is separate; no result is a quote or guaranteed savings.
 - Differences in joint temperature-and-moisture target attainment use percentage points (pp) and both endpoints. Morris effects instead use pp per full screened range, not fictitious paired endpoints.
 - Historical audit, research and design records retain their dates and model versions; they do not supersede regenerated current artifacts.

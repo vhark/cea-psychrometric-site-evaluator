@@ -210,6 +210,16 @@ button.chip[aria-pressed="true"]::before { content: ""; width: 5px; height: 5px;
 .runbar h2 { margin-top: 12px; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -.025em; }
 .runbar .primary { min-height: 46px; }
 .runbar .primary span { padding-left: 10px; }
+.run-review { margin: 0 0 20px; }
+.run-review h3 { margin: 0; }
+.scenario-review { padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.scenario-review .review-control { margin: 0; cursor: pointer; }
+.scenario-review .review-control span { display: block; }
+.scenario-review .review-control strong { display: block; margin-bottom: 4px; color: var(--ink); }
+.scenario-review input[type="checkbox"] { padding: 0; }
+.scenario-review .review-values { margin: 10px 0 0; font-size: 12px; line-height: 1.7; }
+.scenario-review .help { margin: 6px 0 10px; }
+.scenario-review button { font-size: 12px; }
 .evidence-note { display: flex; gap: 10px; align-items: baseline; font-size: 12px; color: var(--text-2); margin-bottom: 20px; line-height: 1.6; }
 .evidence-note strong { font-weight: 600; color: var(--text); }
 .evidence-dot { width: 6px; height: 6px; background: var(--amber); flex-shrink: 0; }

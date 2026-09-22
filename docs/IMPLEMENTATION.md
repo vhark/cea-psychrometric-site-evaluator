@@ -2,7 +2,7 @@
 
 Purpose: hold the cross-module interface contract and the file-ownership map, so parallel work on `src/` composes instead of colliding.
 
-Status: current for model `0.3.0-screening`, reviewed 2026-09-15. Current scenario schema is 2. Historical completed work below is development history, not evidence that every future evaluation gate has passed.
+Status: current for model `0.4.0-screening`, reviewed 2026-09-22. Current scenario schema is 2. Historical completed work below is development history, not evidence that every future evaluation gate has passed.
 
 Read this if: you are changing a module signature, adding a worker message, or dividing work between several implementers.
 
@@ -42,6 +42,8 @@ The user's latest scope distinction is binding: coarse component efficacy and in
 Scenario is a portable JSON object with `schemaVersion:2`, identity, facility/system/crop, floor/canopy/height geometry, envelope/optics, crop/light schedules, finite equipment and price inputs. `config.js` owns `DEFAULT_SCENARIO`, `FIELDS`, `migrateScenario`, validation and explicit review gates; use the current exported scenario for a complete field inventory instead of a second stale flat list. Retired cultivation identifiers are rejected, not aliased.
 
 Airflow contract: `infiltrationACH` is uncontrolled exchange; `minVentACH` and `maxVentACH` bound controlled outdoor air; `fanWPerM3s` covers combined supply/exhaust fans and declared pressure drops. `outsideAirBasis` and `outsideAirReviewed` carry provenance and acknowledgment. DOAS fields are `doasM3s`, `doasSupplyDewPointC`, `doasSupplyTempC`, `doasCoolingCOP`, `doasReheatRecoveryFraction`. `doasM3s` is treatment capacity on that same stream, never additional ventilation.
+
+`app.js` renders a stable row per scenario in `#run-review`, directly below `#runbar`. Each row shows controlled minimum/maximum ACH, combined fan specific power, evidence basis, a review checkbox and an Edit outdoor air button. Review events resolve the scenario by ID, update `outsideAirReviewed` and reuse existing validation/stale-state handling. Editing selects the named scenario and focuses `#airflow-panel`. Minimum, maximum, fan-power and evidence-basis edits clear only that scenario’s review. Save/export uses the existing scenario contract; no model or schema change is required. Browser coverage is in `scripts/review-browser-checks.mjs`.
 
 `migrateScenario` copies inputs. Schema-1 migration preserves airflow values, supplies inert `heatRecovery.type:'none'`, assigns template evidence/review state, discards obsolete `doasKWhPerKg` and nulls legacy DOAS supply performance so active treatment must be completed and reviewed. Mushroom controlled air is project input, finite and ordered with a positive maximum before a run. Unknown future schema fails. Imports discard saved results.
 

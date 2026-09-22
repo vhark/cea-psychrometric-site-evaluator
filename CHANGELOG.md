@@ -4,6 +4,14 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 Versions are model versions: the string the engine stamps into every result and export, so a number on a page can always be traced to the model that produced it. The `-screening` suffix is part of the version and part of the claim: this is an assumption-based screen, not a calibrated model. See [docs/EVALUATION.md](docs/EVALUATION.md) for the evidence ladder.
 
+## Unreleased
+
+### Changed
+
+- Outdoor-air review now sits directly below **Run all scenarios**, with a checkbox, minimum/maximum airflow, combined fan specific power, evidence basis and **Edit outdoor air** shortcut for each scenario. The summary names outstanding reviews; edits clear only the affected scenario’s review, and invalid inputs still block execution.
+- Guided tour, Learn run prompts and current workflow/reference documentation describe the review step. Corrected stale bundled-weather, model-version and weather-schema guidance while retaining historical study evidence.
+- Added root and assembled `/app/` browser coverage for review, keyboard focus, scenario selection, invalid-input gates, save/reload, fixture execution, tour targets and narrow layouts.
+
 ## [0.4.0-screening] — 2026-09-22
 
 ### Added

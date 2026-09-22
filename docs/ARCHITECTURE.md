@@ -2,7 +2,7 @@
 
 Purpose: record the deployment decision, module boundaries, data-contract design and controller design. Exact shipped schema/API details are in [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
-Status: current for model `0.3.0-screening`, scenario schema 2, reviewed 2026-09-15. Runtime evidence and limits are in [VERIFICATION.md](VERIFICATION.md). No site calibration is claimed; future design constraints below are not manufacturer performance.
+Status: current for model `0.4.0-screening`, scenario schema 2, reviewed 2026-09-22. Runtime evidence and limits are in [VERIFICATION.md](VERIFICATION.md). No site calibration is claimed; future design constraints below are not manufacturer performance.
 
 Read this if: you are implementing or reviewing code in `src/`, or deciding where a new capability belongs.
 
@@ -126,8 +126,8 @@ This inventory combines architectural requirements and future fidelity targets; 
 - Control policy, outdoor-air constraints, heat-rejection destination and reheat permissions.
 - Tariff, installed prices, component lives, maintenance and discount rate.
 - Display units are separate from canonical numeric values. Do not serialize display strings as model numbers.
-- Current scenario schema is 2. `migrateScenario` preserves legacy airflow numbers, removes obsolete DOAS energy-per-water semantics, sets inert recovery and applies evidence/review gates. Weather snapshot schema remains 1.
-- Airflow source, review and installed capital basis travel with the scenario. `outsideAirBasis` has four values: `literatureRange`, `adjacentProxy`, `projectInput`, `screeningAssumption`; `outsideAirReviewed` records explicit review of controlled flow and fan power.
+- Current scenario schema is 2. `migrateScenario` preserves legacy airflow numbers, removes obsolete DOAS energy-per-water semantics, sets inert recovery and applies evidence/review gates. Weather snapshot schema is 2, with legacy schema-1 migration; [WEATHER-SCHEMA.md](WEATHER-SCHEMA.md) defines the current contract.
+- Airflow source, review and installed capital basis travel with the scenario. `outsideAirBasis` has four values: `literatureRange`, `adjacentProxy`, `projectInput`, `screeningAssumption`; `outsideAirReviewed` records review of controlled flow and fan power per scenario. The interface presents each checkbox with its values and evidence basis directly below Run all scenarios; changing minimum, maximum, fan power or evidence basis clears that scenario’s review.
 - `heatRecovery` is a nested component owned by `airflow.js`; DOAS uses `doasM3s`, `doasSupplyDewPointC`, `doasSupplyTempC`, `doasCoolingCOP`, `doasReheatRecoveryFraction`. No treatment creates another outdoor-air stream.
 
 ### HourResult

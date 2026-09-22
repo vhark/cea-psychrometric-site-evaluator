@@ -47,7 +47,7 @@ Then open **http://127.0.0.1:8150/** and:
 
 1. Enter the site **ZIP** and select **Locate**, then retrieve weather for the period you want to screen. Nothing loads until you ask for it, and no site is assumed. Year chips appear under **Weather years** for every calendar year already retrieved for these coordinates and time zone, in this session or from the browser cache. No hourly weather ships in the repository; each year is fetched once and cached locally.
 2. Import [docs/example-scenarios.json](docs/example-scenarios.json) for the six-strategy comparison.
-3. Press **Run all scenarios**, then read attainment, misses, loads, runtime and cost.
+3. Under **Run all scenarios**, review each scenario’s displayed minimum and maximum outdoor-air rates, fan power and evidence basis, then check its box. **Edit outdoor air** opens that scenario’s inputs. Resolve any other input errors, press **Run all scenarios**, then read attainment, misses, loads, runtime and cost.
 4. Open **Show the arithmetic for this hour** in the hourly inspector to see every step from the raw weather row to the mode, with that hour's own numbers substituted. `node scripts/worked-example.mjs` prints the same steps for two real Tulsa hours, or for any hour of a saved snapshot.
 
 Do not open `index.html` through `file://`: module fetches and workers require HTTP.
@@ -136,10 +136,10 @@ region and what measurement would. Three of the six regions currently return no 
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Checks actually executed, with measured values and dates |
 | [docs/AUDIT.md](docs/AUDIT.md) | Dated independent-review findings/dispositions and current supersession pointers |
 | [docs/SENSITIVITY.md](docs/SENSITIVITY.md) | Morris screening: which assumptions move the answer, and whether the ranking survives |
-| [docs/REGIONS.md](docs/REGIONS.md) | The ten-year regional study: method, recommendation rule, and the verdict for each bundled climate |
+| [docs/REGIONS.md](docs/REGIONS.md) | The ten-year regional study: method, recommendation rule, and the verdict for each reference climate |
 | [docs/CLASSES.md](docs/CLASSES.md) | Facility topology vocabulary, physical limits and withdrawal of unsupported older class rankings |
 | [docs/COMPONENT-PARAMETERS.md](docs/COMPONENT-PARAMETERS.md) | Current airflow, recovery, DOAS, screen and heat-pump assumptions and evidence limits |
-| [docs/CLIMATES.md](docs/CLIMATES.md) | All six bundled climates, 60 weather years, provenance and site-addition procedure |
+| [docs/CLIMATES.md](docs/CLIMATES.md) | Six reference climates and the 60 weather years behind the retained studies; provenance and retrieval procedure |
 | [docs/EVIDENCE-HOT-HUMID.md](docs/EVIDENCE-HOT-HUMID.md) | What measured research proves for hot-humid CEA, graded by evidence tier, with the gaps named |
 | [docs/ENERGY-DATA.md](docs/ENERGY-DATA.md) | ZIP, utility, price and grid catalogs: coverage, vintages and limits |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Landscape review and source register behind the build decision |
@@ -152,7 +152,7 @@ region and what measurement would. Three of the six regions currently return no 
 
 | Dataset | Vintage | What it is, and is not |
 |---|---|---|
-| NASA POWER hourly meteorology and solar | Six sites, ten years each, 2016 to 2025; per-file retrieval dates in `data/weather/index.json` and snapshots | A gridded reconstruction with UTC source timestamps and original payloads retained. RE hourly solar Wh/m² becomes interval-mean W/m² over one hour. Canonical RH is authoritative; inconsistent auxiliary dew and frost points are flagged, never used to overwrite RH. Not station truth. |
+| NASA POWER hourly meteorology and solar | Retained studies cover six sites, 2016 to 2025; the hourly archive is not shipped. New retrievals retain their own dates and provenance | A gridded reconstruction with UTC source timestamps and original payloads retained. RE hourly solar Wh/m² becomes interval-mean W/m² over one hour. Canonical RH is authoritative; inconsistent auxiliary dew and frost points are flagged, never used to overwrite RH. Not station truth. |
 | Iowa Environmental Mesonet station observations | Archived study period 2026-01-01 to 2026-09-11 | Routine observations nearest the UTC hour within 30 minutes, original timestamps kept, estimated station pressure flagged. Missing observations never receive NASA meteorology. Solar is independently sourced and can be unavailable. |
 | GeoNames ZIP inventory | Retrieved 2026-09-11 | 42,185 records, 39,146 with dated candidate utilities, 27,037 with several candidates, 3,039 with none mapped, 479 mapping-only records without invented coordinates. Not a certified current USPS inventory, and a ZIP does not identify street service. |
 | OpenEI utility to ZIP mapping | Mapping year 2021 | Candidate providers only. Not a service-territory determination. |
@@ -218,7 +218,7 @@ This public repository holds the tool, its public data catalogs and its document
 - `private/`: material belonging to a client engagement, including an audit of a client's own separate internal calculator. It stays with that engagement.
 - `data/energy/raw/`: original public-data archives/workbooks regenerated by `scripts/build-energy.py`. Existing local downloads are checksum-checked; a refresh records new mutable upstream bytes and provenance rather than promising identical historic hashes. Derived runtime catalogs and their dated manifests are committed.
 
-The tool ships with no default site: a new scenario has no ZIP, no coordinates and no time zone, and says so until you locate it. Six climate archetypes (Phoenix, Miami, Denver, Seattle, Fairbanks and Tulsa) carry ten complete NASA POWER weather years each, so those coordinates run with no network access; any other ZIP retrieves its own years from the public sources. No site is privileged, and every crop, envelope, equipment and price input is an editable, labeled assumption.
+The tool ships with no default site: a new scenario has no ZIP, no coordinates and no time zone, and says so until you locate it. The retained studies cover six climate archetypes (Phoenix, Miami, Denver, Seattle, Fairbanks and Tulsa) over ten NASA POWER weather years each. Their hourly archive is not shipped. Retrieve weather for any site, or import a saved snapshot; retrieved years can be reused from the browser cache. No site is privileged, and every crop, envelope, equipment and price input is an editable, labeled assumption.
 
 ## Contributing
 

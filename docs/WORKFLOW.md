@@ -2,7 +2,7 @@
 
 Purpose: the step-by-step working procedure, from picking a site to exporting a result, including the import formats and what each export does and does not contain.
 
-Status: current for model `0.3.0-screening`, scenario schema 2, 2026-09-15.
+Status: current for model `0.4.0-screening`, scenario schema 2, 2026-09-22.
 
 Read this if: you are running the evaluator, or you received an export from someone who did and need to know what it is worth.
 
@@ -30,10 +30,13 @@ There is no default site. A new scenario carries no ZIP, no coordinates and no t
 
 ## 3. Get weather
 
-Four paths, none of which invents data:
+Choose a provider, import a saved record, or retrieve a reference climate:
 
 | Path | What you get |
 |---|---|
+| Open-Meteo retrieval | ERA5/ERA5-Land hourly reanalysis with per-variable model identity and retained provenance |
+| NCEI retrieval | Global Hourly station observations, with station selection and observed-variable provenance |
+| Visual Crossing retrieval | Historical hourly data with source codes, using your provider key |
 | NASA POWER retrieval | Gridded hourly meteorology and solar for the chosen dates, with the original payload and provenance retained |
 | Station observations (IEM) | Routine observations matched to the nearest UTC hour within 30 minutes, plus independently sourced solar that may be unavailable |
 | Import | A saved snapshot, an exported run bundle, or a CSV (schema below) |
@@ -51,7 +54,11 @@ Terms used on these fields are defined in [GLOSSARY.md](GLOSSARY.md). To start f
 
 `infiltrationACH` is uncontrolled envelope leakage. `minVentACH` and `maxVentACH` are the minimum command and maximum installed capacity of one controlled outdoor-air stream, not infiltration or internal circulation. Review the displayed ACH, m³/s, m³/s per m² floor and cfm/ft² conversions at the entered mean height. Internal recirculation and canopy air velocity are not modeled.
 
-Select an evidence status: literature range, adjacent-evidence proxy, project-specific input or screening assumption. Editing controlled airflow marks it project input but does not acknowledge review. Explicitly review both capacities and `fanWPerM3s`, which covers combined supply/exhaust fans and declared pressure drops. Unsupported defaults, DOAS and recovery configurations require review. Literature warnings are construction/context comparisons, not universal design limits.
+Select an evidence status: literature range, adjacent-evidence proxy, project-specific input or screening assumption. Editing controlled airflow marks it project input but does not acknowledge review.
+
+Directly below **Run all scenarios**, each named scenario shows both capacities, `fanWPerM3s` (combined supply/exhaust fans and declared pressure drops), its evidence basis and its own review checkbox. Check each scenario after reviewing those values. **Edit outdoor air** selects that scenario and focuses its Outdoor air panel. Changing minimum, maximum, fan power or evidence basis clears only that scenario’s review. Reviewed rows stay visible so review can also be revoked.
+
+Unsupported defaults, DOAS and recovery configurations require review. Literature warnings are construction/context comparisons, not universal design limits.
 
 Mushroom systems start with null controlled-air minimum and maximum. Enter finite, ordered project-specific values with a positive maximum and acknowledge review, based on species, stage, substrate loading, CO2 target and equipment. There is no universal 6 to 15 ACH mushroom default or CO2 solver.
 
@@ -82,7 +89,7 @@ Cost-of-precision sweeps (temperature tolerance, VPD band, dew-point cap, photop
 
 ## 6. Run and read
 
-Press Run. Results include:
+Check the per-scenario review boxes under **Run all scenarios**. The summary names any scenarios still awaiting review. The button enables once weather is ready and every scenario is reviewed and valid; a checkbox cannot bypass missing or invalid inputs. Reviews travel with saved/exported scenarios, and **Save** keeps the full comparison in this browser. Press **Run all scenarios**. Results include:
 
 - Joint-band attainment and the misses behind it, by hour, day and month.
 - Weather-side modes, including the pad-effective and free-cooling windows, computed independently of the equipment run.
@@ -126,10 +133,10 @@ JSON imports carry `schemaVersion`, explicit units, source and time-zone metadat
 
 ### Scenario schema 2 migration
 
-`migrateScenario` returns a copy; imported outputs are not trusted. Version-1 airflow numbers are preserved, not silently resized, with template-specific evidence status and review gates. Recovery is initialized to `type: 'none'`. Old DOAS supply settings are reset to null, obsolete `doasKWhPerKg` is discarded, and `doasCoolingCOP` plus `doasReheatRecoveryFraction` must be supplied. Unsupported generic/hybrid/opaque defaults require explicit review; mushrooms need project-specific flow. Inert component defaults may be supplied without inventing performance. Unsupported future schema versions fail explicitly. Weather snapshots remain schema 1.
+`migrateScenario` returns a copy; imported outputs are not trusted. Version-1 airflow numbers are preserved, not silently resized, with template-specific evidence status and review gates. Recovery is initialized to `type: 'none'`. Old DOAS supply settings are reset to null, obsolete `doasKWhPerKg` is discarded, and `doasCoolingCOP` plus `doasReheatRecoveryFraction` must be supplied. Unsupported generic/hybrid/opaque defaults require explicit review; mushrooms need project-specific flow. Inert component defaults may be supplied without inventing performance. Unsupported future schema versions fail explicitly. Weather snapshots use schema 2; legacy schema-1 records retain their identity through migration. See [WEATHER-SCHEMA.md](WEATHER-SCHEMA.md).
 
 On startup, saved localStorage scenarios migrate individually: a valid legacy entry remains editable, while an unsupported entry is isolated with a warning rather than crashing initialization. Missing treatment inputs or review still block a run. File import is stricter: after migration all scenarios must validate before the file is adopted, so incomplete legacy active-DOAS or mushroom JSON must be completed/reviewed in the input file and reimported. Save/export writes current schema 2.
 
 ## Reproducible example
 
-Enter ZIP 74103, select Locate, retrieve or select bundled Tulsa 2025, import [example-scenarios.json](example-scenarios.json), then run all six scenarios. That set stays sited at Tulsa because the published figures below were computed there; re-home it to your own ZIP before reading any number as yours. The [exported example report](example-comparison.html) preserves the assumptions and caveats that belonged to that run, and [example-design-basis.html](example-design-basis.html) is the design-basis brief from the same inputs.
+Enter ZIP 74103, select Locate, retrieve Tulsa 2025 or select it if already cached, import [example-scenarios.json](example-scenarios.json), confirm the outdoor-air reviews below Run all scenarios, then run all six scenarios. That set stays sited at Tulsa because the published figures below were computed there; re-home it to your own ZIP before reading any number as yours. The [exported example report](example-comparison.html) preserves the assumptions and caveats that belonged to that run, and [example-design-basis.html](example-design-basis.html) is the design-basis brief from the same inputs.

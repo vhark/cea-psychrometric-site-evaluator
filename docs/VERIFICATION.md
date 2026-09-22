@@ -2,9 +2,17 @@
 
 Purpose: distinguish current executed evidence from historical development checks and unverified claims.
 
-Status: model `0.3.0-screening`, scenario schema 2, updated 2026-09-15. The dated records below remain historical; they are not fresh verification of this release. No independent model benchmark, measured-site calibration or manufacturer validation is claimed.
+Status: model `0.4.0-screening`, scenario and weather schema 2, updated 2026-09-22. Dated records retain their original model and scope. No independent model benchmark, measured-site calibration or manufacturer validation is claimed.
 
-## Current state, 2026-09-15
+## Scenario review beside Run all scenarios — 2026-09-22
+
+- `npm test`: **245 passed**, zero failures, skips or cancellations.
+- `BROWSER_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run test:browser`: passed at root and assembled `/_site/app`. This uses installed Chrome because the default Playwright browser binary is not installed in this environment.
+- `scripts/review-browser-checks.mjs` exercises per-scenario review, displayed airflow, independent review reset, invalid-flow gating, keyboard focus, Edit outdoor air selection/focus, save/reload, completed review in exported JSON, rejection of scenario export after review is revoked, and a completed two-hour synthetic fixture run. It checks the new tour target and all existing target IDs, plus placement and overflow at 1280 px and 390 px. Existing storage, worker lifecycle, workbench, import, request-race, station-pinning and storage-denial browser checks also pass.
+- Desktop and phone screenshots inspected; checkbox labels, values and edit actions fit their review panel. Source syntax and `git diff --check` pass. Independent read-only code review found no blocking issue.
+- This is UI regression evidence. The synthetic fixture establishes interaction and worker completion, not scientific accuracy; no historical study was regenerated for this placement change.
+
+## Historical state, 2026-09-15
 
 | Check | Executed evidence and scope |
 |---|---|

@@ -302,7 +302,7 @@ The measured basis is one instrumented rainy-season campaign at the Asian Instit
 
 **Internal circulation** moves air within the enclosure. Its ACH, canopy air velocity and distribution uniformity are not modeled and are never added to outdoor-air exchange.
 
-**Airflow evidence status** is literature range, adjacent-evidence proxy, project-specific input or screening assumption. Literature context is not a universal validation limit; explicit review acknowledges controlled capacities and combined fan-power input, not scientific validation. Mushroom room minimum/maximum are project inputs, not generic species-independent defaults.
+**Airflow evidence status** is literature range, adjacent-evidence proxy, project-specific input or screening assumption. Literature context is not a universal validation limit; explicit review acknowledges controlled capacities and combined fan-power input, not scientific validation. Each scenario’s checkbox and values appear directly below **Run all scenarios**, with **Edit outdoor air** to open its inputs. Changing either capacity, fan power or evidence basis clears that scenario’s review. Mushroom room minimum/maximum are project inputs, not generic species-independent defaults.
 
 ## HRV, ERV and DOAS
 

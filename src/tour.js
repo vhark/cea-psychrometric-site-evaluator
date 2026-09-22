@@ -2,7 +2,7 @@
    Copy discipline: every figure quoted here comes from the repository's own evidence (docs/VERIFICATION.md,
    docs/SENSITIVITY.md, docs/morris-screening.json and the bundled climate archetypes). No claim beyond them. */
 
-export const TOUR_VERSION = 1;
+export const TOUR_VERSION = 2;
 export const TOUR_KEY = 'cea-psychrometric-site-evaluator.tour.v1';
 
 /** Ordered steps. `target` is an element id in index.html; `absent` explains a step skipped because its
@@ -17,12 +17,12 @@ export const TOUR_STEPS = [
   {id: 'period', target: 'start-date', title: 'Set the period',
     body: 'Start and end dates are inclusive local days and define the record every scenario is scored against. A partial period stays partial: hours and costs cover those days only and are never scaled up into a claimed annual figure. Read attainment together with the valid-hours metric, which reports how much of the expected record actually arrived.'},
   {id: 'provider', target: 'weather-provider', title: 'Choose the evidence source',
-    body: 'NASA POWER is a gridded hourly reconstruction with complete coverage. Station observations pair measured temperature and humidity from the IEM station you name with separately sourced solar, which can be unavailable for some hours. Missing intervals stay visible as gaps, and no synthetic weather is substituted when retrieval fails.',
+    body: 'Choose among Open-Meteo and NASA POWER reanalysis, IEM and NCEI station observations, or Visual Crossing historical data using your provider key. Read the source’s grid, coverage and provenance before retrieving. Station solar is independently sourced and can be unavailable. Missing intervals stay visible as gaps, and no synthetic weather is substituted when retrieval fails.',
     why: 'Gridded and observed records disagree, and that difference belongs in the record rather than in a silent average.'},
   {id: 'retrieve', target: 'fetch-weather', title: 'Retrieve the record',
     body: 'Retrieve weather fetches the selected source for the chosen period and caches it in this browser. Nothing is loaded until you ask for it: enter your ZIP, select Locate, then retrieve the period you want to screen. The badge beside the panel heading reports whether weather is loaded and what it covers.'},
   {id: 'years', target: 'year-chips', title: 'Run more than one year',
-    body: 'Each chip is a calendar year available for these coordinates, from the bundled catalog, the browser cache or a retrieval. Six climate archetypes ship with ten years each, 2016 through 2025, complete at 8,760 or 8,784 hours; any other coordinates build their chips from what you retrieve. Every selected scenario runs against every selected year, which is what fills the across-years panel.',
+    body: 'Each chip is a calendar year already retrieved for the selected provider, coordinates and time zone, in this session or in the browser cache. No hourly weather archive ships with the application. Retrieve the years you need; missing hours remain visible in their data-quality summaries. Every selected scenario runs against every selected year, which is what fills the across-years panel.',
     why: 'In the bundled six-strategy example the baseline attained a median 28.9%, with the worst year (2025) at 27.1% of eligible hours for joint temperature-and-moisture target attainment. Best-to-worst spreads require both endpoints, not median minus worst. One year is an anecdote.'},
   {id: 'retrieve-years', target: 'retrieve-years', title: 'Add years from the source',
     body: 'Set how many of the most recent complete calendar years to pull from the selected source, then retrieve. Years are fetched one at a time and cached locally, so a second run over the same years is immediate. A failed retrieval leaves that year absent rather than substituting a neighbouring year.'},
@@ -32,7 +32,7 @@ export const TOUR_STEPS = [
   {id: 'energy', target: 'energy-panel', title: 'Local energy context',
     body: 'This panel holds the shared customer sector, the working scenario\u2019s electricity costing mode, candidate providers for the ZIP, and historical price and generation-mix context. Manual scenario price uses your own assumption; the historical state and sector proxy recosts the same dispatch against published monthly averages. Proxies are not tariffs, utility candidates are dated mappings rather than a service guarantee, and price gaps produce an unknown total plus a labelled known subtotal.'},
   {id: 'scenario-select', target: 'scenario-select', title: 'The working scenario',
-    body: 'This select chooses which scenario the form below edits, and Duplicate, Remove and Save act on that one. Save keeps scenarios in this browser only, so export a copy if the result matters. The badge counts how many scenarios the next run will execute.'},
+    body: 'This select chooses which scenario the form below edits. Duplicate and Remove act on that scenario; Save validates and saves the full comparison. Save keeps scenarios in this browser only, so export a copy if the result matters. The badge counts how many scenarios the next run will execute.'},
   {id: 'scenario-name', target: 'scenario-name', title: 'Name it for the comparison',
     body: 'The name labels this scenario in every chart, table and export, so make it describe the assumption being tested. Names are the only thing tying an exported run back to the decision it informed.'},
   {id: 'facility', target: 'facility', title: 'Facility type',
@@ -54,7 +54,7 @@ export const TOUR_STEPS = [
   {id: 'core-fields', target: 'core-fields', title: 'Core geometry and targets',
     body: 'Floor area, canopy area and the day and night temperature targets are the four inputs that move almost everything downstream. Inputs stay SI, with live imperial equivalents shown beside the field. Set these before reading any cost, because capacity, energy and water all scale from them.'},
   {id: 'advanced-fields', target: 'advanced-fields', title: 'The rest of the assumptions',
-    body: 'These grouped fields hold envelope and glazing, infiltration and ventilation, moisture, light and DLI, target bands, equipment capacities, efficiencies and costs. Every default is a labelled assumption, and the values you change travel with the run so a reviewer can see exactly what was assumed. Nothing is calibrated to your site until you calibrate it here.'},
+    body: 'These grouped fields hold envelope and glazing, moisture, light and DLI, target bands, equipment capacities, efficiencies and costs. Outdoor air, heat recovery and DOAS have dedicated panels above them. Every default is a labelled assumption, and the values you change travel with the run so a reviewer can see exactly what was assumed. Editing assumptions does not establish site calibration.'},
   {id: 'add-strategy', target: 'add-upgrade-row', title: 'Add a strategy to compare',
     body: 'Pick a technology and add it as a further scenario. New strategies copy the first scenario\u2019s non-equipment assumptions, so the comparison isolates the equipment change. The first scenario remains the named baseline. Differences in joint temperature-and-moisture target attainment use percentage points (pp) with both eligible-hour endpoints, never relative percent. Modeled operating-cost reduction is shown only for a lower-cost named alternative, never as guaranteed savings.'},
   {id: 'sensitivity', target: 'sensitivity-controls', title: 'Vary one assumption at a time',
@@ -62,8 +62,10 @@ export const TOUR_STEPS = [
     why: 'Across the screened ranges the cost ranking was not stable: three distinct orders appeared, the most common in 61.5% of 104 points, though the three cheapest positions held in all 104.'},
   {id: 'files', target: 'file-actions', title: 'Portable in, portable out',
     body: 'Export scenario writes the current inputs as JSON. Import accepts scenario JSON, a full run JSON or a weather CSV in the documented schema, parsed in a background worker so the interface stays responsive. An imported run\u2019s outputs are recomputed rather than trusted; the six-strategy example lives in docs/example-scenarios.json.'},
+  {id: 'run-review', target: 'run-review', title: 'Review before running',
+    body: 'Directly below Run all scenarios, each scenario has its own review checkbox, minimum and maximum controlled outdoor-air rates, combined supply / exhaust fan specific power and evidence basis. Check the assumptions for each named scenario. Edit outdoor air selects that scenario and takes you to its inputs. Changing either airflow capacity, fan power or evidence basis clears only that scenario’s review. Missing or invalid inputs still block the run after review; checking a box does not validate the design.'},
   {id: 'runbar', target: 'runbar', title: 'Run the comparison',
-    body: 'Run all scenarios executes every scenario against every selected year and site in background workers, with progress and a cancel control. Nothing is calculated until you run, and editing an input afterwards marks the results stale instead of quietly updating them. Cancel keeps the previous results rather than presenting a partial run as complete.'},
+    body: 'Once every scenario is reviewed and its inputs are valid, Run all scenarios executes every scenario against every selected year and site in background workers, with progress and a cancel control. Nothing is calculated until you run, and editing an input afterwards marks the results stale instead of quietly updating them. Cancel keeps the previous results rather than presenting a partial run as complete.'},
   {id: 'evidence-note', target: 'evidence-note', title: 'The standing caveat',
     body: 'This note sits beside the results for a reason: the component models are coarse and the run is a screen. It is not a calibrated greenhouse digital twin and not a guarantee of indoor conditions. The disclosure under the metrics carries the per-run warnings, including missing hours, unpriced hours and any numerical failures.'},
   {id: 'headline-metrics', target: 'headline-metrics', title: 'The four numbers',
@@ -113,7 +115,7 @@ export const TOUR_STEPS = [
     body: 'Run JSON carries inputs, provenance and outputs and is the reproducibility bundle. Hourly CSV is the raw per-hour record, and the printable report is the light-themed narrative. The design-basis brief summarises peak hours, air and water requirements and the strategy verdict for the engineer of record; a report on its own is not the full bundle, so keep the run JSON with it.',
     absent: 'exports become available once there is a run to export'},
   {id: 'sources', target: 'sources', title: 'Know what this screen cannot tell you',
-    body: 'The sources section states the standing limits: weather is evidence, equipment is an assumption, and the desiccant and hybrid entries are technology references rather than brand rankings. There is no independent model benchmark, no site calibration and no equipment performance maps behind these numbers. The 91 regression tests defend physical and data boundaries, which is not the same thing as empirical greenhouse validation.',
+    body: 'The sources section states the standing limits: weather is evidence, equipment is an assumption, and the desiccant and hybrid entries are technology references rather than brand rankings. There is no independent model benchmark, no site calibration and no equipment performance maps behind these numbers. The automated regression checks defend physical and data boundaries, which is not the same thing as empirical greenhouse validation.',
     why: 'Quoting a figure from this tool without its basis is the one failure mode the whole interface is built to prevent.'}
 ];
 

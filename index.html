@@ -89,13 +89,12 @@
         <div class="two-grid"><label>Control model<select id="control-mode" name="controlMode"><option value="staged">Staged deadband controller (default)</option><option value="ideal">Ideal per-minute modulation (upper bound)</option></select></label><label>Crop moisture model<select id="transpiration-model" name="transpirationModel"><option value="stanghellini">Stanghellini transpiration (LAI, light, VPD)</option><option value="schedule">Fixed L/m²/day schedule</option></select></label></div>
         <p class="help">Picking a facility or a cultivation system loads a whole template of assumptions. Picking a technology replaces the equipment capacities and the installed-cost figures. You can edit every one of them below.</p>
         <div id="core-fields" class="two-grid"></div>
-        <fieldset id="airflow-panel" class="component-panel" aria-describedby="airflow-description airflow-errors">
+        <fieldset id="airflow-panel" class="component-panel" tabindex="-1" aria-describedby="airflow-description airflow-errors">
           <legend><span data-term="ach">Outdoor air</span></legend>
           <p id="airflow-description" class="help">Air that leaks in and air you bring in on purpose are two different things, and the tool keeps them apart. Fan specific power covers the supply and exhaust fans together. Air moving around inside the room, and how fast it passes over the canopy, are not modelled at all.</p>
           <div id="airflow-fields" class="two-grid"></div>
           <label>Controlled outdoor-air evidence basis<select id="outside-air-basis" name="outsideAirBasis"></select></label>
           <p id="airflow-basis-readout" class="help"></p>
-          <label class="review-control"><input id="outside-air-reviewed" name="outsideAirReviewed" type="checkbox"> I have reviewed the controlled minimum, maximum capacity and combined fan specific power.</label>
           <p id="mushroom-airflow-note" class="component-callout" hidden>Mushroom outdoor air requires project inputs for species, growth stage, substrate loading, CO2 target and equipment. No universal minimum or maximum is assumed.</p>
           <div id="airflow-conversions" class="flow-readouts" aria-live="polite"></div>
           <div id="airflow-errors" class="component-callout component-errors" aria-live="polite" hidden></div>
@@ -134,11 +133,17 @@
     </aside>
     <section class="results-column" aria-labelledby="results-title">
       <div id="runbar" class="runbar"><div><span class="eyebrow">03 · COMPARE THE TRADE-OFFS</span><h2 id="results-title">Find your control window</h2></div><div class="button-row"><button id="cancel-run" type="button" hidden>Cancel</button><button id="run-all" type="button" class="primary" disabled>Run all scenarios <span aria-hidden="true">↗</span></button></div></div>
+      <section id="run-review" class="component-panel run-review" aria-labelledby="run-review-title">
+        <h3 id="run-review-title">Review outdoor-air assumptions</h3>
+        <p id="run-review-summary" class="help" role="status" aria-live="polite"></p>
+        <p id="run-review-help" class="help">Confirm each scenario’s minimum, maximum and combined supply / exhaust fan specific power below. Changing these values or their evidence basis clears that scenario’s review.</p>
+        <div id="run-review-list"></div>
+      </section>
       <div id="configuration-status" class="component-panel" role="status" aria-live="polite" hidden></div>
       <div id="run-progress" class="run-progress" hidden><progress id="progress" max="1" value="0"></progress><span id="progress-label" role="status">Preparing analysis…</span></div>
       <div id="evidence-note" class="evidence-note"><span class="evidence-dot" aria-hidden="true"></span><p><strong data-term="screening">Assumption-based statistical screening.</strong> Coarse component models, not a calibrated greenhouse digital twin or a guarantee of indoor conditions.</p></div>
       <div id="stale-notice" class="notice warning" hidden>Inputs have changed. These results belong to the previous run. Run all scenarios to update.</div>
-      <div id="empty-results" class="empty-state panel"><div class="window-symbol" aria-hidden="true"><span></span><span></span><span></span><span></span></div><h3>A clear comparison starts<br>with a real weather record.</h3><p>Review the facility and crop assumptions, then run the baseline. Add a strategy to see its change in target hours and period operating cost.</p><p class="help">Nothing is calculated until you run a scenario.</p></div>
+      <div id="empty-results" class="empty-state panel"><div class="window-symbol" aria-hidden="true"><span></span><span></span><span></span><span></span></div><h3>A clear comparison starts<br>with a real weather record.</h3><p>Review the facility and crop assumptions, confirm outdoor air under Run all scenarios, then run the baseline. Add a strategy to see its change in target hours and period operating cost.</p><p class="help">Nothing is calculated until you run a scenario.</p></div>
       <div id="results" hidden>
         <div class="results-controls"><label>Inspect result<select id="result-select"></select></label><label id="primary-year-label" hidden>Primary year<select id="primary-year"></select></label><div id="tier-tabs" class="segmented" role="group" aria-label="Analysis evidence tier"><button id="equipment-tab" type="button" aria-pressed="true">Equipment estimate</button><button id="weather-tab" type="button" aria-pressed="false">Weather only</button></div></div>
         <p id="view-explanation" class="help"></p>
