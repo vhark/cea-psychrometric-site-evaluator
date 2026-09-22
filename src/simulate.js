@@ -1,3 +1,4 @@
+import {assertHistoricalWeather} from './weather-contract.js';
 import {MODEL_VERSION,migrateScenario,validateScenario,FACILITY_TEMPLATES} from './config.js';
 import {CP_DRY_AIR as CP,LATENT_HEAT as L,clamp,enthalpy,humidityRatio,saturationHumidityRatio,saturationPressure,
   vaporPressure,relativeHumidity,dewPoint,airVPD,dryAirDensity,padState,weatherState,schedule,moistureBounds,classifyWeather,outdoorDryingHour,
@@ -501,6 +502,7 @@ function finishLoads(loads) {
 // screenBaseline: run the paired screen-open reference runs that make summary.screens attributable. It is
 // set false inside those reference runs themselves, which is the only reason the option exists.
 export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,screenBaseline=true}={}) {
+  assertHistoricalWeather(snapshot);
   if(!Number.isFinite(stepMinutes)||stepMinutes<=0||stepMinutes>5||Math.abs(60/stepMinutes-Math.round(60/stepMinutes))>1e-9)
     throw Error('Integration step must divide one hour and be at most five minutes.');
   // Direct callers receive the same schema migration and completeness checks as worker and browser paths.
@@ -769,7 +771,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       exclusions:'No cycling, frost, duct, drain, or separate process-fan performance beyond declared inputs.',
     }:null,
   };
-  return {scenario:s,hours,summary,weatherSummary:weatherSummary(hours,s),warnings,modelVersion:MODEL_VERSION,controlModeUsed:controlMode,transpirationModelUsed:transpirationModel,
+  return {weatherSnapshotId:snapshot.id ?? null,scenario:s,hours,summary,weatherSummary:weatherSummary(hours,s),warnings,modelVersion:MODEL_VERSION,controlModeUsed:controlMode,transpirationModelUsed:transpirationModel,
     assumptions:{evidenceTier:'Assumption-based component screening',stepMinutes,warmupHoursPerSegment:1,lightSolarConversionUmolJ:2.02,
       controlModeUsed:controlMode,transpirationModelUsed:transpirationModel,
       canopyTemperature:transpirationModel==='stanghellini'?'Equal to zone air temperature (declared simplification, no leaf energy balance).':null,

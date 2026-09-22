@@ -1,8 +1,10 @@
+import {WEATHER_UNITS, withWeatherContract, sealWeatherSnapshot} from './weather-contract.js';
+export {sealWeatherSnapshot} from './weather-contract.js';
 /* Public weather adapters. No credentials, synthetic weather, or station/reanalysis substitution.
  * CSV import: time,tempC,dewPointC,rh,pressurePa,ghiWm2,windMs
  * time is ISO 8601 UTC ending Z, temperatures C, rh fraction [0,1], pressure Pa,
  * solar W/m2, wind m/s. Supply dewPointC or rh; blank cells are missing, never zero.
- * Canonical JSON uses schemaVersion 1 and UNITS below; raw/provenance are retained.
+ * Canonical JSON uses schemaVersion 2 (schema 1 imports migrate) and UNITS below; raw/provenance are retained.
  */
 const HOUR = 3600000;
 const DAY = 24 * HOUR;
@@ -13,7 +15,7 @@ const NCEI_DATA = 'https://www.ncei.noaa.gov/access/services/data/v1';
 const NCEI_SEARCH = 'https://www.ncei.noaa.gov/access/services/search/v1/data';
 const VISUAL_CROSSING = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline';
 const OPEN_METEO_ELEVATION = 'https://api.open-meteo.com/v1/elevation';
-const UNITS = Object.freeze({ time: 'UTC epoch milliseconds', tempC: 'C', dewPointC: 'C', rh: 'fraction', pressurePa: 'Pa', ghiWm2: 'W/m2', windMs: 'm/s' });
+const UNITS = WEATHER_UNITS;
 const PARAMETERS = { T2M: ['tempC', 'C', 1], RH2M: ['rh', '%', .01], PS: ['pressurePa', 'kPa', 1000], ALLSKY_SFC_SW_DWN: ['ghiWm2', 'Wh/m^2', 1], T2MDEW: ['dewPointC', 'C', 1], WS2M: ['windMs', 'm/s', 1] };
 const GRID_NOTE = 'Requested coordinates are not a station. Source-native grids: MERRA-2 meteorology 0.5° latitude × 0.625° longitude; SYN1deg solar 1° × 1°. Returned point geometry is not a grid-cell-center assertion. Source elevation is not measured site elevation.';
 
@@ -24,6 +26,10 @@ function dateValue(value) {
   return stamp;
 }
 function dateString(stamp) { return new Date(stamp).toISOString().slice(0, 10); }
+function localDateString(stamp, timezone) {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit'}).formatToParts(stamp).map(part => [part.type, part.value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
 function localMidnight(date, timezone) {
   const target = dateValue(date);
   const formatter = new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
@@ -338,14 +344,16 @@ export async function fetchNcei(options) {
     hour.windMs = isdField(row.WND, 3, 10, { qcIndex: 4 });
     const stationHpa = isdField(row.MA1, 2, 10, { qcIndex: 3 });
     const altimeterHpa = isdField(row.MA1, 0, 10, { qcIndex: 1 });
-    if (stationHpa != null) { hour.pressurePa = stationHpa * 100; hour.quality.push('station-pressure-observed'); }
+    if (stationHpa != null) { hour.pressurePa = stationHpa * 100; hour.quality.push('station-pressure-observed'); hour.variableQuality = {pressurePa: {evidence: 'observation', derivation: null}}; }
     else if (altimeterHpa != null && Number.isFinite(station.elevationM)) {
       hour.pressurePa = Math.pow(Math.pow(altimeterHpa, .190284) - .00008418496 * station.elevationM, 1 / .190284) * 100;
       hour.quality.push('station-pressure-estimated-from-altimeter-and-elevation');
+      hour.variableQuality = {...hour.variableQuality, pressurePa: {evidence: 'derived', derivation: 'station pressure estimated from altimeter and station elevation'}};
     } else hour.quality.push('station-pressure-unavailable');
     if (hour.rh == null && hour.tempC != null && hour.dewPointC != null && hour.dewPointC <= hour.tempC) {
       hour.rh = saturation(hour.dewPointC) / saturation(hour.tempC);
       hour.quality.push('rh-derived-from-observed-dewpoint');
+      hour.variableQuality = {...hour.variableQuality, rh: {evidence: 'derived', derivation: 'RH from reported dry bulb and dew point using saturation vapor pressure ratio'}};
     }
     hour.quality.push('isd-quality-flags-checked');
     records.set(time, hour);
@@ -390,19 +398,8 @@ export async function fetchNcei(options) {
 }
 
 
-/* Visual Crossing timeline. The one source here that returns all six values in a single call, and
-   the one that needs the most care reading.
- *
- * Two facts govern this adapter. Its `pressure` is sea level, not station: at 1,655 m that is about
- * 22 percent high, and humidity ratio follows pressure, so passing it through would corrupt every
- * moisture figure in the run. It is reduced to station pressure using the site elevation, which is
- * fetched from Open-Meteo's keyless elevation service, and every hour says so.
- *
- * Second, the service blends station observations with model output into a gap-free series and
- * publishes no per-hour flag saying which a value is. The nearest thing it gives is the list of
- * stations that contributed to each hour, so that list is recorded, and an hour that names no
- * station is marked as carrying no observation behind it. That is weaker than the fill flags a
- * source like NSRDB publishes, and the interface says so rather than implying otherwise. */
+/* Visual Crossing records hourly source codes, derived station pressure, and solar
+ * interval energy separately from instantaneous radiation. Missing lineage stays unknown. */
 async function siteElevation(options, coords) {
   const params = new URLSearchParams({ latitude: String(coords.latitude), longitude: String(coords.longitude) });
   const item = await request(OPEN_METEO_ELEVATION + '?' + params, options.signal);
@@ -424,7 +421,7 @@ export async function fetchVisualCrossing(options) {
   options.onProgress?.(0, 'Establishing site elevation for the pressure conversion');
   const elevation = await siteElevation(options, coords);
 
-  const elements = 'datetimeEpoch,temp,dew,humidity,pressure,solarradiation,windspeed,stations';
+  const elements = 'datetimeEpoch,temp,dew,humidity,pressure,solarradiation,windspeed,stations,source,solarenergy';
   const params = new URLSearchParams({ unitGroup: 'metric', include: 'hours', elements,
     contentType: 'json', key });
   const url = `${VISUAL_CROSSING}/${coords.latitude},${coords.longitude}/${bounds.startDate}/${bounds.endDate}?${params}`;
@@ -434,7 +431,7 @@ export async function fetchVisualCrossing(options) {
   if (!Array.isArray(data?.days)) throw new Error('Visual Crossing returned no days block.');
 
   const records = new Map();
-  let modelled = 0, observed = 0;
+  let unknownSource = 0;
   for (const day of data.days) {
     for (const entry of day.hours || []) {
       const time = Number(entry.datetimeEpoch) * 1000;
@@ -445,15 +442,21 @@ export async function fetchVisualCrossing(options) {
       hour.dewPointC = number(entry.dew);
       const humidity = number(entry.humidity);
       hour.rh = humidity == null ? null : humidity / 100;
-      hour.ghiWm2 = number(entry.solarradiation);
+      const solarEnergy = number(entry.solarenergy);
+      hour.ghiWm2 = solarEnergy == null ? number(entry.solarradiation) : solarEnergy * 1e6 / 3600;
+      if (typeof entry.source === 'string') hour.source = entry.source;
+      else unknownSource++;
+      hour.variableQuality = {ghiWm2: {aggregation: solarEnergy == null ? 'instantaneous' : 'mean',
+        sourceTiming: solarEnergy == null ? 'provider hourly radiation timestamp' : 'hourly energy interval',
+        derivation: solarEnergy == null ? 'solarradiation as supplied; not established as interval energy' : 'solarenergy MJ/m2 * 1e6 / 3600 seconds'}};
       const windKmh = number(entry.windspeed);
       hour.windMs = windKmh == null ? null : windKmh / 3.6;
       hour.pressurePa = stationPressureFromSeaLevel(number(entry.pressure), elevation.elevationM);
       if (hour.pressurePa != null) hour.quality.push('station-pressure-reduced-from-sea-level-and-elevation');
       else hour.quality.push('station-pressure-unavailable');
       const stations = Array.isArray(entry.stations) ? entry.stations.filter(Boolean) : [];
-      if (stations.length) { hour.stations = stations; hour.quality.push(`contributing-stations-${stations.length}`); observed++; }
-      else { hour.quality.push('no-contributing-station-value-is-modelled'); modelled++; }
+      if (stations.length) { hour.stations = stations; hour.quality.push(`contributing-stations-${stations.length}`); }
+      else hour.quality.push('no-contributing-station-listed');
       records.set(time, hour);
     }
   }
@@ -461,10 +464,10 @@ export async function fetchVisualCrossing(options) {
   for (const hour of hours) markMissing(hour);
 
   const warnings = [
-    'Visual Crossing blends station observations with model output into a gap-free series and publishes no per-hour flag saying which a value is. The stations that contributed to each hour are recorded where the service names them.',
+    'Visual Crossing hourly source codes are retained when supplied. They describe record lineage, not proof that every variable was measured. Absent station identifiers do not establish modeled provenance.',
     `Pressure arrives as sea-level pressure and is reduced to station pressure using ${elevation.elevationM.toFixed(0)} m site elevation from Open-Meteo. It is derived, not measured.`,
   ];
-  if (modelled) warnings.push(`${modelled} of ${modelled + observed} hours name no contributing station, so those values came from a model rather than an instrument.`);
+  if (unknownSource) warnings.push(`${unknownSource} hours have no source code; their lineage is unknown.`);
   options.onProgress?.(1, 'Visual Crossing timeline received');
   return { schemaVersion: 1, source: 'Visual Crossing Timeline', sourceKind: 'blended station observations and model output', ...coords,
     timezone: bounds.timezone, startDate: bounds.startDate, endDate: bounds.endDate,
@@ -472,7 +475,7 @@ export async function fetchVisualCrossing(options) {
     units: { ...UNITS },
     interval: 'UTC hour start, from the service\'s hourly timeline. Pressure is reduced from sea level using site elevation.',
     sourceVersions: [{ service: 'Visual Crossing Timeline', resolvedAddress: data.resolvedAddress ?? null, timezone: data.timezone ?? null }],
-    coordinateNotes: 'Values are interpolated from nearby stations, weighted by distance, and filled with model output where no station reported. The service does not say per hour which of those a value is.',
+    coordinateNotes: 'Values are interpolated from nearby stations, weighted by distance, and filled with model output where no station reported. Hourly source codes and contributing station identifiers are retained when available; variable-level lineage may remain unknown.',
     sourceElevationM: elevation.elevationM,
     licence: 'Visual Crossing terms. The free tier permits 1,000 records per query and a daily record allowance. Raw data may not be redistributed publicly.',
     attribution: 'Weather Data Provided by Visual Crossing.',
@@ -486,7 +489,39 @@ export const PROVIDER_IDS = Object.keys(ADAPTERS);
 export async function fetchWeather(options) {
   const adapter = ADAPTERS[options.provider || 'nasa'];
   if (!adapter) throw new Error(`Unknown weather provider: ${options.provider}. Available: ${PROVIDER_IDS.join(', ')}.`);
-  return adapter(options);
+  const snapshot = await adapter(options);
+  snapshot.variables = adapterVariables(options.provider || 'nasa');
+  return sealWeatherSnapshot(normalizeWeather(snapshot));
+}
+
+// These declarations apply to new adapter responses only. Legacy imports are not
+// upgraded to stronger evidence merely because their source name is recognizable.
+function adapterVariables(provider) {
+  const metadata = (field, aggregation, evidence, source, sourceTiming, derivation = null) =>
+    ({unit: UNITS[field], aggregation, evidence, source, sourceTiming, derivation});
+  const variables = {};
+  for (const field of Object.keys(UNITS).filter(key => key !== 'time')) {
+    const isSolar = field === 'ghiWm2', station = provider === 'iem' || provider === 'ncei';
+    const source = isSolar && station ? 'NASA POWER' : provider;
+    const evidence = isSolar && (station || provider === 'nasa') ? 'satellite-derived'
+      : station ? 'observation' : provider === 'visualcrossing' ? 'unknown' : 'reanalysis';
+    const aggregation = isSolar || provider === 'nasa' ? 'mean' : 'instantaneous';
+    const timing = isSolar ? (provider === 'openmeteo' ? 'preceding-hour average shifted to interval start' : 'hourly energy interval')
+      : station ? 'nearest observation within 30 minutes; original timestamp retained' : 'provider hourly timestamp';
+    variables[field] = metadata(field, aggregation, evidence, source, timing);
+  }
+  if (provider === 'visualcrossing' || provider === 'iem') {
+    variables.pressurePa.evidence = 'derived';
+    variables.pressurePa.derivation = provider === 'visualcrossing' ? 'station pressure estimated from sea-level pressure and site elevation' : 'station pressure estimated from altimeter and station elevation';
+  }
+  if (provider === 'ncei') {
+    variables.rh.evidence = 'derived';
+    variables.rh.derivation = 'RH from reported dry bulb and dew point using saturation vapor pressure ratio';
+    variables.pressurePa.evidence = 'unknown';
+    variables.pressurePa.derivation = 'station pressure when reported; otherwise altimeter/elevation estimate; see hourly quality flags';
+  }
+  if (provider === 'visualcrossing') variables.ghiWm2.derivation = 'solarenergy MJ/m2 * 1e6 / 3600 seconds; hourly overrides identify radiation fallback';
+  return variables;
 }
 
 function parseCSV(text) {
@@ -561,7 +596,7 @@ export function normalizeWeather(input, {timezone: csvTimezone} = {}) {
       input = { schemaVersion: 1, source: 'Imported CSV', sourceKind: 'user-supplied, unverified', timezone: csvTimezone.trim(), units: { ...UNITS }, raw: { format: 'csv', text }, hours: csv.rows };
     }
   }
-  if (!input || input.schemaVersion !== 1 || !Array.isArray(input.hours) || !input.hours.length) throw new Error('Expected schemaVersion 1 weather snapshot with nonempty hours.');
+  if (!input || ![1, 2].includes(input.schemaVersion) || !Array.isArray(input.hours) || !input.hours.length) throw new Error('Expected schemaVersion 1 or 2 weather snapshot with nonempty hours.');
   if (!input.units || input.units.time !== UNITS.time) throw new Error('Snapshot units.time must be "UTC epoch milliseconds".');
   for (const [field, unit] of Object.entries(UNITS)) {
     if (field !== 'time' && input.hours.some(hour => hour[field] != null && hour[field] !== '') && input.units[field] !== unit) throw new Error('Snapshot units.' + field + ' must be ' + unit + '.');
@@ -595,10 +630,10 @@ export function normalizeWeather(input, {timezone: csvTimezone} = {}) {
     throw new Error('Weather hours lie outside the declared time range.');
   }
   const hours = completeGrid(records, bounds.start, bounds.end);
-  return { ...input, timezone, source: input.source || 'Imported weather', sourceKind: input.sourceKind || 'user-supplied, unverified',
-    startDate: input.startDate || dateString(bounds.start), endDate: input.endDate || dateString(bounds.end - 1),
+  return withWeatherContract({ ...input, timezone, source: input.source || 'Imported weather', sourceKind: input.sourceKind || 'user-supplied, unverified',
+    startDate: input.startDate || localDateString(bounds.start, timezone), endDate: input.endDate || localDateString(bounds.end - 1, timezone),
     startUTC: new Date(bounds.start).toISOString(), endExclusiveUTC: new Date(bounds.end).toISOString(),
-    units: { ...UNITS }, coverage: { ...input.coverage, ...coverage(hours, bounds) }, hours };
+    units: { ...UNITS }, coverage: { ...input.coverage, ...coverage(hours, bounds) }, hours });
 }
 
 /* IEM asks for one request at a time with a pause between them, so requests are queued rather than
@@ -672,6 +707,7 @@ export async function fetchObserved(options) {
         const pressureHpa = Math.pow(Math.pow(altimeter * 33.8638866667, .190284) - .00008418496 * elevationM, 1 / .190284);
         hour.pressurePa = pressureHpa * 100;
         hour.quality.push('station-pressure-estimated-from-altimeter-and-elevation');
+      hour.variableQuality = {...hour.variableQuality, pressurePa: {evidence: 'derived', derivation: 'station pressure estimated from altimeter and station elevation'}};
       } else hour.quality.push('station-pressure-unavailable-no-valid-altimeter'); // Missing stays missing: no standard-atmosphere fill.
     } else hour.quality.push('station-pressure-unavailable-no-valid-elevation');
     stationMetadata.set(station, { station, latitude: finiteCell(row.lat, 'IEM latitude'), longitude: finiteCell(row.lon, 'IEM longitude'), elevationM });
@@ -682,11 +718,12 @@ export async function fetchObserved(options) {
     if (hour.rh == null && hour.tempC != null && hour.dewPointC != null && hour.dewPointC <= hour.tempC) {
       hour.rh = saturation(hour.dewPointC) / saturation(hour.tempC);
       hour.quality.push('rh-derived-from-observed-dewpoint');
+      hour.variableQuality = {...hour.variableQuality, rh: {evidence: 'derived', derivation: 'RH from reported dry bulb and dew point using saturation vapor pressure ratio'}};
     }
     records.set(time, hour);
   }
   let solar = null;
-  const warnings = ['IEM METAR archive has limited quality control. Instantaneous routine observations are matched to nearest UTC hour, not hourly mean weather.', 'Station weather and requested-coordinate gridded solar are independent evidence. No NASA temperature fills missing IEM observations.', 'Station pressure is estimated from altimeter and station elevation; missing altimeter uses a flagged standard-atmosphere elevation fallback.'];
+  const warnings = ['IEM METAR archive has limited quality control. Instantaneous routine observations are matched to nearest UTC hour, not hourly mean weather.', 'Station weather and requested-coordinate gridded solar are independent evidence. No NASA temperature fills missing IEM observations.', 'Station pressure is estimated from altimeter and station elevation; missing altimeter leaves pressure missing.'];
   try { solar = await powerData(options, ['ALLSKY_SFC_SW_DWN']); }
   catch (error) { if (options.signal?.aborted) throw error; warnings.push('NASA POWER solar unavailable; weather-only screening remains possible. ' + error.message); }
   const solarByTime = new Map((solar?.hours || []).map(hour => [hour.time, hour.ghiWm2]));

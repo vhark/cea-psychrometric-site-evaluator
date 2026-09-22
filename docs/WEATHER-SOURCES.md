@@ -18,7 +18,7 @@ Six hourly values: air temperature, dew point or relative humidity, surface pres
 | NOAA NCEI ISD | none | station | 1901 at some stations | Real measurement with a quality flag on every value |
 | NASA POWER | none | 0.5° × 0.625°, solar 1° | 2001 | Public domain with no conditions, dedicated satellite solar |
 | IEM ASOS | none | station | 1970s at many airports | Simple when you already trust a specific airport |
-| Visual Crossing | yours | blended stations and model | 1970s onward | All six in one call, at the cost of not knowing which hours were measured |
+| Visual Crossing | yours | blended stations and model | 1970s onward | All six in one call, hourly source codes, with variable-level lineage limits |
 
 Full pros and cons for each are in `src/providers.js` and shown in the interface when you pick one. They are kept there rather than here so the interface and the documentation cannot drift apart.
 
@@ -30,7 +30,11 @@ Two things the adapter has to do to make it usable, both visible in every snapsh
 
 Its `pressure` is sea-level pressure, which their own data documentation defines as removing the reduction due to altitude. At 1,655 m that is about 22 percent above the real station pressure, and humidity ratio follows pressure, so passing it through would corrupt every moisture figure in the run. The adapter reduces it to station pressure using the site elevation, fetched from Open-Meteo's keyless elevation service, and each hour is flagged `station-pressure-reduced-from-sea-level-and-elevation`. Your pressure from this source is derived, not measured.
 
-The service blends station observations with model output into a gap-free series and publishes no per-hour flag saying which a value is. The nearest thing it gives is the list of stations that contributed to each hour, so the adapter records that list, and marks an hour naming no station as modelled. That is real provenance and it is still weaker than the explicit fill flags a source like NSRDB publishes. A run from this source will never have a gap, which is a convenience and a warning at the same time: the other sources here leave a hole where no data existed.
+The adapter requests and preserves hourly `source` codes (`obs`, `fcst`, `histfcst`, `stats`, `statsfcst`, `comb`) and contributing station identifiers. Missing station identifiers do not establish modeled provenance. Missing source codes remain unknown; a record-level observation code does not prove that each variable was measured. Missing numeric values remain gaps. Historical analysis rejects forecast/statistical rows and observation/forecast combinations, including forecasts whose valid time is now in the past.
+
+For solar loads, hourly `solarenergy` (MJ/m²) is divided by 3,600 seconds and multiplied by 1,000,000 to obtain interval-mean W/m². If only `solarradiation` is available, the value is retained with an explicit instantaneous override, not relabeled as an interval mean. See the provider's [field definitions](https://www.visualcrossing.com/resources/documentation/weather-data/weather-data-documentation/) and [Timeline API](https://www.visualcrossing.com/resources/documentation/weather-api/timeline-weather-api/), checked for this adapter update on 2026-09-22. No live keyed call was used to validate this change; response fixtures exercise the contract.
+
+Forecast issuance and retrieval are different clocks. `forecast.issuedAt` and `runId` remain null when not supplied; fetching a forecast today does not establish its model issue time. The canonical contract can retain forecasts for a future extension, but the current historical app does not analyze them.
 
 ### Why Open-Meteo is the default
 
@@ -75,3 +79,8 @@ Three steps, and a test enforces the first two staying in step:
 3. If it needs a key, an `apiKey` block with `help` and `signupUrl`. The field then appears only when that source is picked. A pasted key stays in the browser under a per-provider storage key, goes only to that provider, and `redactSecrets` strips it from every recorded URL before it can reach an export or the weather cache.
 
 Visual Crossing is the only shipped source needing a key. Its adapter is the one that exercises that path, and a test asserts no key survives into a serialized snapshot.
+
+
+## Canonical contract and local revisions
+
+All app retrievals now pass through `normalizeWeather` and `sealWeatherSnapshot`. [WEATHER-SCHEMA.md](WEATHER-SCHEMA.md) documents schema 2, legacy migration, exact interval semantics, variable evidence and immutable browser storage. Provider-specific payloads remain in `raw`; they do not become the app's data model. Unknown legacy metadata is not upgraded to observed evidence.

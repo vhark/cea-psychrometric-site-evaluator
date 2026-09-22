@@ -402,7 +402,7 @@ test('a silent unit change at the provider fails the fetch instead of rescaling 
  const right={temperature_2m:'°C',relative_humidity_2m:'%',dew_point_2m:'°C',
   surface_pressure:'Pa',shortwave_radiation:'W/m²',wind_speed_10m:'km/h'};
  for(const [name,unit] of Object.entries(right))
-  for(const model of ['era5_land','era5']){payload.hourly_units[`${name}_${model}`]=unit;payload.hourly[`${name}_${model}`]=[1];}
+  for(const model of ['era5_land','era5']){payload.hourly_units[`${name}_${model}`]=unit;payload.hourly[`${name}_${model}`]=[name==='surface_pressure'?840:name==='relative_humidity_2m'?60:1];}
  const prior=globalThis.fetch;
  globalThis.fetch=async()=>({ok:true,status:200,text:async()=>JSON.stringify(payload)});
  try{
@@ -425,7 +425,7 @@ test('a provider key is stripped from anything a snapshot records',async()=>{
  const units={temperature_2m:'°C',relative_humidity_2m:'%',dew_point_2m:'°C',
   surface_pressure:'hPa',shortwave_radiation:'W/m²',wind_speed_10m:'km/h'};
  for(const [name,unit] of Object.entries(units))
-  for(const model of ['era5_land','era5']){payload.hourly_units[`${name}_${model}`]=unit;payload.hourly[`${name}_${model}`]=[1];}
+  for(const model of ['era5_land','era5']){payload.hourly_units[`${name}_${model}`]=unit;payload.hourly[`${name}_${model}`]=[name==='surface_pressure'?840:name==='relative_humidity_2m'?60:1];}
  const prior=globalThis.fetch;
  globalThis.fetch=async()=>({ok:true,status:200,text:async()=>JSON.stringify(payload)});
  try{
@@ -469,12 +469,12 @@ test('the NCEI adapter honours ISD quality flags and refuses to double-count an 
  } finally { globalThis.fetch=prior; }
 });
 
-test('Visual Crossing pressure is reduced to station pressure, and modelled hours are marked',async()=>{
+test('Visual Crossing pressure is reduced to station pressure, and absent station lineage stays unknown',async()=>{
  const {fetchWeather}=await import('../src/weather.js');
  const base=Date.UTC(2025,6,1,0)/1000;
  const hours=Array.from({length:26},(_,i)=>({datetimeEpoch:base+i*3600,temp:20,dew:10,humidity:52.5,
   pressure:1013,solarradiation:400,windspeed:7.2,
-  // Half the hours name a contributing station; half name none and are therefore model output.
+  // Half the hours name a contributing station; absence alone does not establish modeled lineage.
   stations:i%2===0?['KBDU','KBJC']:[]}));
  const payload={resolvedAddress:'Boulder, CO',timezone:'America/Denver',days:[{hours}]};
  const prior=globalThis.fetch;
@@ -491,10 +491,10 @@ test('Visual Crossing pressure is reduced to station pressure, and modelled hour
   assert.ok(h.quality.includes('station-pressure-reduced-from-sea-level-and-elevation'));
   assert.equal(h.windMs,2,'km/h must convert to m/s');
   assert.equal(h.rh,.525,'percent must convert to a fraction');
-  assert.deepEqual(h.stations,['KBDU','KBJC'],'contributing stations are the only provenance this service gives');
-  const modelled=snap.hours.find(x=>x.quality.includes('no-contributing-station-value-is-modelled'));
-  assert.ok(modelled,'an hour naming no station must be marked as modelled');
-  assert.match(snap.warnings.join(' '),/came from a model rather than an instrument/);
+  assert.deepEqual(h.stations,['KBDU','KBJC'],'contributing stations are retained');
+  const unknown=snap.hours.find(x=>x.quality.includes('no-contributing-station-listed'));
+  assert.equal(unknown.dataKind,'unknown');
+  assert.match(snap.warnings.join(' '),/lineage is unknown/);
   assert.match(snap.warnings.join(' '),/reduced to station pressure using 1655 m/);
   assert.ok(!JSON.stringify(snap).includes('test-key-abcdef'),'the key must not survive into the snapshot');
  } finally { globalThis.fetch=prior; }

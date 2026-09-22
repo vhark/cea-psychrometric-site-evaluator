@@ -1,8 +1,10 @@
+import {assertHistoricalWeather, sealWeatherSnapshot} from './weather-contract.js';
+import {calendarYear, selectWeatherYears, selectCachedWeather, weatherRequest, pinResolvedStation} from './weather-selection.js';
 import {CROPS, FACILITIES, SYSTEMS, TECHNOLOGIES, FIELDS, DEFAULT_SCENARIO, OPAQUE_FACILITIES, AIRFLOW_BASIS, AIRFLOW_EVIDENCE, LIGHT_FIXTURES, FT2_PER_M2, fixtureWm2, makeScenario, applyTechnology, migrateScenario, validateScenario, airflowEvidenceWarnings, MODEL_VERSION} from './config.js';
 import {airflowConversions, heatRecoveryErrors, backfillHeatRecovery} from './airflow.js';
 import {fetchWeather, normalizeWeather} from './weather.js';
 import {loadEnergyCatalog, lookupZip, getEnergyContext, proposeTimezone} from './energy.js';
-import {loadScenarios, saveScenarios, loadWeather, saveWeather, listWeather, loadCachedWeather, weatherKey} from './storage.js';
+import {loadScenarios, saveScenarios, loadWeather, saveWeather, listWeather, loadCachedWeather} from './storage.js';
 import {downloadRun, downloadScenario} from './export.js';
 import {compareScenarios, aggregateYears, compareSites, loadDecomposition, co2Window} from './metrics.js';
 import {modeLabel, modeEntries, attainmentClass, attainmentText, renderMonthly, renderTimeline, renderTimelineTable, renderScatter, renderDLI, renderLoads, renderYears} from './charts.js';
@@ -43,7 +45,7 @@ const units = (value, unit, digits = 1) => finite(value) ? `${format(value, digi
 const percent = (value, digits = 1) => finite(value) ? `${format(value, digits)}%` : 'Not available';
 const describe = value => typeof value === 'string' ? value : value == null ? 'Not available' : typeof value === 'object' ? JSON.stringify(value) : String(value);
 const near = (a, b) => finite(a) && finite(b) && Math.abs(a - b) <= .001;
-const calendarYear = snapshot => {const year = String(snapshot?.startDate || '').slice(0, 4); return snapshot?.startDate === `${year}-01-01` && snapshot?.endDate === `${year}-12-31` ? year : null;};
+
 const current = () => state.scenarios.find(s => s.id === state.selected) || state.scenarios[0];
 const result = () => state.results.find(r => r.scenario.id === state.resultId) || state.results[0];
 const node = (tag, text, className) => {const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (className) n.className = className; return n;};
@@ -397,14 +399,14 @@ function weatherBusy(busy, text = '') {
    UTC hours than the same year on another. Offering a year cached under a different time zone would
    both fail the run and, because retrieveYears skips any year listed here, stop the user re-fetching
    the one that would work. Matching the zone as well as the coordinates is what keeps that door open. */
-function yearSources(latitude, longitude, timezone) {
-  const sources = new Map();
-  const sameSite = entry => near(entry.latitude, latitude) && near(entry.longitude, longitude) && entry.timezone === timezone;
-  for (const entry of state.cached) {const year = calendarYear(entry); if (year && sameSite(entry)) sources.set(year, {kind: 'cached', key: entry.key, source: entry.source});}
-  const loaded = calendarYear(state.snapshot);
-  if (loaded && state.snapshot && sameSite(state.snapshot)) sources.set(loaded, {kind: 'loaded', source: state.snapshot.source});
-  return new Map([...sources].sort());
+function yearSources(latitude, longitude, timezone, provider = $('weather-provider').value) {
+  return selectWeatherYears(state.cached, state.snapshot, {latitude, longitude, timezone, provider, station: provider === 'iem' || provider === 'ncei' ? $('station').value.trim() : ''});
 }
+function acquisitionOptions() {
+  const provider = $('weather-provider').value;
+  return {provider, station: $('station').value.trim(), apiKey: apiKeyFor(provider)};
+}
+
 async function refreshYears() {
   try {state.cached = await listWeather();} catch {state.cached = [];}
   // Blank coordinates are not 0,0: an unlocated site has no weather years, it does not sit off Africa.
@@ -472,15 +474,19 @@ async function retrieveYears() {
   const missing = wanted.filter(year => !state.yearSources.has(year)).reverse();
   if (!missing.length) {for (const year of wanted) state.years.add(year); renderYearChips(); renderSiteChips(); markChanged(); message(`The ${count} most recent complete years are already available locally and are now selected.`, 'success'); return;}
   const epoch = ++state.weatherEpoch; state.weatherController?.abort(); state.weatherController = new AbortController();
-  const provider = $('weather-provider').value, station = $('station').value.trim();
+  let acquisition = acquisitionOptions();
   weatherBusy(true, `Retrieving ${missing.length} calendar year${missing.length === 1 ? '' : 's'} from the selected source…`);
   let done = 0;
   try {
     for (const year of missing) {
-      const snapshot = await fetchWeather({...location, startDate: `${year}-01-01`, endDate: `${year}-12-31`, provider, station, signal: state.weatherController.signal, onProgress: (value, text) => {if (epoch === state.weatherEpoch) $('weather-status').textContent = `Year ${year} (${done + 1}/${missing.length}) · ${finite(value) ? `${format(value * 100)}% · ` : ''}${text || 'Retrieving weather…'}`;}});
+      const snapshot = await fetchWeather({...weatherRequest(location, {startDate: `${year}-01-01`, endDate: `${year}-12-31`}, acquisition), signal: state.weatherController.signal, onProgress: (value, text) => {if (epoch === state.weatherEpoch) $('weather-status').textContent = `Year ${year} (${done + 1}/${missing.length}) · ${finite(value) ? `${format(value * 100)}% · ` : ''}${text || 'Retrieving weather…'}`;}});
       if (epoch !== state.weatherEpoch) return;
-      const normalized = normalizeWeather(snapshot);
+      acquisition = pinResolvedStation(acquisition, snapshot);
+      if (acquisition.provider === 'ncei' && acquisition.station) $('station').value = acquisition.station;
+      const normalized = snapshot;
+      assertHistoricalWeather(normalized);
       try {await saveWeather(normalized, {latest: false});} catch (error) {throw new Error(`Year ${year} was retrieved but could not be cached: ${error.message}`);}
+      if (epoch !== state.weatherEpoch) return;
       done++; state.years.add(year);
     }
     await refreshYears(); for (const year of wanted) if (state.yearSources.has(year)) state.years.add(year); renderYearChips(); renderSiteChips(); markChanged();
@@ -489,9 +495,18 @@ async function retrieveYears() {
   finally {if (epoch === state.weatherEpoch) {const text = $('weather-status').textContent, error = $('weather-status').classList.contains('error'); weatherBusy(false, text); $('weather-status').classList.toggle('error', error);}}
 }
 // `normalized` is set only where the snapshot already came out of normalizeWeather (the import worker),
-// so a 100+ MB import is not re-normalized on the UI thread.
-async function acceptWeather(snapshot, {persistSnapshot = true, adoptLocation = true, normalized = false} = {}) {
-  state.snapshot = normalized ? snapshot : normalizeWeather(snapshot);
+// avoiding a duplicate validation pass before adoption. Storage still validates and hashes its copy.
+async function acceptWeather(snapshot, {persistSnapshot = true, adoptLocation = true, normalized = false, epoch = state.weatherEpoch} = {}) {
+  const canonical = normalized ? snapshot : normalizeWeather(snapshot);
+  assertHistoricalWeather(canonical);
+  snapshot = await sealWeatherSnapshot(canonical);
+  if (epoch !== state.weatherEpoch) return false;
+  state.snapshot = snapshot;
+  if (Object.hasOwn(PROVIDERS, snapshot.provider.id)) {
+    $('weather-provider').value = snapshot.provider.id;
+    if (snapshot.provider.stationId) $('station').value = snapshot.provider.stationId;
+    renderProvider();
+  }
   const location = {latitude: finite(snapshot.latitude) ? snapshot.latitude : Number($('latitude').value), longitude: finite(snapshot.longitude) ? snapshot.longitude : Number($('longitude').value), timezone: snapshot.timezone};
   if(adoptLocation){
     if(Math.abs(location.latitude-Number($('latitude').value))>.001||Math.abs(location.longitude-Number($('longitude').value))>.001){
@@ -505,12 +520,16 @@ async function acceptWeather(snapshot, {persistSnapshot = true, adoptLocation = 
   const detail = $('weather-detail'); detail.replaceChildren();
   safeSource(detail, `${describe(snapshot.source)} · ${describe(snapshot.sourceKind)}`, snapshot.sourceUrl);
   detail.append(document.createTextNode(` · ${snapshot.startDate} to ${snapshot.endDate} · ${snapshot.timezone}. Meteorology ${format(met)}/${format(hours.length)} h; solar ${format(solar)}/${format(hours.length)} h.${finite(snapshot.sourceElevationM) ? ` Source elevation ${format(snapshot.sourceElevationM, 0)} m: pressure, and so humidity ratio, are at the source's elevation, not necessarily the site's.` : ''} Retrieved ${snapshot.retrievedAt || 'date unavailable'}.`));
+  detail.append(node('p', `Data kind: ${snapshot.dataKind}. UTC hourly intervals; field-specific averaging and derivations are retained in exports. Snapshot ${snapshot.id.slice(-12)}.`, 'help'));
   if (snapshot.warnings?.length) detail.append(document.createTextNode(` ${snapshot.warnings.map(describe).join(' ')}`));
   markChanged(); persist(); renderComponentStatus();
-  if (persistSnapshot) {try {await saveWeather(state.snapshot);} catch (error) {message(`Weather is loaded but could not be cached: ${error.message}`, 'warning');}}
+  if (persistSnapshot) {try {await saveWeather(snapshot, {isCurrent: () => epoch === state.weatherEpoch});} catch (error) {if (epoch === state.weatherEpoch) message(`Weather is loaded but could not be cached: ${error.message}`, 'warning');}}
+  if (epoch !== state.weatherEpoch) return false;
   const year = calendarYear(state.snapshot); state.years = new Set(year ? [year] : []);
   await refreshYears();
+  if (epoch !== state.weatherEpoch) return false;
   await refreshEnergy();
+  return epoch === state.weatherEpoch;
 }
 async function retrieveWeather(event) {
   event.preventDefault(); const location = locationValues(), startDate = $('start-date').value, endDate = $('end-date').value;
@@ -518,8 +537,8 @@ async function retrieveWeather(event) {
   const epoch = ++state.weatherEpoch; state.weatherController?.abort(); state.weatherController = new AbortController();
   weatherBusy(true, 'Retrieving real source data. Public services may take a little while…');
   try {
-    const snapshot = await fetchWeather({...location, startDate, endDate, provider: $('weather-provider').value, apiKey: apiKeyFor($('weather-provider').value), station: $('station').value.trim(), signal: state.weatherController.signal, onProgress: (value, text) => {if (epoch === state.weatherEpoch) $('weather-status').textContent = `${finite(value) ? `${format(value * 100)}% · ` : ''}${text || 'Retrieving weather…'}`;}});
-    if (epoch !== state.weatherEpoch) return; await acceptWeather(snapshot); $('weather-status').textContent = 'Weather retrieved. Any hours the source did not have are kept as gaps rather than filled in with a guess.';
+    const snapshot = await fetchWeather({...weatherRequest(location, {startDate, endDate}, acquisitionOptions()), signal: state.weatherController.signal, onProgress: (value, text) => {if (epoch === state.weatherEpoch) $('weather-status').textContent = `${finite(value) ? `${format(value * 100)}% · ` : ''}${text || 'Retrieving weather…'}`;}});
+    if (epoch !== state.weatherEpoch || !await acceptWeather(snapshot, {epoch})) return; $('weather-status').textContent = 'Weather retrieved. Any hours the source did not have are kept as gaps rather than filled in with a guess.';
   } catch (error) {if (epoch === state.weatherEpoch) {$('weather-status').className = 'status-line error'; $('weather-status').textContent = `${error.message} Whatever weather you already had is untouched, and nothing was invented to replace what failed.`;}}
   finally {if (epoch === state.weatherEpoch) {const text = $('weather-status').textContent, error = $('weather-status').classList.contains('error'); weatherBusy(false, text); $('weather-status').classList.toggle('error', error);}}
 }
@@ -615,14 +634,23 @@ function startPool(jobs, {onProgress, onDone, onError}) {
 }
 /** Snapshot for one site and period: the loaded snapshot, the browser cache, or (additional sites only) a NASA POWER retrieval that is then cached. */
 async function resolveSnapshot(site, period, source, signal, onProgress) {
-  if (source?.kind === 'loaded') return state.snapshot;
-  if (source?.kind === 'cached') {const cached = await loadCachedWeather(source.key); if (cached) return normalizeWeather(cached);}
-  const snapshot = normalizeWeather(await fetchWeather({latitude: site.latitude, longitude: site.longitude, timezone: site.timezone, startDate: period.startDate, endDate: period.endDate, provider: 'nasa', signal, onProgress}));
+  if (source?.kind === 'loaded') {
+    if (source.key && source.key !== state.snapshot.id) throw new Error('The loaded weather changed while assembling this run. Run again with the current snapshot.');
+    return state.snapshot;
+  }
+  if (source?.kind === 'cached') {
+    const cached = await loadCachedWeather(source.key);
+    if (!cached) throw new Error('The selected weather revision is no longer cached. Retrieve or import it again before running.');
+    assertHistoricalWeather(cached); return cached;
+  }
+  const snapshot = await fetchWeather(weatherRequest(site, period, {provider: 'nasa', signal, onProgress}));
+  assertHistoricalWeather(snapshot);
   try {await saveWeather(snapshot, {latest: false});} catch {/* the cache is an optimization; the retrieved period still runs */}
   return snapshot;
 }
 async function run() {
   if (!state.snapshot) throw new Error('Load or import actual weather before running.');
+  assertHistoricalWeather(state.snapshot);
   const location = locationValues(), years = [...state.years].sort();
   try {state.cached = await listWeather();} catch {state.cached = [];}
   if (years.length) {state.yearSources = yearSources(location.latitude, location.longitude, location.timezone); for (const year of years) if (!state.yearSources.has(year)) throw new Error(`Weather year ${year} is not available for the current coordinates. Locate the site again or refresh the year list.`);}
@@ -642,15 +670,15 @@ async function run() {
   const jobs = [];
   try {
     for (const [siteIndex, entry] of sites.entries()) {
-      const sources = yearSources(entry.site.latitude, entry.site.longitude, entry.site.timezone);
+      const sources = yearSources(entry.site.latitude, entry.site.longitude, entry.site.timezone, siteIndex ? 'nasa' : $('weather-provider').value);
       const periods = years.length ? years.map(year => ({year, startDate: `${year}-01-01`, endDate: `${year}-12-31`})) : [{year: null, startDate: state.snapshot.startDate, endDate: state.snapshot.endDate}];
       for (const period of periods) {
         const progressLabel = `${entry.site.city || entry.site.zip || 'Site'} ${period.year || `${period.startDate} to ${period.endDate}`}`;
         $('progress-label').textContent = `Loading weather · ${progressLabel}`;
-        const cachedKey = weatherKey({...entry.site, ...period}), cachedEntry = state.cached.find(c => c.key === cachedKey);
-        const source = period.year ? sources.get(period.year) : !siteIndex ? {kind: 'loaded'} : cachedEntry ? {kind: 'cached', key: cachedEntry.key} : null;
+        const cachedEntry = selectCachedWeather(state.cached, {...entry.site, ...period, provider: 'nasa'});
+        const source = period.year ? sources.get(period.year) : !siteIndex ? {kind: 'loaded', key: state.snapshot.id} : cachedEntry ? {kind: 'cached', key: cachedEntry.key} : null;
         const snapshot = await resolveSnapshot(entry.site, period, source, controller.signal, (value, text) => {if (state.runId === runId) $('progress-label').textContent = `Retrieving ${progressLabel} · ${finite(value) ? `${format(value * 100)}% · ` : ''}${text || ''}`;});
-        if (!siteIndex && snapshot.timezone !== location.timezone) throw new Error(`Weather year ${period.year} was stored for time zone ${snapshot.timezone}, but this site is on ${location.timezone}. A calendar year is bounded by local days, so the stored year covers different hours than this site needs. Select Retrieve years to download it for ${location.timezone}, which replaces the stored copy.`);
+        if (!siteIndex && snapshot.timezone !== location.timezone) throw new Error(`Weather year ${period.year} was stored for time zone ${snapshot.timezone}, but this site is on ${location.timezone}. A calendar year is bounded by local days, so the stored year covers different hours than this site needs. Select Retrieve years to download it for ${location.timezone}, which saves a separate snapshot.`);
         if (state.runId !== runId) return;
         const energyContext = entry.priced && state.energyContext ? getEnergyContext(state.zipInfo, {sector, startDate: snapshot.startDate, endDate: snapshot.endDate}, state.catalog) : null;
         jobs.push({id: `${runId}:${jobs.length}`, siteIndex, label: period.year || `${snapshot.startDate} to ${snapshot.endDate}`, snapshot, scenarios: entry.scenarios, energyContext});
@@ -926,12 +954,12 @@ async function importFile(event) {
     if (epoch !== state.weatherEpoch) return;
     importProgress(true, 1, 'Applying the import…');
     if (parsed.kind !== 'run') {
-      await acceptWeather(parsed.snapshot, {normalized: true});
+      if (!await acceptWeather(parsed.snapshot, {normalized: true, epoch})) return;
       message(parsed.kind === 'weather-csv' ? 'Weather CSV imported. Units and hourly continuity were checked; source values remain user-supplied.' : 'Weather snapshot imported and normalized.', 'success');
       return;
     }
     stopPool(); state.scenarios = parsed.scenarios; state.selected = parsed.scenarios[0].id; $('sector').value = current().sector; markChanged(); renderScenario();reflectLocation(current());
-    if (parsed.snapshot) await acceptWeather(parsed.snapshot, {normalized: true}); else {await refreshYears(); await refreshEnergy();}
+    if (parsed.snapshot) {if (!await acceptWeather(parsed.snapshot, {normalized: true, epoch})) return;} else {await refreshYears(); await refreshEnergy();}
     persist();
     message(`Imported ${parsed.scenarios.length} validated scenario${parsed.scenarios.length === 1 ? '' : 's'}${parsed.snapshot ? ' and its weather snapshot' : ''}. All will run at the shared site and customer sector shown above. Re-run to calculate local results; imported result claims are not displayed without recomputation.`, 'success');
   } finally {event.target.value = ''; importProgress(false);}
@@ -939,7 +967,15 @@ async function importFile(event) {
 function bindEvents() {
   on('lookup-zip', 'click', locate); on('weather-form', 'submit', retrieveWeather);
   buildProviders(); on('weather-provider', 'change', renderProvider); on('provider-key', 'change', saveProviderKey); on('provider-key', 'blur', saveProviderKey);
-  for (const id of ['zip', 'latitude', 'longitude', 'timezone', 'start-date', 'end-date', 'weather-provider', 'station']) on(id, 'change', () => {markChanged(); if (['latitude', 'longitude', 'timezone'].includes(id)) return refreshYears(); if (['zip', 'start-date', 'end-date'].includes(id)) return refreshEnergy();});
+  for (const id of ['zip', 'latitude', 'longitude', 'timezone', 'start-date', 'end-date', 'weather-provider', 'station']) on(id, 'change', () => {
+    if (['latitude', 'longitude', 'timezone'].includes(id)) copyLocationToScenarios({
+      latitude: $('latitude').value === '' ? null : Number($('latitude').value),
+      longitude: $('longitude').value === '' ? null : Number($('longitude').value), timezone: $('timezone').value.trim(),
+    });
+    markChanged();
+    if (['latitude', 'longitude', 'timezone', 'weather-provider', 'station'].includes(id)) return refreshYears();
+    if (['zip', 'start-date', 'end-date'].includes(id)) return refreshEnergy();
+  });
   on('retrieve-years', 'click', retrieveYears); on('add-site', 'click', addSite); on('site-zip', 'keydown', event => {if (event.key === 'Enter') {event.preventDefault(); return addSite();}});
   on('site-zip', 'input', proposeSiteTimezone); on('site-timezone', 'input', () => {$('site-timezone').dataset.edited = '1';});
   on('scenario-form', 'input', updateScenario); on('scenario-form', 'submit', event => event.preventDefault());
@@ -977,8 +1013,10 @@ async function initialize() {
   if (!state.scenarios.length) state.scenarios = [makeScenario()]; state.selected = state.scenarios[0].id; $('sector').value = current().sector; renderScenario(); reflectLocation(current());
   decorateTerms();
   const energyPromise = initializeEnergy();
+  const restoreEpoch = state.weatherEpoch;
   let cached = null; try {cached = await loadWeather();} catch (error) {message(`Weather cache unavailable: ${error.message}. Source retrieval and imports still work.`, 'warning');}
-  if (cached) {try {await acceptWeather(cached, {persistSnapshot: false,adoptLocation:false}); $('weather-status').textContent = 'Weather you loaded earlier has been restored. Your scenario site was left alone, so if the two do not match, retrieve weather for this site before running.';} catch (error) {$('weather-status').textContent = `Saved weather was rejected: ${error.message} Enter a ZIP, then retrieve weather for your site.`;}}
+  if (restoreEpoch !== state.weatherEpoch) {await energyPromise; return;}
+  if (cached) {try {if (!await acceptWeather(cached, {persistSnapshot: false,adoptLocation:false,epoch:restoreEpoch})) return; $('weather-status').textContent = 'Weather you loaded earlier has been restored. Your scenario site was left alone, so if the two do not match, retrieve weather for this site before running.';} catch (error) {$('weather-status').textContent = `Saved weather was rejected: ${error.message} Enter a ZIP, then retrieve weather for your site.`;}}
   else $('weather-status').textContent = 'No weather loaded yet. Enter your ZIP, select Locate, then retrieve weather for the period you want to look at. A full year is the useful screen and takes about a minute to fetch. A single week arrives in seconds if you would rather see the tool work first.';
   await energyPromise;
 }

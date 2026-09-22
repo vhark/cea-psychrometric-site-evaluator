@@ -100,8 +100,8 @@ export function downloadRun(results,snapshot,format='json',extras={}){
   'recoveryDefrostFraction','preheatFraction','doasConditionedFraction','doasTreatmentM3s'];
  const costColumns=['costBasis','installedCostBasis'];
  const columns=[...keys,...controlKeys,...costColumns];
- const rows=[['scenario','source','sourceKind','timezone',...columns].map(csvValue).join(',')];
- for(const r of results)for(const h of r.hours)rows.push([r.scenario.name,snapshot.source,snapshot.sourceKind,snapshot.timezone,
+ const rows=[['scenario','source','sourceKind','timezone','weatherSnapshotId','weatherDataKind',...columns].map(csvValue).join(',')];
+ for(const r of results)for(const h of r.hours)rows.push([r.scenario.name,snapshot.source,snapshot.sourceKind,snapshot.timezone,snapshot.id,snapshot.dataKind,
   ...keys.map(k=>k==='time'?new Date(h.time).toISOString():h[k]),
   ...controlKeys.map(k=>k==='controlledACHStages'?JSON.stringify(h.controls?.[k]||[]):h.controls?.[k]),JSON.stringify(r.summary.costBasis),r.scenario.installedCostBasis].map(csvValue).join(','));
  download('cea-psychrometric-site-evaluator-hourly.csv',rows.join('\r\n'),'text/csv');return;

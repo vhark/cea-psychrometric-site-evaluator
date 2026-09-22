@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather storage browser integration</title>
+<style>
+body{font:16px system-ui,sans-serif;max-width:960px;margin:40px auto;padding:0 20px;line-height:1.5;background:#f5f4ef;color:#222}button{font:inherit;padding:8px 14px;margin:4px 12px 4px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid #aaa;padding:16px;font:13px ui-monospace,monospace}.pass{color:#125b26}.fail{color:#a31616}#status{font-weight:700}
+</style>
+</head>
+<body>
+<h1>Weather storage browser integration</h1>
+<p>Dedicated test origin only: <strong>http://localhost:8153</strong>. This harness writes synthetic fixtures to this origin's weather database. It refuses to run if any database already exists. It never deletes a database automatically.</p>
+<p><button id="run" disabled>Run integration tests</button><button id="reset" disabled>Reset test database</button></p>
+<p>The reset button deletes only <code>cea-psychrometric-site-evaluator</code> on the dedicated test origin. Close other tabs on port 8153 first.</p>
+<p id="status" role="status">Loading test modules…</p>
+<pre id="results" aria-live="polite"></pre>
+<script type="module" src="./weather-storage.mjs"></script>
+</body>
+</html>

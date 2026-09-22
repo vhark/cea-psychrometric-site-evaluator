@@ -76,7 +76,7 @@ export const PROVIDERS = {
       'A generous free allowance for occasional screening work.',
     ],
     cons: [
-      'It blends observations with model output into a gap-free series and publishes no per-hour flag saying which a value is. This tool records the contributing stations, and marks an hour naming none as modelled, but that is weaker than a real fill flag.',
+      'Hourly source codes distinguish observations, forecasts and statistical data when supplied. Missing station identifiers do not prove modeled values. Variable-level lineage may remain unknown; forecasts and statistical records cannot enter historical analysis.',
       'Pressure arrives as sea-level pressure, which at 1,655 m is about 22 percent above the real station pressure. This tool reduces it using site elevation fetched separately, so your pressure here is derived rather than measured.',
       'Needs an account and your own key, unlike every other source offered.',
       'Its terms forbid redistributing raw data publicly, so a snapshot exported from it is not yours to republish.',

@@ -8,6 +8,8 @@ Versions are model versions: the string the engine stamps into every result and 
 
 ### Added
 
+- Weather schema 2 with provider/model/station identity, per-variable evidence and temporal semantics, separate forecast issuance/retrieval clocks, and SHA-256 snapshot IDs. Historical analysis rejects forecast/statistical evidence and future values. Result JSON/CSV/reports retain weather identity.
+- Immutable IndexedDB weather revisions and provider-aware request lookup, with non-destructive migration from the legacy cache. Added contract, selection and storage regression tests plus a browser integration harness.
 - The arithmetic behind every hour, shown with that hour's own numbers. `src/steps.js` recomputes ten steps from the raw weather row to the weather-side mode (validation, vapour pressures, humidity ratio, dew point and wet bulb and enthalpy and VPD, the local schedule, the moisture band, the pad state, the tests, the mode, outside air as a dehumidifier) plus how the coupled run scored the hour. The hourly inspector shows it under "Show the arithmetic for this hour"; the four per-hour Learn sections follow two real NASA POWER Tulsa hours (`data/weather/sample-hours.json`, with their source requests) through the same steps; `node scripts/worked-example.mjs` prints them. Nothing is stored: every number is recomputed by the functions the screen runs, and `test/steps.test.mjs` asserts the steps agree with the classifier.
 - Purchased fuel combustion now counts in CO2 at a scenario factor, `fuelCo2KgPerKWh`, default 0.181 kg CO2 per kWh of fuel (natural gas at 53.06 kg CO2 per MMBtu, EPA GHG Emission Factors Hub). Older scenarios receive the default on migration.
 - The weather status line and step 1 of the arithmetic show the source's elevation, because a gridded source reports pressure at its cell rather than the site. Denver's NASA POWER cell sits at 2,095 m against a 1,609 m city, which puts humidity ratio about 5% high there.
@@ -15,6 +17,10 @@ Versions are model versions: the string the engine stamps into every result and 
 
 ### Fixed
 
+- Cached years now match provider, model, station, exact coordinates and time zone. NCEI automatic station selection is pinned across annual requests, and multi-year Visual Crossing retrieval receives the provider key.
+- Visual Crossing preserves hourly source codes rather than inferring modeled data from absent stations. Hourly solar energy supplies mean irradiance; instantaneous radiation fallback is identified explicitly. Derived humidity/pressure metadata is retained.
+- Manual coordinate/timezone edits now update scenario validation so restored weather can run at the entered site.
+- Dateless weather imports infer calendar dates in the declared time zone, allowing repeat normalization and cache/export round trips. Superseded weather requests cannot overwrite a newer accepted snapshot after hashing.
 - Open-Meteo reports shortwave radiation as the mean of the preceding hour, while NASA POWER stamps the hour it covers. The Open-Meteo adapter filed both at the stamp, so its solar arrived one hour late against the same hour's temperature. Radiation is now filed one hour earlier; instant fields are unchanged.
 - A weather CSV was labelled UTC and that label became the site's zone on import. The import now takes the zone from the site controls and refuses to proceed without one.
 - The NCEI request ended at UTC midnight of the last local day, so every year on a western-hemisphere clock lost its last four to ten hours as false station gaps. The request now runs one UTC day past the end date; the local grid still stops where it did.
