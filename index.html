@@ -20,7 +20,7 @@
 <div class="orbital" aria-hidden="true"><svg viewBox="0 0 800 800" fill="none"><circle cx="400" cy="400" r="380" stroke="#F5F5F0" stroke-width="1"/><circle cx="400" cy="400" r="280" stroke="#F5F5F0" stroke-width="0.5"/><circle cx="400" cy="120" r="4" fill="#4DB405"/></svg></div>
 <header class="topbar">
   <a class="wordmark" href="./" aria-label="CEA Psychrometric Site Evaluator home"><img class="logo" src="assets/logo-white.png" alt="Grownetics" width="1584" height="474"><span class="product">Site Evaluator</span></a>
-  <div class="header-actions"><div id="view-switch" class="segmented viewswitch" role="tablist" aria-label="Workspace view"><button id="analyze-tab" type="button" role="tab" aria-selected="true" aria-controls="analyze-view" tabindex="0">Analyze</button><button id="learn-tab" type="button" role="tab" aria-selected="false" aria-controls="learn-view" tabindex="-1">Learn</button></div><button id="tour-button" type="button" class="tour-button">Take the tour</button><a href="#sources">Sources &amp; limits</a><span class="version">Screening 0.4.0</span></div>
+  <div class="header-actions"><div id="view-switch" class="segmented viewswitch" role="tablist" aria-label="Workspace view"><button id="analyze-tab" type="button" role="tab" aria-selected="true" aria-controls="analyze-view" tabindex="0">Analyze</button><button id="learn-tab" type="button" role="tab" aria-selected="false" aria-controls="learn-view" tabindex="-1">Learn</button></div><button id="tour-button" type="button" class="tour-button">Take the tour</button><a href="lab/">Air-state lab</a><a href="#sources">Sources &amp; limits</a><span class="version">Screening 0.4.0</span></div>
 </header>
 <main>
 <div id="analyze-view" role="tabpanel" aria-labelledby="analyze-tab" tabindex="-1">
@@ -36,7 +36,7 @@
         <label>Start date <span class="unit">local day</span><input id="start-date" type="date" value="2025-01-01" required></label>
         <label>End date <span class="unit">local day, inclusive</span><input id="end-date" type="date" value="2025-12-31" required></label>
         <label><span data-term="gridded">Weather source</span><select id="weather-provider"></select></label>
-        <button id="fetch-weather" class="primary" type="submit">Retrieve weather</button>
+        <button id="fetch-weather" class="primary" type="submit">Retrieve weather</button><button id="cancel-weather" type="button" hidden>Cancel retrieval</button>
       </div>
       <div class="context-bottom"><p id="location-description">Enter a US ZIP code and select Locate. A ZIP resolves to a catalog centroid, not an exact facility location.</p></div>
       <details class="location-details"><summary>Coordinates, time zone &amp; station</summary><div class="four-grid">
@@ -49,6 +49,7 @@
         <label>API key for this source<input id="provider-key" type="password" autocomplete="off" spellcheck="false" placeholder="paste your own key"></label>
         <p id="provider-key-note" class="help"></p>
       </div>
+      <p id="weather-request-estimate" class="help" aria-live="polite"></p>
       <details id="provider-detail" class="provider-detail"><summary>What this source is, and what it costs you</summary><div id="provider-detail-body"></div></details>
     </form>
     <div class="climate-row" id="years-row">

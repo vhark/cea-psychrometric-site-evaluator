@@ -12,3 +12,6 @@ data/energy/raw/
 .DS_Store
 node_modules/
 *.log
+
+node_modules/
+_site/

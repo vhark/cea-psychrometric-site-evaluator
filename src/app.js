@@ -1,11 +1,17 @@
 import {weatherQuality} from './weather-quality.js';
-import {assertHistoricalWeather, sealWeatherSnapshot} from './weather-contract.js';
+import {assertHistoricalWeather} from './weather-contract.js';
 import {calendarYear, selectWeatherYears, selectCachedWeather, weatherRequest, pinResolvedStation} from './weather-selection.js';
 import {CROPS, FACILITIES, SYSTEMS, TECHNOLOGIES, FIELDS, DEFAULT_SCENARIO, OPAQUE_FACILITIES, AIRFLOW_BASIS, AIRFLOW_EVIDENCE, LIGHT_FIXTURES, FT2_PER_M2, fixtureWm2, makeScenario, applyTechnology, migrateScenario, validateScenario, airflowEvidenceWarnings, MODEL_VERSION} from './config.js';
 import {airflowConversions, heatRecoveryErrors, backfillHeatRecovery} from './airflow.js';
-import {fetchWeather, normalizeWeather} from './weather.js';
+import {createWeatherClient} from './weather-client.js';
+import {requestEstimate} from './weather-request.js';
+const weatherClient=createWeatherClient();
+const fetchWeather=({signal,onProgress,...options})=>weatherClient.fetch({...options,historicalOnly:true},{signal,onProgress});
+const listWeather=()=>weatherClient.list();
+const loadWeather=()=>weatherClient.load();
+const loadCachedWeather=key=>weatherClient.load(key);
 import {loadEnergyCatalog, lookupZip, getEnergyContext, proposeTimezone} from './energy.js';
-import {loadScenarios, saveScenarios, loadWeather, saveWeather, listWeather, loadCachedWeather} from './storage.js';
+import {loadScenarios, saveScenarios} from './storage.js';
 import {downloadRun, downloadScenario} from './export.js';
 import {compareScenarios, aggregateYears, compareSites, loadDecomposition, co2Window} from './metrics.js';
 import {modeLabel, modeEntries, attainmentClass, attainmentText, renderMonthly, renderTimeline, renderTimelineTable, renderScatter, renderDLI, renderLoads, renderYears} from './charts.js';
@@ -358,6 +364,10 @@ function renderProvider() {
     for (const item of items || []) list.append(node('li', item));
     section.append(list); body.append(section);
   }
+  const start=$('start-date').value,end=$('end-date').value;
+  $('weather-request-estimate').textContent='';
+  if(start&&end&&start<=end){const estimate=requestEstimate(start,end,id);$('weather-request-estimate').textContent=`Requested period: approximately ${format(estimate.hours)} hourly records${id==='visualcrossing'?`; ${estimate.chunks} metered requests, total records are not reduced by chunking`:''}. Retrieve-years selection: up to ${format(Number($('retrieve-years-count').value)*8784)} hourly records before excluding cached years. Check your provider allowance.`;}
+  if(start&&end&&start<=end){const estimate=requestEstimate(start,end,id);body.append(node('p', `Requested period: approximately ${format(estimate.hours)} hourly records. ${id==='visualcrossing'?`${estimate.chunks} requests of at most 30 local days each; chunking does not reduce total metered records. Provider allowance and daily limits still apply.`:'Sources are requested in bounded date chunks.'}`, 'help'));}
   if (provider.attribution) body.append(node('p', `Attribution required in anything you publish: ${provider.attribution}`, 'source-line'));
   if (provider.termsUrl) {const p = node('p', '', 'source-line'); safeSource(p, 'Provider terms', provider.termsUrl); body.append(p);}
 
@@ -392,7 +402,7 @@ function locationValues() {
 function copyLocationToScenarios(location) {for (const s of state.scenarios) Object.assign(s, location);}
 function reflectLocation(location) {for (const id of ['latitude', 'longitude', 'timezone', 'zip']) if (location[id] != null) $(id).value = location[id];}
 function weatherBusy(busy, text = '') {
-  $('fetch-weather').disabled = busy; $('retrieve-years').disabled = busy; $('weather-status').className = 'status-line'; $('weather-status').textContent = text;
+  $('cancel-weather').hidden=!busy; $('fetch-weather').disabled = busy; $('retrieve-years').disabled = busy; $('weather-status').className = 'status-line'; $('weather-status').textContent = text;
   state.weatherBusy = busy; renderComponentStatus();
 }
 /* Weather years: every calendar-year snapshot available for a coordinate pair, by source. Loaded > cached. */
@@ -471,36 +481,34 @@ async function addSite() {
 async function retrieveYears() {
   const location = locationValues(), count = Math.max(1, Math.min(10, Math.round(Number($('retrieve-years-count').value) || 0)));
   const lastComplete = new Date().getUTCFullYear() - 1, wanted = Array.from({length: count}, (_, i) => String(lastComplete - i));
-  await refreshYears();
-  const missing = wanted.filter(year => !state.yearSources.has(year)).reverse();
-  if (!missing.length) {for (const year of wanted) state.years.add(year); renderYearChips(); renderSiteChips(); markChanged(); message(`The ${count} most recent complete years are already available locally and are now selected.`, 'success'); return;}
   const epoch = ++state.weatherEpoch; state.weatherController?.abort(); state.weatherController = new AbortController();
-  let acquisition = acquisitionOptions();
-  weatherBusy(true, `Retrieving ${missing.length} calendar year${missing.length === 1 ? '' : 's'} from the selected source…`);
-  let done = 0;
+  let acquisition = acquisitionOptions(),missing=[];
+  let done = 0,volatileYears=0;
+  weatherBusy(true,'Checking saved years for the selected source…');
   try {
+    await refreshYears();if(epoch!==state.weatherEpoch)return;
+    missing=wanted.filter(year=>!state.yearSources.has(year)).reverse();
+    if(!missing.length){for(const year of wanted)state.years.add(year);renderYearChips();renderSiteChips();markChanged();$('weather-status').textContent=`The ${count} most recent complete years are already available locally and are selected.`;return;}
+    $('weather-status').textContent=`Retrieving ${missing.length} calendar years from the selected source…`;
     for (const year of missing) {
-      const snapshot = await fetchWeather({...weatherRequest(location, {startDate: `${year}-01-01`, endDate: `${year}-12-31`}, acquisition), signal: state.weatherController.signal, onProgress: (value, text) => {if (epoch === state.weatherEpoch) $('weather-status').textContent = `Year ${year} (${done + 1}/${missing.length}) · ${finite(value) ? `${format(value * 100)}% · ` : ''}${text || 'Retrieving weather…'}`;}});
+      const snapshot = await fetchWeather({...weatherRequest(location, {startDate: `${year}-01-01`, endDate: `${year}-12-31`}, {...acquisition,latest:false}), signal: state.weatherController.signal, onProgress: (value, text) => {if (epoch === state.weatherEpoch) $('weather-status').textContent = `Year ${year} (${done + 1}/${missing.length}) · ${finite(value) ? `${format(value * 100)}% · ` : ''}${text || 'Retrieving weather…'}`;}});
       if (epoch !== state.weatherEpoch) return;
       acquisition = pinResolvedStation(acquisition, snapshot);
       if (acquisition.provider === 'ncei' && acquisition.station) $('station').value = acquisition.station;
       const normalized = snapshot;
       assertHistoricalWeather(normalized);
-      try {await saveWeather(normalized, {latest: false});} catch (error) {throw new Error(`Year ${year} was retrieved but could not be cached: ${error.message}`);}
+      if(snapshot.cacheWarning){volatileYears++;message(snapshot.cacheWarning,'warning');}
       if (epoch !== state.weatherEpoch) return;
       done++; state.years.add(year);
     }
-    await refreshYears(); for (const year of wanted) if (state.yearSources.has(year)) state.years.add(year); renderYearChips(); renderSiteChips(); markChanged();
-    $('weather-status').textContent = `${done} calendar year${done === 1 ? '' : 's'} retrieved and cached in this browser. The loaded snapshot is unchanged.`;
-  } catch (error) {if (epoch === state.weatherEpoch) {await refreshYears(); $('weather-status').className = 'status-line error'; $('weather-status').textContent = `${error.message} ${done} of ${missing.length} years were cached before the failure. No synthetic replacement was used.`;}}
+    await refreshYears();if(epoch!==state.weatherEpoch)return; for (const year of wanted) if (state.yearSources.has(year)) state.years.add(year); renderYearChips(); renderSiteChips(); markChanged();
+    $('weather-status').textContent = `${done} calendar year${done === 1 ? '' : 's'} retrieved; ${done-volatileYears} saved in browser storage${volatileYears?`, ${volatileYears} available only for this session (export before reload)`:''}. The loaded snapshot is unchanged.`;
+  } catch (error) {if (epoch === state.weatherEpoch) {await refreshYears();if(epoch!==state.weatherEpoch)return; $('weather-status').className = 'status-line error'; $('weather-status').textContent = `${error.message} ${done} of ${missing.length} years were cached before the failure. No synthetic replacement was used.`;}}
   finally {if (epoch === state.weatherEpoch) {const text = $('weather-status').textContent, error = $('weather-status').classList.contains('error'); weatherBusy(false, text); $('weather-status').classList.toggle('error', error);}}
 }
-// `normalized` is set only where the snapshot already came out of normalizeWeather (the import worker),
-// avoiding a duplicate validation pass before adoption. Storage still validates and hashes its copy.
-async function acceptWeather(snapshot, {persistSnapshot = true, adoptLocation = true, normalized = false, epoch = state.weatherEpoch} = {}) {
-  const canonical = normalized ? snapshot : normalizeWeather(snapshot);
-  assertHistoricalWeather(canonical);
-  snapshot = await sealWeatherSnapshot(canonical);
+// Only verified compact records returned by our worker enter this path.
+async function acceptWeather(snapshot, {adoptLocation = true, epoch = state.weatherEpoch} = {}) {
+  assertHistoricalWeather(snapshot);
   if (epoch !== state.weatherEpoch) return false;
   state.snapshot = snapshot;
   if (Object.hasOwn(PROVIDERS, snapshot.provider.id)) {
@@ -522,12 +530,12 @@ async function acceptWeather(snapshot, {persistSnapshot = true, adoptLocation = 
   safeSource(detail, `${describe(snapshot.source)} · ${describe(snapshot.sourceKind)}`, snapshot.sourceUrl);
   detail.append(document.createTextNode(` · ${snapshot.startDate} to ${snapshot.endDate} · ${snapshot.timezone}. Meteorology ${format(met)}/${format(hours.length)} h; solar ${format(solar)}/${format(hours.length)} h.${finite(snapshot.sourceElevationM) ? ` Source elevation ${format(snapshot.sourceElevationM, 0)} m: pressure, and so humidity ratio, are at the source's elevation, not necessarily the site's.` : ''} Retrieved ${snapshot.retrievedAt || 'date unavailable'}.`));
   detail.append(node('p', `Data kind: ${snapshot.dataKind}. UTC hourly intervals; field-specific averaging and derivations are retained in exports. Snapshot ${snapshot.id.slice(-12)}.`, 'help'));
-  const quality=weatherQuality(snapshot);
+  const quality=snapshot.preanalysisQuality||weatherQuality(snapshot);
   detail.append(node('p', `Data quality before analysis: ${quality.rawMeteorologyHours}/${quality.expectedHours} intervals contain meteorology; ${quality.derivedHours} include derived variables (${Object.entries(quality.derivedVariables).map(([key,count])=>`${key}: ${count}`).join(', ')||'none flagged'}). Weather screening: ${quality.weatherEligibleHours} eligible hours. Solar-required simulation: ${quality.simulationEligibleHours} eligible before segment warm-up; opaque facilities can use the ${quality.weatherEligibleHours} meteorology-valid hours. ${quality.unsupportedStateHours} unsupported or missing states; ${quality.unresolvedMoistureHours} unresolved moisture interpretations. Finite values are not proof of measured data.`, 'help'));
   if(quality.legacyMoistureHours)detail.append(node('p', `${quality.legacyMoistureHours} intervals retain a legacy PsychroLib humidity convention with unconfirmed provider provenance. Explicit reprocessing creates a new snapshot; originals remain unchanged.`, 'help'));
   if (snapshot.warnings?.length) detail.append(document.createTextNode(` ${snapshot.warnings.map(describe).join(' ')}`));
   markChanged(); persist(); renderComponentStatus();
-  if (persistSnapshot) {try {await saveWeather(snapshot, {isCurrent: () => epoch === state.weatherEpoch});} catch (error) {if (epoch === state.weatherEpoch) message(`Weather is loaded but could not be cached: ${error.message}`, 'warning');}}
+  if(snapshot.cacheWarning){detail.append(node('p',snapshot.cacheWarning,'error'));message(snapshot.cacheWarning,'warning');}
   if (epoch !== state.weatherEpoch) return false;
   const year = calendarYear(state.snapshot); state.years = new Set(year ? [year] : []);
   await refreshYears();
@@ -647,9 +655,8 @@ async function resolveSnapshot(site, period, source, signal, onProgress) {
     if (!cached) throw new Error('The selected weather revision is no longer cached. Retrieve or import it again before running.');
     assertHistoricalWeather(cached); return cached;
   }
-  const snapshot = await fetchWeather(weatherRequest(site, period, {provider: 'nasa', signal, onProgress}));
+  const snapshot = await fetchWeather(weatherRequest(site, period, {provider: 'nasa',latest:false, signal, onProgress}));
   assertHistoricalWeather(snapshot);
-  try {await saveWeather(snapshot, {latest: false});} catch {/* the cache is an optimization; the retrieved period still runs */}
   return snapshot;
 }
 async function run() {
@@ -733,13 +740,13 @@ function renderModeTable(r) {
   table($('mode-table'), state.weatherOnly ? ['Primary weather mode', 'Hours', '% classified', 'Days ≥4 h', 'Longest episode · h'] : ['Equipment mode', 'Hours', '% valid'], entries.map(([mode, hours]) => state.weatherOnly ? [modeLabel(mode), format(hours), units(total ? hours / total * 100 : null, '%', 1), format(ws?.modeExposureDays?.[mode]?.atLeast4), format(ws?.episodes?.[mode]?.maximumHours)] : [modeLabel(mode), format(hours), units(total ? hours / total * 100 : null, '%', 1)]));
 }
 function renderRuntime(r) {
-  const s = r.summary, pv = r.weatherSummary?.padViability, rt = s.runtime || {}, hours = s.validHours || 0;
+  const s = r.summary, pv = r.weatherSummary?.padViability, rt = s.runtime || {}, hours = (state.weatherOnly?r.weatherSummary?.validHours:s.validHours) || 0;
   const share = n => hours ? units(n / hours * 100, '% of valid h', 1) : 'Not available';
   const row = (label, key, note) => rt[key] ? [label, format(rt[key].hours), format(rt[key].equivalentHours, 1), format(rt[key].days), share(rt[key].hours), note] : null;
   if (state.weatherOnly) {
     const u = r.weatherSummary?.utility;
     $('runtime-title').textContent = 'What the weather makes useful: pad and vent, measured separately';
-    $('runtime-help').textContent = 'A wet pad and an open vent are different tools, so they are scored independently and jointly rather than by one mutually exclusive label per hour. The row that decides whether a pad is worth buying is the pad-only one: hours outside air is above the ceiling, so ventilation cannot hold the band, while pad leaving air still can. Air-side capability, not equipment runtime or installed capacity.';
+    $('runtime-help').textContent = 'A wet pad and an open vent are different tools, so they are scored independently and jointly rather than by one mutually exclusive label per hour. The row that decides whether a pad is worth buying is the pad-only one: hours outside air is above the ceiling, so ventilation cannot hold the band, while pad leaving air still can. Counts require installed equipment and available airflow; they are weather-side capability hours, not runtime or demonstrated load capacity.';
     const days = d => `${format(d?.atLeast1)} / ${format(d?.atLeast4)} / ${format(d?.atLeast8)}`;
     const pct = n => units(hours ? n / hours * 100 : null, '% of valid h', 1);
     table($('runtime-table'), ['Weather-side capability', 'Hours', 'Share of valid hours', 'Reading'], u ? [
@@ -749,7 +756,7 @@ function renderRuntime(r) {
       ['Vent could cool usefully', format(u.ventCoolingHours), pct(u.ventCoolingHours), 'Outside air below the target by the ventilation margin without importing moisture'],
       ['Vent could dry usefully', format(u.ventDryingHours), pct(u.ventDryingHours), 'Outside air below the zone moisture ceiling by the drying margin'],
       ['Both useful in the same hour', format(u.bothHours), pct(u.bothHours), 'Overlap, not a sum: these hours are counted in both tools above'],
-      ['Neither useful', format(u.neitherHours), pct(u.neitherHours), 'Hours no outside-air path helps, so mechanical equipment is the only option'],
+      ['Neither useful', format(u.neitherHours), pct(u.neitherHours), 'No installed outside-air path meets these usefulness tests; hypothetical opportunities may still exist'],
       ['Limit hit: temperature margin', format(pv?.failureCauses?.temperature), '', 'Hours pad leaving air stays too warm'],
       ['Limit hit: moisture ceiling', format(pv?.failureCauses?.moisture), '', 'Hours pad leaving air is too humid'],
       ['Legacy pad screen: effective / marginal / ineffective', `${format(pv?.effectiveHours)} / ${format(pv?.marginalHours)} / ${format(pv?.ineffectiveHours)}`, '', `Mutually exclusive primary-mode counts, retained for continuity. Effective days ≥1 / ≥4 / ≥8: ${days(pv?.effectiveDays)}`]] : []);
@@ -863,6 +870,7 @@ function renderInspector() {
   const local = new Intl.DateTimeFormat('en-US', {timeZone: r.scenario.timezone, dateStyle: 'medium', timeStyle: 'long'}).format(h.time);
   box.append(node('p', `${local} · ${new Date(h.time).toISOString()}`, 'hour-date'));
   box.append(node('p', `${modeLabel(state.weatherOnly ? h.weatherMode : h.mode)}. ${state.weatherOnly ? h.weatherReason || '' : h.reason || ''}${h.warmup && !state.weatherOnly ? ' Warm-up hour, excluded from comparison.' : ''}`, 'hour-reason'));
+  if(h.opportunity)box.append(node('p', `Evaporative cooling opportunity: ${h.opportunity.pad.cooling?'yes':'no'}. Pad installed: ${h.capability?.pad.installed?'yes':'no'}; useful with available airflow: ${h.capability?.pad.cooling?'yes':'no'}. Simulated pad operation: ${h.operation?`${format(h.operation.pad.equivalentHours,3)} equivalent hours`:'not evaluated'}.`, 'help'));
   const grid = node('dl', undefined, 'inspection-grid');
   const rows = [['Outdoor dry bulb', units(w.tempC, '°C')], ['Outdoor dew point', units(w.dewPointC, '°C')], ['Outdoor relative humidity', units(finite(w.rh) ? w.rh * 100 : null, '%')], ['Station pressure', units(w.pressurePa, 'Pa', 0)], ['Solar irradiance', units(w.ghiWm2, 'W/m²', 0)], ['Wind speed', units(w.windMs, 'm/s')], ['Pad leaving dry bulb', units(h.padTempC, '°C')], ['Pad leaving dew point', units(h.padDewPointC, '°C')]];
   if (!state.weatherOnly) rows.push(['Estimated zone temperature', units(h.tempC, '°C')], ['Estimated zone RH', units(finite(h.rh) ? h.rh * 100 : null, '%')], ['Estimated air VPD', units(h.vpd, 'kPa', 2)], ['Joint-target fraction', units(finite(h.compliantFraction) ? h.compliantFraction * 100 : null, '%', 1)], ['Electricity', units(h.electricKWh, 'kWh', 2)], ['Purchased fuel', units(h.fuelKWh, 'kWh', 2)], ['Water', units(h.waterL, 'L', 1)], ['Condensate', units(h.condensateKg, 'kg', 2)], ['DX cooling delivered', units(h.coolingKWh, 'kWh', 2)], ['Dehu heat indoors', units(h.dehuHeatKWh, 'kWh', 2)], ['Regeneration energy', units(h.regenerationKWh, 'kWh', 2)], ['Desiccant removal', units(h.desiccantRemovedKg, 'kg', 2)], ['Unmet sensible load', units(h.unmetSensibleKWh, 'kWh', 2)], ['Unmet moisture', units(h.unmetMoistureKg, 'kg', 2)], ['Energy residual', units(h.energyResidualW, 'W', 1)], ['Moisture residual', units(h.moistureResidualKgS, 'kg/s', 6)],
@@ -927,37 +935,21 @@ function importProgress(visible, value = 0, text = '') {
   $('import-progress-bar').value = Math.max(0, Math.min(1, finite(value) ? value : 0));
   $('import-progress-label').textContent = text;
 }
-/* Parsing and weather normalization run in a worker: a 100+ MB run JSON never blocks the interface, and a
-   file beyond the tab's memory kills the worker instead of the page. Only one parse runs at a time. */
-function parseInWorker(file, onProgress) {
-  state.parseWorker?.terminate();
-  const worker = new Worker(new URL('./worker.js', import.meta.url), {type: 'module'}), id = uid();
-  state.parseWorker = worker;
-  return new Promise((resolve, reject) => {
-    const settle = (finish, value) => {worker.terminate(); if (state.parseWorker === worker) state.parseWorker = null; finish(value);};
-    worker.onmessage = event => {
-      const data = event.data; if (data.id !== id) return;
-      if (data.type === 'progress') onProgress(data.value, data.message);
-      else if (data.type === 'error') settle(reject, new Error(data.message));
-      else if (data.type === 'parsed') settle(resolve, data);
-    };
-    worker.onerror = event => {event.preventDefault(); settle(reject, new Error(`The import worker stopped: ${event.message || 'the file needed more memory than this browser tab could allocate'}. Nothing was replaced. Split the comparison or the weather period and import again.`));};
-    worker.onmessageerror = () => settle(reject, new Error('The parsed import could not be transferred out of the worker. Nothing was replaced.'));
-    try {worker.postMessage({id, type: 'parse', file, timezone: $('timezone').value.trim()});} catch (error) {settle(reject, error);}
-  });
+function parseInWorker(file,onProgress){
+ return weatherClient.parseFile(file,{timezone:$('timezone').value.trim(),historicalOnly:true},{signal:state.weatherController.signal,onProgress});
 }
 async function importFile(event) {
   const file = event.target.files[0]; if (!file) return;
   // An import is the latest weather request: retire any in-flight retrieval so it cannot land afterwards.
-  const superseded = $('fetch-weather').disabled; const epoch = ++state.weatherEpoch; state.weatherController?.abort();
-  weatherBusy(false, superseded ? 'Pending retrieval canceled; the imported weather is current.' : $('weather-status').textContent);
+  const superseded = $('fetch-weather').disabled; const epoch = ++state.weatherEpoch; state.weatherController?.abort();state.weatherController=new AbortController();
+  weatherBusy(true, superseded ? 'Pending retrieval cancelled; preparing the import…' : 'Preparing the import in a background worker…');
   const size = finite(file.size) ? `${format(file.size / 1048576, 1)} MB` : 'the file';
   try {
     importProgress(true, .02, `Handing ${size} to a background worker…`);
     const parsed = await parseInWorker(file, (value, text) => importProgress(true, value, text || `Parsing ${size}…`));
     if (epoch !== state.weatherEpoch) return;
     importProgress(true, 1, 'Applying the import…');
-    if (parsed.kind !== 'run') {
+    if (!parsed.scenarios.length) {
       if (!await acceptWeather(parsed.snapshot, {normalized: true, epoch})) return;
       message(parsed.kind === 'weather-csv' ? 'Weather CSV imported. Units and hourly continuity were checked; source values remain user-supplied.' : 'Weather snapshot imported and normalized.', 'success');
       return;
@@ -966,12 +958,15 @@ async function importFile(event) {
     if (parsed.snapshot) {if (!await acceptWeather(parsed.snapshot, {normalized: true, epoch})) return;} else {await refreshYears(); await refreshEnergy();}
     persist();
     message(`Imported ${parsed.scenarios.length} validated scenario${parsed.scenarios.length === 1 ? '' : 's'}${parsed.snapshot ? ' and its weather snapshot' : ''}. All will run at the shared site and customer sector shown above. Re-run to calculate local results; imported result claims are not displayed without recomputation.`, 'success');
-  } finally {event.target.value = ''; importProgress(false);}
+  } finally {event.target.value = ''; importProgress(false);if(epoch===state.weatherEpoch)weatherBusy(false,'Import finished. Review the data quality and storage status above.');}
 }
 function bindEvents() {
   on('lookup-zip', 'click', locate); on('weather-form', 'submit', retrieveWeather);
+  on('cancel-weather','click',()=>{++state.weatherEpoch;state.weatherController?.abort();weatherBusy(false,'Weather retrieval cancelled. Previously loaded weather is retained.');});
+  for(const id of ['start-date','end-date','retrieve-years-count'])on(id,'change',renderProvider);
   buildProviders(); on('weather-provider', 'change', renderProvider); on('provider-key', 'change', saveProviderKey); on('provider-key', 'blur', saveProviderKey);
   for (const id of ['zip', 'latitude', 'longitude', 'timezone', 'start-date', 'end-date', 'weather-provider', 'station']) on(id, 'change', () => {
+    if(state.weatherBusy){++state.weatherEpoch;state.weatherController?.abort();weatherBusy(false,'Weather request cancelled because source, location or period changed.');}
     if (['latitude', 'longitude', 'timezone'].includes(id)) copyLocationToScenarios({
       latitude: $('latitude').value === '' ? null : Number($('latitude').value),
       longitude: $('longitude').value === '' ? null : Number($('longitude').value), timezone: $('timezone').value.trim(),
@@ -1002,7 +997,11 @@ function bindEvents() {
   on('timeline-month', 'change', renderCalendar); on('hour-slider', 'input', () => {state.hour = Number($('hour-slider').value); renderInspector();});
   on('hour-prev', 'click', () => {state.hour--; renderInspector();}); on('hour-next', 'click', () => {state.hour++; renderInspector();});
   on('export-scenario', 'click', () => {const errors = scenarioErrors(current()); if (errors.length) throw new Error(errors.join('\n')); downloadScenario(current());});
-  for (const type of ['json', 'csv']) on(`export-${type}`, 'click', () => downloadRun(state.results, state.resultSnapshot, type));
+  on('export-csv','click',()=>downloadRun(state.results,state.resultSnapshot,'csv'));
+  on('export-json','click',async()=>{
+    const blob=await weatherClient.exportRun({results:state.results,snapshotId:state.resultSnapshot?.id});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='cea-psychrometric-site-evaluator-run.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
   // The results document carries the multi-year and multi-site sections when those runs exist.
   on('export-report', 'click', () => downloadRun(state.results, state.resultSnapshot, 'report', {aggregate: state.aggregate, sites: state.siteComparison, siteRuns: state.siteRuns}));
   on('export-design-basis', 'click', () => downloadRun(state.results, state.resultSnapshot, 'design-basis', {aggregate: state.aggregate, sites: state.siteComparison, siteRuns: state.siteRuns}));

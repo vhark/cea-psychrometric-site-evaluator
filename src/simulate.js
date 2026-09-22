@@ -569,7 +569,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     const weather=input[index],outside=weatherState(weather,needsSolar),classification=classifyWeather(weather,s);
     const row={time:weather.time,valid:false,eligible:false,compliantFraction:null,tempC:null,rh:null,vpd:null,
       mode:'MISSING_DATA',reason:'Missing or invalid meteorology or solar. Continuous state reset.',weatherMode:classification.weatherMode,
-      opportunity:classification.opportunity??null,capability:classification.capability??null,operation:null,weatherFlags:classification.flags,padTempC:classification.padTempC??null,padDewPointC:classification.padDewPointC??null,
+      opportunity:classification.opportunity??null,capability:classification.capability??null,operation:null,weatherReason:classification.reason,weatherFlags:classification.flags,padTempC:classification.padTempC??null,padDewPointC:classification.padDewPointC??null,
       wetBulbC:classification.wetBulbC??null,outdoorTempC:weather.tempC??null,outdoorRH:weather.rh??null,outdoorDrying:outdoorDryingHour(weather,s,classification),
       quality:weather.quality||[],energyResidualW:null,moistureResidualKgS:null};
     for(const key of TOTALS)row[key]=0;

@@ -7,7 +7,7 @@ import {downloadRun, parseImport} from '../../src/export.js';
 const NAME='cea-psychrometric-site-evaluator';
 const status=document.querySelector('#status'), output=document.querySelector('#results');
 const run=document.querySelector('#run'), reset=document.querySelector('#reset');
-const dedicated=location.origin==='http://localhost:8153';
+const dedicated=(location.origin==='http://localhost:8153'||(globalThis.__ISOLATED_TEST_CONTEXT__===true&&['localhost','127.0.0.1'].includes(location.hostname)));
 const units={time:'UTC epoch milliseconds',tempC:'C',dewPointC:'C',rh:'fraction',pressurePa:'Pa',ghiWm2:'W/m2',windMs:'m/s'};
 const fixture=(changes={})=>({schemaVersion:1,source:'NASA POWER',sourceKind:'synthetic browser integration fixture',
  dataKind:'synthetic',latitude:40,longitude:-105,timezone:'America/Denver',startDate:'2025-01-01',endDate:'2025-01-01',
@@ -17,7 +17,7 @@ const legacyKey='40.000,-105.000|America/Denver|2025-01-01|2025-01-01';
 const check=(condition,message)=>{if(!condition)throw new Error(message);};
 function opened(version){return new Promise((resolve,reject)=>{
  const request=version?indexedDB.open(NAME,version):indexedDB.open(NAME);
- request.onupgradeneeded=()=>{for(const name of ['snapshots','weather'])if(!request.result.objectStoreNames.contains(name))request.result.createObjectStore(name);};
+ request.onupgradeneeded=()=>{for(const name of ['snapshots','weather',...(version>=3?['weatherSnapshots','weatherRequests','weatherMeta']:[])])if(!request.result.objectStoreNames.contains(name))request.result.createObjectStore(name);};
  request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);request.onblocked=()=>reject(new Error('Database blocked by another test-origin tab.'));
 });}
 function transaction(db,stores,mode,work){return new Promise((resolve,reject)=>{
@@ -37,12 +37,19 @@ async function integration(){
  check(dedicated,'Refusing writes outside http://localhost:8153.');
  check(typeof indexedDB.databases==='function','This harness needs indexedDB.databases() to safely check the test origin.');
  check((await indexedDB.databases()).length===0,'Test origin already contains a database. Use Reset test database explicitly, or choose a clean browser profile.');
- let legacyBytes, migrated, revised, alternate;
+ let legacyBytes, migrated, revised, alternate, existingV3;
  await test('seed a version 2 database on the empty dedicated origin',async()=>{
   const db=await opened(2);try{await transaction(db,['snapshots','weather'],'readwrite',tx=>{
    tx.objectStore('snapshots').put(fixture(),'latest');tx.objectStore('weather').put(fixture(),legacyKey);
   });}finally{db.close();}
   legacyBytes=JSON.stringify(await allLegacy());
+ });
+ await test('seed a version 3 immutable revision before upgrading its derived index',async()=>{
+  existingV3=await sealWeatherSnapshot(normalizeWeather(fixture({source:'Synthetic existing version 3 fixture'})));
+  const db=await opened(3);try{await transaction(db,['weatherSnapshots','weatherRequests'],'readwrite',tx=>{
+   tx.objectStore('weatherSnapshots').put(existingV3,existingV3.id);
+   tx.objectStore('weatherRequests').put(existingV3.id,weatherKey(existingV3));
+  });}finally{db.close();}
  });
  await test('migration racing a newer save cannot replace the latest pointer',async()=>{
   const original=crypto.subtle.digest;let release,first=true,reached;
@@ -60,10 +67,16 @@ async function integration(){
   check(migrated.id!==revised.id,'Revised weather must have a different content ID');
   check((await loadWeather()).id===revised.id,'Migration overwrote the newer latest pointer');
  });
- await test('version 3 migration keeps both legacy stores byte-identical',async()=>{
-  const db=await opened();try{check(db.version===3,'Expected database version 3');}finally{db.close();}
+ await test('version 4 migration keeps both legacy stores byte-identical',async()=>{
+  const db=await opened();try{check(db.version===4,'Expected database version 4');}finally{db.close();}
   check(JSON.stringify(await allLegacy())===legacyBytes,'Legacy store values changed during migration');
   check((await loadCachedWeather(legacyKey)).id===migrated.id,'Legacy key did not resolve its exact migrated snapshot');
+ });
+ await test('version 3 revisions receive metadata and compact views without identity changes',async()=>{
+  const compact=await loadCachedWeather(existingV3.id,{compact:true});
+  check(compact?.id===existingV3.id&&compact.transport?.rawOmitted,'Existing revision lacks a compact view');
+  check(JSON.stringify(await loadCachedWeather(existingV3.id))===JSON.stringify(existingV3),'Upgrade changed original revision');
+  check((await listWeather()).some(row=>row.key===existingV3.id),'Existing revision lacks metadata index');
  });
  await test('NASA and Open-Meteo coexist at identical coordinates and dates',async()=>{
   alternate=await saveWeather(fixture({source:'Open-Meteo ERA5',retrievedAt:'2025-01-05T00:00:00Z'}),{latest:false});
@@ -82,6 +95,34 @@ async function integration(){
  check((await loadWeather()).id===revised.id,'latest:false save or listing changed latest');
   check(JSON.stringify(await allLegacy())===legacyBytes,'Listing changed legacy stores');
  });
+ await test('repeated metadata lists deserialize no raw snapshots or legacy rows',async()=>{
+  await listWeather();
+  const original=IDBDatabase.prototype.transaction,readStores=[];
+  try{
+   IDBDatabase.prototype.transaction=function(names,...args){readStores.push(...(typeof names==='string'?[names]:Array.from(names)));return original.call(this,names,...args);};
+   const rows=await listWeather();await listWeather();
+   check(rows.some(row=>row.key===revised.id),'Metadata revision disappeared');
+  }finally{IDBDatabase.prototype.transaction=original;}
+  check(!readStores.some(name=>['weatherSnapshots','snapshots','weather'].includes(name)),`Repeated listing read raw stores: ${readStores.join(', ')}`);
+ });
+ await test('compact loads preserve identity and hourly evidence without raw payloads',async()=>{
+  const compact=await loadCachedWeather(revised.id,{compact:true});
+  check(compact.id===revised.id,'Compact load changed snapshot identity');
+  check(!Object.hasOwn(compact,'raw')&&compact.transport?.rawOmitted,'Compact load returned raw');
+  check(JSON.stringify(compact.hours)===JSON.stringify(revised.hours),'Compact load changed hourly evidence');
+  let refused=false;try{await saveWeather(compact);}catch(error){refused=/compact/i.test(error.message);}
+  check(refused,'Saving a compact transport view must not reseal it as a full snapshot');
+ });
+ await test('explicit legacy audit detects same-key changes and memoizes ordinary lists',async()=>{
+  const changed=fixture({retrievedAt:'2025-01-07T00:00:00Z'});
+  const expected=await sealWeatherSnapshot(normalizeWeather(changed));
+  const db=await opened();try{await transaction(db,'weather','readwrite',tx=>tx.objectStore('weather').put(changed,legacyKey));}finally{db.close();}
+  check(!(await listWeather()).some(row=>row.key===expected.id),'Ordinary list unexpectedly rescanned legacy store');
+  check((await listWeather({refreshLegacy:true})).some(row=>row.key===expected.id),'Audit missed changed legacy record');
+  check((await loadWeather()).id===revised.id,'Legacy audit changed latest');
+  check((await loadCachedWeather(weatherKey(revised))).id===revised.id,'Legacy audit replaced current request');
+  const restore=await opened();try{await transaction(restore,'weather','readwrite',tx=>tx.objectStore('weather').put(fixture(),legacyKey));}finally{restore.close();}
+ });
  await test('a superseded save finishing its digest changes no persisted records or pointers',async()=>{
   const before=await listWeather(),original=crypto.subtle.digest;let current=true,cancelled;
   try{
@@ -92,6 +133,41 @@ async function integration(){
   check((await loadCachedWeather(weatherKey(revised))).id===revised.id,'Superseded save changed request pointer');
   check(await loadCachedWeather(cancelled.id)===null,'Superseded save persisted a new snapshot');
   check((await listWeather()).length===before.length,'Superseded save changed revision count');
+ });
+ await test('failed index writes roll back raw revision, compact record and lookup pointers atomically',async()=>{
+  const input=fixture({retrievedAt:'2025-01-08T00:00:00Z'}),expected=await sealWeatherSnapshot(normalizeWeather(input));
+  const original=IDBObjectStore.prototype.add;let rejected;
+  try{
+   IDBObjectStore.prototype.add=function(value,key){return original.call(this,value,this.name==='weatherIndex'?revised.id:key);};
+   try{await saveWeather(input);}catch(error){rejected=error;}
+  }finally{IDBObjectStore.prototype.add=original;}
+  check(rejected&&/storage|save weather/i.test(rejected.message),'Failed write did not return a recoverable storage error');
+  check(await loadCachedWeather(expected.id)===null,'Aborted transaction left a raw revision');
+  check(await loadCachedWeather(expected.id,{compact:true})===null,'Aborted transaction left a compact revision');
+  check(!(await listWeather()).some(row=>row.key===expected.id),'Aborted transaction left index metadata');
+  check((await loadWeather()).id===revised.id,'Aborted transaction changed latest');
+  check((await loadCachedWeather(weatherKey(revised))).id===revised.id,'Aborted transaction changed request pointer');
+ });
+ await test('quota exceptions and in-flight cancellation roll back the complete transaction',async()=>{
+  for(const kind of ['quota','cancel']){
+   const input=fixture({retrievedAt:kind==='quota'?'2025-01-09T00:00:00Z':'2025-01-10T00:00:00Z'}),expected=await sealWeatherSnapshot(normalizeWeather(input));
+   const original=IDBObjectStore.prototype.add,controller=new AbortController();let rejected;
+   try{
+    IDBObjectStore.prototype.add=function(...args){
+     if(this.name==='weatherIndex'){
+      if(kind==='quota')throw new DOMException('Synthetic quota denial','QuotaExceededError');
+      controller.abort();return;
+     }
+     return original.apply(this,args);
+    };
+    try{await saveWeather(input,{signal:controller.signal});}catch(error){rejected=error;}
+   }finally{IDBObjectStore.prototype.add=original;}
+   check(rejected,`${kind} did not reject`);
+   check(await loadCachedWeather(expected.id)===null,`${kind} left a raw revision`);
+   check(await loadCachedWeather(expected.id,{compact:true})===null,`${kind} left a compact revision`);
+   check(!(await listWeather()).some(row=>row.key===expected.id),`${kind} left metadata`);
+   check((await loadWeather()).id===revised.id,`${kind} replaced current weather`);
+  }
  });
  await test('schema 1 import preserves non-UTC local-day boundaries and hash on roundtrip',async()=>{
   check(migrated.schemaVersion===2&&migrated.timezone==='America/Denver','Import lost schema or time zone');
@@ -115,6 +191,7 @@ async function integration(){
   try{
    URL.createObjectURL=blob=>{exported=blob;return 'blob:weather-test-captured';};
    HTMLAnchorElement.prototype.click=function(){};
+   for(const format of ['csv','report']){downloadRun([result],revised,format);check((await exported.text()).includes(revised.id),`${format} export lost snapshot identity`);}
    downloadRun([result],revised,'json');
   }finally{URL.createObjectURL=originalURL;HTMLAnchorElement.prototype.click=originalClick;}
   check(exported instanceof Blob,'JSON export did not produce a Blob');
@@ -139,3 +216,4 @@ reset.addEventListener('click',async()=>{
 });
 run.disabled=reset.disabled=!dedicated;
 status.textContent=dedicated?'Ready. Run tests writes synthetic fixtures to this empty test origin.':'Refusing writes: open http://localhost:8153/test/browser/weather-storage.html';
+if(dedicated&&new URLSearchParams(location.search).has('autorun'))run.click();

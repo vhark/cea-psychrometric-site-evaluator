@@ -41,3 +41,6 @@ test('automatic NCEI station selection pins subsequent annual requests',async()=
  assert.equal(options.station,'');
  assert.throws(()=>pinResolvedStation(pinned,{provider:{id:'ncei',stationId:'other'}}),/station/i);
 });
+test('background acquisition intent survives request construction',()=>{
+ assert.equal(weatherRequest({latitude:40,longitude:-105,timezone:'UTC'},{startDate:'2025-01-01',endDate:'2025-12-31'},{provider:'visualcrossing',latest:false}).latest,false);
+});

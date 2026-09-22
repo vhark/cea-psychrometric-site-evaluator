@@ -1,11 +1,11 @@
 name: tests
 
-# The repository has no runtime or build dependencies, so there is nothing to install:
-# npm test is node --test over test/*.test.mjs.
+# Zero runtime dependencies; Playwright is used only for browser verification.
 
 on:
   push:
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
@@ -22,8 +22,17 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install test-only browser runner
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
       - name: Run the regression suite
         run: npm test
+
+      - name: Verify browser workflows at root and deployed subpath
+        run: npm run test:browser
 
       # Reports bundled dataset ages. It exits 1 when a dataset is past its staleness budget,
       # which is a maintenance signal, not a broken build, so it never fails the run.

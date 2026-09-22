@@ -68,12 +68,12 @@ export function weatherSteps(hour, scenario, source = {}) {
     'drying: w_ceiling - w >= dryingMargin; cooling: T <= target - ventMargin; hot: T >= ceiling; pad ok: T_pad <= ceiling - padMargin and w_pad <= pad ceiling',
     `drying margin ${n(bounds.maxW, 5)} - ${n(w, 5)} = ${n(cls.dryingMarginKgKg, 5)} >= ${n(dryingMargin, 4)}? ${yes(cls.dryingMarginKgKg >= dryingMargin)}; ` +
     `cooling ${n(T)} <= ${n(sch.targetC, 1)} - ${n(ventMargin, 1)}? ${yes(T <= sch.targetC - ventMargin)}; ` +
-    `hot ${n(T)} >= ${n(cls.maxTempC, 1)}? ${yes(T >= cls.maxTempC)}; heating ${n(T)} < ${n(cls.heatingThresholdC, 1)}? ${yes(T < cls.heatingThresholdC)}; ` +
+    `hot ${n(T)} >= ${n(scenario.coolingTriggerC ?? cls.maxTempC, 1)}? ${yes(T >= (scenario.coolingTriggerC ?? cls.maxTempC))}; heating ${n(T)} < ${n(cls.heatingThresholdC, 1)}? ${yes(T < cls.heatingThresholdC)}; ` +
     `pad ${n(pad.tempC)} <= ${n(cls.maxTempC - margin, 1)}? ${yes(pad.tempC <= cls.maxTempC - margin)} and ${n(pad.w, 5)} <= ${n(padMaxW, 5)}? ${yes(pad.w <= padMaxW)}; ` +
     `outdoor enthalpy ${n(cls.enthalpyJkg / 1000, 2)} vs ceiling-state enthalpy ${n(cls.targetEnthalpyJkg / 1000, 2)} kJ/kg`,
     `flags: ${cls.flags.length ? cls.flags.join(', ') : 'none'}`, 'classifyWeather');
   add('The weather-side mode', 'first matching branch: heating, then hot (pad tests), then cool-and-dry, cool-and-humid, humidify, else neutral',
-    cls.reason, cls.mode, 'classifyWeather');
+    `${cls.reason} Evaporative cooling opportunity: ${yes(cls.opportunity.pad.cooling)}; pad installed: ${yes(cls.capability.pad.installed)}; useful with available airflow: ${yes(cls.capability.pad.cooling)}. Operation is evaluated only in the simulation.`, cls.mode, 'classifyWeather');
   const drying = outdoorDryingHour(hour, scenario, cls);
   const m3s = scenario.areaM2 * scenario.heightM * scenario.maxVentACH / 3600, rho = dryAirDensity(T, w, P);
   add('Outside air as a dehumidifier at full ventilation',

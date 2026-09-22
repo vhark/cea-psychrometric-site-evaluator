@@ -61,3 +61,11 @@ test('cold liquid dewpoint is not misrepresented as a frost-point discrepancy',(
  assert.doesNotMatch(steps[3].working,/consistency check/);
  assert.match(weatherSteps(file.hours[0].hour,scenario)[1].working,/Legacy input/);
 });
+test('worked hot test uses the same custom cooling trigger as classification',()=>{
+ for(const tempC of [39.99,40,40.01]){
+  const s={...scenario,coolingTriggerC:40},h={time:Date.UTC(2025,5,1,12),tempC,rh:.15,pressurePa:101325,ghiWm2:500};
+  const steps=weatherSteps(h,s);
+  assert.ok(steps[7].working.includes(`hot ${tempC.toFixed(2)} >= 40.0? ${tempC>=40?'yes':'no'}`));
+  assert.equal(steps[8].result,classifyWeather(h,s).mode);
+ }
+});

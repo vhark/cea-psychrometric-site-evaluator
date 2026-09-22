@@ -1,3 +1,4 @@
+import {boundedFetch,dateChunks} from './weather-request.js';
 import {MOISTURE_VERSION, displayRH, resolveMoisture, saturationVaporPressure} from './moisture.js';
 import {WEATHER_UNITS, withWeatherContract, sealWeatherSnapshot} from './weather-contract.js';
 export {sealWeatherSnapshot} from './weather-contract.js';
@@ -109,7 +110,7 @@ export function redactSecrets(url, secrets = []) {
   return safe;
 }
 async function request(url, signal, json = true, secrets = []) {
-  const response = await fetch(url, { signal });
+  const response = await boundedFetch(url, { signal });
   const text = await response.text();
   const recorded = redactSecrets(url, secrets);
   if (!response.ok) throw new Error('Weather source HTTP ' + response.status + ': ' + redactSecrets(text.slice(0, 400), secrets));
@@ -199,8 +200,17 @@ export async function fetchOpenMeteo(options) {
   options.onProgress?.(0, 'Fetching Open-Meteo ERA5 archive');
   // Open-Meteo needs no key on the free tier. The secret is threaded through anyway so that a paid
   // key, or the next keyed provider, is redacted from the recorded url by construction.
-  const item = await request(OPEN_METEO + '?' + params, options.signal, true, [options.apiKey].filter(Boolean));
-  const data = item.payload;
+  const items=[];
+  for(const [index,chunk] of dateChunks(first,last,365).entries()){
+    params.set('start_date',chunk.startDate);params.set('end_date',chunk.endDate);
+    options.onProgress?.(0,`Fetching Open-Meteo archive chunk ${index+1}`);
+    const entry=await request(OPEN_METEO+'?'+params,options.signal,true,[options.apiKey].filter(Boolean));
+    if(entry.payload.error)throw new Error('Open-Meteo API: '+(entry.payload.reason||'request rejected'));
+    if(!entry.payload.hourly?.time)throw new Error('Open-Meteo returned no hourly block.');
+    if(items.length&&JSON.stringify(entry.payload.hourly_units)!==JSON.stringify(items[0].payload.hourly_units))throw new Error('Open-Meteo changed units between date chunks.');
+    items.push(entry);
+  }
+  const item=items[0],data={...item.payload,hourly:Object.fromEntries(Object.keys(item.payload.hourly).map(key=>[key,items.flatMap(entry=>entry.payload.hourly[key]||[])]))};
   if (data.error) throw new Error('Open-Meteo API: ' + (data.reason || 'request rejected'));
   const hourly = data.hourly;
   if (!hourly?.time) throw new Error('Open-Meteo returned no hourly block.');
@@ -242,13 +252,13 @@ export async function fetchOpenMeteo(options) {
   options.onProgress?.(1, 'Open-Meteo archive received');
   return { schemaVersion: 1, source: 'Open-Meteo ERA5 archive', sourceKind: 'gridded reanalysis', ...coords,
     timezone: bounds.timezone, startDate: bounds.startDate, endDate: bounds.endDate,
-    retrievedAt: new Date().toISOString(), sourceUrl: item.url, sourceUrls: [item.url], units: { ...UNITS },
+    retrievedAt: new Date().toISOString(), sourceUrl: item.url, sourceUrls: items.map(entry=>entry.url), units: { ...UNITS },
     interval: 'UTC hour start. Instant fields at their stamp; shortwave radiation, which Open-Meteo reports as the preceding-hour mean, is filed one hour earlier so it covers the hour it describes. ERA5 and ERA5-Land hourly reanalysis. Wind measured at 10 m, not 2 m.',
     sourceVersions: [{ model: 'era5_land + era5', generationTimeMs: data.generationtime_ms, utcOffsetSeconds: data.utc_offset_seconds }],
     coordinateNotes: OPEN_METEO_NOTE, sourceElevationM: Number.isFinite(data.elevation) ? data.elevation : null,
     licence: 'CC BY 4.0, Open-Meteo. Free tier is non-commercial use only.',
     attribution: 'Weather data by Open-Meteo.com, CC BY 4.0. ERA5 and ERA5-Land produced by ECMWF / Copernicus Climate Change Service.',
-    coverage: coverage(hours, bounds), raw: [item], hours };
+    coverage: coverage(hours, bounds), raw: items, hours };
 }
 
 
@@ -304,9 +314,15 @@ export async function fetchNcei(options) {
     startDate: bounds.startDate, endDate: new Date(dateValue(bounds.endDate) + DAY).toISOString().slice(0, 10),
     dataTypes: 'TMP,DEW,WND,MA1,SLP', includeStationName: 'true', includeStationLocation: '1', format: 'json' });
   options.onProgress?.(.1, `Fetching NCEI observations for station ${station.id}`);
-  const item = await request(NCEI_DATA + '?' + params, options.signal);
-  const rows = item.payload;
-  if (!Array.isArray(rows)) throw new Error('NCEI returned an unexpected response shape.');
+  const items=[];
+  for(const [index,chunk] of dateChunks(bounds.startDate,dateString(dateValue(bounds.endDate)+DAY),31).entries()){
+    params.set('startDate',chunk.startDate);params.set('endDate',chunk.endDate);
+    options.onProgress?.(.1,`Fetching NCEI station ${station.id}, chunk ${index+1}`);
+    const entry=await request(NCEI_DATA+'?'+params,options.signal);
+    if(!Array.isArray(entry.payload))throw new Error('NCEI returned an unexpected response shape.');
+    items.push(entry);
+  }
+  const item=items[0],rows=items.flatMap(entry=>entry.payload);
   if (!rows.length) throw new Error(`NCEI station ${station.id} has no records for ${bounds.startDate} to ${bounds.endDate}.`);
   const meta = rows[0];
   const metaNumber = value => { const n = Number(value); return Number.isFinite(n) ? n : null; };
@@ -389,7 +405,7 @@ export async function fetchNcei(options) {
     timezone: bounds.timezone, startDate: bounds.startDate, endDate: bounds.endDate, station: station.id,
     stationMetadata: [{ station: station.id, latitude: station.latitude, longitude: station.longitude, name: station.name, elevationM: station.elevationM ?? null }],
     sourceElevationM: solar?.sourceElevationM ?? null,
-    retrievedAt: new Date().toISOString(), sourceUrl: item.url, sourceUrls: [item.url, ...(solar?.sourceUrls || [])],
+    retrievedAt: new Date().toISOString(), sourceUrl: item.url, sourceUrls: [...items.map(entry=>entry.url), ...(solar?.sourceUrls || [])],
     units: { ...UNITS }, interval: 'UTC hour start. ISD FM-15 routine reports matched to the nearest UTC hour, at most 30 minutes away; NASA solar hourly mean.',
     observationSelection: 'Nearest timestamp wins; an exact tie takes the earlier observation. Only FM-15 routine reports are used, so synoptic and daily summary rows cannot double-count an hour.',
     licence: 'US Government work, public domain.',
@@ -397,7 +413,7 @@ export async function fetchNcei(options) {
     requestedCutoffUTC: new Date(bounds.end).toISOString(),
     actualObservationCutoffUTC: actualObservationCutoff == null ? null : new Date(actualObservationCutoff).toISOString(),
     solarSource: { source: 'NASA POWER', fields: ['ghiWm2'], coordinateNotes: GRID_NOTE, sourceVersions: solar?.sourceVersions || [], sourceUrls: solar?.sourceUrls || [] },
-    coverage: coverage(hours, bounds), warnings, raw: [item, ...(solar?.raw || [])], hours };
+    coverage: coverage(hours, bounds), warnings, raw: [...items, ...(solar?.raw || [])], hours };
 }
 
 
@@ -427,11 +443,17 @@ export async function fetchVisualCrossing(options) {
   const elements = 'datetimeEpoch,temp,dew,humidity,pressure,solarradiation,windspeed,stations,source,solarenergy';
   const params = new URLSearchParams({ unitGroup: 'metric', include: 'hours', elements,
     contentType: 'json', key });
-  const url = `${VISUAL_CROSSING}/${coords.latitude},${coords.longitude}/${bounds.startDate}/${bounds.endDate}?${params}`;
-  options.onProgress?.(.2, 'Fetching Visual Crossing timeline');
-  const item = await request(url, options.signal, true, [key]);
-  const data = item.payload;
-  if (!Array.isArray(data?.days)) throw new Error('Visual Crossing returned no days block.');
+  const items=[];
+  const chunks=dateChunks(bounds.startDate,bounds.endDate,30);
+  for(const [index,chunk] of chunks.entries()){
+    options.signal?.throwIfAborted();
+    options.onProgress?.(.2+.7*index/chunks.length,`Visual Crossing chunk ${index+1}/${chunks.length}; metered records accumulate across chunks`);
+    const url=`${VISUAL_CROSSING}/${coords.latitude},${coords.longitude}/${chunk.startDate}/${chunk.endDate}?${params}`;
+    const item=await request(url,options.signal,true,[key]);
+    if(!Array.isArray(item.payload?.days))throw new Error('Visual Crossing returned no days block.');
+    items.push(item);
+  }
+  const item=items[0],data={...item.payload,days:items.flatMap(entry=>entry.payload.days)};
 
   const records = new Map();
   let unknownSource = 0;
@@ -474,15 +496,15 @@ export async function fetchVisualCrossing(options) {
   options.onProgress?.(1, 'Visual Crossing timeline received');
   return { schemaVersion: 1, source: 'Visual Crossing Timeline', sourceKind: 'blended station observations and model output', ...coords,
     timezone: bounds.timezone, startDate: bounds.startDate, endDate: bounds.endDate,
-    retrievedAt: new Date().toISOString(), sourceUrl: item.url, sourceUrls: [item.url, elevation.url],
+    retrievedAt: new Date().toISOString(), sourceUrl: item.url, sourceUrls: [...items.map(entry=>entry.url), elevation.url],
     units: { ...UNITS },
     interval: 'UTC hour start, from the service\'s hourly timeline. Pressure is reduced from sea level using site elevation.',
     sourceVersions: [{ service: 'Visual Crossing Timeline', resolvedAddress: data.resolvedAddress ?? null, timezone: data.timezone ?? null }],
     coordinateNotes: 'Values are interpolated from nearby stations, weighted by distance, and filled with model output where no station reported. Hourly source codes and contributing station identifiers are retained when available; variable-level lineage may remain unknown.',
     sourceElevationM: elevation.elevationM,
-    licence: 'Visual Crossing terms. The free tier permits 1,000 records per query and a daily record allowance. Raw data may not be redistributed publicly.',
+    licence: 'Visual Crossing terms. Queries are chunked to at most 30 local days of hourly records. Account query and daily limits still apply. Raw data may not be redistributed publicly.',
     attribution: 'Weather Data Provided by Visual Crossing.',
-    coverage: coverage(hours, bounds), warnings, raw: [item, elevation.item], hours };
+    coverage: coverage(hours, bounds), warnings, raw: [...items, elevation.item], hours };
 }
 
 /* One adapter per provider id. providers.js describes the same ids for the interface, and a test

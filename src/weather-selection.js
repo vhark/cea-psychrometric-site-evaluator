@@ -5,9 +5,9 @@ export const calendarYear = snapshot => {
   const year=String(snapshot?.startDate || '').slice(0,4);
   return /^\d{4}$/.test(year) && snapshot.startDate===`${year}-01-01` && snapshot.endDate===`${year}-12-31` ? year : null;
 };
-export function weatherRequest(site,period,{provider='nasa',station='',apiKey='',signal,onProgress}={}) {
+export function weatherRequest(site,period,{provider='nasa',station='',apiKey='',signal,onProgress,latest=true}={}) {
   return {latitude:site.latitude,longitude:site.longitude,timezone:site.timezone,
-    startDate:period.startDate,endDate:period.endDate,provider,station,apiKey,signal,onProgress};
+    startDate:period.startDate,endDate:period.endDate,provider,station,apiKey,signal,onProgress,latest};
 }
 export function pinResolvedStation(options,snapshot) {
   if(options.provider!=='ncei') return options;
