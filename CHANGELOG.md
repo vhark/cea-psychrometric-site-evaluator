@@ -4,7 +4,22 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 Versions are model versions: the string the engine stamps into every result and export, so a number on a page can always be traced to the model that produced it. The `-screening` suffix is part of the version and part of the claim: this is an assumption-based screen, not a calibrated model. See [docs/EVALUATION.md](docs/EVALUATION.md) for the evidence ladder.
 
-## [Unreleased]
+## [0.4.0-screening] — 2026-09-22
+
+### Added
+
+- Declared water/ice/unknown moisture interpretation shared by imports, providers and calculations; independent published reference vectors and immutable legacy snapshot regressions.
+- Separate weather opportunity, installed capability and simulated operation, plus pre-analysis data-quality counts and explicit missing-hour denominators.
+- Dedicated weather Worker, IndexedDB v4 metadata/compact indexes, cancellable imports, recoverable storage denial and Blob exports. Provider requests have timeouts, finite retries and bounded date chunks.
+- Standalone air-state learning workbench at `/lab/`: pressure-aware chart, SI/IP calculator, four predict/change/explain lessons, named reanalysis examples and historical imports.
+- Isolated browser verification at root and assembled `/app/`; Pages deployment depends on passing Node and browser checks. Playwright is a development-only dependency.
+
+### Changed
+
+- Model outputs identify `0.4.0-screening` and `phase-aware-1`. Existing regional/Morris results remain labeled historical `0.3.0-screening`; old weather snapshots are preserved. Reprocessing creates a new child revision.
+- Disabled pads and zero-airflow installations receive no capability credit. Hypothetical opportunities and actual equivalent runtime are shown separately.
+
+## Weather foundation — 2026-09-22
 
 ### Added
 

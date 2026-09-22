@@ -178,3 +178,14 @@ Run low/base/high cases for crop moisture, envelope U/leakage, shade/transmissio
 - Verify a static web server serves all required runtime assets; imported dataset calculation works with external weather access disabled.
 - Retain regression tests only for meaningful physical/data boundary failures. Use throwaway experiments for basic wiring demonstrations.
 - Record exact run commands/environment, numerical results and browser observations in the implementation verification report. Nothing in this draft means those release gates have passed.
+
+
+## Model 0.4.0 verification and remaining limits
+
+Phase-aware conversion now has published ASHRAE/IAPWS and Murphy–Koop reference vectors, declared-water CSV/JSON/provider/direct equality tests, and a pinned pre-change snapshot identity regression. See [moisture conventions](validation/moisture-conventions.md) for tolerances, original-source citations and affected cold cases. The preserved regional and Morris studies remain **0.3.0-screening** historical artifacts; they have not been regenerated as current-model validation.
+
+Weather results expose separate thermodynamic `opportunity`, installed/airflow-limited `capability`, and simulated `operation`. Whole weather hours use the classified-weather denominator; runtime comes from simulated substeps and reports equivalent hours. Missing intervals break episodes. Pre-analysis coverage distinguishes finite inputs, declared derivations, unresolved interpretations and meteorology/solar eligibility; it does not turn gridded/derived values into observations.
+
+The `/lab/` workbench uses the same moisture and process functions. Its chart backdrop declares liquid-water saturation and reference pressure; historical points retain actual pressure. Heating and evaporative examples are ideal air processes; the condensing-dehumidifier lesson is a coarse latent-plus-electrical-heat illustration, not an equipment map or sizing model. RH unavailable under a phase convention remains unavailable in both table and explanation.
+
+[Responsiveness measurements](validation/weather-responsiveness.md) document synthetic one-year, ten-year and 100 MB fixtures. Browser regression gates cover actual IndexedDB/Workers, storage denial, cancellation, stale responses, multi-year keyed fixtures, station pinning, export identity, teaching workflows and the assembled subpath. These checks establish implementation behavior, not measured greenhouse accuracy. Initialization sensitivity, empirical greenhouse calibration, curtain condensation physics, forecast advisories and control replay remain future work.

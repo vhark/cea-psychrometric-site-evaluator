@@ -3,7 +3,7 @@
 Screen a controlled-environment agriculture site against real historical weather: how many hours the climate gives you for free, what constraint binds, and which class of equipment closes the gap at what running cost.
 
 [![tests](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml/badge.svg)](https://github.com/vhark/cea-psychrometric-site-evaluator/actions/workflows/test.yml)
-[![model](https://img.shields.io/badge/model-0.3.0--screening-5E9643)](docs/VERIFICATION.md)
+[![model](https://img.shields.io/badge/model-0.4.0--screening-5E9643)](docs/VERIFICATION.md)
 [![runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-none-5E9643)](#quick-start)
 [![licence](https://img.shields.io/badge/licence-MIT-5E9643)](LICENSE)
 [![demo](https://img.shields.io/badge/demo-GitHub%20Pages-5E9643)](https://vhark.github.io/cea-psychrometric-site-evaluator/)
@@ -12,6 +12,8 @@ Screen a controlled-environment agriculture site against real historical weather
 A Grownetics open-source tool. Static HTML and JavaScript, no build step, no backend, no account. Everything computes in your browser. Interactive tools use Instrument mode; exported documents use Archive mode by default regardless of operating-system theme.
 
 > **Evidence tier: assumption-based screening.** This is a coarse planning screen. It is not a calibrated greenhouse digital twin, not equipment sizing, not a manufacturer comparison, and not a guarantee of indoor conditions. See [Evidence tiers](#evidence-tiers) and [docs/DIGITAL-TWIN.md](docs/DIGITAL-TWIN.md).
+
+For a single air-state question, start with **[the learning lab](lab/)**: dry bulb, RH or dew/frost point, pressure, and four short process lessons. No weather account or facility configuration is required.
 
 ## What it answers
 
@@ -27,12 +29,13 @@ Three questions about a specific site, crop band and equipment class, before cap
 |---|---|
 | Explainer site | https://vhark.github.io/cea-psychrometric-site-evaluator/ |
 | The tool itself | https://vhark.github.io/cea-psychrometric-site-evaluator/app/ |
+| Air-state learning lab | https://vhark.github.io/cea-psychrometric-site-evaluator/app/lab/ |
 
 The Pages workflow publishes the explainer from `site/` at the root and packages this static calculator at `/app/` on pushes to `main`. Calculations and saved scenarios remain in your browser; triggered public weather requests transmit selected location/dates, and hosted assets/fonts generate ordinary network requests (see [SECURITY.md](SECURITY.md)). The release gallery uses `site/assets/screenshots/`; `docs/screenshots/` contains historical captures and is not the current UI reference.
 
 ## Quick start
 
-Requirements: Python 3 (any static server works) and a current browser with ES modules, Web Workers and IndexedDB. Node 20 or newer is needed only for tests and the reproduction scripts. No package installation.
+Requirements: Python 3 (any static server works) and a current browser with ES modules, Web Workers and IndexedDB. Node 20 or newer is needed only for tests and the reproduction scripts. Serving the app needs no package installation. Browser verification uses the development-only Playwright package.
 
 ```sh
 git clone https://github.com/vhark/cea-psychrometric-site-evaluator.git
@@ -79,7 +82,7 @@ The full ladder, with the output each tier permits and the implication each tier
 
 ## Key results from the bundled example
 
-Current evidence is model `0.3.0-screening`, scenario schema 2. The actual browser run used Tulsa 2025, 8,760 valid hours and 8,759 eligible hours after one warm-up hour. Its full-run totals include warm-up; matched comparison costs cover only the common eligible set. These populations must not be mixed.
+The retained historical study evidence is model `0.3.0-screening` (current application: `0.4.0-screening`), scenario schema 2. The actual browser run used Tulsa 2025, 8,760 valid hours and 8,759 eligible hours after one warm-up hour. Its full-run totals include warm-up; matched comparison costs cover only the common eligible set. These populations must not be mixed.
 
 | Current result | Value | Source |
 |---|---|---|
@@ -184,6 +187,9 @@ The observed study in [reference-study/](reference-study/) keeps the weather-onl
 
 ```sh
 npm test                      # node --test test/*.test.mjs
+npm ci                        # development-only browser runner
+npx playwright install chromium
+npm run test:browser           # isolated root and assembled /app/ workflows
 node --test test/model.test.mjs
 ```
 
