@@ -286,7 +286,7 @@ export function compareScenarios(results) {
 }
 
 export function weatherSummary(hours,scenario) {
-  const out={expectedHours:hours.length,validHours:0,missingHours:0,modeCounts:{},monthly:[],dayNight:{day:{hours:0,modeCounts:{}},night:{hours:0,modeCounts:{}}},
+  const out={opportunity:{padCoolingHours:0,padHumidifyingHours:0},denominator:"Whole classified weather hours; missing intervals excluded. Capability is not runtime.",expectedHours:hours.length,validHours:0,missingHours:0,modeCounts:{},monthly:[],dayNight:{day:{hours:0,modeCounts:{}},night:{hours:0,modeCounts:{}}},
     modeExposureDays:{},episodes:{},padFailureCauses:{temperature:0,moisture:0},extremes:{minTempC:null,maxTempC:null,maxWetBulbC:null},
     // Pad and outside-air usefulness are independent questions, so they are counted independently and jointly
     // rather than inferred from the mutually exclusive primary mode. Read from the hour's flags, which both the
@@ -301,6 +301,8 @@ export function weatherSummary(hours,scenario) {
     if(previous!==null&&h.time-previous!==3600000)close();previous=h.time;
     if(!classification.valid){out.missingHours++;close();continue;}
     out.validHours++;const mode=classification.mode;
+    if(classification.opportunity?.pad.cooling)out.opportunity.padCoolingHours++;
+    if(classification.opportunity?.pad.humidifying)out.opportunity.padHumidifyingHours++;
     out.modeCounts[mode]=(out.modeCounts[mode]||0)+1;
     if(!months.has(c.month))months.set(c.month,{month:c.month,hours:0,modeCounts:{}});
     const m=months.get(c.month);m.hours++;m.modeCounts[mode]=(m.modeCounts[mode]||0)+1;
@@ -335,9 +337,9 @@ export function weatherSummary(hours,scenario) {
     out.episodes[mode]=episodeSummary(episodeLists.get(mode)||[]);
   }
   const exposure=mode=>out.modeExposureDays[mode]||{atLeast1:0,atLeast4:0,atLeast8:0};
-  out.padViability={effectiveHours:out.modeCounts.PAD_EFFECTIVE||0,marginalHours:out.modeCounts.PAD_MARGINAL||0,ineffectiveHours:out.modeCounts.PAD_INEFFECTIVE_DEHU_NEEDED||0,
+  out.padViability={basis:'Installed pad availability, not runtime',hypotheticalEffectiveHours:out.modeCounts.PAD_EFFECTIVE_REQUIRES_PAD||0,hypotheticalMarginalHours:out.modeCounts.PAD_MARGINAL_REQUIRES_PAD||0,effectiveHours:out.modeCounts.PAD_EFFECTIVE||0,marginalHours:out.modeCounts.PAD_MARGINAL||0,ineffectiveHours:out.modeCounts.PAD_INEFFECTIVE_DEHU_NEEDED||0,
     effectiveDays:exposure('PAD_EFFECTIVE'),marginalDays:exposure('PAD_MARGINAL'),ineffectiveDays:exposure('PAD_INEFFECTIVE_DEHU_NEEDED'),
-    coolingDemandHours:(out.modeCounts.PAD_EFFECTIVE||0)+(out.modeCounts.PAD_MARGINAL||0)+(out.modeCounts.PAD_INEFFECTIVE_DEHU_NEEDED||0),failureCauses:out.padFailureCauses};
+    coolingDemandHours:(out.modeCounts.PAD_EFFECTIVE_REQUIRES_AIRFLOW||0)+(out.modeCounts.PAD_MARGINAL_REQUIRES_AIRFLOW||0)+(out.modeCounts.PAD_EFFECTIVE_REQUIRES_PAD||0)+(out.modeCounts.PAD_MARGINAL_REQUIRES_PAD||0)+(out.modeCounts.PAD_EFFECTIVE||0)+(out.modeCounts.PAD_MARGINAL||0)+(out.modeCounts.PAD_INEFFECTIVE_DEHU_NEEDED||0),failureCauses:out.padFailureCauses};
   out.outdoorDrying=outdoorDrying(hours,scenario);
   return out;
 }

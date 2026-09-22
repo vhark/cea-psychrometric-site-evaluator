@@ -569,7 +569,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     const weather=input[index],outside=weatherState(weather,needsSolar),classification=classifyWeather(weather,s);
     const row={time:weather.time,valid:false,eligible:false,compliantFraction:null,tempC:null,rh:null,vpd:null,
       mode:'MISSING_DATA',reason:'Missing or invalid meteorology or solar. Continuous state reset.',weatherMode:classification.weatherMode,
-      weatherFlags:classification.flags,padTempC:classification.padTempC??null,padDewPointC:classification.padDewPointC??null,
+      opportunity:classification.opportunity??null,capability:classification.capability??null,operation:null,weatherFlags:classification.flags,padTempC:classification.padTempC??null,padDewPointC:classification.padDewPointC??null,
       wetBulbC:classification.wetBulbC??null,outdoorTempC:weather.tempC??null,outdoorRH:weather.rh??null,outdoorDrying:outdoorDryingHour(weather,s,classification),
       quality:weather.quality||[],energyResidualW:null,moistureResidualKgS:null};
     for(const key of TOTALS)row[key]=0;
@@ -709,6 +709,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
       row.mode='NUMERICAL_FAILURE';row.energyResidualW=maxEnergyResidual;row.moistureResidualKgS=maxMoistureResidual;state=null;controller=null;
       for(const key of TOTALS)row[key]=null;
     }else{
+      row.operation={pad:{equivalentHours:controls.padFraction,operated:controls.padFraction>0},modeEquivalentHours:Object.fromEntries(Object.entries(modeCounts).map(([mode,count])=>[mode,count/nSteps]))};
       controls.controlledACHStages=[...controlledStageHours].sort((a,b)=>a[0]-b[0]).map(([ach,hours])=>({ach,hours}));
       loads.storedKWh=state.capacity*(state.tempC-startTempC)/KWH;loads.latentKg.stored=state.mass*(state.w-startW);
       finishLoads(loads);

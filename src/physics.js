@@ -173,12 +173,15 @@ export function classifyWeather(hour, scenario) {
   // the installed check belongs here rather than only on the resolved object, otherwise an uninstalled pad
   // still gets credited with hours.
   const padInstalled=scenario.padEnabled!==false;
-  const padCooling=padInstalled&&Boolean(pad)&&outside.tempC>target.targetC&&pad.tempC<=maxTempC-margin&&pad.w<=padMaxW;
-  const padHumidifying=padInstalled&&Boolean(pad)&&warmEnough&&dryEnough&&pad.w<=bounds.maxW;
+  const padCoolingOpportunity=Boolean(pad)&&outside.tempC>target.targetC&&pad.tempC<=maxTempC-margin&&pad.w<=padMaxW;
+  const padHumidifyingOpportunity=Boolean(pad)&&warmEnough&&dryEnough&&pad.w<=bounds.maxW;
   // Outside air alone, no water added. It cools when it is below the target by the ventilation margin without
   // importing moisture past the ceiling, and it dries whenever it sits below the ceiling by the drying margin.
-  const ventCooling=cooling&&outside.w<=bounds.maxW;
-  const ventDrying=drying;
+  const ventCoolingOpportunity=cooling&&outside.w<=bounds.maxW;
+  const ventInstalled=scenario.maxVentACH>0;
+  const ventCooling=ventInstalled&&ventCoolingOpportunity,ventDrying=ventInstalled&&drying;
+  const padAvailable=padInstalled&&scenario.maxVentACH>0;
+  const padCooling=padAvailable&&padCoolingOpportunity,padHumidifying=padAvailable&&padHumidifyingOpportunity;
   const padUseful=padCooling||padHumidifying;
   const ventUseful=ventCooling||ventDrying;
   // What the pad adds that an open vent cannot. Outside air can only cool the zone toward its own dry bulb, so
@@ -188,11 +191,13 @@ export function classifyWeather(hour, scenario) {
   // target, so this stays independent of how wide a tolerance the scenario declares.
   const ventHoldsCeiling=outside.tempC<=maxTempC;
   const padHoldsCeiling=Boolean(pad)&&pad.tempC<=maxTempC-margin&&pad.w<=padMaxW;
-  const padDeeper=padInstalled&&!ventHoldsCeiling&&padHoldsCeiling;
+  const padDeeper=padAvailable&&!ventHoldsCeiling&&padHoldsCeiling;
   const utility={
-    pad:{useful:padUseful,cooling:padCooling,humidifying:padHumidifying,deeperThanVent:padDeeper,installed:padInstalled},
-    vent:{useful:ventUseful,cooling:ventCooling,drying:ventDrying,holdsCeiling:ventHoldsCeiling},
+    pad:{useful:padUseful,cooling:padCooling,humidifying:padHumidifying,deeperThanVent:padDeeper,installed:padInstalled,airflowAvailable:scenario.maxVentACH>0},
+    vent:{installed:ventInstalled,useful:ventUseful,cooling:ventCooling,drying:ventDrying,holdsCeiling:ventInstalled&&ventHoldsCeiling},
     both:padUseful&&ventUseful,either:padUseful||ventUseful,neither:!padUseful&&!ventUseful};
+  const opportunity={pad:{cooling:padCoolingOpportunity,humidifying:padHumidifyingOpportunity,useful:padCoolingOpportunity||padHumidifyingOpportunity,deeperThanVent:!ventHoldsCeiling&&padHoldsCeiling},vent:{cooling:ventCoolingOpportunity,drying,useful:ventCoolingOpportunity||drying}};
+  const capability={pad:utility.pad,vent:utility.vent};
   if(padCooling)flags.push('PAD_COOLING_USEFUL');
   if(padHumidifying)flags.push('PAD_HUMIDIFICATION_USEFUL');
   if(padDeeper)flags.push('PAD_DEEPER_THAN_VENT');
@@ -217,7 +222,10 @@ export function classifyWeather(hour, scenario) {
   } else if(scenario.humidificationRequired&&outside.w>=bounds.minW+(scenario.humidifyingMarginKgKg??.0003)&&outside.w<=bounds.maxW) {
     mode='PASSIVE_HUMIDIFY_OPPORTUNITY';reason='Outside air can add moisture relative to the selected lower bound without exceeding the upper bound.';
   } else {mode='NEUTRAL_MIN_VENT';reason='No primary weather-side heating, cooling or requested humidification opportunity.';}
-  return {mode,weatherMode:mode,valid:true,reason,flags,isDay:target.isDay,humidityRatio:outside.w,
+  if(padInstalled&&!padAvailable&&['PAD_EFFECTIVE','PAD_MARGINAL'].includes(mode)){mode+='_REQUIRES_AIRFLOW';reason='Evaporative cooling opportunity requires available pad airflow. Installed hardware alone does not establish capability.';}
+  if(!padInstalled&&mode==='PAD_EFFECTIVE'){mode='PAD_EFFECTIVE_REQUIRES_PAD';reason='Evaporative cooling opportunity — pad required. Hypothetical leaving air clears the selected temperature and moisture limits.';}
+  if(!padInstalled&&mode==='PAD_MARGINAL'){mode='PAD_MARGINAL_REQUIRES_PAD';reason='Marginal evaporative cooling opportunity — pad required. Hypothetical leaving air misses the cooling margin.';}
+  return {opportunity,capability,operation:null,mode,weatherMode:mode,valid:true,reason,flags,isDay:target.isDay,humidityRatio:outside.w,
     targetC:target.targetC,maxTempC,heatingThresholdC:heatingThreshold,maxDewPointC,minHumidityRatio:bounds.minW,maxHumidityRatio:bounds.maxW,
     dryingMarginKgKg:dryingMargin,enthalpyJkg:outsideEnthalpy,targetEnthalpyJkg:targetEnthalpy,enthalpyDifferenceJkg:outsideEnthalpy-targetEnthalpy,
     wetBulbC:pad.wetBulbC,padTempC:pad.tempC,padDewPointC:pad.dewPointC,padHumidityRatio:pad.w,padRH:pad.rh,utility};

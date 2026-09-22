@@ -4,7 +4,8 @@ const DAY = 24 * HOUR;
 const colors = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5', 'chart-6', 'chart-7', 'chart-8'];
 const scatterColor = {outdoor: 'text-2', pad: 'green'};
 const number = (value, digits = 0) => Number.isFinite(value) ? value.toLocaleString('en-US', {maximumFractionDigits: digits}) : 'Not available';
-export const modeLabel = value => String(value || 'Missing data').replaceAll('_', ' ').toLowerCase().replace(/^./, c => c.toUpperCase());
+const modeLabels={PAD_EFFECTIVE_REQUIRES_AIRFLOW:'Evaporative cooling opportunity — airflow required',PAD_MARGINAL_REQUIRES_AIRFLOW:'Marginal evaporative cooling opportunity — airflow required',PAD_EFFECTIVE_REQUIRES_PAD:'Evaporative cooling opportunity — pad required',PAD_MARGINAL_REQUIRES_PAD:'Marginal evaporative cooling opportunity — pad required',PAD_INEFFECTIVE_DEHU_NEEDED:'Evaporative cooling limited by temperature or moisture'};
+export const modeLabel = value => modeLabels[value] || String(value || 'Missing data').replaceAll('_', ' ').toLowerCase().replace(/^./, c => c.toUpperCase());
 function svgNode(tag, attributes = {}, text) {
   const node = document.createElementNS(NS, tag);
   for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, String(value));

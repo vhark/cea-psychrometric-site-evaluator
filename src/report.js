@@ -209,18 +209,19 @@ function strategySentences(rows, frontier, aggregate, usingMedian) {
 
 function padSentences(weather, scenario, summary) {
   const out = [], pv = weather?.padViability, drying = weather?.outdoorDrying;
-  if (pv && pv.coolingDemandHours > 0) {
+  if(scenario.padEnabled===false)out.push(`Evaporative cooling opportunity — pad required: ${int(weather?.opportunity?.padCoolingHours)} whole classified weather hours. Installed pad availability and simulated pad runtime are zero. Weather opportunities do not establish crop demand.`);
+  if (scenario.padEnabled!==false && pv && pv.coolingDemandHours > 0) {
     const share = 100 * pv.effectiveHours / pv.coolingDemandHours;
     out.push(share < 15
-      ? `Pad-effective weather covers ${int(pv.effectiveHours)} h of the ${int(pv.coolingDemandHours)} h that show a cooling demand, ${pct(share)}, so at this site the pad is a marginal device rather than a primary cooling stage.`
-      : `Pad-effective weather covers ${int(pv.effectiveHours)} h of the ${int(pv.coolingDemandHours)} h that show a cooling demand, ${pct(share)}, so the pad carries a real share of the cooling season here.`);
+      ? `Pad-effective weather covers ${int(pv.effectiveHours)} h of the ${int(pv.coolingDemandHours)} h above the outdoor cooling trigger, ${pct(share)}, under the selected leaving-air limits.`
+      : `Pad-effective weather covers ${int(pv.effectiveHours)} h of the ${int(pv.coolingDemandHours)} h above the outdoor cooling trigger, ${pct(share)}, under the selected leaving-air limits.`);
     out.push(`It is effective on ${int(pv.effectiveDays?.atLeast1)} days, of which ${int(pv.effectiveDays?.atLeast4)} give four hours or more, and it is ineffective in ${int(pv.ineffectiveHours)} h on ${int(pv.ineffectiveDays?.atLeast1)} days.`);
     const causes = pv.failureCauses || {};
     if ((causes.moisture || 0) + (causes.temperature || 0) > 0) {
       const moistureBinds = (causes.moisture || 0) >= (causes.temperature || 0);
       out.push(`The limit that binds more often is the ${moistureBinds ? 'moisture ceiling' : 'temperature margin'}: counted over every classified hour, ${int(causes.moisture)} h carry the moisture-ceiling flag against ${int(causes.temperature)} h that run out of temperature margin, so ${moistureBinds ? 'adding pad area cannot help those hours, while removing moisture can' : 'the binding problem is sensible capacity at high dry bulb rather than humidity'}.`);
     }
-  } else out.push('The weather screen records no cooling-demand hours at this band, so pad viability cannot be assessed from 0 candidate hours.');
+  } else if(!pv?.coolingDemandHours) out.push('The weather screen records no cooling-demand hours at this band, so pad viability cannot be assessed from 0 candidate hours.');
   const padRun = summary?.runtime?.pad;
   if (scenario.padEnabled && padRun?.hours > 0 && pv) {
     const ratio = pv.effectiveHours > 0 ? padRun.hours / pv.effectiveHours : null;
@@ -229,7 +230,7 @@ function padSentences(weather, scenario, summary) {
   if (drying) {
     const total = drying.coolDry.hours + drying.coldDry.hours + drying.hotDry.hours;
     out.push(`Outside air can carry moisture out of the zone in ${int(total)} h (cool-dry ${int(drying.coolDry.hours)}, cold-dry ${int(drying.coldDry.hours)}, hot-dry ${int(drying.hotDry.hours)}) at up to ${num(drying.maxVentACH)} ACH.`);
-    if (finite(drying.dehuKWhPerKg)) out.push(`Against the declared ${num(drying.dehuKWhPerKg, 2)} kWh/kg condensing dehumidifier, outside air is cheaper per kilogram in ${int(drying.cheaperThanDehuHours)} h and lower in energy per kilogram in ${int(drying.lowerEnergyThanDehuHours)} h, so a ventilation-first moisture sequence is worth wiring.`);
+    if (finite(drying.dehuKWhPerKg)) out.push(`Against the declared ${num(drying.dehuKWhPerKg, 2)} kWh/kg condensing dehumidifier, outside air is cheaper per kilogram in ${int(drying.cheaperThanDehuHours)} h and lower in energy per kilogram in ${int(drying.lowerEnergyThanDehuHours)} h, under the declared marginal-energy assumptions; this does not establish crop demand or the cheapest whole-system strategy.`);
     out.push(`Those are weather-side opportunity hours, not equipment runtime: the ${int(drying.coldDry.hours)} cold-dry hours carry a heating penalty that is priced here, while the sensible import of the ${int(drying.hotDry.hours)} hot-dry hours is not.`);
   }
   return out;

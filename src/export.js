@@ -89,7 +89,7 @@ export function downloadRun(results,snapshot,format='json',extras={}){
  if(format==='report'){download('cea-psychrometric-site-evaluator-report.html',reportHTML(results,snapshot,extras||{}),'text/html');return;}
  if(format==='design-basis'){download('cea-psychrometric-site-evaluator-design-basis.html',designBasisHTML(results,snapshot,extras||{}),'text/html');return;}
  if(format==='csv'){
- const keys=['time','valid','weatherMode','mode','reason','tempC','rh','vpd','compliantFraction','electricKWh','fuelKWh','waterL','condensateKg',
+ const keys=['time','valid','weatherMode','padCoolingOpportunity','padInstalled','padEquivalentHours','mode','reason','tempC','rh','vpd','compliantFraction','electricKWh','fuelKWh','waterL','condensateKg',
   'recoverySensibleKWh','recoveryLatentKWh','recoveryAuxKWh','recoveryCoreM3','recoveryBypassM3','recoveryDefrostHours',
   'preheatDeliveredKWh','preheatElectricKWh','preheatFuelKWh','preheatInsufficientHours',
   'doasCondensateKg','doasCoolingDeliveredKWh','doasCoolingElectricKWh','doasRecoveredReheatKWh','doasExternalHeatKWh','doasUnmetConditioningKWh',
@@ -102,7 +102,7 @@ export function downloadRun(results,snapshot,format='json',extras={}){
  const columns=[...keys,...controlKeys,...costColumns];
  const rows=[['scenario','source','sourceKind','timezone','weatherSnapshotId','weatherDataKind',...columns].map(csvValue).join(',')];
  for(const r of results)for(const h of r.hours)rows.push([r.scenario.name,snapshot.source,snapshot.sourceKind,snapshot.timezone,snapshot.id,snapshot.dataKind,
-  ...keys.map(k=>k==='time'?new Date(h.time).toISOString():h[k]),
+  ...keys.map(k=>k==='time'?new Date(h.time).toISOString():k==='padCoolingOpportunity'?h.opportunity?.pad.cooling:k==='padInstalled'?h.capability?.pad.installed:k==='padEquivalentHours'?h.operation?.pad.equivalentHours:h[k]),
   ...controlKeys.map(k=>k==='controlledACHStages'?JSON.stringify(h.controls?.[k]||[]):h.controls?.[k]),JSON.stringify(r.summary.costBasis),r.scenario.installedCostBasis].map(csvValue).join(','));
  download('cea-psychrometric-site-evaluator-hourly.csv',rows.join('\r\n'),'text/csv');return;
  }
