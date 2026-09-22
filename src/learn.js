@@ -1330,6 +1330,7 @@ function onTabKey(event) {
     the switch, applies the hash or the remembered view, and loads the study. Returns what it wired, for
     the caller to log or ignore. */
 export function initLearn() {
+  document.getElementById('learn-view').prepend(node('p', 'Historical study evidence: the regional and Morris figures below were calculated with model 0.3.0-screening. They have not been regenerated for the current phase-aware moisture conversion. Use them as historical examples, not current-model validation.', 'help'));
   const host = $('learn-modules');
   if (host) {
     const fragment = document.createDocumentFragment();

@@ -55,3 +55,9 @@ test('the attainment step reads the engine fields and excludes warm-up and missi
   assert.match(attainmentSteps({valid: false, compliantFraction: null})[0].result, /missing/);
   assert.deepEqual(attainmentSteps(null), []);
 });
+test('cold liquid dewpoint is not misrepresented as a frost-point discrepancy',()=>{
+ const steps=weatherSteps({time:Date.UTC(2025,0,1),tempC:-10,dewPointC:-20,pressurePa:101325,moisture:{authoritative:'dewPointC',rhReference:'water',dewPointReference:'water'}},scenario);
+ assert.match(steps[3].working,/frost point/);
+ assert.doesNotMatch(steps[3].working,/consistency check/);
+ assert.match(weatherSteps(file.hours[0].hour,scenario)[1].working,/Legacy input/);
+});

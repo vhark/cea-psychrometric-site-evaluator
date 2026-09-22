@@ -1,3 +1,4 @@
+import {MOISTURE_VERSION, displayRH, resolveMoisture, saturationVaporPressure} from './moisture.js';
 import {WEATHER_UNITS, withWeatherContract, sealWeatherSnapshot} from './weather-contract.js';
 export {sealWeatherSnapshot} from './weather-contract.js';
 /* Public weather adapters. No credentials, synthetic weather, or station/reanalysis substitution.
@@ -351,7 +352,9 @@ export async function fetchNcei(options) {
       hour.variableQuality = {...hour.variableQuality, pressurePa: {evidence: 'derived', derivation: 'station pressure estimated from altimeter and station elevation'}};
     } else hour.quality.push('station-pressure-unavailable');
     if (hour.rh == null && hour.tempC != null && hour.dewPointC != null && hour.dewPointC <= hour.tempC) {
-      hour.rh = saturation(hour.dewPointC) / saturation(hour.tempC);
+      const resolved = resolveMoisture({...hour,authoritative:'dewPointC',rhReference:'unknown',dewPointReference:'unknown'});
+      hour.moisture = {authoritative:'dewPointC',rhReference:'unknown',dewPointReference:'unknown'};
+      hour.rh = resolved.valid && hour.tempC >= .01 ? resolved.vaporPressurePa / saturationVaporPressure(hour.tempC,'water') : null;
       hour.quality.push('rh-derived-from-observed-dewpoint');
       hour.variableQuality = {...hour.variableQuality, rh: {evidence: 'derived', derivation: 'RH from reported dry bulb and dew point using saturation vapor pressure ratio'}};
     }
@@ -491,6 +494,11 @@ export async function fetchWeather(options) {
   if (!adapter) throw new Error(`Unknown weather provider: ${options.provider}. Available: ${PROVIDER_IDS.join(', ')}.`);
   const snapshot = await adapter(options);
   snapshot.variables = adapterVariables(options.provider || 'nasa');
+  const provider = options.provider || 'nasa';
+  const confirmedWater = provider === 'nasa' || provider === 'openmeteo';
+  snapshot.moisture = {authoritative:provider === 'ncei' ? 'dewPointC' : 'rh',
+    rhReference:confirmedWater ? 'water' : 'unknown',dewPointReference:provider === 'openmeteo' ? 'water' : 'unknown'};
+  snapshot.conversionVersion = MOISTURE_VERSION;
   return sealWeatherSnapshot(normalizeWeather(snapshot));
 }
 
@@ -554,8 +562,8 @@ function finiteCell(value, name) {
   if (!Number.isFinite(number)) throw new Error('Invalid numeric ' + name + ': ' + value);
   return number;
 }
-function saturation(tempC) { return 610.94 * Math.exp(17.625 * tempC / (243.04 + tempC)); }
-function normalizeHour(input) {
+
+function normalizeHour(input, declaration, preserve = false) {
   let time = input.time;
   if (typeof time === 'string') {
     if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?Z$/.test(time)) throw new Error('Weather timestamps must be explicit UTC ISO 8601 ending Z.');
@@ -569,19 +577,24 @@ function normalizeHour(input) {
     hour[key] = finiteCell(input[key], key);
     if (hour[key] != null && (hour[key] < min || hour[key] > max)) throw new Error('Out-of-range ' + key + ' at ' + new Date(time).toISOString() + '. Check units.');
   }
-  if (hour.dewPointC != null && hour.tempC != null) {
-    const derived = Math.min(1, saturation(hour.dewPointC) / saturation(hour.tempC));
-    if (Number.isFinite(hour.rh)) {
-      if (hour.dewPointC > hour.tempC + .5 || Math.abs(hour.rh - derived) > .15) hour.quality.push('auxiliary-dew-frost-point-disagrees-with-authoritative-rh');
-    } else if (!Object.hasOwn(input, 'rh')) {
-      if (hour.dewPointC > hour.tempC + .5) throw new Error('Dew point exceeds dry bulb at ' + new Date(time).toISOString());
-      hour.rh = derived; hour.quality.push('rh-derived-from-dewpoint');
+  if (preserve && declaration && !hour.moisture && (Number.isFinite(hour.rh) || Number.isFinite(hour.dewPointC))) hour.moisture = {...declaration};
+  if (!preserve) {
+    const basis = input.moisture || declaration || {authoritative:Object.hasOwn(input,'rh') ? 'rh' : 'dewPointC',rhReference:'unknown',dewPointReference:'unknown'};
+    hour.moisture = {...basis,conversionVersion:MOISTURE_VERSION};
+    const resolved = resolveMoisture({...hour,...basis});
+    if (!resolved.valid && Number.isFinite(hour.tempC)) hour.quality.push('moisture-interpretation-unresolved');
+    if (basis.authoritative === 'dewPointC' && resolved.valid) {
+      // Keep a display RH only when its reference is established; physics uses
+      // authoritative dew point, never feeds this rounded/derived value back.
+      hour.rh = displayRH(hour.tempC,resolved.vaporPressurePa,basis.rhReference);
+      hour.quality.push(hour.rh === null ? 'display-rh-unavailable' : 'rh-derived-from-dewpoint');
     }
+    if (resolved.warnings.some(w => w.startsWith('Auxiliary dew/frost point disagrees'))) hour.quality.push('auxiliary-dew-frost-point-disagrees-with-authoritative-rh');
   }
   return markMissing(hour);
 }
 
-export function normalizeWeather(input, {timezone: csvTimezone} = {}) {
+export function normalizeWeather(input, {timezone: csvTimezone, moisture} = {}) {
   if (typeof input === 'string') {
     const text = input.trim();
     if (text.startsWith('{')) { try { input = JSON.parse(text); } catch { throw new Error('Invalid weather JSON.'); } }
@@ -603,7 +616,7 @@ export function normalizeWeather(input, {timezone: csvTimezone} = {}) {
   }
   const records = new Map();
   for (const item of input.hours) {
-    const hour = normalizeHour(item);
+    const hour = normalizeHour(item, moisture || input.moisture, input.schemaVersion === 2);
     if (records.has(hour.time)) throw new Error('Duplicate weather hour: ' + new Date(hour.time).toISOString());
     records.set(hour.time, hour);
   }
@@ -716,7 +729,9 @@ export async function fetchObserved(options) {
       if (hour[key] != null && (!Number.isFinite(hour[key]) || hour[key] < min || hour[key] > max)) { hour[key] = null; hour.quality.push('invalid-reported-' + key); }
     }
     if (hour.rh == null && hour.tempC != null && hour.dewPointC != null && hour.dewPointC <= hour.tempC) {
-      hour.rh = saturation(hour.dewPointC) / saturation(hour.tempC);
+      const resolved = resolveMoisture({...hour,authoritative:'dewPointC',rhReference:'unknown',dewPointReference:'unknown'});
+      hour.moisture = {authoritative:'dewPointC',rhReference:'unknown',dewPointReference:'unknown'};
+      hour.rh = resolved.valid && hour.tempC >= .01 ? resolved.vaporPressurePa / saturationVaporPressure(hour.tempC,'water') : null;
       hour.quality.push('rh-derived-from-observed-dewpoint');
       hour.variableQuality = {...hour.variableQuality, rh: {evidence: 'derived', derivation: 'RH from reported dry bulb and dew point using saturation vapor pressure ratio'}};
     }
@@ -760,4 +775,13 @@ export async function fetchObserved(options) {
     requestedCutoffUTC: new Date(queryEnd).toISOString(), actualObservationCutoffUTC: actualObservationCutoff == null ? null : new Date(actualObservationCutoff).toISOString(),
     solarSource: { source: 'NASA POWER', fields: ['ghiWm2'], coordinateNotes: GRID_NOTE, sourceVersions: solar?.sourceVersions || [], sourceUrls: solar?.sourceUrls || [] },
     coverage: coverage(hours, bounds), warnings, raw: { observations, solar: solar?.raw || [] }, hours };
+}
+
+/** Explicit conversion produces a child revision; the original evidence is untouched. */
+export async function reprocessWeather(input, moisture) {
+  const parent = await sealWeatherSnapshot(normalizeWeather(input));
+  const hours = parent.hours.map(hour => normalizeHour({...hour,moisture,
+    quality:(hour.quality || []).filter(flag => !['moisture-interpretation-unresolved','rh-derived-from-dewpoint','auxiliary-dew-frost-point-disagrees-with-authoritative-rh'].includes(flag))},moisture));
+  return sealWeatherSnapshot(normalizeWeather({...parent,hours,moisture,parentSnapshotId:parent.id,
+    conversionVersion:MOISTURE_VERSION,transformations:[...parent.transformations,{operation:'reprocess-moisture',version:MOISTURE_VERSION,parentSnapshotId:parent.id}]}));
 }

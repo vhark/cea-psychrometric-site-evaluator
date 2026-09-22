@@ -1,3 +1,4 @@
+import {equilibriumTemperature} from './moisture.js';
 /* The arithmetic behind one weather hour, written out step by step with the hour's own numbers.
    Every value here is recomputed from the same functions the screen uses (src/physics.js), never
    copied from a result, so what a reader checks by hand is exactly what the classifier decided on.
@@ -23,22 +24,23 @@ export function weatherSteps(hour, scenario, source = {}) {
   const outside = weatherState(hour);
   if (!outside) return steps;
   const {tempC: T, rh, pressurePa: P, w} = outside;
-  const ps = saturationPressure(T), pv = rh * ps;
+  const ps = saturationPressure(T), pv = outside.vaporPressurePa;
   add('Saturation and actual vapour pressure',
-    'p_sat = f(T) from PsychroLib; p_v = RH * p_sat',
-    `p_sat(${n(T)} C) = ${n(ps, 1)} Pa; p_v = ${n(rh, 4)} * ${n(ps, 1)} = ${n(pv, 1)} Pa`,
+    'p_v follows the declared humidity reference; w and all later steps use that same vapor pressure',
+    `stable-phase p_sat(${n(T)} C) = ${n(ps, 1)} Pa; interpretation ${JSON.stringify(outside.moistureBasis)}; ${outside.warnings.join(' ')}; p_v = ${n(pv, 1)} Pa`,
     `${n(pv, 1)} Pa of the ${n(P, 0)} Pa total is water vapour`, 'saturationPressure');
   add('Humidity ratio, the mass of water per kg of dry air',
     'w = 0.621945 * p_v / (P - p_v)',
     `w = 0.621945 * ${n(pv, 1)} / (${n(P, 0)} - ${n(pv, 1)})`,
     `${n(w, 5)} kg/kg, or ${n(w * 1000, 2)} g of water per kg of dry air`, 'humidityRatio');
-  const twb = wetBulb(T, w, P), tdp = dewPoint(T, w, P), h = enthalpy(T, w), vpd = airVPD(T, w, P);
-  add('Dew point, wet bulb, enthalpy and VPD from T, w and P',
-    'dew point: T where p_sat(T) = p_v; wet bulb: PsychroLib iteration; h = 1006 T + w (2501000 + 1860 T); VPD = (p_sat(T) - p_v) / 1000',
-    `dew point ${n(tdp)} C (the record said ${n(hour.dewPointC)} C, the difference is a consistency check); ` +
+  const twb = wetBulb(T, w, P), tdp = equilibriumTemperature(pv), h = enthalpy(T, w), vpd = airVPD(T, w, P);
+  const equilibriumLabel = tdp < .01 ? 'frost point (ice equilibrium)' : 'dew point (water equilibrium)';
+  add('Equilibrium temperature, wet bulb, enthalpy and VPD from T, w and P',
+    'stable-phase equilibrium: T where p_sat(T) = p_v; wet bulb: PsychroLib iteration; h = 1006 T + w (2501000 + 1860 T); VPD = (p_sat(T) - p_v) / 1000',
+    `${equilibriumLabel} ${n(tdp)} C; reported dew/frost point ${n(hour.dewPointC)} C uses its own declared reference; ` +
     `wet bulb ${n(twb)} C; h = 1006 * ${n(T)} + ${n(w, 5)} * (2501000 + 1860 * ${n(T)}) = ${n(h / 1000, 2)} kJ/kg; ` +
     `VPD = (${n(ps, 1)} - ${n(pv, 1)}) / 1000`,
-    `dew point ${n(tdp)} C, wet bulb ${n(twb)} C, enthalpy ${n(h / 1000, 2)} kJ/kg, air VPD ${n(vpd, 3)} kPa`, 'wetBulb, dewPoint, enthalpy, airVPD');
+    `${equilibriumLabel} ${n(tdp)} C, wet bulb ${n(twb)} C, enthalpy ${n(h / 1000, 2)} kJ/kg, air VPD ${n(vpd, 3)} kPa`, 'wetBulb, dewPoint, enthalpy, airVPD');
   const clock = localClock(hour.time, scenario.timezone), sch = schedule(hour.time, scenario);
   add('Which local hour this is, and what the crop wants then',
     'local clock in the site zone; day if (hour - dayStart) mod 24 < photoperiod; target = day or night target; band = target +/- tolerance',

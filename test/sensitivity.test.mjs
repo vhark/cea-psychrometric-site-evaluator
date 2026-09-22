@@ -132,10 +132,11 @@ test('ranking stability needs one order in at least 90% of screened points',()=>
   assert.equal(none.mostCommon,null);
 });
 
-test('committed Morris evidence uses the current model, unchanged design and complete numerical coverage',()=>{
+test('committed Morris evidence retains its historical model, unchanged design and complete numerical coverage',()=>{
   const study=JSON.parse(readFileSync(new URL('../docs/morris-screening.json',import.meta.url),'utf8'));
   assert.equal(study.schemaVersion,2);
-  assert.equal(study.provenance.modelVersion,MODEL_VERSION);
+  assert.equal(study.provenance.modelVersion,'0.3.0-screening');
+  assert.notEqual(study.provenance.modelVersion,MODEL_VERSION);
   assert.equal(study.provenance.scenarioSchemaVersion,SCENARIO_SCHEMA_VERSION);
   assert.deepEqual(study.provenance.years,[2023,2024,2025]);
   assert.equal(study.provenance.simulations,1872);

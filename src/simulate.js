@@ -1,3 +1,4 @@
+import {MOISTURE_VERSION} from './moisture.js';
 import {assertHistoricalWeather} from './weather-contract.js';
 import {MODEL_VERSION,migrateScenario,validateScenario,FACILITY_TEMPLATES} from './config.js';
 import {CP_DRY_AIR as CP,LATENT_HEAT as L,clamp,enthalpy,humidityRatio,saturationHumidityRatio,saturationPressure,
@@ -721,6 +722,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     hours.push(row);
     if(onProgress&&(index%24===0||index===input.length-1))onProgress((index+1)/input.length);
   }
+  if(snapshot.hours.some(hour=>!hour.moisture))warnings.push('Legacy input: historical PsychroLib phase conventions are assumed for unannotated moisture values; provider provenance is unconfirmed.');
   if(gapCount)warnings.push(`${gapCount} missing/invalid weather hours break continuous operation. Each subsequent segment restarts with an excluded warm-up hour. Incomplete local days do not enter DLI deficit-day counts.`);
   if(unsupportedRecoveryFlow)warnings.push('Selected controlled airflow fell below 50% of heat-recovery nominal flow. The core was bypassed because its rating is unsupported below that limit.');
   const summary=summarizeHours(hours,s);
@@ -772,7 +774,7 @@ export function simulateScenario(scenario,snapshot,{stepMinutes=1,onProgress,scr
     }:null,
   };
   return {weatherSnapshotId:snapshot.id ?? null,scenario:s,hours,summary,weatherSummary:weatherSummary(hours,s),warnings,modelVersion:MODEL_VERSION,controlModeUsed:controlMode,transpirationModelUsed:transpirationModel,
-    assumptions:{evidenceTier:'Assumption-based component screening',stepMinutes,warmupHoursPerSegment:1,lightSolarConversionUmolJ:2.02,
+    assumptions:{moistureConversionVersion:MOISTURE_VERSION,legacyMoistureConvention:snapshot.hours.some(hour=>!hour.moisture),evidenceTier:'Assumption-based component screening',stepMinutes,warmupHoursPerSegment:1,lightSolarConversionUmolJ:2.02,
       controlModeUsed:controlMode,transpirationModelUsed:transpirationModel,
       canopyTemperature:transpirationModel==='stanghellini'?'Equal to zone air temperature (declared simplification, no leaf energy balance).':null,
       leafAreaIndex:transpirationModel==='stanghellini'?s.lai:null,

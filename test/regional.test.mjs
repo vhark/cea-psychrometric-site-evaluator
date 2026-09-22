@@ -18,7 +18,8 @@ const VERDICT_KEYS=['recommended','recommendedBasis','runnerUp','marginPct','sta
 test('the committed study carries the contract shape the Learn tab codes against',()=>{
   assert.equal(study.schemaVersion,1);
   assert.equal(study.scenarioSchemaVersion,SCENARIO_SCHEMA_VERSION);
-  assert.equal(study.modelVersion,MODEL_VERSION,'a study from an older model version must be regenerated');
+  assert.equal(study.modelVersion,'0.3.0-screening','retained study belongs to its original model, never relabel it as current');
+  assert.notEqual(study.modelVersion,MODEL_VERSION);
   assert.ok(!Number.isNaN(Date.parse(study.generatedAt)));
   const m=study.method;
   assert.deepEqual(m.years,[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025]);

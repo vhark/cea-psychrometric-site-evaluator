@@ -66,6 +66,12 @@ function variableMetadata(value, field, defaults) {
 }
 
 export function withWeatherContract(snapshot) {
+  const validateMoisture = basis => {
+    if (basis == null) return;
+    if (typeof basis !== 'object' || Array.isArray(basis) || !['rh','dewPointC'].includes(basis.authoritative)) throw new Error('Invalid authoritative moisture declaration.');
+    for (const field of ['rhReference','dewPointReference']) if (!['water','ice','unknown'].includes(basis[field])) throw new Error(`Invalid moisture reference: ${field}.`);
+  };
+  validateMoisture(snapshot.moisture);
   metadataMap(snapshot.variables, 'variables');
   if (snapshot.transformations != null && !Array.isArray(snapshot.transformations)) throw new Error('transformations must be an array.');
   const provider = providerIdentity(snapshot);
@@ -78,6 +84,7 @@ export function withWeatherContract(snapshot) {
     });
   }
   const hours = snapshot.hours.map(hour => {
+    validateMoisture(hour.moisture);
     if (hour.intervalStart != null && hour.intervalStart !== hour.time || hour.intervalEnd != null && hour.intervalEnd !== hour.time + HOUR) {
       throw new Error('Weather interval must match its UTC hour start and one-hour duration.');
     }
@@ -108,6 +115,7 @@ function stableJSON(value) {
     ? Object.fromEntries(Object.keys(item).sort().map(key => [key,item[key]])) : item);
 }
 export async function sealWeatherSnapshot(snapshot) {
+  if (snapshot.transport?.rawOmitted) throw new Error('A compact weather view cannot be resealed. Load the complete snapshot from its repository.');
   if (snapshot.schemaVersion !== WEATHER_SCHEMA_VERSION) throw new Error('Normalize weather to schema 2 before sealing it.');
   if (!globalThis.crypto?.subtle) throw new Error('Weather identity requires Web Crypto. Use HTTPS or localhost.');
   const {id:ignoredId,...payload} = snapshot;

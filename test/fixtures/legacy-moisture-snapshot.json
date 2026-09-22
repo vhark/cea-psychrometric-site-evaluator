@@ -1,0 +1,225 @@
+{
+  "generatedFromCommit": "efeacd24fb5f89d1c2b499e46c6390a765c6afd4",
+  "generation": "git archive committed src, vendor, package.json into a temporary directory; execute committed normalizeWeather, sealWeatherSnapshot and weatherState with Node; no current source imports",
+  "inputCSV": "time,tempC,dewPointC,pressurePa,ghiWm2\n2025-01-01T00:00:00Z,-10,-20,84000,0\n2025-01-01T01:00:00Z,-20,-30,70000,0\n2025-01-01T02:00:00Z,20,10,101325,0",
+  "inputRows": [
+    {
+      "time": 1735689600000,
+      "tempC": -10,
+      "dewPointC": -20,
+      "pressurePa": 84000,
+      "ghiWm2": 0
+    },
+    {
+      "time": 1735693200000,
+      "tempC": -20,
+      "dewPointC": -30,
+      "pressurePa": 70000,
+      "ghiWm2": 0
+    },
+    {
+      "time": 1735696800000,
+      "tempC": 20,
+      "dewPointC": 10,
+      "pressurePa": 101325,
+      "ghiWm2": 0
+    }
+  ],
+  "snapshot": {
+    "coverage": {
+      "actualSolarCutoffUTC": "2025-01-01T02:00:00.000Z",
+      "actualWeatherCutoffUTC": "2025-01-01T02:00:00.000Z",
+      "endExclusiveUTC": "2025-01-01T03:00:00.000Z",
+      "expectedHours": 3,
+      "incompleteTrailingHours": 0,
+      "solarHours": 3,
+      "startUTC": "2025-01-01T00:00:00.000Z",
+      "weatherHours": 3
+    },
+    "dataKind": "unknown",
+    "endDate": "2025-01-01",
+    "endExclusiveUTC": "2025-01-01T03:00:00.000Z",
+    "forecast": {
+      "issuedAt": null,
+      "runId": null
+    },
+    "hours": [
+      {
+        "dataKind": "unknown",
+        "dewPointC": -20,
+        "ghiWm2": 0,
+        "intervalEnd": 1735693200000,
+        "intervalStart": 1735689600000,
+        "pressurePa": 84000,
+        "quality": [
+          "rh-derived-from-dewpoint"
+        ],
+        "rh": 0.43861814530032217,
+        "tempC": -10,
+        "time": 1735689600000,
+        "variableQuality": {},
+        "windMs": null
+      },
+      {
+        "dataKind": "unknown",
+        "dewPointC": -30,
+        "ghiWm2": 0,
+        "intervalEnd": 1735696800000,
+        "intervalStart": 1735693200000,
+        "pressurePa": 70000,
+        "quality": [
+          "rh-derived-from-dewpoint"
+        ],
+        "rh": 0.40596258714704875,
+        "tempC": -20,
+        "time": 1735693200000,
+        "variableQuality": {},
+        "windMs": null
+      },
+      {
+        "dataKind": "unknown",
+        "dewPointC": 10,
+        "ghiWm2": 0,
+        "intervalEnd": 1735700400000,
+        "intervalStart": 1735696800000,
+        "pressurePa": 101325,
+        "quality": [
+          "rh-derived-from-dewpoint"
+        ],
+        "rh": 0.5254132558106587,
+        "tempC": 20,
+        "time": 1735696800000,
+        "variableQuality": {},
+        "windMs": null
+      }
+    ],
+    "provider": {
+      "id": "import",
+      "model": null,
+      "product": "Imported CSV",
+      "stationId": null
+    },
+    "raw": {
+      "format": "csv",
+      "text": "time,tempC,dewPointC,pressurePa,ghiWm2\n2025-01-01T00:00:00Z,-10,-20,84000,0\n2025-01-01T01:00:00Z,-20,-30,70000,0\n2025-01-01T02:00:00Z,20,10,101325,0"
+    },
+    "schemaVersion": 2,
+    "source": "Imported CSV",
+    "sourceKind": "user-supplied, unverified",
+    "startDate": "2025-01-01",
+    "startUTC": "2025-01-01T00:00:00.000Z",
+    "timeBasis": {
+      "intervalSeconds": 3600,
+      "reportingTimezone": "UTC",
+      "timestamp": "UTC interval start"
+    },
+    "timezone": "UTC",
+    "transformations": [
+      {
+        "from": 1,
+        "operation": "migrate-weather-schema",
+        "to": 2
+      }
+    ],
+    "units": {
+      "dewPointC": "C",
+      "ghiWm2": "W/m2",
+      "pressurePa": "Pa",
+      "rh": "fraction",
+      "tempC": "C",
+      "time": "UTC epoch milliseconds",
+      "windMs": "m/s"
+    },
+    "variables": {
+      "dewPointC": {
+        "aggregation": "unknown",
+        "derivation": null,
+        "evidence": "unknown",
+        "source": "Imported CSV",
+        "sourceTiming": "unknown",
+        "unit": "C"
+      },
+      "ghiWm2": {
+        "aggregation": "unknown",
+        "derivation": null,
+        "evidence": "unknown",
+        "source": "Imported CSV",
+        "sourceTiming": "unknown",
+        "unit": "W/m2"
+      },
+      "pressurePa": {
+        "aggregation": "unknown",
+        "derivation": null,
+        "evidence": "unknown",
+        "source": "Imported CSV",
+        "sourceTiming": "unknown",
+        "unit": "Pa"
+      },
+      "rh": {
+        "aggregation": "unknown",
+        "derivation": null,
+        "evidence": "unknown",
+        "source": "Imported CSV",
+        "sourceTiming": "unknown",
+        "unit": "fraction"
+      },
+      "tempC": {
+        "aggregation": "unknown",
+        "derivation": null,
+        "evidence": "unknown",
+        "source": "Imported CSV",
+        "sourceTiming": "unknown",
+        "unit": "C"
+      },
+      "windMs": {
+        "aggregation": "unknown",
+        "derivation": null,
+        "evidence": "unknown",
+        "source": "Imported CSV",
+        "sourceTiming": "unknown",
+        "unit": "m/s"
+      }
+    },
+    "id": "weather:sha256:56d9382e8ad0fea20343d56dec0f7f7672947fe2f378fc28cab54a05cdf1445a"
+  },
+  "expectedLegacyCSVStates": [
+    {
+      "tempC": -10,
+      "w": 0.0008452012795405488,
+      "rh": 0.43861814530032217,
+      "pressurePa": 84000
+    },
+    {
+      "tempC": -20,
+      "w": 0.00037267805698963966,
+      "rh": 0.40596258714704875,
+      "pressurePa": 70000
+    },
+    {
+      "tempC": 20,
+      "w": 0.007635357125596846,
+      "rh": 0.5254132558106587,
+      "pressurePa": 101325
+    }
+  ],
+  "expectedLegacyDirectStates": [
+    {
+      "tempC": -10,
+      "w": 0.0007654919183516777,
+      "rh": 0.3973037334525093,
+      "pressurePa": 84000
+    },
+    {
+      "tempC": -20,
+      "w": 0.00033795011058456944,
+      "rh": 0.36815357152853184,
+      "pressurePa": 70000
+    },
+    {
+      "tempC": 20,
+      "w": 0.0076300537032615865,
+      "rh": 0.5250527333276989,
+      "pressurePa": 101325
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import {hourMoisture, displayRH} from './moisture.js';
 import psychrolib from '../vendor/psychrolib.js';
 import {heatSourceState} from './screens.js';
 
@@ -72,16 +73,12 @@ export function weatherState(hour, requireSolar = false) {
   if (!hour || !Number.isFinite(hour.time) || !Number.isFinite(hour.tempC) || hour.tempC < -80 || hour.tempC > 65 ||
       !Number.isFinite(hour.pressurePa) || hour.pressurePa < 30000 || hour.pressurePa > 110000 ||
       (requireSolar && (!Number.isFinite(hour.ghiWm2) || hour.ghiWm2 < 0 || hour.ghiWm2 > 1600))) return null;
-  let rh = hour.rh;
-  if (!Number.isFinite(rh) && Number.isFinite(hour.dewPointC)) {
-    if (hour.dewPointC > hour.tempC || hour.dewPointC < -100) return null;
-    rh = saturationPressure(hour.dewPointC) / saturationPressure(hour.tempC);
-  }
-  if (!Number.isFinite(rh) || rh < 0 || rh > 1) return null;
-  try {
-    const w = humidityRatio(hour.tempC,rh,hour.pressurePa);
-    return {tempC:hour.tempC,w,rh,pressurePa:hour.pressurePa};
-  } catch { return null; }
+  const moisture = hourMoisture(hour);
+  if (!moisture.valid) return null;
+  const rh = Number.isFinite(hour.rh) && hour.moisture?.authoritative !== 'dewPointC'
+    ? hour.rh : displayRH(hour.tempC,moisture.vaporPressurePa,moisture.basis.rhReference);
+  return {tempC:hour.tempC,w:moisture.humidityRatio,rh,pressurePa:hour.pressurePa,
+    vaporPressurePa:moisture.vaporPressurePa,moistureBasis:moisture.basis,warnings:moisture.warnings};
 }
 
 export function localClock(time, timezone = 'UTC') {
