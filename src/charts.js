@@ -143,10 +143,26 @@ function glyphPath(name, fill, stroke, x, y, w, h) {
     default: fill.rect(x, y, w, h);
   }
 }
-export function renderTimeline(container, hours, onSelect, weatherOnly = false, modeOrder = null) {
+/* Local day across, local hour down, matching the table view and every other local-month panel. A local hour that
+   repeats on the autumn daylight-saving fold is drawn as two half cells (earlier instant on the left); the hour
+   skipped in spring has no source row and stays empty. */
+export function renderTimeline(container, hours, onSelect, weatherOnly = false, modeOrder = null, timezone = 'UTC') {
   if (!hours.length) {blank(container, 'No hourly record.'); return;}
-  const start = Math.floor(hours[0].time / DAY) * DAY;
-  const days = Math.max(1, Math.floor((hours.at(-1).time - start) / DAY) + 1);
+  const clock = new Intl.DateTimeFormat('en-CA', {timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23'});
+  const cells = new Map(), dates = [];
+  hours.forEach((hour, index) => {
+    if (!Number.isFinite(hour.time)) return;
+    const parts = Object.fromEntries(clock.formatToParts(hour.time).map(part => [part.type, part.value]));
+    const date = `${parts.year}-${parts.month}-${parts.day}`, localHour = Number(parts.hour) % 24;
+    const dayNumber = Date.UTC(+parts.year, +parts.month - 1, +parts.day) / DAY;
+    dates.push([dayNumber, date]);
+    const key = `${dayNumber}:${localHour}`;
+    if (!cells.has(key)) cells.set(key, {dayNumber, localHour, entries: []});
+    cells.get(key).entries.push(index);
+  });
+  if (!dates.length) {blank(container, 'No hour in this record carries a usable timestamp.'); return;}
+  const [firstDay, firstDate] = dates.reduce((a, b) => b[0] < a[0] ? b : a), [lastDay, lastDate] = dates.reduce((a, b) => b[0] > a[0] ? b : a);
+  const days = lastDay - firstDay + 1;
   const width = 1100, height = 280, left = 32, right = 8, top = 8, bottom = 30;
   const plotWidth = width - left - right, plotHeight = height - top - bottom;
   const entries = modeOrder || modeEntries(hours, true), ranks = new Map(entries.map(([mode], index) => [mode, index]));
@@ -155,37 +171,40 @@ export function renderTimeline(container, hours, onSelect, weatherOnly = false, 
     : ATTAINMENT_ORDER.map(cls => `${ATTAINMENT[cls].code} is a ${GLYPH_NAMES[ATTAINMENT[cls].glyph]}: ${ATTAINMENT[cls].text}`);
   const canvas = document.createElement('canvas'); canvas.width = width * 2; canvas.height = height * 2;
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', `${days} UTC days by 24 hours. Each cell is drawn as a shape as well as a colour. ${legendParts.join('. ')}. Cells with no source hour stay empty. The day by hour table below and the hourly inspector slider are the keyboard and text alternatives.`);
+  canvas.setAttribute('aria-label', `${days} local days in ${timezone} by 24 local hours. Each cell is drawn as a shape as well as a colour. ${legendParts.join('. ')}. A repeated autumn hour is split into two half cells; cells with no source hour stay empty. The day by hour table below and the hourly inspector slider are the keyboard and text alternatives.`);
   const ctx = canvas.getContext('2d');
   if (!ctx) {blank(container, 'Canvas is unavailable. Use the day by hour table, the hourly inspector and the exported hourly CSV.'); return;}
   ctx.scale(2, 2);
   const styles = getComputedStyle(document.documentElement), color = key => styles.getPropertyValue(`--${key}`).trim();
   ctx.fillStyle = color('canvas-2'); ctx.fillRect(left, top, plotWidth, plotHeight);
-  const buckets = new Map(), lookup = new Map();
+  const buckets = new Map();
   const cellWidth = Math.max(.7, plotWidth / days - .5), cellHeight = Math.max(.7, plotHeight / 24 - .7);
-  hours.forEach((hour, index) => {
-    if (!Number.isFinite(hour.time)) return;
-    const day = Math.floor((hour.time - start) / DAY), utcHour = new Date(hour.time).getUTCHours();
-    lookup.set(`${day}:${utcHour}`, index);
-    let spec;
-    if (!weatherOnly) spec = ATTAINMENT[attainmentClass(hour)];
-    else {const rank = ranks.get(hour.weatherMode); spec = rank === undefined ? ATTAINMENT.invalid : {color: colors[rank % colors.length], glyph: MODE_GLYPHS[rank % MODE_GLYPHS.length]};}
-    const id = `${spec.color}|${spec.glyph}`;
-    let bucket = buckets.get(id);
-    if (!bucket) {bucket = {color: spec.color, glyph: spec.glyph, fill: new Path2D(), stroke: new Path2D()}; buckets.set(id, bucket);}
-    glyphPath(spec.glyph, bucket.fill, bucket.stroke, left + day / days * plotWidth, top + utcHour / 24 * plotHeight, cellWidth, cellHeight);
-  });
+  for (const {dayNumber, localHour, entries: indices} of cells.values()) {
+    const share = cellWidth / indices.length;
+    indices.forEach((index, slot) => {
+      const hour = hours[index];
+      let spec;
+      if (!weatherOnly) spec = ATTAINMENT[attainmentClass(hour)];
+      else {const rank = ranks.get(hour.weatherMode); spec = rank === undefined ? ATTAINMENT.invalid : {color: colors[rank % colors.length], glyph: MODE_GLYPHS[rank % MODE_GLYPHS.length]};}
+      const id = `${spec.color}|${spec.glyph}`;
+      let bucket = buckets.get(id);
+      if (!bucket) {bucket = {color: spec.color, glyph: spec.glyph, fill: new Path2D(), stroke: new Path2D()}; buckets.set(id, bucket);}
+      glyphPath(spec.glyph, bucket.fill, bucket.stroke, left + (dayNumber - firstDay) / days * plotWidth + slot * share, top + localHour / 24 * plotHeight, share, cellHeight);
+    });
+  }
   ctx.lineWidth = Math.min(1, Math.max(.5, cellHeight / 8));
   for (const bucket of buckets.values()) {ctx.fillStyle = color(bucket.color); ctx.strokeStyle = ctx.fillStyle; ctx.fill(bucket.fill); ctx.stroke(bucket.stroke);}
   ctx.fillStyle = color('text-3'); ctx.font = '11px "IBM Plex Mono", monospace'; ctx.textAlign = 'right';
   for (const hour of [0, 6, 12, 18, 23]) ctx.fillText(String(hour).padStart(2, '0'), left - 7, top + (hour + .75) / 24 * plotHeight);
-  ctx.textAlign = 'left'; ctx.fillText(new Date(start).toISOString().slice(0, 10), left, height - 8);
-  ctx.textAlign = 'right'; ctx.fillText(new Date(start + (days - 1) * DAY).toISOString().slice(0, 10), width - right, height - 8);
+  ctx.textAlign = 'left'; ctx.fillText(firstDate, left, height - 8);
+  ctx.textAlign = 'right'; ctx.fillText(lastDate, width - right, height - 8);
   canvas.addEventListener('click', event => {
     const box = canvas.getBoundingClientRect();
     const x = (event.clientX - box.left) / box.width * width, y = (event.clientY - box.top) / box.height * height;
-    const day = Math.floor((x - left) / plotWidth * days), hour = Math.floor((y - top) / plotHeight * 24);
-    const index = lookup.get(`${day}:${hour}`); if (index !== undefined && hour >= 0 && hour < 24) onSelect(index);
+    const position = (x - left) / plotWidth * days, day = Math.floor(position), hour = Math.floor((y - top) / plotHeight * 24);
+    const cell = cells.get(`${firstDay + day}:${hour}`);
+    if (!cell || hour < 0 || hour >= 24) return;
+    onSelect(cell.entries[Math.min(cell.entries.length - 1, Math.floor((position - day) * cell.entries.length))]);
   });
   const key = document.createElement('p'); key.className = 'timeline-key';
   key.textContent = `Shape carries the class; colour repeats it. ${legendParts.join('. ')}. Cells with no source hour stay empty.`;

@@ -1,6 +1,7 @@
 import {airState,runLesson,lessonDefinitions,inputFromSI,inputToSI} from '../education/lessons.js';
 import {hourMoisture} from '../moisture.js';
 import {WeatherClient} from '../weather-client.js';
+import {enthalpyBtuPerLb} from '../physics.js';
 import {renderChart} from './psychrometric-chart.js';
 const $=id=>document.getElementById(id);
 const state={input:{...lessonDefinitions[0].input},units:'si',lesson:lessonDefinitions[0],parameter:10,revealed:false,source:null,history:null,index:0,examples:[],importController:null,client:null};
@@ -27,7 +28,7 @@ function renderTable(points){
   const row=node('tr');const heading=node('th',['A · Input','B · After process','C · Room at 70% RH'][index]);heading.scope='row';
   const temp=[`${format(point.tempC)} °C`,`${format(point.tempC*9/5+32)} °F`];
   const water=[`${format(point.w*1000,3)} g/kg`,`${format(point.w*7000,2)} gr/lb`];
-  const energy=[`${format(point.enthalpyJkg/1000)} kJ/kg`,`${format(point.enthalpyJkg/2326)} Btu/lb`];
+  const energy=[`${format(point.enthalpyJkg/1000)} kJ/kg`,`${format(enthalpyBtuPerLb(point.tempC,point.w))} Btu/lb`];
   const pressure=[`${format(point.pressurePa/1000,3)} kPa`,`${format(point.pressurePa/6894.757293168,3)} psia`];
   row.append(heading,cell(temp[+ip],temp[+!ip]),cell(Number.isFinite(point.rh)?`${format(point.rh*100)}%`:'Unavailable',`RH ref: ${point.basis.rhReference}`),cell(water[+ip],water[+!ip]),cell(energy[+ip],energy[+!ip]),cell(pressure[+ip],pressure[+!ip]));tbody.append(row);
  });

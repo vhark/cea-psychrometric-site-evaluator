@@ -21,6 +21,7 @@ import {initLearn, stepsNode} from './learn.js';
 import {weatherSteps, attainmentSteps} from './steps.js';
 import {TERMS, infoBubble, decorateTerms} from './terms.js';
 import {PROVIDERS, PROVIDER_ORDER, needsApiKey} from './providers.js';
+import {localClock} from './physics.js';
 
 const $ = id => document.getElementById(id);
 const state = {scenarios: [], selected: null, snapshot: null, results: [], resultSnapshot: null, resultId: null, revision: 0, resultRevision: -1, pool: null, runId: null, runController: null, catalog: null, zipInfo: null, energyContext: null, energyEpoch: 0, weatherEpoch: 0, weatherController: null, parseWorker: null, weatherOnly: false, hour: 0,
@@ -398,7 +399,7 @@ function renderProvider() {
   const start=$('start-date').value,end=$('end-date').value;
   $('weather-request-estimate').textContent='';
   if(start&&end&&start<=end){const estimate=requestEstimate(start,end,id);$('weather-request-estimate').textContent=`Requested period: approximately ${format(estimate.hours)} hourly records${id==='visualcrossing'?`; ${estimate.chunks} metered requests, total records are not reduced by chunking`:''}. Retrieve-years selection: up to ${format(Number($('retrieve-years-count').value)*8784)} hourly records before excluding cached years. Check your provider allowance.`;}
-  if(start&&end&&start<=end){const estimate=requestEstimate(start,end,id);body.append(node('p', `Requested period: approximately ${format(estimate.hours)} hourly records. ${id==='visualcrossing'?`${estimate.chunks} requests of at most 30 local days each; chunking does not reduce total metered records. Provider allowance and daily limits still apply.`:'Sources are requested in bounded date chunks.'}`, 'help'));}
+  if(start&&end&&start<=end){const estimate=requestEstimate(start,end,id);body.append(node('p', `Requested period: approximately ${format(estimate.hours)} hourly records. ${id==='visualcrossing'?`${estimate.chunks} requests of at most 30 local days each; chunking does not reduce total metered records. Provider allowance and daily limits still apply.`:id==='openmeteo'?`About ${estimate.chunks} requests of at most 365 days, including the padding days that cover local-time boundaries.`:'Sources are requested in bounded date chunks.'}`, 'help'));}
   if (provider.attribution) body.append(node('p', `Attribution required in anything you publish: ${provider.attribution}`, 'source-line'));
   if (provider.termsUrl) {const p = node('p', '', 'source-line'); safeSource(p, 'Provider terms', provider.termsUrl); body.append(p);}
 
@@ -494,6 +495,7 @@ function proposeSiteTimezone() {
   }
 }
 async function addSite() {
+  if (!state.catalog) await state.catalogLoading;
   if (!state.catalog) throw new Error('The public ZIP catalog is unavailable, so additional sites cannot be resolved. Reload the page to retry the catalog.');
   const zip = $('site-zip').value.trim(); if (!/^\d{5}$/.test(zip)) throw new Error('Enter a five-digit US ZIP code for the additional site.');
   if (zip === $('zip').value.trim()) throw new Error('That ZIP is the primary site. Add a different ZIP to compare.');
@@ -586,6 +588,8 @@ async function retrieveWeather(event) {
   finally {if (epoch === state.weatherEpoch) {const text = $('weather-status').textContent, error = $('weather-status').classList.contains('error'); weatherBusy(false, text); $('weather-status').classList.toggle('error', error);}}
 }
 async function locate() {
+  // A Locate pressed while the public list is still downloading waits for it rather than reporting it unavailable.
+  if (!state.catalog) await state.catalogLoading;
   if (!state.catalog) throw new Error('The public ZIP list could not be loaded, so Locate cannot run. You can still type coordinates in by hand. Reloading the page will try the list again.');
   const zip = $('zip').value.trim(); if (!/^\d{5}$/.test(zip)) throw new Error('Enter a five-digit US ZIP code. Leading zeroes matter, so keep them.');
   const info = lookupZip(zip, state.catalog); state.zipInfo = info;
@@ -814,17 +818,20 @@ function renderRuntime(r) {
 }
 function renderOutdoorDrying(r) {
   const d = r.weatherSummary?.outdoorDrying; if (!d) {table($('drying-table'), ['Outdoor-air dehumidification'], []); return;}
-  const s = r.summary, dehuRef = finite(d.dehuKWhPerKg) ? `${format(d.dehuKWhPerKg, 2)} kWh/kg · $${format(d.dehuCostPerKg, 3)}/kg` : 'No dehumidifier efficiency set';
-  const row = (label, b, note) => [label, format(b.hours), `${format(b.days.atLeast1)} / ${format(b.days.atLeast4)}`, units(b.meanPotentialKgH, 'kg/h', 1), finite(b.kWhPerKg) ? `${format(b.kWhPerKg, 2)} kWh/kg` : 'Not available', finite(b.costPerKg) ? `$${format(b.costPerKg, 3)}/kg` : 'Not available', note];
+  const s = r.summary, dehuRef = finite(d.dehuKWhPerKg) ? `${format(d.dehuKWhPerKg, 2)} kWh/kg electricity · $${format(d.dehuCostPerKg, 3)}/kg at the manual scenario rate` : 'No dehumidifier efficiency set';
+  const net = d.dehuHeatingHours?.meanCostPerKg, netText = finite(net) ? `${net < 0 ? '−' : ''}$${format(Math.abs(net), 3)}/kg${net < 0 ? ', negative because the displaced heating is worth more than the electricity it draws' : ''}` : 'Not available';
+  const heatCredit = d.dehuHeatingHours ? ` In the ${format(d.dehuHeatingHours.hours)} heating hours the dehumidifier returns a mean ${format(d.dehuHeatingHours.returnedHeatKWhPerKg, 2)} kWh of heat per kg to the zone (latent heat plus its electricity, at the declared heat-return fraction); that heat is credited against purchased heating at the scenario heat source, for a mean net ${netText}.` : '';
+  const perKg = b => finite(b.electricKWhPerKg) ? `${format(b.electricKWhPerKg, 2)} / ${format(b.fuelKWhPerKg, 2)} kWh/kg` : 'Not available';
+  const row = (label, b, note) => [label, format(b.hours), `${format(b.days.atLeast1)} / ${format(b.days.atLeast4)}`, units(b.meanPotentialKgH, 'kg/h', 1), perKg(b), finite(b.costPerKg) ? `$${format(b.costPerKg, 3)}/kg` : 'Not available', note];
   const dryingBasis = {...s.costBasis, label:'Modeled outdoor-air drying operating cost per kg, not the full facility cost',
-    included:['fan electricity', 'heating fuel for outdoor-air conditioning'],
+    included:['fan electricity', 'purchased heating for outdoor-air conditioning'],
     priceBasis:{electricity:{source:'manual scenario input, even when the coupled run uses historical prices',usdPerKWh:r.scenario.electricityPrice},
       fuel:{source:'scenario input',usdPerKWh:r.scenario.fuelPrice},water:{source:'excluded from this marginal drying screen',usdPerL:0}},
     excluded:[...(s.costBasis?.excluded || []),'water costs','hot-dry sensible cooling cost']};
-  $('drying-help').textContent = `Hours when outside air is drier than the zone's moisture ceiling. Removal potential is at the installed maximum ${format(d.maxVentACH, 1)} controlled ACH, not actual dispatched airflow. Condensing-dehumidifier reference: ${dehuRef}, electricity only at the manual scenario rate. Outdoor-air drying has lower modeled cost per kg than that reference in ${format(d.cheaperThanDehuHours)} h and lower energy per kg in ${format(d.lowerEnergyThanDehuHours)} h. ${costBasisText(dryingBasis)} The coupled run determines actual dispatch.`;
-  table($('drying-table'), ['Outside-air condition', 'Hours', 'Days ≥1 / ≥4 h', 'Mean removal potential', 'Energy per kg water', 'Modeled cost per kg water', 'Reading'], [
+  $('drying-help').textContent = `Hours when outside air is drier than the zone's moisture ceiling. Removal potential is at the installed maximum ${format(d.maxVentACH, 1)} controlled ACH, not actual dispatched airflow. Condensing-dehumidifier reference: ${dehuRef}.${heatCredit} Outdoor-air drying has lower modeled cost per kg than that reference in ${format(d.cheaperThanDehuHours)} h, and uses less energy per kg, with neither its electricity nor its fuel per kg higher, in ${format(d.lowerEnergyThanDehuHours)} h; electricity and fuel are different carriers and are not added together. ${costBasisText(dryingBasis)} The coupled run determines actual dispatch.`;
+  table($('drying-table'), ['Outside-air condition', 'Hours', 'Days ≥1 / ≥4 h', 'Mean removal potential', 'Electricity / fuel per kg water', 'Modeled cost per kg water', 'Reading'], [
     row('Cool and dry (free latent economizer)', d.coolDry, 'No heating penalty; fan energy only'),
-    row('Cold and dry (heat the ventilation air)', d.coldDry, 'Drying with a fuel penalty; compare cost per kg to the dehumidifier'),
+    row('Cold and dry (heat the ventilation air)', d.coldDry, 'Drying with a heating penalty; the dehumidifier reference is credited with its returned heat in these hours'),
     row('Hot and dry (latent relief, sensible import)', d.hotDry, 'Only useful with separate sensible cooling')]);
   if (!state.weatherOnly && finite(s.reheatKWh) && s.reheatKWh > 0) $('drying-help').textContent += ` Zone reheat after overcooling: ${format(s.reheatKWh)} kWh. DOAS cooling and reheat are separate conditioning quantities, not avoided-energy claims.`;
 }
@@ -869,10 +876,10 @@ function renderCalendar() {
   const r = result(); if (!r) return;
   const selectedMonth = $('timeline-month').value;
   const indices = [];
-  r.hours.forEach((h, index) => {if (new Date(h.time).toISOString().slice(0, 7) === selectedMonth) indices.push(index);});
+  r.hours.forEach((h, index) => {if (localClock(h.time, r.scenario.timezone).month === selectedMonth) indices.push(index);});
   const month = indices.map(index => r.hours[index]);
   const select = index => {state.hour = indices[index]; renderInspector(); $('hour-detail').scrollIntoView({block: 'nearest', behavior: 'auto'});};
-  renderTimeline($('timeline-chart'), month, select, state.weatherOnly, modeEntries(r.hours, true));
+  renderTimeline($('timeline-chart'), month, select, state.weatherOnly, modeEntries(r.hours, true), r.scenario.timezone);
   renderTimelineTable($('timeline-table'), month, r.scenario.timezone, select, state.weatherOnly);
 }
 /* One polite announcement per settled hour. Dragging the slider or holding an arrow key would otherwise
@@ -954,7 +961,7 @@ function renderResults() {
   $('warning-disclosure').open=Boolean(r.summary.numericalFailureHours||r.summary.missingHours||r.summary.priceMissingHours);
   renderMonthly($('monthly-chart'), $('mode-legend'), r.hours, r.scenario.timezone, state.weatherOnly); renderModeTable(r); renderRuntime(r); renderOutdoorDrying(r);
   renderLoadsPanel(r); renderCO2Panel(r);
-  const months = [...new Set(r.hours.map(h => new Date(h.time).toISOString().slice(0, 7)))], selectedMonth = $('timeline-month').value;
+  const months = [...new Set(r.hours.map(h => localClock(h.time, r.scenario.timezone).month))], selectedMonth = $('timeline-month').value;
   options($('timeline-month'), months.map(month => [month, month]), months.includes(selectedMonth) ? selectedMonth : months[0]); renderCalendar();
   renderScatter($('scatter-chart'), state.resultSnapshot.hours, r.hours); if (!state.weatherOnly) renderDLI($('dli-chart'), r.summary.daily, r.scenario.dliTarget);
   renderInspector(); renderComparison(); renderYearsPanel(); renderSitesPanel();
@@ -1059,7 +1066,7 @@ async function initialize() {
   catch (error) {message(`Local scenarios could not be loaded: ${error.message}. A fresh baseline is available.`, 'warning');}
   if (!state.scenarios.length) state.scenarios = [makeScenario()]; state.selected = state.scenarios[0].id; $('sector').value = current().sector; renderScenario(); reflectLocation(current());
   decorateTerms();
-  const energyPromise = initializeEnergy();
+  const energyPromise = state.catalogLoading = initializeEnergy();
   const restoreEpoch = state.weatherEpoch;
   let cached = null; try {cached = await loadWeather();} catch (error) {message(`Weather cache unavailable: ${error.message}. Source retrieval and imports still work.`, 'warning');}
   if (restoreEpoch !== state.weatherEpoch) {await energyPromise; return;}

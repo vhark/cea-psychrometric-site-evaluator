@@ -12,6 +12,16 @@ Versions are model versions: the string the engine stamps into every result and 
 - Guided tour, Learn run prompts and current workflow/reference documentation describe the review step. Corrected stale bundled-weather, model-version and weather-schema guidance while retaining historical study evidence.
 - Added root and assembled `/app/` browser coverage for review, keyboard focus, scenario selection, invalid-input gates, save/reload, fixture execution, tour targets and narrow layouts.
 
+### Fixed
+
+- Outside-air drying screen: electricity and fuel per kilogram are reported separately and never summed, and "lower energy than the dehumidifier" now requires neither carrier to be higher. In heating hours the condensing-dehumidifier reference is credited with the purchased heating its returned heat (condensate latent heat plus electrical input, times `dehuHeatFraction`) displaces at the scenario heat source. Cold, dry hours therefore no longer count as cheaper than a dehumidifier whose heat a heating zone uses. Earlier drying-hour counts are not comparable.
+- "Where the gaps occur" calendar groups and draws local months, local days and local hours. A local calendar year no longer lists a phantom following month holding the last evening of December; the repeated autumn hour is two selectable half cells and the skipped spring hour stays empty.
+- Air-state lab enthalpy in Btu/lb now uses the IP 0 °F datum (ASHRAE Fundamentals 2017 ch. 1), matching IP charts; it was a unit conversion of the 0 °C SI value (18.18 instead of 25.85 Btu/lb at 20 °C, 60% RH).
+- Locate and Add site wait for the public ZIP list when it is still loading instead of reporting it unavailable.
+- The tour invitation reserves room at the bottom of the page, so a `#sources` link is no longer covered by it.
+- Open-Meteo request count: a calendar year takes two requests because of the local-time padding days; the source card, request estimate and help line now say so. Open-Meteo grid comparison corrected to about 31 times finer than NASA POWER (0.1° × 0.1° against 0.5° × 0.625°).
+- Sources & limits panel, weather placeholder text, `SECURITY.md` provider table, landing card, Learn and tour copy now describe all five weather sources and no bundled weather. Tour examples cite the committed ten-year `docs/regional-study.json` instead of an earlier five-year run, and the Learn frontier example is labelled as recorded on `0.3.0-screening`.
+
 ## [0.4.0-screening] — 2026-09-22
 
 ### Added

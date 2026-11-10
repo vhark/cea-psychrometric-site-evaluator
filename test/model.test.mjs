@@ -286,8 +286,35 @@ test('outdoor air is a dehumidifier only when drier than the zone ceiling, with 
  const cold=simulateScenario(s,weather(6,{tempC:2,rh:.5})).weatherSummary.outdoorDrying;
  const humid=simulateScenario(s,weather(6,{tempC:24,rh:.95})).weatherSummary.outdoorDrying;
  assert.equal(cold.coldDry.hours,6);assert.equal(cold.coolDry.hours+cold.hotDry.hours,0);
- assert.ok(cold.coldDry.kWhPerKg>1/2.5,'heating cold ventilation air must cost more per kg than a 2.5 L/kWh dehumidifier');
+ assert.ok(cold.coldDry.fuelKWhPerKg>0,'fuel-heated cold ventilation air must carry a fuel penalty per kg');
  assert.equal(humid.coolDry.hours+humid.coldDry.hours+humid.hotDry.hours,0,'saturated warm air cannot dry the zone');
+});
+test('in heating hours the dehumidifier reference is credited with the purchased heat its returned heat displaces',()=>{
+ const base={...makeScenario('greenhouse'),outsideAirReviewed:true,latitude:40,longitude:-100,timezone:'UTC',dehuLPerKWh:2.5,heatSource:'fuel'};
+ const drying=over=>simulateScenario({...base,...over},weather(6,{tempC:2,rh:.5})).weatherSummary.outdoorDrying;
+ const rejected=drying({dehuHeatFraction:0}),returned=drying({dehuHeatFraction:1});
+ // Closed form: 1 kg condensed releases 2.45 MJ latent heat plus 0.4 kWh of electricity, all returned at fraction 1,
+ // displacing that heat divided by the 0.9 heater efficiency at the 0.045 USD/kWh fuel price.
+ const credit=(2450000/3600000+1/2.5)/base.heaterEfficiency*base.fuelPrice;
+ assert.ok(Math.abs(returned.dehuHeatingHours.meanCostPerKg-(base.electricityPrice/2.5-credit))<1e-12);
+ assert.ok(returned.coldDry.costPerKg>returned.dehuHeatingHours.meanCostPerKg&&rejected.coldDry.costPerKg<base.electricityPrice/2.5,
+  'fixture must straddle the credit for the hour counts below to test it');
+ assert.equal(rejected.cheaperThanDehuHours,6,'with heat rejected outdoors the gross dehumidifier cost applies');
+ assert.equal(returned.cheaperThanDehuHours,0,'with heat returned to a heating zone the dehumidifier is cheaper per kg');
+ assert.equal(returned.lowerEnergyThanDehuHours,0,'outside air that burns fuel is never lower energy than a reference that saves fuel');
+});
+test('IP enthalpy uses the 0 °F datum of IP charts, not a unit conversion of the 0 °C SI value',async()=>{
+ const {enthalpyBtuPerLb}=await import('../src/physics.js');
+ const {Psychrometrics}=await import('../vendor/psychrolib.js');
+ const ip=new Psychrometrics();ip.SetUnitSystem(ip.IP);
+ for(const [tempC,rh] of [[20,.6],[-10,.8],[35,.3]]){
+  const w=humidityRatio(tempC,rh,101325),value=enthalpyBtuPerLb(tempC,w);
+  assert.ok(Math.abs(value-ip.GetMoistAirEnthalpy(tempC*9/5+32,w))<1e-9,`${tempC} C`);
+  assert.ok(Math.abs(value-enthalpy(tempC,w)/2326)>7,'absolute IP and SI enthalpy differ by the datum shift');
+ }
+ // Differences between two states do not depend on the datum.
+ const a=humidityRatio(20,.6,101325),b=humidityRatio(30,.4,101325);
+ assert.ok(Math.abs((enthalpyBtuPerLb(30,b)-enthalpyBtuPerLb(20,a))-(enthalpy(30,b)-enthalpy(20,a))/2326)<.01);
 });
 test('unmet loads are steady capacity shortfalls, not re-counted every substep',()=>{
  const s=closed({uValue:5,infiltrationACH:2,transpirationLDayM2:10});

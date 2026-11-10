@@ -230,7 +230,7 @@ function padSentences(weather, scenario, summary) {
   if (drying) {
     const total = drying.coolDry.hours + drying.coldDry.hours + drying.hotDry.hours;
     out.push(`Outside air can carry moisture out of the zone in ${int(total)} h (cool-dry ${int(drying.coolDry.hours)}, cold-dry ${int(drying.coldDry.hours)}, hot-dry ${int(drying.hotDry.hours)}) at up to ${num(drying.maxVentACH)} ACH.`);
-    if (finite(drying.dehuKWhPerKg)) out.push(`Against the declared ${num(drying.dehuKWhPerKg, 2)} kWh/kg condensing dehumidifier, outside air is cheaper per kilogram in ${int(drying.cheaperThanDehuHours)} h and lower in energy per kilogram in ${int(drying.lowerEnergyThanDehuHours)} h, under the declared marginal-energy assumptions; this does not establish crop demand or the cheapest whole-system strategy.`);
+    if (finite(drying.dehuKWhPerKg)) out.push(`Against the declared ${num(drying.dehuKWhPerKg, 2)} kWh/kg condensing dehumidifier${drying.dehuHeatingHours ? `, credited in the ${int(drying.dehuHeatingHours.hours)} heating hours with the purchased heating its returned heat displaces` : ''}, outside air is cheaper per kilogram in ${int(drying.cheaperThanDehuHours)} h and uses less energy per kilogram, with neither electricity nor fuel higher, in ${int(drying.lowerEnergyThanDehuHours)} h, under the declared marginal-energy assumptions; this does not establish crop demand or the cheapest whole-system strategy.`);
     out.push(`Those are weather-side opportunity hours, not equipment runtime: the ${int(drying.coldDry.hours)} cold-dry hours carry a heating penalty that is priced here, while the sensible import of the ${int(drying.hotDry.hours)} hot-dry hours is not.`);
   }
   return out;

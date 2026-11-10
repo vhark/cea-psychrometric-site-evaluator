@@ -16,6 +16,20 @@ test('date chunks bound VC records and preserve leap dates',()=>{
  assert.equal(chunks.length,13);assert.equal(chunks[0].endDate,'2024-01-30');assert.equal(chunks.at(-1).endDate,'2024-12-31');
  assert.deepEqual(requestEstimate('2024-01-01','2024-12-31','visualcrossing'),{hours:8784,chunks:13,maxHoursPerChunk:744});
 });
+test('Open-Meteo request estimate matches the padded requests a local calendar year actually makes',async()=>{
+ const {fetchOpenMeteo}=await import('../src/weather.js');const prior=globalThis.fetch,requests=[];
+ const names=['temperature_2m','relative_humidity_2m','dew_point_2m','surface_pressure','shortwave_radiation','wind_speed_10m'];
+ const units={temperature_2m:'\u00b0C',relative_humidity_2m:'%',dew_point_2m:'\u00b0C',surface_pressure:'hPa',shortwave_radiation:'W/m\u00b2',wind_speed_10m:'km/h'};
+ globalThis.fetch=async url=>{const params=new URL(url).searchParams;requests.push([params.get('start_date'),params.get('end_date')]);
+  return new Response(JSON.stringify({hourly:{time:[]},hourly_units:Object.fromEntries(names.flatMap(name=>['era5_land','era5'].map(model=>[`${name}_${model}`,units[name]])))}));};
+ try{
+  for(const timezone of ['America/Chicago','UTC','Asia/Tokyo']){
+   requests.length=0;
+   await fetchOpenMeteo({latitude:36.15,longitude:-95.99,timezone,startDate:'2025-01-01',endDate:'2025-12-31'});
+   assert.equal(requests.length,requestEstimate('2025-01-01','2025-12-31','openmeteo').chunks,timezone);
+  }
+ }finally{globalThis.fetch=prior;}
+});
 test('Visual Crossing multi-month acquisition uses bounded contiguous chunks with redacted evidence',async()=>{
  const {fetchWeather}=await import('../src/weather.js');const prior=globalThis.fetch,requests=[];
  globalThis.fetch=async url=>{
