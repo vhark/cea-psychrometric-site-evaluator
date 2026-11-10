@@ -720,10 +720,10 @@ export const MODULES = [
     title: 'Outside air as a dehumidifier',
     meta: 'Removal potential, cost per kilogram, the hidden heat',
     lede: [
-      'When outside air carries less water than the zone\u2019s moisture ceiling allows, ventilation removes water, and the cheapest dehumidifier on the site is a fan. The tool counts those hours and prices them: the drying margin times the air mass the scenario can actually move gives a removal potential in kg/h, then fan power plus any heating needed to temper the incoming air gives energy per kilogram and cost per kilogram, against a condensing-dehumidifier reference.',
+      'When outside air carries less water than the zone\u2019s moisture ceiling allows, ventilation removes water, and the cheapest dehumidifier on the site is a fan. The tool counts those hours and prices them: the drying margin times the air mass the scenario can actually move gives a removal potential in kg/h, then fan power plus any heating needed to temper the incoming air gives electricity and fuel per kilogram and cost per kilogram, against a condensing-dehumidifier reference. In a heating hour that reference is credited with the purchased heating its own returned heat displaces, because the latent heat it releases and the electricity it draws land in a zone that is calling for heat.',
       'The count is split into cool and dry, cold and dry, and hot and dry, because those three are not the same offer. Cold and dry air is free water removal that arrives with a heating bill; hot and dry air is free water removal that arrives with a cooling bill.'
     ],
-    formula: 'removalKgPerH = massFlowKgPerH * (w_ceiling - w_outdoor),   costPerKg = (fanKWh + temperingKWh) * price / removalKg',
+    formula: 'removalKgPerH = massFlowKgPerH * (w_ceiling - w_outdoor),   costPerKg = (fanKWh * elecPrice + temperingKWh * heatPrice) / removalKg,   dehuNetPerKg = dehuKWh * elecPrice - returnedHeatKWh / (efficiency or COP) * heatPrice',
     formulaNote: 'outdoorDryingHour in src/physics.js, evaluated at the scenario\u2019s maximum ventilation rate. It is a weather-side screen, not a dispatch decision: the coupled controller still decides what runs in the hour.',
     worked: [
       {label: 'Outside-air drying is conditional', value: 'The earlier Tulsa per-kilogram advantage count is historical. Read actual fan, conditioning and finite heating inputs before comparing a current run; low outdoor humidity alone does not establish an operating-cost reduction.', source: 'docs/COMPONENT-PARAMETERS.md'}
@@ -743,7 +743,7 @@ export const MODULES = [
     formulaNote: 'compareScenarios in src/metrics.js, scored on the common eligible hour set; strategyFrontier applies the same rule to median cost and median attainment across weather years. A scenario with missing prices or numerical-failure hours is not comparable and is excluded rather than assumed.',
     worked: [
       {label: 'Cheapest non-dominated strategy', value: 'the pad baseline, in 100% of the 104 points', source: 'docs/SENSITIVITY.md'},
-      {label: 'Current canonical Tulsa 2025 comparison', value: 'DX plus dehumidifier reaches 73.066% joint attainment against the pad baseline at 27.135%, a 45.931 pp increase on the same 8,759 eligible hours. This is not an opaque-room or full-library ranking.', source: 'docs/browser-run-metrics.json'}
+      {label: 'Recorded Tulsa 2025 comparison, model 0.3.0-screening', value: 'DX plus dehumidifier reaches 73.066% joint attainment against the pad baseline at 27.135%, a 45.931 pp increase on the same 8,759 eligible hours. Recorded on the earlier model, not regenerated on the current one. This is not an opaque-room or full-library ranking.', source: 'docs/browser-run-metrics.json'}
     ],
     caveat: 'Cheapest on the frontier is a position on the operating-cost axis, not a recommendation. Capacity and target attainment still matter. Close modeled rankings require project measurements, capital, maintenance and redundancy review; the retained regional decision bands are methodological choices, not calibrated ties.',
     show: {target: 'comparison-table', label: 'Show me the investment screen and the frontier', needsRun: true, fallbacks: ['tier-tabs'], first: 'In the Analyze view: add a second strategy, run, and stay on the Equipment estimate tier. The frontier column marks which strategies are operating-dominated, capital excluded.'}
@@ -900,7 +900,7 @@ function emptyStudy(reason) {
   box.append(node('p', 'No regional study is loaded.', 'learn-empty-title'));
   box.append(node('p', reason, 'help'));
   const how = node('p', undefined, 'source-line');
-  how.append(document.createTextNode('Expected at '), node('code', STUDY_URL), document.createTextNode('. Regenerate it with '), node('code', STUDY_COMMAND), document.createTextNode(', which reads the bundled ten years at all five sites and writes that file. Nothing is shown here until it exists: this section never substitutes an example for a computed result.'));
+  how.append(document.createTextNode('Expected at '), node('code', STUDY_URL), document.createTextNode('. Regenerate it with '), node('code', STUDY_COMMAND), document.createTextNode(' after fetching the study years for every site with scripts/fetch-weather.py, because the hourly weather archive is not committed. Nothing is shown here until the file exists: this section never substitutes an example for a computed result.'));
   box.append(how);
   return box;
 }

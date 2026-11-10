@@ -15,6 +15,9 @@ export function humidityRatio(tempC, rh, pressurePa = 101325) {
 export const saturationHumidityRatio = (t, p) => humidityRatio(t, 1, p);
 export const relativeHumidity = (t, w, p) => vaporPressure(w, p) / saturationPressure(t);
 export const enthalpy = (t, w) => psychrolib.GetMoistAirEnthalpy(t, w);
+// Moist-air enthalpy on the IP datum (0 °F dry air, ASHRAE Fundamentals 2017 ch. 1 eq. 32), Btu/lb dry air. The SI
+// value is referenced to 0 °C, so dividing J/kg by 2326 converts the unit but not the datum and does not match an IP chart.
+export const enthalpyBtuPerLb = (tempC, w) => {const tempF = tempC * 9 / 5 + 32; return 0.240 * tempF + w * (1061 + 0.444 * tempF);};
 export const wetBulb = (t, w, p) => psychrolib.GetTWetBulbFromHumRatio(t, w, p);
 export const dewPoint = (t, w, p) => w <= 0 ? -100 : psychrolib.GetTDewPointFromHumRatio(t, w, p);
 export const airVPD = (t, w, p) => (saturationPressure(t) - vaporPressure(w, p)) / 1000;
@@ -236,6 +239,10 @@ export function classifyWeather(hour, scenario) {
 // The heating leg follows the scenario's heating source: fuel at its combustion efficiency, or a heat pump
 // at the COP interpolated for this hour's outdoor temperature. Below a declared compressor cutoff a
 // heat-pump plant cannot temper the incoming air at all, so the hour is not an outdoor-drying opportunity.
+// Purchased electricity and purchased fuel are different carriers and are returned separately, never summed.
+// The condensing-dehumidifier reference for the same hour is returned beside it on the same basis: its
+// electricity, less, in a heating hour, the purchased heating its returned heat (latent heat of the condensed
+// water plus its electrical input, times dehuHeatFraction) displaces at this hour's heat source.
 export function outdoorDryingHour(hour, scenario, classification = classifyWeather(hour, scenario)) {
   const outside = weatherState(hour);
   if (!outside || !classification.valid || classification.dryingMarginKgKg < (scenario.dryingMarginKgKg ?? .0005)) return null;
@@ -246,8 +253,19 @@ export function outdoorDryingHour(hour, scenario, classification = classifyWeath
   const fanW = scenario.fanWPerM3s * m3s;
   const heat = heatSourceState(scenario, outside.tempC);
   if (heatW > 0 && heat.capacityW <= 0) return null;
-  const heatingKWh = heatW / 1000 / (heat.cop ?? scenario.heaterEfficiency);
-  const energyKWh = fanW / 1000 + heatingKWh;
-  const cost = fanW / 1000 * scenario.electricityPrice + heatingKWh * (heat.cop === null ? scenario.fuelPrice : scenario.electricityPrice);
-  return {potentialKgH, energyKWh, cost, bucket: heatW > 0 ? 'coldDry' : outside.tempC > classification.maxTempC ? 'hotDry' : 'coolDry'};
+  const heatPump = heat.cop !== null;
+  const purchasedPerDelivered = 1 / (heat.cop ?? scenario.heaterEfficiency);
+  const heatingKWh = heatW / 1000 * purchasedPerDelivered;
+  const electricKWh = fanW / 1000 + (heatPump ? heatingKWh : 0), fuelKWh = heatPump ? 0 : heatingKWh;
+  const cost = electricKWh * scenario.electricityPrice + fuelKWh * scenario.fuelPrice;
+  let dehu = null;
+  if (scenario.dehuLPerKWh > 0) {
+    const dehuElectricKWhPerKg = 1 / scenario.dehuLPerKWh;
+    const returnedKWhPerKg = heatW > 0 ? (scenario.dehuHeatFraction ?? 1) * (LATENT_HEAT / 3600000 + dehuElectricKWhPerKg) : 0;
+    const displacedKWhPerKg = returnedKWhPerKg * purchasedPerDelivered;
+    const electricKWhPerKg = dehuElectricKWhPerKg - (heatPump ? displacedKWhPerKg : 0), fuelKWhPerKg = heatPump ? 0 : -displacedKWhPerKg;
+    dehu = {electricKWhPerKg, fuelKWhPerKg, returnedHeatKWhPerKg:returnedKWhPerKg,
+      costPerKg:electricKWhPerKg * scenario.electricityPrice + fuelKWhPerKg * scenario.fuelPrice};
+  }
+  return {potentialKgH, electricKWh, fuelKWh, cost, dehu, bucket: heatW > 0 ? 'coldDry' : outside.tempC > classification.maxTempC ? 'hotDry' : 'coolDry'};
 }

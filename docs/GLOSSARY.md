@@ -2,7 +2,7 @@
 
 Purpose: define every domain term the interface, the exports and these documents use, with its unit, where it appears and exactly how this tool computes it.
 
-Status: current for model `0.3.0-screening`, scenario schema 2, 2026-09-15.
+Status: written for model `0.3.0-screening`, scenario schema 2, 2026-09-15. The latent-economizer entry was updated on 2026-11-10 for the carrier-by-carrier outside-air drying comparison in the current `0.4.0-screening` application; other entries have not been re-reviewed for 0.4.0.
 
 Read this if: you are reading a result, a report or a design-basis brief and want to know precisely what a number means here, rather than what the term means in general practice.
 
@@ -40,7 +40,7 @@ each hour is scored for both independently rather than receiving one mutually ex
 - **Vent could cool usefully**: outside air is below the target by the ventilation margin without importing
   moisture past the ceiling. **Vent could dry usefully**: outside air sits below the zone moisture ceiling by
   the drying margin.
-- **Both useful** is an overlap and not a sum. Measured across all six bundled sites there is no hour where the
+- **Both useful** is an overlap and not a sum. Measured across all six regional-study sites there is no hour where the
   pad is useful and the vent is not, so a pad is a way to push vent air colder than the weather allows rather
   than an alternative to a vent.
 
@@ -155,7 +155,7 @@ whether cooling was wanted in that hour, or what the controller dispatched.
 
 **Where it appears.** The weather-mode legend ("Cool and dry (free latent economizer)"), and the outside-air dehumidification screen.
 
-**How it is computed here.** The mode is `PASSIVE_VENT_COOL_DRY`. `outdoorDryingHour` in `src/physics.js` calculates removal potential at the declared maximum controlled flow, then fan and incoming-air tempering energy per kg at scenario prices. Heating uses the declared fuel efficiency or outdoor-temperature heat-pump COP; a locked-out heat source cannot provide a cold-air drying opportunity. This weather-side calculation does not dispatch the zone or apply the full recovery/DOAS train and finite heating allocation. It must not be read as actual removal, annual savings or a sizing result.
+**How it is computed here.** The mode is `PASSIVE_VENT_COOL_DRY`. `outdoorDryingHour` in `src/physics.js` calculates removal potential at the declared maximum controlled flow, then fan electricity and incoming-air tempering energy per kg at scenario prices. Heating uses the declared fuel efficiency or outdoor-temperature heat-pump COP; a locked-out heat source cannot provide a cold-air drying opportunity. Electricity and fuel are kept as separate carriers and never summed. The condensing-dehumidifier reference uses the same hour's basis: in a heating hour it is credited with the purchased heating that its returned heat (condensate latent heat plus electrical input, times the declared heat-return fraction) displaces. Outside air counts as lower energy only when neither its electricity nor its fuel per kg exceeds the reference. This weather-side calculation does not dispatch the zone or apply the full recovery/DOAS train and finite heating allocation. It must not be read as actual removal, annual savings or a sizing result.
 
 ## Dehumidifier heat returned to the zone
 

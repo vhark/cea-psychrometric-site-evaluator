@@ -22,8 +22,8 @@ export const PROVIDERS = {
     licence: 'CC BY 4.0. The free tier is non-commercial use only.',
     attribution: 'Weather data by Open-Meteo.com. ERA5 and ERA5-Land produced by ECMWF and the Copernicus Climate Change Service.',
     pros: [
-      'The finest free grid available here. Roughly 36 times smaller cells than NASA POWER for temperature and humidity.',
-      'A whole year arrives in one request in a couple of seconds, against three chunked requests for NASA POWER.',
+      'The finest free grid available here. Roughly 31 times smaller cells than NASA POWER for temperature and humidity (0.1° × 0.1° against 0.5° × 0.625°).',
+      'A whole year arrives in two requests in a few seconds (the year plus padding days at each end for the local-time boundaries), against three chunked requests for NASA POWER.',
       'Reaches back to 1940, where NASA POWER starts in 2001.',
       'Reports which of the two models supplied each value, so the resolution behind a number is never a guess.',
     ],

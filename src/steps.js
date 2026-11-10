@@ -82,7 +82,7 @@ export function weatherSteps(hour, scenario, source = {}) {
       `removal = ${n(m3s * rho, 3)} * ${n(cls.dryingMarginKgKg, 5)} * 3600; fan = ${n(scenario.fanWPerM3s, 0)} W per m3/s * ${n(m3s, 3)}` +
       (T < cls.heatingThresholdC ? `; heat = ${n(m3s * rho, 3)} * ${CP_DRY_AIR} * (${n(cls.targetC, 1)} - ${n(T)})` : '; no tempering needed')
       : `outside air is not drier than the ceiling by ${n(dryingMargin, 4)} kg/kg, so there is nothing to remove`,
-    drying ? `${n(drying.potentialKgH, 2)} kg/h removable for ${n(drying.energyKWh, 3)} kWh, ${n(drying.cost, 4)} USD, bucket ${drying.bucket}` : 'not an outdoor drying hour', 'outdoorDryingHour');
+    drying ? `${n(drying.potentialKgH, 2)} kg/h removable for ${n(drying.electricKWh, 3)} kWh electricity and ${n(drying.fuelKWh, 3)} kWh fuel, ${n(drying.cost, 4)} USD, bucket ${drying.bucket}` : 'not an outdoor drying hour', 'outdoorDryingHour');
   return steps;
 }
 

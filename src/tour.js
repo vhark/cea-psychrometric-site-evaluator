@@ -23,12 +23,12 @@ export const TOUR_STEPS = [
     body: 'Retrieve weather fetches the selected source for the chosen period and caches it in this browser. Nothing is loaded until you ask for it: enter your ZIP, select Locate, then retrieve the period you want to screen. The badge beside the panel heading reports whether weather is loaded and what it covers.'},
   {id: 'years', target: 'year-chips', title: 'Run more than one year',
     body: 'Each chip is a calendar year already retrieved for the selected provider, coordinates and time zone, in this session or in the browser cache. No hourly weather archive ships with the application. Retrieve the years you need; missing hours remain visible in their data-quality summaries. Every selected scenario runs against every selected year, which is what fills the across-years panel.',
-    why: 'In the bundled six-strategy example the baseline attained a median 28.9%, with the worst year (2025) at 27.1% of eligible hours for joint temperature-and-moisture target attainment. Best-to-worst spreads require both endpoints, not median minus worst. One year is an anecdote.'},
+    why: 'Across ten Tulsa weather years (2016 to 2025, docs/regional-study.json) the pad-and-vent baseline attained a median 28.038% of eligible hours for joint temperature-and-moisture target attainment, with the worst year (2019) at 22.589% and the best (2017) at 30.315%. Best-to-worst spreads require both endpoints, not median minus worst. One year is an anecdote.'},
   {id: 'retrieve-years', target: 'retrieve-years', title: 'Add years from the source',
     body: 'Set how many of the most recent complete calendar years to pull from the selected source, then retrieve. Years are fetched one at a time and cached locally, so a second run over the same years is immediate. A failed retrieval leaves that year absent rather than substituting a neighbouring year.'},
   {id: 'sites', target: 'sites-row', title: 'Compare climates',
     body: 'Add further ZIPs to run the same facility, crop and years at other centroids. Each ZIP proposes its own time zone from the bundled table, which is right for about 99.5 percent of US ZIPs. Confirm it anyway when a site sits near a state or county line, because that is where the boundaries run. Extra sites are costed at manual scenario prices, not their local historical proxies, so read their cost column as a common assumption rather than a local tariff.',
-    why: 'Tulsa gave 244 pad-effective and 401 free-cooling hours where Phoenix gave 2,334 and 2,636 on the same screen. Climate, not equipment, sets that ceiling.'},
+    why: 'Over the same ten weather years Tulsa gave a median 205 pad-effective and 342 free-cooling hours where Phoenix gave 2,274 and 2,577.5 on the same screen (docs/regional-study.json). Climate, not equipment, sets that ceiling.'},
   {id: 'energy', target: 'energy-panel', title: 'Local energy context',
     body: 'This panel holds the shared customer sector, the working scenario\u2019s electricity costing mode, candidate providers for the ZIP, and historical price and generation-mix context. Manual scenario price uses your own assumption; the historical state and sector proxy recosts the same dispatch against published monthly averages. Proxies are not tariffs, utility candidates are dated mappings rather than a service guarantee, and price gaps produce an unknown total plus a labelled known subtotal.'},
   {id: 'scenario-select', target: 'scenario-select', title: 'The working scenario',
@@ -50,7 +50,7 @@ export const TOUR_STEPS = [
     body: 'Technology replaces equipment capacities, efficiencies and installed-cost assumptions: ventilation and pads, heating, DX, condensing dehumidification, generic desiccant and hybrid indirect evaporation. Desiccant and hybrid entries are generic editable screens, not manufacturer performance maps, and installed costs are illustrative rather than quotations. Every value stays editable in the field groups below.'},
   {id: 'toggles', target: 'equipment-toggles', title: 'Pad and integrated reheat',
     body: 'Evaporative pad adds a finite-effectiveness pad stage to the strategy. Integrated reheat couples recovered heat back into the space instead of rejecting it, which shows up as reheat energy in the outside-air panel. Enabling the pad does not make it useful: the weather screen decides that.',
-    why: 'In the Tulsa pad-and-vent baseline the pad ran 2,772 hours on 296 days, yet the weather-side screen found pad leaving air genuinely viable in only 244 hours on 65 days.'},
+    why: 'Across ten Tulsa years the weather-side screen found pad leaving air genuinely effective in a median 205 hours a year, against 4,694 hours when outside air alone could cool (docs/regional-study.json). Simulated pad runtime is a separate output: read both.'},
   {id: 'core-fields', target: 'core-fields', title: 'Core geometry and targets',
     body: 'Floor area, canopy area and the day and night temperature targets are the four inputs that move almost everything downstream. Inputs stay SI, with live imperial equivalents shown beside the field. Set these before reading any cost, because capacity, energy and water all scale from them.'},
   {id: 'advanced-fields', target: 'advanced-fields', title: 'The rest of the assumptions',
@@ -79,11 +79,11 @@ export const TOUR_STEPS = [
     absent: 'the mode chart appears after you run scenarios'},
   {id: 'runtime', target: 'runtime-table', title: 'What each component ran',
     body: 'For every component this lists hours with any use, duty-weighted equivalent full-load hours, local days used and the share of valid hours, under the controller named in the help line. Equivalent full-load hours, not hours used, is the figure to compare against a capacity assumption. In weather-only mode the same table becomes the pad viability screen, splitting cooling-demand hours into pad-effective, marginal and ineffective with the limit that bound.',
-    why: 'In the Tulsa baseline the moisture ceiling bound in 3,851 hours against 2,952 for the temperature margin, which points at dehumidification rather than more cooling.',
+    why: 'Across ten Tulsa years the moisture ceiling bound in a median 1,833 hours against 1,258 for the temperature margin (docs/regional-study.json), which points at dehumidification rather than more cooling.',
     absent: 'runtime is computed from a run, so run scenarios first'},
   {id: 'drying', target: 'drying-table', title: 'When outside air is the dehumidifier',
-    body: 'This counts hours when outside air is drier than the zone\u2019s moisture ceiling, so ventilation removes water, split into cool and dry, cold and dry, and hot and dry. Each row gives hours, days with at least one and at least four hours, mean removal potential at the scenario\u2019s maximum ventilation rate, and energy and cost per kilogram of water against a condensing-dehumidifier reference. Hot and dry hours import sensible heat that is not costed here, so read them alongside a separate cooling plan.',
-    why: 'In the Tulsa example outside air beat a 2.5 L/kWh dehumidifier on cost per kilogram in 4,970 hours and on energy per kilogram in 1,752 hours.',
+    body: 'This counts hours when outside air is drier than the zone\u2019s moisture ceiling, so ventilation removes water, split into cool and dry, cold and dry, and hot and dry. Each row gives hours, days with at least one and at least four hours, mean removal potential at the scenario\u2019s maximum ventilation rate, and electricity, fuel and cost per kilogram of water against a condensing-dehumidifier reference. Hot and dry hours import sensible heat that is not costed here, so read them alongside a separate cooling plan.',
+    why: 'Cold, dry air is not automatically the cheaper dryer: in a heating hour the dehumidifier\u2019s own returned heat offsets purchased heating, and the reference is credited with it. Electricity and fuel per kilogram are shown separately and never added together.',
     absent: 'the outside-air screen appears after you run scenarios'},
   {id: 'loads', target: 'loads-panel', title: 'Sensible against latent',
     body: 'Monthly sensible gains from solar, light, envelope, infiltration, ventilation, fans and the crop are plotted against the crop\u2019s evaporative load, expressed as latent heat below the axis. The sensible-heat ratio, in the table and in the hourly distribution line, indicates whether coupled cooling with reheat or decoupled moisture removal suits the load. These are model balance terms, not measurements.',
@@ -92,7 +92,7 @@ export const TOUR_STEPS = [
     body: 'This counts hours when ventilation stays at the minimum outside-air rate with no pad or indirect stage running, which is when CO\u2082 enrichment is physically possible. Equivalent hours are duty-weighted, so a half-open hour counts as half, and the weather-side row counts hours whose outdoor classification alone would allow a closed house. The value of enrichment depends on crop response, which this tool does not model.',
     absent: 'the enrichment window is computed from a run'},
   {id: 'calendar', target: 'timeline-chart', title: 'Where the gaps occur',
-    body: 'The calendar plots day against hour for the selected month, with a shape as well as a colour in every cell so it survives printing and colour-vision differences. Hours are labelled in UTC, which keeps repeated local daylight-saving hours distinct. Select a cell to load that hour into the inspector below.',
+    body: 'The calendar plots local day against local hour for the selected local month, with a shape as well as a colour in every cell so it survives printing and colour-vision differences. On the night the clocks go back the repeated hour is drawn as two half cells, and the inspector\u2019s UTC stamp keeps them apart; the hour skipped in spring stays empty. Select a cell to load that hour into the inspector below.',
     absent: 'the calendar appears after you run scenarios'},
   {id: 'calendar-table', target: 'timeline-table', title: 'The same month as a table',
     body: 'Day by hour as text, for reading exact values and copying them into a report. Opening this disclosure is often faster than hunting across the grid when you are checking one specific date. Missing hours appear as gaps here too, never as favourable conditions.',
@@ -102,7 +102,7 @@ export const TOUR_STEPS = [
     absent: 'the hourly inspector needs a run to inspect'},
   {id: 'years-panel', target: 'years-panel', title: 'Median year, worst year, spread',
     body: 'With two or more weather years this reports median, worst and best attainment and cost per scenario, the spread between them, and a least-squares trend once five or more calendar years exist. The ranking line states in plain words whether the cost ranking held across those years. Ten years of gridded weather is climate evidence, not a forecast of next season.',
-    why: 'In the five-year example the cost ranking was not stable, producing two distinct orders. A single year would have hidden that.',
+    why: 'Across ten Tulsa weather years the cost ranking was not stable: two distinct orders appeared, the most common in eight of ten years (docs/regional-study.json). A single year would have hidden that.',
     absent: 'across-years needs a run covering two or more weather years'},
   {id: 'sites-panel', target: 'sites-panel', title: 'Which climate gives the most for free',
     body: 'Per site this reports median free-cooling hours, pad-effective hours, the binding constraint, the cheapest non-dominated strategy by median operating cost, and worst-year attainment. Additional sites are gridded weather at ZIP centroids priced at manual scenario prices, so treat their cost column as a common assumption rather than a local quote. Use this to rank climates, not to select a building.',
@@ -386,7 +386,9 @@ export function startTour(trigger, {resume = true} = {}) {
   return true;
 }
 
-function hideInvite() {$('tour-invite')?.remove();}
+// The invitation is fixed to the bottom of the viewport. While it is open the page gains matching bottom room, so
+// the last section (Sources & limits, the target of a #sources link) can scroll clear of it instead of sitting under it.
+function hideInvite() {$('tour-invite')?.remove(); document.body.classList.remove('tour-invite-open');}
 function invite() {
   if ($('tour-invite')) return;
   const box = document.createElement('aside');
@@ -396,6 +398,9 @@ function invite() {
   box.innerHTML = `<p><strong>First time here?</strong> A guided tour explains every panel, what each number means and what it does not prove. Leave it whenever you like; it resumes where you stopped.</p>
 <div class="tour-actions"><button type="button" id="tour-invite-start" class="primary">Take the tour</button><button type="button" id="tour-invite-dismiss" class="quiet">Not now</button></div>`;
   document.body.append(box);
+  document.body.classList.add('tour-invite-open');
+  document.body.style.setProperty('--tour-invite-room', `${Math.ceil(box.getBoundingClientRect().height) + 40}px`);
+  if (location.hash.length > 1) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
   $('tour-invite-start').addEventListener('click', () => {hideInvite(); startTour($('tour-button'), {resume: false});});
   $('tour-invite-dismiss').addEventListener('click', () => {write({dismissedAt: new Date().toISOString()}); hideInvite(); refreshButton(); $('tour-button')?.focus();});
 }

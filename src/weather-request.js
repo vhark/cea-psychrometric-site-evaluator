@@ -46,7 +46,10 @@ export function dateChunks(startDate,endDate,maxDays=30){
  for(let t=start;t<=end;t+=maxDays*DAY)chunks.push({startDate:new Date(t).toISOString().slice(0,10),endDate:new Date(Math.min(end,t+(maxDays-1)*DAY)).toISOString().slice(0,10)});
  return chunks;
 }
+// Open-Meteo is requested in 365-day UTC chunks over the local period padded by at least one UTC day at each end
+// (fetchOpenMeteo), so a calendar year takes two requests, not one. Visual Crossing uses 30 local days per request.
 export function requestEstimate(startDate,endDate,provider){
- const chunks=dateChunks(startDate,endDate,provider==='visualcrossing'?30:365);
+ const pad=(date,days)=>new Date(Date.parse(date+'T00:00:00Z')+days*DAY).toISOString().slice(0,10);
+ const chunks=provider==='visualcrossing'?dateChunks(startDate,endDate,30):provider==='openmeteo'?dateChunks(pad(startDate,-1),pad(endDate,1),365):dateChunks(startDate,endDate,365);
  return {hours:(Math.round((Date.parse(endDate)-Date.parse(startDate))/DAY)+1)*24,chunks:chunks.length,maxHoursPerChunk:provider==='visualcrossing'?744:8784};
 }

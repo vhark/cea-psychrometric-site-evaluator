@@ -2,11 +2,11 @@
 
 Purpose: state exactly what this tool does with your data, what leaves your browser, and how to report a problem.
 
-Status: current for model `0.3.0-screening`, scenario/run schema 2 and weather schema 1, 2026-09-15.
+Status: reviewed for model `0.3.0-screening`, scenario/run schema 2 and weather schema 1, 2026-09-15. The provider table was updated on 2026-11-10 for the five weather sources in the current `0.4.0-screening` application; the rest has not been re-reviewed for 0.4.0.
 
 ## The short version
 
-There is no application backend, account, login, API key or telemetry. Calculations run in your browser, in a Web Worker, on data you supplied or fetched. Facility, crop, equipment and cost inputs are not transmitted by the application. A weather retrieval does send the coordinates or station and date range you choose to the public provider, as listed below.
+There is no application backend, account, login or telemetry, and the application embeds no API key. Calculations run in your browser, in a Web Worker, on data you supplied or fetched. Facility, crop, equipment and cost inputs are not transmitted by the application. A weather retrieval does send the coordinates or station and date range you choose to the public provider, as listed below. A Visual Crossing key, if you choose that source, is your own: it is kept in this browser and sent only to Visual Crossing.
 
 ## What stays local
 
@@ -25,8 +25,11 @@ Weather requests happen when you trigger retrieval; font requests happen automat
 
 | Destination | When | What is sent |
 |---|---|---|
-| `power.larc.nasa.gov` (NASA POWER) | You press retrieve with the NASA provider selected | Latitude, longitude and the date range. No facility, crop, equipment or cost input. |
-| `mesonet.agron.iastate.edu` (Iowa Environmental Mesonet) | You press retrieve with the station provider selected | Station id and the date range, plus a separate NASA solar request. |
+| `archive-api.open-meteo.com` (Open-Meteo ERA5 archive) | You press retrieve with Open-Meteo selected (the default) | Latitude, longitude and the date range. No facility, crop, equipment or cost input. |
+| `power.larc.nasa.gov` (NASA POWER) | You press retrieve with NASA POWER selected, and for solar with either station source | Latitude, longitude and the date range. No facility, crop, equipment or cost input. |
+| `www.ncei.noaa.gov` (NOAA NCEI) | You press retrieve with the NCEI station source selected | Coordinates for the station search, then station id and the date range, plus a separate NASA solar request. |
+| `mesonet.agron.iastate.edu` (Iowa Environmental Mesonet) | You press retrieve with the IEM station source selected | Station id and the date range, plus a separate NASA solar request. |
+| `weather.visualcrossing.com` and `api.open-meteo.com` (elevation) | You press retrieve with Visual Crossing selected | Latitude, longitude, the date range and your own Visual Crossing key; the elevation request sends latitude and longitude only. |
 | `fonts.googleapis.com` and `fonts.gstatic.com` | Page load, and when an exported report is opened | A normal font request. Fonts are a presentation asset; the interface and the reports remain usable with system fallbacks if the request is blocked. |
 
 Coordinates for a ZIP come from the committed catalog served with the application, so a ZIP lookup does not reach a geocoding service. Importing weather does not contact a weather provider; static assets, catalogs and optional fonts can still be requested. Blocking outbound HTTP while serving the folder locally was tested: retrieval fails with an explicit error and no substitute weather is generated.

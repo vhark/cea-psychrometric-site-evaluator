@@ -38,7 +38,7 @@ Forecast issuance and retrieval are different clocks. `forecast.issuedAt` and `r
 
 ### Why Open-Meteo is the default
 
-For temperature and humidity it is about 36 times finer by area than NASA POWER, a whole year arrives in one request of about 411 KB in roughly two seconds, and it reaches back to 1940. It also reports elevation closer to reality: at Boulder its cell says 1,589 m where NASA POWER says 1,801 m, for a city at about 1,655 m. Station pressure follows elevation and humidity ratio follows pressure, so that gap is a bias in every moisture figure, not a cosmetic difference.
+For temperature and humidity it is about 31 times finer by area than NASA POWER (0.1° × 0.1° against 0.5° × 0.625°), a calendar year arrives in two requests in a few seconds (the adapter pads the local period by at least one UTC day at each end and requests at most 365 days at a time), and it reaches back to 1940. It also reports elevation closer to reality: at Boulder its cell says 1,589 m where NASA POWER says 1,801 m, for a city at about 1,655 m. Station pressure follows elevation and humidity ratio follows pressure, so that gap is a bias in every moisture figure, not a cosmetic difference.
 
 The adapter asks for `era5_land` and `era5` by name rather than letting the service blend them, because a value whose model is unknown cannot be reported honestly. Every hour records which model supplied each field.
 

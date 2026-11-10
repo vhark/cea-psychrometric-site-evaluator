@@ -1,32 +1,41 @@
 import {classifyWeather, localClock, schedule, outdoorDryingHour, weatherState, wetBulb, dewPoint, LATENT_HEAT} from './physics.js';
 
-// Aggregates outdoorDryingHour over the record: hours, days, removal potential and energy/cost per kg of
-// water against the scenario's condensing dehumidifier. Result rows carry the per-hour value from the
-// simulation; raw weather rows are evaluated here.
+// Aggregates outdoorDryingHour over the record: hours, days, removal potential, electricity and fuel per kg and
+// cost per kg of water against the scenario's condensing dehumidifier on the same hour's basis. Result rows carry
+// the per-hour value from the simulation; raw weather rows are evaluated here.
+// Outside air counts as lower energy only when it needs no more electricity and no more fuel per kg than the
+// dehumidifier, and less of at least one: kWh of fuel and kWh of electricity are not summed into one number.
 function outdoorDrying(hours, scenario) {
-  const buckets = () => ({hours: 0, potentialKg: 0, energyKWh: 0, cost: 0, days: new Map()});
+  const buckets = () => ({hours: 0, potentialKg: 0, electricKWh: 0, fuelKWh: 0, cost: 0, days: new Map()});
   const out = {coolDry: buckets(), coldDry: buckets(), hotDry: buckets()};
   const dehuKWhPerKg = scenario.dehuLPerKWh > 0 ? 1 / scenario.dehuLPerKWh : null;
   const dehuCostPerKg = dehuKWhPerKg === null ? null : dehuKWhPerKg * scenario.electricityPrice;
+  const heatingDehu = {hours: 0, returnedHeatKWhPerKg: 0, costPerKg: 0};
   let cheaperThanDehuHours = 0, lowerEnergyThanDehuHours = 0;
   for (const h of hours) {
     const d = h.outdoorDrying !== undefined ? h.outdoorDrying : outdoorDryingHour(h, scenario);
     if (!d) continue;
     const b = out[d.bucket];
-    b.hours++; b.potentialKg += d.potentialKgH; b.energyKWh += d.energyKWh; b.cost += d.cost;
+    b.hours++; b.potentialKg += d.potentialKgH; b.electricKWh += d.electricKWh; b.fuelKWh += d.fuelKWh; b.cost += d.cost;
     const date = localClock(h.time, scenario.timezone).date; b.days.set(date, (b.days.get(date) || 0) + 1);
-    if (dehuKWhPerKg !== null && d.energyKWh / d.potentialKgH < dehuKWhPerKg) lowerEnergyThanDehuHours++;
-    if (dehuCostPerKg !== null && d.cost / d.potentialKgH < dehuCostPerKg) cheaperThanDehuHours++;
+    if (!d.dehu || !(d.potentialKgH > 0)) continue;
+    if (d.dehu.returnedHeatKWhPerKg > 0) {heatingDehu.hours++; heatingDehu.returnedHeatKWhPerKg += d.dehu.returnedHeatKWhPerKg; heatingDehu.costPerKg += d.dehu.costPerKg;}
+    const electric = d.electricKWh / d.potentialKgH, fuel = d.fuelKWh / d.potentialKgH;
+    if (electric <= d.dehu.electricKWhPerKg && fuel <= d.dehu.fuelKWhPerKg && (electric < d.dehu.electricKWhPerKg || fuel < d.dehu.fuelKWhPerKg)) lowerEnergyThanDehuHours++;
+    if (d.cost / d.potentialKgH < d.dehu.costPerKg) cheaperThanDehuHours++;
   }
   for (const b of Object.values(out)) {
     const counts = [...b.days.values()];
     b.days = {atLeast1: counts.length, atLeast4: counts.filter(n => n >= 4).length};
     b.meanPotentialKgH = b.hours ? b.potentialKg / b.hours : null;
-    b.kWhPerKg = b.potentialKg ? b.energyKWh / b.potentialKg : null;
+    b.electricKWhPerKg = b.potentialKg ? b.electricKWh / b.potentialKg : null;
+    b.fuelKWhPerKg = b.potentialKg ? b.fuelKWh / b.potentialKg : null;
     b.costPerKg = b.potentialKg ? b.cost / b.potentialKg : null;
   }
-  return {...out, maxVentACH: scenario.maxVentACH, dehuKWhPerKg, dehuCostPerKg, cheaperThanDehuHours, lowerEnergyThanDehuHours,
-    basis: 'Maximum ventilation rate, fan power and heating of ventilation air to the target at scenario prices; sensible import in hot-dry hours is not costed here.'};
+  const dehuHeatingHours = heatingDehu.hours ? {hours: heatingDehu.hours, returnedHeatKWhPerKg: heatingDehu.returnedHeatKWhPerKg / heatingDehu.hours,
+    meanCostPerKg: heatingDehu.costPerKg / heatingDehu.hours} : null;
+  return {...out, maxVentACH: scenario.maxVentACH, dehuKWhPerKg, dehuCostPerKg, dehuHeatingHours, cheaperThanDehuHours, lowerEnergyThanDehuHours,
+    basis: 'Maximum ventilation rate, fan power and heating of ventilation air to the target at scenario prices; sensible import in hot-dry hours is not costed here. In heating hours the dehumidifier reference is credited with the purchased heating its returned heat displaces at the scenario heat source. Electricity and fuel are compared carrier by carrier, never summed.'};
 }
 
 const ENERGY_FIELDS = ['electricKWh','fuelKWh','waterL','condensateKg','lightKWh','heatingKWh','coolingKWh','dehuKWh','dehuHeatKWh','dehuRejectedHeatKWh','regenerationKWh','regenerationElectricKWh','regenerationFuelKWh','desiccantRemovedKg','desiccantHeatKWh','desiccantExportedHeatKWh','reheatKWh','rejectedHeatKWh','surfaceCondensateKg','cropWaterL','padWaterL','humidifierWaterL','unmetSensibleKWh','unmetMoistureKg',
